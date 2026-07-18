@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <sc-if value="{{coverIsInk}}" hint-placeholder-val="{{true}}">
+    <div data-screen-label="Cover" style="min-height:92vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 24px;gap:32px;">
+      <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">SISTEMA DE MARCA</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <div style="display:flex;gap:8px;"><div style="width:20px;height:20px;background:#D8A84E;transform:rotate(45deg);border-radius:2px;"></div></div>
+        <div style="display:flex;gap:8px;">
+          <div style="width:20px;height:20px;background:#C68A3D;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#C68A3D;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#C68A3D;transform:rotate(45deg);border-radius:2px;"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div style="width:20px;height:20px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+        </div>
+      </div>
+      <div style="font-family: 'Spectral',serif; font-weight: 700; font-size: 88px; letter-spacing: 6px; line-height: 1" data-om-label="INMERGE">INMERGE</div>
+      <div style="font-family:'Spectral',serif;font-weight:500;font-size:22px;color:#D8A84E;">Consultoría en datos y estrategia</div>
+      <div style="font-size:14px;color:#C9B79C;max-width:480px;line-height:1.6;">Inspirado en las culturas Mochica y Chimú</div>
+    </div>
+  </sc-if>
+  <sc-if value="{{coverIsTerracotta}}" hint-placeholder-val="{{false}}">
+    <div data-screen-label="Cover" style="min-height:92vh;background:#A8472B;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 24px;gap:32px;">
+      <div style="font-size:13px;letter-spacing:4px;color:#241A12;font-weight:600;">SISTEMA DE MARCA</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <div style="display:flex;gap:8px;"><div style="width:20px;height:20px;background:#241A12;transform:rotate(45deg);border-radius:2px;"></div></div>
+        <div style="display:flex;gap:8px;">
+          <div style="width:20px;height:20px;background:#F3EADA;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#F3EADA;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#F3EADA;transform:rotate(45deg);border-radius:2px;"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div style="width:20px;height:20px;background:#D8A84E;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#D8A84E;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#D8A84E;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#D8A84E;transform:rotate(45deg);border-radius:2px;"></div>
+          <div style="width:20px;height:20px;background:#D8A84E;transform:rotate(45deg);border-radius:2px;"></div>
+        </div>
+      </div>
+      <div style="font-family:'Spectral',serif;font-weight:700;font-size:88px;letter-spacing:6px;line-height:1;">INMERGE</div>
+      <div style="font-family:'Spectral',serif;font-weight:500;font-size:22px;color:#241A12;">Consultoría en datos y estrategia</div>
+      <div style="font-size:14px;color:#F3D9C8;max-width:480px;line-height:1.6;">Inspirado en las culturas Mochica y Chimú</div>
+    </div>
+  </sc-if>
+
+  <div data-screen-label="Concepto" style="max-width:1160px;margin:0 auto;padding:120px 48px;display:grid;grid-template-columns:280px 1fr;gap:64px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;line-height:1.15;">Concepto de marca</div>
+    <div style="display:flex;flex-direction:column;gap:40px;">
+      <p style="font-size:19px;line-height:1.75;color:#241A12;margin:0;max-width:640px;">Durante siglos, los pueblos Mochica y Chimú organizaron sistemas complejos de riego, metalurgia y comercio con una precisión que hoy reconoceríamos como ingeniería. Inmerge retoma ese legado: convierte la complejidad de la información pública, financiera y organizacional en decisiones claras para instituciones y empresas que operan en el Perú.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;padding-top:32px;border-top:1px solid #DDCBAE;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="width:10px;height:10px;background:#A8472B;transform:rotate(45deg);"></div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;">Frisos de Chan Chan</div>
+          <div style="font-size:14px;color:#7A6B58;line-height:1.6;">Repetición geométrica como estructura visual.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="width:10px;height:10px;background:#C68A3D;transform:rotate(45deg);"></div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;">Cerámica Moche</div>
+          <div style="font-size:14px;color:#7A6B58;line-height:1.6;">Formas depuradas y funcionales, sin ornamento excesivo.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="width:10px;height:10px;background:#D8A84E;transform:rotate(45deg);"></div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;">Metalurgia</div>
+          <div style="font-size:14px;color:#7A6B58;line-height:1.6;">El ocre y el oro como señal de valor y permanencia.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="ADN de Marca" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">ADN de marca</div>
+    <div style="font-size:14px;color:#7A6B58;margin-bottom:64px;max-width:640px;line-height:1.6;">Propósito, arquetipo y manifiesto — el fundamento antes del sistema visual.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-bottom:64px;">
+      <div>
+        <div style="font-size:13px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:12px;">PROPÓSITO Y PROMESA</div>
+        <p style="font-size:19px;line-height:1.75;margin:0 0 16px;">Convertimos datos públicos y organizacionales dispersos en decisiones verificables. Cada entregable cita su fuente y expone su método — sin cajas negras.</p>
+        <p style="font-size:15px;color:#7A6B58;line-height:1.7;margin:0;">Impacto real: instituciones que gastan mejor, empresas que reportan con evidencia, y ciudadanía con acceso a información hoy enterrada en PDFs y portales dispersos.</p>
+      </div>
+      <div>
+        <div style="font-size:13px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:12px;">ARQUETIPO</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:22px;margin-bottom:8px;">El Sabio Cercano</div>
+        <p style="font-size:15px;color:#7A6B58;line-height:1.7;margin:0;">Ni el genio inaccesible ni el vendedor efusivo. Inmerge explica antes de vender, muestra el cálculo antes de la conclusión, y responde en el mismo canal donde el cliente ya vive — WhatsApp incluido.</p>
+      </div>
+    </div>
+    <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:56px;">
+      <div style="font-size:13px;letter-spacing:2px;color:#D8A84E;font-weight:600;margin-bottom:20px;">MANIFIESTO</div>
+      <p style="font-family:'Spectral',serif;font-weight:500;font-size:26px;line-height:1.5;margin:0;max-width:820px;">No adivinamos con el dato: lo mostramos. Como los canales Chimú que movían agua con precisión hacia donde hacía falta, nosotros movemos información hacia quien decide. Sin jerga, sin humo, sin promesas que el dato no respalda.</p>
+    </div>
+  </div>
+
+  <div data-screen-label="Identidad" style="background:#EBDFC9;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:64px;">Identidad</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div style="background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;padding:64px;display:flex;align-items:center;justify-content:center;gap:20px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+            <div style="display:flex;gap:3px;"><div style="width:8px;height:8px;background:#D8A84E;transform:rotate(45deg);"></div></div>
+            <div style="display:flex;gap:3px;">
+              <div style="width:8px;height:8px;background:#C68A3D;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#C68A3D;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#C68A3D;transform:rotate(45deg);"></div>
+            </div>
+            <div style="display:flex;gap:3px;">
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+            </div>
+          </div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:30px;letter-spacing:3px;color:#241A12;">INMERGE</div>
+        </div>
+        <div style="background:#241A12;border-radius:4px;padding:64px;display:flex;align-items:center;justify-content:center;gap:20px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+            <div style="display:flex;gap:3px;"><div style="width:8px;height:8px;background:#D8A84E;transform:rotate(45deg);"></div></div>
+            <div style="display:flex;gap:3px;">
+              <div style="width:8px;height:8px;background:#C68A3D;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#C68A3D;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#C68A3D;transform:rotate(45deg);"></div>
+            </div>
+            <div style="display:flex;gap:3px;">
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div>
+            </div>
+          </div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:30px;letter-spacing:3px;color:#F3EADA;">INMERGE</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:200px 1fr;gap:48px;margin-top:24px;align-items:center;">
+        <div style="background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;padding:40px;display:flex;align-items:center;justify-content:center;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div style="display:flex;gap:4px;"><div style="width:12px;height:12px;background:#D8A84E;transform:rotate(45deg);"></div></div>
+            <div style="display:flex;gap:4px;">
+              <div style="width:12px;height:12px;background:#C68A3D;transform:rotate(45deg);"></div>
+              <div style="width:12px;height:12px;background:#C68A3D;transform:rotate(45deg);"></div>
+              <div style="width:12px;height:12px;background:#C68A3D;transform:rotate(45deg);"></div>
+            </div>
+            <div style="display:flex;gap:4px;">
+              <div style="width:12px;height:12px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:12px;height:12px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:12px;height:12px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:12px;height:12px;background:#A8472B;transform:rotate(45deg);"></div>
+              <div style="width:12px;height:12px;background:#A8472B;transform:rotate(45deg);"></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:14px;color:#7A6B58;line-height:1.7;">Símbolo: pirámide escalonada de tres niveles, referencia directa a las plataformas ceremoniales Chimú.<br>Espacio de protección mínimo: el ancho de un diamante alrededor de toda la marca.<br>Tamaño mínimo: 24px de alto en pantalla, 10mm en impresión.</div>
+      </div>
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-top:56px;margin-bottom:24px;">LOGO FLUIDO — DE VALLA A FAVICON</div>
+      <div style="display:flex;gap:40px;align-items:flex-end;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:220px;height:90px;background:#241A12;border-radius:4px;display:flex;align-items:center;justify-content:center;gap:12px;">
+            <div style="width:14px;height:14px;background:#D8A84E;transform:rotate(45deg);"></div>
+            <div style="font-family:'Spectral',serif;font-weight:600;font-size:22px;letter-spacing:2px;color:#F3EADA;">INMERGE</div>
+          </div>
+          <div style="font-size:11px;color:#7A6B58;text-align:center;">Lockup completo<br>Valla / portada / firma email</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:72px;height:72px;background:#241A12;border-radius:14px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:22px;height:22px;background:#D8A84E;transform:rotate(45deg);"></div>
+          </div>
+          <div style="font-size:11px;color:#7A6B58;text-align:center;">Isotipo<br>Ícono de app / redes</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:40px;height:40px;background:#241A12;border-radius:9px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:12px;height:12px;background:#D8A84E;transform:rotate(45deg);"></div>
+          </div>
+          <div style="font-size:11px;color:#7A6B58;text-align:center;">Favicon / avatar<br>WhatsApp — 40px mín.</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#7A6B58;line-height:1.7;margin-top:20px;max-width:720px;">Bajo 48px se retiene solo el diamante superior — nunca se comprime la pirámide completa. Sobre fondo de foto o textura, el isotipo va siempre en placa sólida de tinta (#241A12) o arena (#F3EADA), nunca flotando directo sobre imagen.</div>
+    </div>
+  </div>
+
+  <div data-screen-label="Color" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:64px;">Paleta cromática</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:160px;background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;"></div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Arena — base</div>
+        <div style="font-size:13px;color:#7A6B58;font-family:monospace;">#F3EADA</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:160px;background:#241A12;border-radius:4px;"></div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Tinta — texto / fondo oscuro</div>
+        <div style="font-size:13px;color:#7A6B58;font-family:monospace;">#241A12</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:160px;background:#C68A3D;border-radius:4px;"></div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Ocre — primario</div>
+        <div style="font-size:13px;color:#7A6B58;font-family:monospace;">#C68A3D</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:160px;background:#A8472B;border-radius:4px;"></div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Terracota — acento</div>
+        <div style="font-size:13px;color:#7A6B58;font-family:monospace;">#A8472B</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:160px;background:#D8A84E;border-radius:4px;"></div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Oro — metalurgia</div>
+        <div style="font-size:13px;color:#7A6B58;font-family:monospace;">#D8A84E</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:160px;background:#6B3A26;border-radius:4px;"></div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Barro — secundario</div>
+        <div style="font-size:13px;color:#7A6B58;font-family:monospace;">#6B3A26</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1160px;margin:0 auto;padding:0 48px 120px;">
+    <div style="padding-top:56px;border-top:1px solid #DDCBAE;">
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:8px;">VALIDACIÓN DE CONTRASTE — WCAG 3.0</div>
+      <div style="font-size:13px;color:#7A6B58;line-height:1.6;margin-bottom:24px;max-width:640px;">Paleta calibrada para pantalla móvil prolongada: la calidez se atenúa deliberadamente para reducir fatiga visual frente al ocre o terracota saturados.</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+        <div style="background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;padding:16px;">
+          <div style="font-size:12px;color:#241A12;">Tinta / Arena</div>
+          <div style="font-family:monospace;font-size:13px;color:#7A6B58;margin-top:6px;">13.8:1 — AAA</div>
+        </div>
+        <div style="background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;padding:16px;">
+          <div style="font-size:12px;color:#A8472B;">Terracota / Arena</div>
+          <div style="font-family:monospace;font-size:13px;color:#7A6B58;margin-top:6px;">4.6:1 — AA texto ≥14px</div>
+        </div>
+        <div style="background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;padding:16px;">
+          <div style="font-size:12px;color:#C68A3D;">Ocre / Arena</div>
+          <div style="font-family:monospace;font-size:13px;color:#7A6B58;margin-top:6px;">3.1:1 — solo texto ≥18px / UI</div>
+        </div>
+        <div style="background:#241A12;border-radius:4px;padding:16px;">
+          <div style="font-size:12px;color:#D8A84E;">Oro / Tinta</div>
+          <div style="font-family:monospace;font-size:13px;color:#C9B79C;margin-top:6px;">7.2:1 — AAA</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#7A6B58;margin-top:16px;">Regla: ocre nunca en texto de párrafo sobre arena — reservarlo a etiquetas grandes, íconos y acentos de UI.</div>
+    </div>
+  </div>
+
+  <div data-screen-label="Tipografía" style="background:#241A12;color:#F3EADA;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:64px;">Tipografía</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-bottom:64px;">
+        <div>
+          <div style="font-family:'Spectral',serif;font-weight:700;font-size:120px;line-height:1;color:#D8A84E;">Aa</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;margin-top:16px;">Spectral</div>
+          <div style="font-size:14px;color:#C9B79C;margin-top:4px;">Titulares, portadas y el logotipo.</div>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:120px;line-height:1;color:#F3EADA;">Aa</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;margin-top:16px;">IBM Plex Sans</div>
+          <div style="font-size:14px;color:#C9B79C;margin-top:4px;">Texto de lectura, datos e interfaces.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;border-top:1px solid #4A3826;padding-top:32px;">
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:56px;">Título H1</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:40px;">Título H2</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:28px;">Título H3</div>
+        <div style="font-family:'IBM Plex Sans',sans-serif;font-weight:400;font-size:17px;">Texto de párrafo — IBM Plex Sans Regular</div>
+        <div style="font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:13px;letter-spacing:2px;color:#D8A84E;">ETIQUETA EN VERSALES</div>
+      </div>
+      <div style="font-size:13px;color:#C9B79C;line-height:1.7;margin-top:32px;max-width:720px;">Peso y ancho variables: Spectral e IBM Plex Sans se cargan como fuentes variables — el peso sube ligeramente y el tracking se abre en pantallas pequeñas para mantener legibilidad sin cambiar de tipografía.</div>
+    </div>
+  </div>
+
+  <div data-screen-label="Identidad Dinámica" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:64px;">Identidad dinámica</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:40px;">
+      <div>
+        <div style="font-size:13px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:12px;">COMPORTAMIENTO DEL LOGO</div>
+        <p style="font-size:15px;color:#7A6B58;line-height:1.7;margin:0;">El diamante inferior (nivel más ancho de la pirámide) respira: 2% de escala cada 4s, easing suave, sin rebote. Solo en splash y estados de carga — nunca en el header estático de un documento.</p>
+      </div>
+      <div>
+        <div style="font-size:13px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:12px;">MICROINTERACCIONES</div>
+        <p style="font-size:15px;color:#7A6B58;line-height:1.7;margin:0;">Botones: 120ms ease-out, 8% más oscuro al tacto. Loaders: los cinco diamantes de la base se iluminan en secuencia, ciclo de 900ms. Menús: deslizan 200ms sin rebote — preciso, no juguetón.</p>
+      </div>
+      <div>
+        <div style="font-size:13px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:12px;">MARCA SONORA</div>
+        <p style="font-size:15px;color:#7A6B58;line-height:1.7;margin:0;">Dos notas graves de quena procesadas con ataque limpio (0.6s) + un tono metálico corto (0.4s), eco de la metalurgia Chimú. 2 segundos, para notificaciones de app y cierre de video.</p>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Voz y Conversación" style="background:#EBDFC9;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:64px;">Voz y conversación</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;">
+        <div>
+          <div style="font-size:13px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:20px;">TONO DE VOZ</div>
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            <div>
+              <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Experto, no arrogante</div>
+              <div style="font-size:14px;color:#7A6B58;line-height:1.6;">Explicamos el método sin condescendencia. Cero jerga técnica sin traducir.</div>
+            </div>
+            <div>
+              <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Peruano, sin forzar</div>
+              <div style="font-size:14px;color:#7A6B58;line-height:1.6;">Cercanía real, no jerga impostada. Sin modismos ni emojis para "parecer" local.</div>
+            </div>
+            <div>
+              <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Directo</div>
+              <div style="font-size:14px;color:#7A6B58;line-height:1.6;">La conclusión primero, el detalle después. Frases cortas, cero relleno corporativo.</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:13px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:20px;">PERSONA DEL BOT — WHATSAPP</div>
+          <div style="background:#241A12;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:12px;">
+            <div style="align-self:flex-start;background:#3A2B1C;color:#F3EADA;font-size:13px;padding:10px 14px;border-radius:10px 10px 10px 2px;max-width:88%;">Hola, soy el asistente de Inmerge. Reviso tu consulta y en menos de 2 min te digo si la resuelvo yo o te paso con el equipo. ¿En qué te ayudo?</div>
+            <div style="align-self:flex-start;background:#3A2B1C;color:#F3EADA;font-size:13px;padding:10px 14px;border-radius:10px 10px 10px 2px;max-width:88%;">Entiendo la demora — reviso el caso ahora mismo y te confirmo un tiempo real, no una excusa.</div>
+          </div>
+          <p style="font-size:13px;color:#7A6B58;line-height:1.6;margin-top:16px;">Regla no negociable: el bot se identifica como asistente automatizado desde el primer mensaje y nunca simula ser una persona. Ante frustración, reconoce el problema y ofrece una acción concreta — no una disculpa vacía.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="text-align:center;padding:20px 24px;font-size:13px;color:#7A6B58;">Motivo escalonado — inspirado libremente en las bandas geométricas de los frisos de Chan Chan.</div>
+
+  <sc-if value="{{showApplications}}" hint-placeholder-val="{{true}}">
+    <div data-screen-label="Aplicaciones" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:64px;">Aplicaciones</div>
+
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;margin-bottom:20px;color:#7A6B58;">Tarjeta de presentación</div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:80px;">
+        <div style="width:340px;height:194px;background:#241A12;border-radius:6px;padding:26px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 12px 24px -12px rgba(36,26,18,0.4);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="display:flex;gap:2px;"><div style="width:6px;height:6px;background:#D8A84E;transform:rotate(45deg);"></div></div>
+              <div style="display:flex;gap:2px;">
+                <div style="width:6px;height:6px;background:#C68A3D;transform:rotate(45deg);"></div>
+                <div style="width:6px;height:6px;background:#C68A3D;transform:rotate(45deg);"></div>
+                <div style="width:6px;height:6px;background:#C68A3D;transform:rotate(45deg);"></div>
+              </div>
+            </div>
+            <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;letter-spacing:2px;color:#F3EADA;">INMERGE</div>
+          </div>
+          <div style="font-size:9px;color:#D8A84E;letter-spacing:1px;">CONSULTORÍA EN DATOS Y ESTRATEGIA</div>
+        </div>
+        <div style="width:340px;height:194px;background:#F3EADA;border:1px solid #DDCBAE;border-radius:6px;padding:26px;display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">Nombre Apellido</div>
+            <div style="font-size:12px;color:#7A6B58;margin-top:2px;">Consultoría Estratégica</div>
+            <div style="font-size:11px;color:#7A6B58;margin-top:12px;line-height:1.8;">nombre@inmerge.pe<br>+51 999 999 999<br>Lima, Perú</div>
+          </div>
+          <div style="height:6px;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 5px,transparent 5px 10px);border-radius:2px;"></div>
+        </div>
+      </div>
+
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;margin-bottom:20px;color:#7A6B58;">Papelería / carta membretada</div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:80px;">
+        <div style="width:420px;height:594px;background:#F3EADA;border:1px solid #DDCBAE;box-shadow:0 12px 24px -12px rgba(36,26,18,0.25);padding:40px;display:flex;flex-direction:column;justify-content:space-between;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                <div style="display:flex;gap:2px;"><div style="width:5px;height:5px;background:#D8A84E;transform:rotate(45deg);"></div></div>
+                <div style="display:flex;gap:2px;">
+                  <div style="width:5px;height:5px;background:#C68A3D;transform:rotate(45deg);"></div>
+                  <div style="width:5px;height:5px;background:#C68A3D;transform:rotate(45deg);"></div>
+                  <div style="width:5px;height:5px;background:#C68A3D;transform:rotate(45deg);"></div>
+                </div>
+              </div>
+              <div style="font-family:'Spectral',serif;font-weight:600;font-size:14px;letter-spacing:1.5px;">INMERGE</div>
+            </div>
+            <div style="font-size:10px;color:#7A6B58;">Lima, 16 de julio de 2026</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="height:8px;width:70%;background:#DDCBAE;border-radius:2px;"></div>
+            <div style="height:8px;width:95%;background:#DDCBAE;border-radius:2px;"></div>
+            <div style="height:8px;width:88%;background:#DDCBAE;border-radius:2px;"></div>
+            <div style="height:8px;width:60%;background:#DDCBAE;border-radius:2px;"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="height:1px;background:#C68A3D;"></div>
+            <div style="font-size:10px;color:#7A6B58;text-align:center;">www.inmerge.pe · contacto@inmerge.pe · Lima, Perú</div>
+          </div>
+        </div>
+
+        <div style="width:420px;height:594px;background:#241A12;position:relative;overflow:hidden;box-shadow:0 12px 24px -12px rgba(36,26,18,0.4);">
+          <div style="position:absolute;inset:0;opacity:0.3;">
+            <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="report-cover-texture" shape="rect" placeholder="foto: sitio arqueológico / textura de adobe" style="width:100%;height:100%;display:block;" hint-size="100%,100%"></x-import>
+          </div>
+          <div style="position:absolute;inset:0;padding:40px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                <div style="display:flex;gap:2px;"><div style="width:5px;height:5px;background:#D8A84E;transform:rotate(45deg);"></div></div>
+                <div style="display:flex;gap:2px;">
+                  <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+                  <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+                  <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+                </div>
+              </div>
+              <div style="font-family:'Spectral',serif;font-weight:600;font-size:14px;letter-spacing:1.5px;color:#F3EADA;">INMERGE</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="font-size:12px;letter-spacing:2px;color:#D8A84E;">INFORME ESTRATÉGICO</div>
+              <div style="font-family:'Spectral',serif;font-weight:700;font-size:28px;color:#F3EADA;line-height:1.2;">Diagnóstico de Datos Públicos 2026</div>
+              <div style="font-size:13px;color:#C9B79C;">Preparado para [Cliente]</div>
+              <div style="height:6px;width:80px;background-color:#241A12;background-image:repeating-linear-gradient(45deg,#A8472B 0 4px,transparent 4px 8px);margin-top:8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;margin-bottom:20px;margin-top:80px;color:#7A6B58;">Puentes digitales</div>
+      <p style="font-size:14px;color:#7A6B58;line-height:1.7;max-width:640px;margin-bottom:24px;">Cada informe impreso y cada tarjeta llevan un código QR dinámico enlazado al dashboard interactivo o expediente vivo del proyecto — el papel es punto de entrada, no el entregable final.</p>
+      <div style="display:flex;gap:24px;align-items:center;">
+        <div style="width:100px;height:100px;background:#241A12;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:3px;width:64px;height:64px;">
+            <div style="background:#F3EADA;"></div><div style="background:#F3EADA;"></div><div style="background:#F3EADA;"></div><div style="background:#241A12;"></div><div style="background:#F3EADA;"></div>
+            <div style="background:#F3EADA;"></div><div style="background:#241A12;"></div><div style="background:#F3EADA;"></div><div style="background:#241A12;"></div><div style="background:#241A12;"></div>
+            <div style="background:#F3EADA;"></div><div style="background:#F3EADA;"></div><div style="background:#F3EADA;"></div><div style="background:#241A12;"></div><div style="background:#F3EADA;"></div>
+            <div style="background:#241A12;"></div><div style="background:#241A12;"></div><div style="background:#241A12;"></div><div style="background:#D8A84E;"></div><div style="background:#241A12;"></div>
+            <div style="background:#F3EADA;"></div><div style="background:#241A12;"></div><div style="background:#F3EADA;"></div><div style="background:#241A12;"></div><div style="background:#F3EADA;"></div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.7;max-width:480px;">Marco: el módulo central siempre lleva el diamante oro — nunca un QR genérico sin marca. Módulos en tinta sobre arena, sin gradientes ni logos incrustados que rompan el escaneo.</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;border-top:1px solid #DDCBAE;">Inmerge — Sistema de marca v1.0 — 2026</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;coverVariant&quot;: {&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;ink&quot;,&quot;options&quot;:[&quot;ink&quot;,&quot;terracotta&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Portada&quot;},
+  &quot;showApplications&quot;: {&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Secciones&quot;}
+}">
+class Component extends DCLogic {
+  renderVals() {
+    const variant = this.props.coverVariant ?? 'ink';
+    const showApplications = this.props.showApplications ?? true;
+    return {
+      coverIsInk: variant !== 'terracotta',
+      coverIsTerracotta: variant === 'terracotta',
+      showApplications
+    };
+  }
+}
+</script>
+</body>
+</html>

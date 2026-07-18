@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <div data-screen-label="Portada" style="min-height:52vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px;gap:20px;">
+    <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">FASE II · DOCUMENTO 1 DE 3</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:48px;">Ideal Client Profiles</div>
+    <div style="font-size:16px;color:#C9B79C;max-width:640px;line-height:1.6;">Tres segmentos con igual peso: gobiernos regionales/municipales, empresas y consultoras, investigadores y prensa.</div>
+  </div>
+
+  <sc-for list="{{segments}}" as="seg" hint-placeholder-count="3">
+    <div data-screen-label="{{seg.name}}" style="max-width:1160px;margin:0 auto;padding:96px 48px;border-top:1px solid #DDCBAE;">
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:8px;flex-wrap:wrap;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:34px;">{{seg.name}}</div>
+        <div style="font-size:13px;color:#7A6B58;">Decisor: {{seg.decisionMaker}} · Compra: {{seg.buyingProcess}}</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin:40px 0;">
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">RESPONSABILIDADES</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;color:#241A12;">
+            <sc-for list="{{seg.responsibilities}}" as="r" hint-placeholder-count="3"><li>{{r}}</li></sc-for>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">OBJETIVOS</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;color:#241A12;">
+            <sc-for list="{{seg.objectives}}" as="o" hint-placeholder-count="3"><li>{{o}}</li></sc-for>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">KPIs QUE LE IMPORTAN</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;color:#241A12;">
+            <sc-for list="{{seg.kpis}}" as="k" hint-placeholder-count="3"><li>{{k}}</li></sc-for>
+          </ul>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px;">
+        <div style="background:#EBDFC9;border-radius:4px;padding:24px;">
+          <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">DOLORES</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{seg.painPoints}}" as="p" hint-placeholder-count="3"><li>{{p}}</li></sc-for>
+          </ul>
+        </div>
+        <div style="background:#EBDFC9;border-radius:4px;padding:24px;">
+          <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">GATILLOS DE COMPRA</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{seg.buyingTriggers}}" as="t" hint-placeholder-count="3"><li>{{t}}</li></sc-for>
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-bottom:40px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:16px;">OBJECIONES Y RESPUESTA DE MARCA</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+          <sc-for list="{{seg.objections}}" as="obj" hint-placeholder-count="3">
+            <div style="border:1px solid #DDCBAE;border-radius:4px;padding:20px;">
+              <div style="font-family:'Spectral',serif;font-weight:600;font-size:14px;margin-bottom:6px;color:#A8472B;">"{{obj.title}}"</div>
+              <div style="font-size:13px;color:#7A6B58;line-height:1.6;">{{obj.desc}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-bottom:40px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">CRITERIOS DE DECISIÓN</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <sc-for list="{{seg.decisionCriteria}}" as="c" hint-placeholder-count="4">
+            <div style="background:#241A12;color:#F3EADA;border-radius:20px;padding:8px 18px;font-size:13px;">{{c}}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-bottom:40px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:16px;">CUSTOMER JOURNEY</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;">
+          <sc-for list="{{seg.journey}}" as="j" hint-placeholder-count="5">
+            <div>
+              <div style="font-family:'Spectral',serif;font-weight:600;font-size:14px;color:#A8472B;margin-bottom:6px;">{{j.stage}}</div>
+              <div style="font-size:12px;color:#7A6B58;line-height:1.6;">{{j.desc}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-bottom:40px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:16px;">EMPATHY MAP</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+          <sc-for list="{{seg.empathy}}" as="e" hint-placeholder-count="4">
+            <div style="background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:1px;color:#A8472B;font-weight:600;margin-bottom:8px;">{{e.quadrant}}</div>
+              <div style="font-size:13px;color:#241A12;line-height:1.7;">{{e.desc}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:28px 32px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#D8A84E;font-weight:600;margin-bottom:8px;">ESTRATEGIA DE RELACIÓN</div>
+        <div style="font-size:14px;line-height:1.7;">{{seg.relationshipStrategy}}</div>
+      </div>
+    </div>
+  </sc-for>
+
+  <div data-screen-label="Recomendaciones" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">SIGUIENTE — FASE II: SERVICE PORTFOLIO</div>
+      <p style="font-size:15px;color:#241A12;line-height:1.7;max-width:720px;margin:0;">Con los tres perfiles definidos, el siguiente documento traduce cada dolor y objetivo en un servicio concreto del portafolio — incluyendo el diagnóstico de entrada mencionado en Market Positioning.</p>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;">Inmerge — Ideal Client Profiles v1.0 — Fase II, Documento 1 de 3 — 2026</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const segments = [
+      {
+        name: 'Gobiernos regionales y municipales',
+        decisionMaker: 'Alcalde / Gerente Municipal (influye Gerente de Planeamiento y Presupuesto)',
+        buyingProcess: 'contratación directa en montos menores, licitación SEACE en mayores',
+        responsibilities: ['Ejecutar el presupuesto asignado (PIA/PIM) dentro del año fiscal', 'Rendir cuentas ante Contraloría y ciudadanía', 'Reportar avance de metas a MEF/PCM'],
+        objectives: ['Mejorar el % de ejecución presupuestal', 'Evitar observaciones en auditoría', 'Mostrar resultados tangibles a la población'],
+        kpis: ['% de ejecución presupuestal', 'N° de observaciones de Contraloría', 'Tiempo de respuesta a pedidos de información pública'],
+        painPoints: ['Presupuesto sub-ejecutado por falta de análisis oportuno', 'Sin personal técnico especializado en datos', 'Reportes desordenados y dispersos entre áreas', 'Presión mediática y social sobre gestión'],
+        buyingTriggers: ['Cambio de gestión o nueva autoridad electa', 'Observación reciente de Contraloría', 'Exigencia de transparencia o pedido de acceso a información'],
+        objections: [
+          { title: 'Somos muy chicos, ¿pueden con esto?', desc: 'Se responde con el diagnóstico de entrada de bajo riesgo y casos de estudio regionales acumulados.' },
+          { title: 'Un freelance lo hace más barato', desc: 'El costo real de un freelance es la falta de continuidad — Inmerge entrega sistema, no solo informe puntual.' },
+          { title: 'No sabemos cómo contratar algo así', desc: 'Inmerge asesora en la redacción de TDR y encaja en contratación directa o SEACE según el monto.' }
+        ],
+        decisionCriteria: ['Experiencia en sector público', 'Claridad del método', 'Cumplimiento de plazos', 'Encaje con normativa de contratación'],
+        journey: [
+          { stage: 'Conciencia', desc: 'Detecta el problema tras una observación o pedido de información.' },
+          { stage: 'Consideración', desc: 'Compara boutique BI, freelance e Inmerge.' },
+          { stage: 'Decisión', desc: 'Evalúa TDR, referencias y precio.' },
+          { stage: 'Onboarding', desc: 'Firma, kickoff y capacitación del equipo interno.' },
+          { stage: 'Advocacy', desc: 'Recomienda a otras municipalidades vía gremios.' }
+        ],
+        empathy: [
+          { quadrant: 'PIENSA Y SIENTE', desc: 'Miedo a una observación de Contraloría; presión política de mostrar resultados rápido.' },
+          { quadrant: 'VE', desc: 'Reportes en Excel desordenados, data que no cruza entre áreas.' },
+          { quadrant: 'DICE Y HACE', desc: 'Consulta a colegas de otras municipalidades, busca referencias en LinkedIn.' },
+          { quadrant: 'ESCUCHA', desc: 'Exigencias del MEF, quejas ciudadanas, prensa local.' }
+        ],
+        relationshipStrategy: 'Contacto directo por WhatsApp y visita presencial cuando el proyecto lo amerita. Contenido educativo sobre cumplimiento normativo con datos, y el diagnóstico de entrada como primer paso de bajo riesgo antes de un contrato mayor.'
+      },
+      {
+        name: 'Empresas y consultoras privadas',
+        decisionMaker: 'Gerente General / dueño de consultora / Gerente de Operaciones',
+        buyingProcess: 'contratación directa en la mayoría de casos, RFP interno en montos mayores',
+        responsibilities: ['Sostener rentabilidad y eficiencia operativa', 'Reportar resultados a directorio o socios', 'Escalar la operación sin inflar costos fijos'],
+        objectives: ['Decisiones más rápidas y menos "a ciegas"', 'Reducir dependencia de una sola persona clave', 'Escalar capacidad de análisis sin contratar planilla fija'],
+        kpis: ['Tiempo de generación de un reporte', 'Precisión de proyecciones', 'Costo por insight accionable'],
+        painPoints: ['Datos dispersos entre sistemas y hojas de cálculo', 'Dependencia de un único analista interno', 'Dificultad para escalar análisis cuando crece el negocio'],
+        buyingTriggers: ['Pérdida o rotación de un analista clave', 'Crecimiento que supera la capacidad interna', 'Necesidad de presentar data sólida a inversionistas o directorio'],
+        objections: [
+          { title: 'Un freelance cobra menos', desc: 'Un freelance no ofrece continuidad ni respaldo si falla — Inmerge entrega proceso documentado y reemplazable.' },
+          { title: '¿Tienen la escala para atendernos?', desc: 'El equipo pequeño se presenta como ventaja: acceso directo al consultor senior, no a un account manager junior.' },
+          { title: '¿Cómo protegen la confidencialidad de nuestra data?', desc: 'NDA estándar desde la primera reunión, sin fricción de proceso.' }
+        ],
+        decisionCriteria: ['Rapidez de respuesta', 'Discreción y confidencialidad', 'Calidad de visualización', 'Flexibilidad contractual'],
+        journey: [
+          { stage: 'Conciencia', desc: 'El dolor de datos dispersos empieza a costar dinero visible.' },
+          { stage: 'Consideración', desc: 'Compara boutique BI, freelance e Inmerge.' },
+          { stage: 'Decisión', desc: 'Evalúa propuesta ágil y referencias disponibles.' },
+          { stage: 'Onboarding', desc: 'Integración a sus sistemas bajo NDA.' },
+          { stage: 'Advocacy', desc: 'Referral directo a otras empresas de su rubro.' }
+        ],
+        empathy: [
+          { quadrant: 'PIENSA Y SIENTE', desc: 'Ansiedad por decidir sin data confiable; presión de directorio o inversionistas.' },
+          { quadrant: 'VE', desc: 'Dashboards desactualizados, reportes manuales en Excel.' },
+          { quadrant: 'DICE Y HACE', desc: 'Pregunta en su red de contactos, busca proveedores en LinkedIn.' },
+          { quadrant: 'ESCUCHA', desc: 'Presión de socios o inversionistas por métricas claras.' }
+        ],
+        relationshipStrategy: 'Propuesta ágil y comunicación ejecutiva directa. WhatsApp habilitado para consultas rápidas, NDA fácil de firmar desde la primera reunión.'
+      },
+      {
+        name: 'Investigadores y prensa',
+        decisionMaker: 'El propio investigador o periodista, o el editor de un medio',
+        buyingProcess: 'colaboración o análisis puntual pagado, más relación que compra formal',
+        responsibilities: ['Publicar con rigor y plazos editoriales', 'Verificar y citar fuentes correctamente', 'Encontrar ángulos noticiosos en datos públicos'],
+        objectives: ['Publicar historias basadas en evidencia verificable', 'Cumplir el plazo editorial sin sacrificar rigor', 'Construir credibilidad ante su audiencia'],
+        kpis: ['Tiempo de procesamiento de una base de datos', 'Precisión y citabilidad de la fuente', 'Alcance e impacto de la publicación'],
+        painPoints: ['Poco tiempo para procesar bases de datos crudas del Estado', 'Datos públicos mal estructurados o incompletos', 'Poca capacidad técnica interna para limpiar y cruzar bases'],
+        buyingTriggers: ['Investigación en curso con plazo ajustado', 'Necesidad de verificar una cifra oficial antes de publicar', 'Proyecto de datos abiertos o periodismo de datos'],
+        objections: [
+          { title: 'El presupuesto de un medio es bajo', desc: 'Tarifas diferenciadas y colaboraciones puntuales para construir relación de largo plazo con el gremio.' },
+          { title: 'Prefiero procesarlo yo mismo', desc: 'Inmerge ofrece apoyo puntual en el cuello de botella técnico, no reemplaza el trabajo editorial.' },
+          { title: '¿Van a sesgar el análisis?', desc: 'Transparencia total del método y la fuente es la promesa central de marca — verificable por el propio investigador.' }
+        ],
+        decisionCriteria: ['Independencia y neutralidad', 'Transparencia total del método', 'Rapidez de entrega'],
+        journey: [
+          { stage: 'Conciencia', desc: 'Encuentra una base de datos pública demasiado compleja para procesar solo.' },
+          { stage: 'Consideración', desc: 'Evalúa si pedir ayuda externa compromete su independencia.' },
+          { stage: 'Decisión', desc: 'Acuerda colaboración puntual o análisis pagado.' },
+          { stage: 'Onboarding', desc: 'Acceso a datos y acuerdo claro de atribución de fuente.' },
+          { stage: 'Advocacy', desc: 'Cita a Inmerge como fuente metodológica; boca a boca en el gremio.' }
+        ],
+        empathy: [
+          { quadrant: 'PIENSA Y SIENTE', desc: 'Presión de tiempo editorial; miedo a publicar un error verificable.' },
+          { quadrant: 'VE', desc: 'Bases de datos crudas, mal documentadas, en formatos inconsistentes.' },
+          { quadrant: 'DICE Y HACE', desc: 'Pide ayuda a colegas del gremio, publica pese a la incertidumbre técnica.' },
+          { quadrant: 'ESCUCHA', desc: 'Crítica pública inmediata si una cifra publicada resulta incorrecta.' }
+        ],
+        relationshipStrategy: 'Contenido técnico gratuito y notas de datos abiertos como puerta de entrada. Acceso rápido por WhatsApp y tarifas especiales o pro-bono ocasional para construir relación de largo plazo con el gremio periodístico.'
+      }
+    ];
+    return { segments };
+  }
+}
+
+</script>
+</body>
+</html>

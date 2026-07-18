@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <div data-screen-label="Portada" style="min-height:52vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px;gap:20px;">
+    <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">FASE III · DOCUMENTO 2 DE 3</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:48px;">Design System Strategy</div>
+    <div style="font-size:16px;color:#C9B79C;max-width:640px;line-height:1.6;">Principios visuales, no componentes de interfaz — la filosofía que cualquier producto de Inmerge debe respetar.</div>
+  </div>
+
+  <div data-screen-label="Principios" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:56px;">Principios de diseño</div>
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <sc-for list="{{principles}}" as="p" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:40px 220px 1fr;gap:24px;align-items:baseline;padding:24px 0;border-bottom:1px solid #DDCBAE;">
+          <div style="width:10px;height:10px;background:#A8472B;transform:rotate(45deg);"></div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;">{{p.title}}</div>
+          <div style="font-size:14px;color:#7A6B58;line-height:1.7;">{{p.desc}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-screen-label="Color" style="background:#EBDFC9;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Filosofía de color</div>
+      <p style="font-size:14px;color:#7A6B58;margin-bottom:40px;max-width:680px;line-height:1.6;">La paleta ya fijada en el Brand Book no cambia — esta es la regla de uso detrás de cada color.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+        <div style="background:#F3EADA;border-radius:4px;padding:24px;">
+          <div style="width:32px;height:32px;background:#241A12;border-radius:3px;margin-bottom:14px;"></div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:6px;">Tinta — autoridad</div>
+          <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Texto de lectura y fondos de máxima seriedad — informes, propuestas, secciones formales.</div>
+        </div>
+        <div style="background:#F3EADA;border-radius:4px;padding:24px;">
+          <div style="width:32px;height:32px;background:#A8472B;border-radius:3px;margin-bottom:14px;"></div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:6px;">Terracota — acción</div>
+          <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Único color reservado para llamadas a la acción, enlaces y acentos que piden atención.</div>
+        </div>
+        <div style="background:#F3EADA;border-radius:4px;padding:24px;">
+          <div style="width:32px;height:32px;background:#D8A84E;border-radius:3px;margin-bottom:14px;"></div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:6px;">Oro — jerarquía, no párrafo</div>
+          <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Solo etiquetas grandes, íconos y detalles sobre tinta — nunca texto de lectura (falla WCAG en arena).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Tipografia" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Sistema tipográfico</div>
+    <p style="font-size:14px;color:#7A6B58;margin-bottom:40px;max-width:680px;line-height:1.6;">Dos fuentes, dos trabajos — nunca se mezclan sus funciones.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:32px;">
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:64px;color:#241A12;">Aa</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-top:12px;">Spectral</div>
+        <div style="font-size:13px;color:#7A6B58;margin-top:4px;line-height:1.6;">Narrativa y autoridad: titulares, portadas, citas, wordmark. Nunca para datos o interfaz.</div>
+      </div>
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:32px;">
+        <div style="font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:64px;color:#241A12;">Aa</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-top:12px;">IBM Plex Sans</div>
+        <div style="font-size:13px;color:#7A6B58;margin-top:4px;line-height:1.6;">Datos e interfaz: cifras, tablas, botones, cuerpo de texto. Peso variable se ajusta en pantallas pequeñas sin cambiar de fuente.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Iconografia" style="background:#241A12;color:#F3EADA;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Iconografía</div>
+      <p style="font-size:14px;color:#C9B79C;margin-bottom:40px;max-width:680px;line-height:1.6;">Familia geométrica derivada directamente del isotipo — diamante sólido, nunca librerías de íconos genéricas (Material, Feather) mezcladas en el mismo producto.</p>
+      <div style="display:flex;gap:32px;align-items:flex-end;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:56px;height:56px;background:#3A2B1C;border-radius:8px;display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;background:#A8472B;transform:rotate(45deg);"></div></div>
+          <div style="font-size:11px;color:#C9B79C;">Diamante sólido</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:56px;height:56px;background:#3A2B1C;border-radius:8px;display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border:2px solid #D8A84E;transform:rotate(45deg);"></div></div>
+          <div style="font-size:11px;color:#C9B79C;">Diamante contorno — estado inactivo</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:56px;height:56px;background:#3A2B1C;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:3px;"><div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);"></div><div style="width:8px;height:8px;background:#D8A84E;transform:rotate(45deg);"></div></div>
+          <div style="font-size:11px;color:#C9B79C;">Par — navegación / progreso</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#7A6B58;margin-top:24px;">Regla: todo ícono nuevo se construye rotando o repitiendo el cuadrado a 45° — si necesita otra forma base, no pertenece al sistema.</div>
+    </div>
+  </div>
+
+  <div data-screen-label="Imagen" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Fotografía e ilustración</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+      <div style="background:#EBDFC9;border-radius:4px;padding:32px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#4A7A5C;font-weight:600;margin-bottom:12px;">GEOMETRÍA COMO RECURSO PRINCIPAL</div>
+        <p style="font-size:14px;line-height:1.7;margin:0;">Mientras no exista banco de imágenes propio, los patrones geométricos (frisos, diamantes, bandas) cubren todo espacio visual que en otra marca llevaría una foto de stock.</p>
+      </div>
+      <div style="background:#EBDFC9;border-radius:4px;padding:32px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:12px;">FOTO SOLO SI ES REAL Y VERIFICADA</div>
+        <p style="font-size:14px;line-height:1.7;margin:0;">Ninguna fotografía de stock genérica de "Perú" o "datos". Solo imagen real de un proyecto, equipo o sitio, con permiso confirmado — de lo contrario, se usa el placeholder geométrico.</p>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Layout" style="background:#EBDFC9;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Layout y espaciado</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;">
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:16px;">ESCALA DE ESPACIADO (BASE 8PX)</div>
+          <div style="display:flex;gap:10px;align-items:flex-end;">
+            <sc-for list="{{spacingScale}}" as="s" hint-placeholder-count="7">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <div style="width:20px;background:#241A12;border-radius:2px;height:{{s}}px;"></div>
+                <div style="font-size:10px;color:#7A6B58;">{{s}}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:16px;">PRINCIPIOS DE LAYOUT</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <li>Ancho máximo de contenido: 1160px en documentos, columna única en móvil.</li>
+            <li>El espacio en blanco es jerarquía, no vacío que rellenar.</li>
+            <li>Grid de 12 columnas en producto digital; nunca menos de 8px de gap.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Accesibilidad" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Accesibilidad — estándar alto, por defecto</div>
+    <p style="font-size:14px;color:#7A6B58;margin-bottom:32px;max-width:720px;line-height:1.6;">Un cliente de gobierno no puede permitirse un producto que excluye usuarios — la accesibilidad se valida en el diseño, no se corrige después de entregado.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:24px;color:#D8A84E;">AA mínimo</div>
+        <div style="font-size:13px;color:#C9B79C;margin-top:8px;line-height:1.6;">Contraste mínimo en todo producto digital entregado a cliente; AAA como objetivo en texto de lectura.</div>
+      </div>
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:24px;color:#D8A84E;">44px</div>
+        <div style="font-size:13px;color:#C9B79C;margin-top:8px;line-height:1.6;">Tamaño mínimo de cualquier objetivo táctil en móvil — sin excepciones en dashboards ejecutivos.</div>
+      </div>
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:24px;color:#D8A84E;">100%</div>
+        <div style="font-size:13px;color:#C9B79C;margin-top:8px;line-height:1.6;">De las combinaciones de color de la paleta ya validadas contra fondo — ver tabla en Brand Guidelines.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Componentes" style="background:#EBDFC9;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Filosofía de componentes</div>
+      <p style="font-size:14px;color:#241A12;line-height:1.7;max-width:760px;margin-bottom:24px;">Este documento fija principios, no una librería de componentes de interfaz — eso se define proyecto a proyecto sobre esta base. La única regla no negociable:</p>
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:32px 40px;">
+        <p style="font-family:'Spectral',serif;font-weight:600;font-size:19px;line-height:1.6;margin:0;">Ningún componente nuevo se agrega sin poder justificar su forma contra el diamante o el rectángulo de canal — si necesita una forma genérica de UI kit, no pertenece al sistema.</p>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Responsive" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Principios responsive</div>
+    <div style="font-size:14px;color:#7A6B58;margin-bottom:40px;max-width:680px;line-height:1.6;">Más del 80% del usuario peruano llega desde móvil — el diseño se piensa desde ahí, no se adapta después.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:8px;">Mobile-first real</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Se diseña primero para 375px de ancho; el escritorio es la expansión, no al revés.</div>
+      </div>
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:8px;">Peso variable, no solo tamaño</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.6;">La legibilidad en pantallas chicas se gana subiendo peso y tracking de la fuente variable, no solo agrandando el texto.</div>
+      </div>
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:8px;">Exportable a WhatsApp</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Todo hallazgo clave de un dashboard debe poder exportarse como imagen legible para compartir por chat.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Recomendaciones" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">SIGUIENTE — FASE III: EXECUTIVE REPORTING STYLE GUIDE</div>
+      <p style="font-size:15px;color:#241A12;line-height:1.7;max-width:720px;margin:0;">Con los principios visuales fijados, el siguiente documento aplica esta filosofía al producto insignia de Inmerge: dashboards, KPIs, gráficos y storytelling de datos.</p>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;">Inmerge — Design System Strategy v1.0 — Fase III, Documento 2 de 3 — 2026</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const principles = [
+      { title: 'La forma nace del diamante', desc: 'Todo elemento gráfico deriva geométricamente del isotipo — nunca de un ícono genérico de librería.' },
+      { title: 'El dato manda, no el adorno', desc: 'Cualquier elemento decorativo cede espacio si compite con la legibilidad de una cifra o un texto.' },
+      { title: 'Foto real o no hay foto', desc: 'Sin stock photography — geometría y color hacen el trabajo hasta que exista un banco de imágenes verificado.' },
+      { title: 'Accesible por defecto', desc: 'Contraste y tamaño de texto se validan en el diseño, no se corrigen después de entregado.' },
+      { title: 'Consistente en cualquier pantalla', desc: 'El mismo sistema sirve para una valla, un dashboard ejecutivo y un mensaje de WhatsApp.' }
+    ];
+    const spacingScale = [8, 16, 24, 32, 48, 64, 96];
+    return { principles, spacingScale };
+  }
+}
+
+</script>
+</body>
+</html>

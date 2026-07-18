@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <div data-screen-label="Portada" style="min-height:52vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px;gap:20px;">
+    <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">FASE V · DOCUMENTO 2 DE 2 — DOCUMENTO FINAL</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:48px;">Business Growth Roadmap</div>
+    <div style="font-size:16px;color:#C9B79C;max-width:640px;line-height:1.6;">Cinco etapas de madurez. Hoy: Etapa 1 — Fundación. Foco inmediato: los próximos 12 meses, con la trayectoria completa como visión de largo plazo.</div>
+  </div>
+
+  <div data-screen-label="Ubicacion" style="max-width:1160px;margin:0 auto;padding:80px 48px 40px;">
+    <div style="font-size:12px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">DÓNDE ESTÁ INMERGE HOY</div>
+    <div style="display:flex;gap:0;">
+      <sc-for list="{{stages}}" as="s" hint-placeholder-count="5">
+        <div style="flex:1;text-align:center;position:relative;">
+          <div style="height:6px;background:{{s.barColor}};"></div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:13px;margin-top:12px;color:{{s.labelColor}};">{{s.name}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <sc-for list="{{stages}}" as="stage" hint-placeholder-count="5">
+    <div data-screen-label="{{stage.name}}" style="max-width:1160px;margin:0 auto;padding:80px 48px;border-top:1px solid #DDCBAE;">
+      <div style="display:flex;align-items:baseline;gap:20px;margin-bottom:8px;flex-wrap:wrap;">
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;color:#A8472B;">ETAPA {{stage.number}}</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:30px;">{{stage.name}}</div>
+        <sc-if value="{{stage.isCurrent}}" hint-placeholder-val="{{false}}">
+          <div style="background:#241A12;color:#D8A84E;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;letter-spacing:1px;">ESTAMOS AQUÍ</div>
+        </sc-if>
+      </div>
+      <div style="font-size:13px;color:#7A6B58;margin-bottom:32px;">{{stage.timeframe}}</div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px;">
+        <div>
+          <div style="font-size:11px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">PRIORIDADES DE NEGOCIO</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{stage.business}}" as="b" hint-placeholder-count="2"><li>{{b}}</li></sc-for>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:11px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">MARKETING Y VENTAS</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{stage.marketingSales}}" as="m" hint-placeholder-count="2"><li>{{m}}</li></sc-for>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:11px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">CAPACIDAD DE CONSULTORÍA</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{stage.consulting}}" as="c" hint-placeholder-count="2"><li>{{c}}</li></sc-for>
+          </ul>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px;">
+        <div>
+          <div style="font-size:11px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">TECNOLOGÍA Y PROCESOS</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{stage.techProcess}}" as="t" hint-placeholder-count="2"><li>{{t}}</li></sc-for>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:11px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">DOCUMENTACIÓN</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{stage.documentation}}" as="d" hint-placeholder-count="2"><li>{{d}}</li></sc-for>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:11px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">ESTRUCTURA ORGANIZACIONAL</div>
+          <div style="font-size:13px;line-height:1.7;">{{stage.orgStructure}}</div>
+        </div>
+      </div>
+
+      <div style="background:#EBDFC9;border-radius:4px;padding:24px;">
+        <div style="font-size:11px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">KPIs DE ESTA ETAPA</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <sc-for list="{{stage.kpis}}" as="k" hint-placeholder-count="3">
+            <div style="background:#F3EADA;border-radius:20px;padding:6px 16px;font-size:12px;">{{k}}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+
+  <div data-screen-label="Cierre" style="background:#241A12;color:#F3EADA;padding:96px 48px;">
+    <div style="max-width:900px;margin:0 auto;text-align:center;">
+      <div style="font-size:12px;letter-spacing:2px;color:#D8A84E;font-weight:600;margin-bottom:20px;">DOCUMENTACIÓN CORPORATIVA — COMPLETA</div>
+      <p style="font-family:'Spectral',serif;font-weight:500;font-size:22px;line-height:1.6;margin:0 0 24px;">Con este documento se cierran las Fases I a V del roadmap. Queda un único pendiente, deliberadamente: el Case Study Framework, que se activa con el primer proyecto real que Inmerge pueda documentar.</p>
+      <div style="font-size:13px;color:#C9B79C;">Brand Architecture · Market Positioning · Ideal Client Profiles · Service Portfolio · Consulting Methodology · Corporate Communication Guide · Design System Strategy · Executive Reporting Style Guide · Corporate Portfolio · Proposal Template · Internal Knowledge System · Business Growth Roadmap</div>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;">Inmerge — Business Growth Roadmap v1.0 — Fase V, Documento 2 de 2 — 2026</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const stages = [
+      {
+        number: 'I', name: 'Fundación', isCurrent: true, timeframe: 'Meses 0-3 — donde está Inmerge hoy',
+        barColor: '#A8472B', labelColor: '#241A12',
+        business: ['Cerrar el primer diagnóstico de datos pagado', 'Fijar precio y alcance del servicio de entrada'],
+        marketingSales: ['Publicar los primeros 2-3 reportes gratuitos', 'Prospección directa por WhatsApp a gobiernos regionales'],
+        consulting: ['Fundador como único consultor', 'Entrega 100% artesanal, sin automatización'],
+        techProcess: ['Stack básico: Python, SQL, AWS free tier', 'Sin infraestructura de proyecto formal aún'],
+        documentation: ['Brand Book y sitio web ya completos', 'Metodología documentada, sin casos reales todavía'],
+        orgStructure: 'Una persona: el fundador cubre los 5 roles definidos en la metodología.',
+        kpis: ['1er cliente pagado', '3 reportes publicados', '10 conversaciones de WhatsApp calificadas']
+      },
+      {
+        number: 'II', name: 'Crecimiento', isCurrent: false, timeframe: 'Meses 3-9',
+        barColor: '#C68A3D', labelColor: '#7A6B58',
+        business: ['3-5 proyectos de implementación activos', 'Primer contrato de Sistema Vivo (retención)'],
+        marketingSales: ['Primeros casos de estudio citables con permiso del cliente', 'Presencia activa en LinkedIn con contenido técnico'],
+        consulting: ['Primer colaborador externo puntual (Data Scientist o Ingeniero de Cloud)', 'Plantillas de la Fase 02 del Knowledge System ya en uso real'],
+        techProcess: ['Pipelines reutilizables entre proyectos', 'Primer proceso formal de onboarding de cliente'],
+        documentation: ['Primeros Case Studies documentados', 'Lecciones aprendidas alimentando las plantillas'],
+        orgStructure: 'Fundador + 1 colaborador externo puntual por proyecto, sin planilla fija todavía.',
+        kpis: ['5 proyectos activos', '1 contrato de retención firmado', '2 casos de estudio publicados']
+      },
+      {
+        number: 'III', name: 'Expansión', isCurrent: false, timeframe: 'Meses 9-18 (más allá del horizonte de 12 meses)',
+        barColor: '#D8A84E', labelColor: '#7A6B58',
+        business: ['Ingreso recurrente de Sistema Vivo cubre costos fijos', 'Primer proyecto con un ministerio o corporativo grande'],
+        marketingSales: ['Primer proceso de licitación pública (SEACE) ganado', 'Alianzas con gremios de periodismo de datos'],
+        consulting: ['Equipo estable de 2-3 personas (Consultor Senior + Data Scientist)', 'Metodología ejecutada por más de una persona sin el fundador presente'],
+        techProcess: ['Estándares técnicos (carpeta 03) auditados y consistentes entre proyectos', 'Primer dashboard interno para gestión de proyectos propios'],
+        documentation: ['Migración de carpetas locales a herramienta compartida (ej. Notion)', 'Playbook de ventas formalizado, no solo intuición del fundador'],
+        orgStructure: 'Equipo de 2-3 personas con roles claros; el fundador empieza a delegar entrega directa.',
+        kpis: ['Ingreso recurrente > 40% del total', '1 proceso de licitación ganado', 'Equipo de 3 personas']
+      },
+      {
+        number: 'IV', name: 'Enterprise', isCurrent: false, timeframe: 'Año 2-3 — visión de largo plazo',
+        barColor: '#7A6B58', labelColor: '#7A6B58',
+        business: ['Portafolio de clientes institucionales recurrentes (varios ministerios/regiones)', 'Diversificación hacia empresas privadas grandes'],
+        marketingSales: ['Equipo comercial dedicado, no solo el fundador', 'Participación en eventos y conferencias de gobierno abierto'],
+        consulting: ['Equipo de 6-10 personas con especialización por servicio', 'Capacidad de correr 2-3 proyectos grandes en paralelo'],
+        techProcess: ['Plataforma propia de monitoreo de proyectos y calidad', 'Procesos de QA formales con checklist auditado por cliente'],
+        documentation: ['Base de conocimiento madura en herramienta dedicada con control de acceso real', 'Biblioteca de casos de estudio por sector'],
+        orgStructure: 'Equipo de 6-10 personas, con gerencias funcionales (Delivery, Comercial, Técnico).',
+        kpis: ['10+ clientes institucionales activos', 'Equipo de 8+ personas', 'Ingreso recurrente > 60%']
+      },
+      {
+        number: 'V', name: 'Liderazgo de Mercado', isCurrent: false, timeframe: 'Año 3-5 — visión de largo plazo',
+        barColor: '#241A12', labelColor: '#7A6B58',
+        business: ['Referente peruano en transparencia de datos públicos', 'Posible expansión a otros países de la región andina'],
+        marketingSales: ['Marca reconocida sin necesidad de prospección en frío', 'Inbound desde investigadores, prensa y gobiernos'],
+        consulting: ['Múltiples equipos especializados por industria (público, privado, investigación)', 'Programa formal de formación de nuevos consultores'],
+        techProcess: ['Producto propio de analítica como línea de ingreso adicional', 'Estándares técnicos certificables ante clientes institucionales'],
+        documentation: ['Sistema de conocimiento interno como ventaja competitiva formal', 'Publicaciones y research propio como autoridad de marca'],
+        orgStructure: 'Organización de 20+ personas con estructura por unidad de negocio.',
+        kpis: ['Presencia en 2+ países', 'Equipo de 20+ personas', 'Marca top-of-mind en consultoría de datos pública en Perú']
+      }
+    ];
+    return { stages };
+  }
+}
+
+</script>
+</body>
+</html>

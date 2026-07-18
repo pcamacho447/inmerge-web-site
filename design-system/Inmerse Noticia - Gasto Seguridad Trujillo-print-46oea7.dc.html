@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style data-omelette-print-defaults>
+@media print {
+  @page { margin: 0.5in; }
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+  figure, table, pre, blockquote, img, svg, tr, [class~="card" i] { break-inside: avoid; }
+  img, svg { max-width: 100%; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #EBDFC9; }
+    doc-page:not(:defined) { visibility: hidden; }
+    * { font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-feature-settings: "liga" 0, "clig" 0; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;display:flex;justify-content:center;padding:40px;background:#EBDFC9;">
+  <x-import component-from-global-scope="doc-page" from="./doc-page.js" size="letter" orientation="portrait" margin="0.9in" hint-size="850px,1100px">
+
+    <div slot="header" style="display:flex;align-items:center;gap:6px;font-size:9px;letter-spacing:1px;color:#7A6B58;">
+      <div style="width:7px;height:7px;background:#A8472B;transform:rotate(45deg);"></div>
+      <div style="font-family:'Spectral',serif;font-weight:700;letter-spacing:1.5px;color:#241A12;">INMERGE</div>
+      <div>· SEGURIDAD CIUDADANA · LA LIBERTAD</div>
+    </div>
+    <div slot="footer" style="display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#7A6B58;">
+      <div>Inmerge — El dato, a la vista.</div>
+      <div>inmerge.pe</div>
+    </div>
+
+    <div style="color:#241A12;padding-top:0.35in;">
+      <div style="font-size:11px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:14px;">REPORTE GRATUITO · TRUJILLO 2019–2025</div>
+      <h1 style="font-family:'Spectral',serif;font-weight:800;font-size:34px;line-height:1.15;margin:0 0 18px;">En Trujillo, el gasto en seguridad no sigue al delito</h1>
+      <p style="font-family:'Spectral',serif;font-style:italic;font-weight:500;font-size:17px;line-height:1.6;color:#3A2B1C;margin:0 0 20px;">Los distritos con más denuncias no son los que más plata destinan por vecino a serenazgo, cámaras y patrullaje. Y los que más gastan por habitante están, en varios casos, entre los de menor incidencia. No es un misterio de gestión: es cómo está armado el presupuesto público —y quién, dentro de él, hace qué.</p>
+      <div style="height:3px;width:64px;background:#A8472B;margin-bottom:28px;"></div>
+
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Hay una manera sencilla de mirar cuánto le importa la seguridad a un municipio: cuánto pone, por cada vecino, para pagar serenos, comprar patrulleros o instalar cámaras. Y hay otra, igual de sencilla, de mirar cuánta seguridad hace falta: cuántos delitos denuncia la Policía en ese mismo distrito. Cuando se ponen las dos cifras una al lado de la otra para los distritos de la provincia de Trujillo, entre 2019 y 2025, aparece algo que descoloca. Las dos listas no se parecen.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Pero antes de mirarlas de cerca conviene detenerse en algo que suele pasar inadvertido: en Trujillo no todos los que gastan en seguridad gastan en lo mismo, ni les toca hacerlo.</p>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">Quién pone qué</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">El gobierno regional de La Libertad también ejecuta el programa presupuestal de seguridad ciudadana, y lo hace de una forma radicalmente distinta a la de cualquier municipio. En 2025, ocho de cada diez soles que destinó a seguridad —el 81.2%— fueron a activos: patrulleros, cámaras de videovigilancia, equipamiento, mobiliario. Apenas el 1.7% fue a personal. Los municipios hacen casi lo contrario: en el agregado de los distritos de Trujillo, más de la mitad del gasto es planilla, y en las municipalidades provinciales de la región lo que se pone en sueldos (34.5%) y en bienes y servicios (36.5%) supera con holgura lo que va a activos (28.2%).</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Ese contraste se lee como un degradado. En un extremo, el gobierno regional, casi puro comprador de equipamiento. En el otro, distritos como Alto Trujillo, donde casi seis de cada diez soles (58.5%) son sueldos y apenas alrededor del 4% son activos. En el medio, cada municipio con su mezcla: Víctor Larco pone el 57.4% de su gasto en personal, Florencia de Mora el 45.7%, y la Municipalidad Provincial de Trujillo —que destina proporcionalmente más a capital que sus pares— baja su planilla al 33.6%. No hay una sola forma "municipal" de gastar en seguridad; hay un abanico. Pero todas están más cerca del sueldo que del equipamiento, y ninguna se parece al perfil del gobierno regional.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Esta diferencia no es casualidad ni resultado de una decisión de gestión: responde a cómo la ley de seguridad ciudadana del país reparte los roles entre niveles de gobierno. La Ley 27933, que creó el Sistema Nacional de Seguridad Ciudadana en 2003 y fue actualizada por el Decreto Legislativo N° 1454 en 2018, le asigna al gobierno regional una función de coordinación —a través de un comité regional, el CORESEC, que articula a los distintos actores— pero no le entrega personal operativo propio ni un cuerpo de agentes bajo su mando. Por eso su gasto no incluye planillas de operadores: se concentra en comprar el equipamiento que otros —la Policía Nacional o los propios municipios— terminan usando en el terreno.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Los municipios, en cambio, sí cuentan con personal propio dedicado a la seguridad: el serenazgo, un servicio que gestionan directamente como parte de sus propias competencias. Esa es la razón estructural por la que, a medida que se baja de nivel —de las municipalidades provinciales a los distritos—, el gasto se inclina cada vez más hacia el pago de sueldos y menos hacia la compra de bienes: son ellos, y no el gobierno regional, quienes ponen y sostienen al personal que patrulla el territorio día a día.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Un mismo programa se traduce, así, en dos tipos de ejecución muy distintos porque cada nivel de gobierno tiene, por diseño normativo, una función diferente: uno abastece de herramientas, el otro opera con gente en la calle. No es que un nivel gaste "mejor" o "peor" que el otro, ni la elección discrecional de una autoridad: es la división de funciones que la propia legislación estableció para cada uno. Aclarado ese reparto, se entiende por qué la comparación reveladora ocurre entre municipios: son ellos los que sostienen el patrullaje cotidiano, y es entre ellos donde tiene sentido preguntar si quien enfrenta más delito pone más plata por vecino. Ahí aparece la sorpresa.</p>
+
+      <div style="margin:8px 0 28px;break-inside:avoid;">
+        <div style="font-size:10px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:4px;">FIGURA 1</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;margin-bottom:14px;">Cómo gasta en seguridad cada actor: GORE vs. municipios, Trujillo (2025)</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{fig14}}" as="row" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:1.15in 1fr;gap:10px;align-items:center;">
+              <div style="font-size:11px;">{{row.name}}</div>
+              <div style="display:flex;height:20px;border-radius:2px;overflow:hidden;">
+                <div style="width:{{row.personal}}%;background:#241A12;display:flex;align-items:center;justify-content:center;"><sc-if value="{{row.showPersonal}}" hint-placeholder-val="{{true}}"><div style="font-size:9px;color:#F3EADA;font-weight:600;">{{row.personalLabel}}</div></sc-if></div>
+                <div style="width:{{row.bienes}}%;background:#C68A3D;display:flex;align-items:center;justify-content:center;"><sc-if value="{{row.showBienes}}" hint-placeholder-val="{{true}}"><div style="font-size:9px;color:#241A12;font-weight:600;">{{row.bienesLabel}}</div></sc-if></div>
+                <div style="width:{{row.activos}}%;background:#A8472B;display:flex;align-items:center;justify-content:center;"><sc-if value="{{row.showActivos}}" hint-placeholder-val="{{true}}"><div style="font-size:9px;color:#F3EADA;font-weight:600;">{{row.activosLabel}}</div></sc-if></div>
+                <div style="width:{{row.otros}}%;background:#C9B79C;"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#7A6B58;"><div style="width:10px;height:10px;background:#241A12;"></div>Personal</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#7A6B58;"><div style="width:10px;height:10px;background:#C68A3D;"></div>Bienes y servicios</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#7A6B58;"><div style="width:10px;height:10px;background:#A8472B;"></div>Activos (capital)</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#7A6B58;"><div style="width:10px;height:10px;background:#C9B79C;"></div>Pensiones</div>
+        </div>
+        <div style="font-size:9.5px;color:#7A6B58;margin-top:8px;">Fuente: SIAF-MEF, elaboración propia. PP 0030 Seguridad Ciudadana, función Orden Público y Seguridad, devengado 2025.</div>
+      </div>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">Las dos listas que no se parecen</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Tomemos tres casos. El distrito de Trujillo —el casco urbano, no la provincia— es el que registra la tasa de denuncias más alta de todos: 31 delitos por cada mil habitantes al año, en promedio. Florencia de Mora, su vecino, registra bastante menos: 23 por mil. Uno esperaría que el primero gastara sensiblemente más por habitante en cuidar a su gente. No es lo que pasa. En el promedio de esos siete años, Trujillo gastó 22.82 soles por vecino en seguridad y Florencia de Mora, 22.89. Siete céntimos de diferencia. Gastan casi lo mismo, pese a convivir con niveles de delito distintos.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">El contraste se vuelve más marcado con Víctor Larco. Es uno de los distritos con menos denuncias de la provincia —11 por cada mil habitantes, de los más bajos— y, sin embargo, es por lejos el que más plata pone por vecino: casi 83 soles en el promedio del periodo, y hasta 96.50 en 2025. Es decir, más de tres veces y media lo que destina por habitante el distrito de Trujillo, que tiene casi el triple de denuncias.</p>
+
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:26px 30px;margin:8px 0 24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-style:italic;font-size:16px;line-height:1.55;">"El gráfico de dispersión es una nube sin pendiente, sin esa línea ascendente que uno esperaría si más delito llamara a más gasto."</div>
+      </div>
+
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">No se trata de dos o tres casos escogidos con pinza. Cuando se cruzan los once distritos de Trujillo para los que la Policía separa las denuncias —siete años de datos cada uno, unas 76 mediciones distrito-año—, la relación entre gasto por habitante y tasa de delito es prácticamente inexistente. La correlación ronda el cero: apenas -0.06 con el delito total y -0.08 con los delitos contra el patrimonio, que son los más asociados al trabajo de serenazgo. Ni positiva ni claramente negativa: plana.</p>
+
+      <div style="margin:8px 0 28px;break-inside:avoid;">
+        <div style="font-size:10px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:4px;">FIGURA 2</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;margin-bottom:14px;">Gasto en seguridad vs. incidencia delictiva: distritos de Trujillo (2019-2025)</div>
+        <svg viewBox="0 0 560 340" style="width:100%;max-width:5.6in;">
+          <line x1="50" y1="10" x2="50" y2="290" stroke="#DDCBAE" stroke-width="1"></line>
+          <line x1="50" y1="290" x2="540" y2="290" stroke="#DDCBAE" stroke-width="1"></line>
+          <sc-for list="{{fig11Grid}}" as="gy" hint-placeholder-count="5">
+            <line x1="50" y1="{{gy.y}}" x2="540" y2="{{gy.y}}" stroke="#EBDFC9" stroke-width="1"></line>
+          </sc-for>
+          <text x="10" y="295" font-size="10" fill="#7A6B58">0</text>
+          <text x="4" y="15" font-size="10" fill="#7A6B58">90</text>
+          <text x="45" y="308" font-size="10" fill="#7A6B58">7</text>
+          <text x="520" y="308" font-size="10" fill="#7A6B58">32</text>
+          <sc-for list="{{fig11Others}}" as="pt" hint-placeholder-count="6">
+            <circle cx="{{pt.x}}" cy="{{pt.y}}" r="6" fill="#C9B79C"></circle>
+          </sc-for>
+          <circle cx="461" cy="238" r="8" fill="#241A12"></circle>
+          <text x="440" y="222" font-size="11" font-weight="700" fill="#241A12">Trujillo</text>
+          <circle cx="270" cy="242" r="8" fill="#D8A84E"></circle>
+          <text x="220" y="228" font-size="11" font-weight="700" fill="#241A12">Florencia de Mora</text>
+          <circle cx="118" cy="60" r="8" fill="#A8472B"></circle>
+          <text x="128" y="52" font-size="11" font-weight="700" fill="#A8472B">Víctor Larco</text>
+          <text x="230" y="325" font-size="11" fill="#7A6B58">Tasa de denuncias (por 1,000 hab., promedio 2019-2025) →</text>
+          <text x="-160" y="24" font-size="11" fill="#7A6B58" transform="rotate(-90)">Gasto per cápita PP 0030 (S/) →</text>
+        </svg>
+        <div style="font-size:9.5px;color:#7A6B58;margin-top:6px;">Fuente: SIAF-MEF y SIDPOL-PNP, elaboración propia. Alto Trujillo excluido (SIDPOL no desagrega su delito del distrito El Porvenir).</div>
+      </div>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">Lo que el dato dice, y lo que no</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Es tentador leer esa nube plana como un veredicto. Quien quiera argumentar que la plata está mal repartida encontrará munición: el distrito con más denuncias gasta como uno con bastante menos, y el que menos delito tiene es el que más invierte por vecino. Pero quien quiera argumentar lo contrario también tiene una historia disponible, y conviene tomarla en serio antes de cerrar el caso.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Esa segunda historia es la de la disuasión. Un distrito podría gastar mucho por habitante precisamente porque en algún momento decidió invertir con fuerza y de forma sostenida en serenazgo, cámaras y patrullaje, y ese esfuerzo constante podría ser parte de por qué su tasa de delito se mantiene baja. Bajo esa lectura, gasto alto y delito bajo no serían una contradicción, sino la misma historia contada desde dos ángulos. Víctor Larco encajaría en ese molde tan bien como en el otro.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">El problema es que, con la información disponible, no hay forma de saber cuál de las dos historias es la correcta. Se observa el gasto y el delito en el mismo periodo, sin ningún cambio de política aislado que permita distinguir qué vino antes ni qué causó qué. Una correlación cercana a cero no permite concluir ninguna de las dos cosas por separado, y menos ambas a la vez. No prueba que la plata haya sido puesta donde no hacía falta, ni prueba lo contrario.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Lo que sí se puede afirmar, sin forzar el dato, es más modesto y más sólido: no se observa que el gasto en seguridad de estos distritos se distribuya en proporción a la necesidad que miden las denuncias policiales. Es un hecho descriptivo, verificable, que no depende de ninguna teoría sobre causas. La plata sigue algún otro criterio; simplemente no es el mapa del delito.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Conviene, además, una cautela sobre el propio termómetro. Las denuncias no son el delito real, sino el que la gente reporta, y la disposición a acercarse a una comisaría cambia de un distrito a otro —por confianza en la Policía, por costumbre, por cercanía— de un modo que puede estar ligado al nivel socioeconómico. La tasa de denuncias es un piso de la incidencia real, no la incidencia misma. Aun así, el patrón es lo bastante consistente año tras año como para no ser un accidente de un dato aislado.</p>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">De qué depende, entonces, la plata</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Si el gasto no sigue al delito, ¿qué sigue? La pista está en un cuarto distrito. Alto Trujillo es el más pobre de este grupo y también el que menos destina por habitante a seguridad: 8.89 soles en 2025. Es un distrito joven —recién figura por separado en los registros presupuestales desde 2023, cuando se independizó de El Porvenir— y todavía sin una base de recaudación propia consolidada. No tiene una tasa de delito medible por sí sola, porque la Policía todavía cuenta sus denuncias junto con las de El Porvenir; pero su presupuesto sí se ve, y es minúsculo.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Entre Víctor Larco y Alto Trujillo hay una brecha de más de diez a uno en gasto por habitante. Y lo que mejor la explica no es cuánto delito enfrenta cada uno, sino cuánto puede recaudar cada uno por su cuenta. Ahí aparece el diseño de fondo del sistema, que vale la pena mirar sin buscar culpables.</p>
+
+      <div style="margin:8px 0 28px;break-inside:avoid;">
+        <div style="font-size:10px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:4px;">FIGURA 3</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;margin-bottom:14px;">Brecha en gasto per cápita en seguridad: distritos foco, Trujillo (2025)</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <sc-for list="{{fig12}}" as="d" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:1.15in 1fr 0.65in;gap:12px;align-items:center;">
+              <div style="font-size:12px;">{{d.name}}</div>
+              <div style="background:#EBDFC9;height:16px;border-radius:2px;"><div style="width:{{d.pct}}%;height:100%;background:{{d.color}};border-radius:2px;"></div></div>
+              <div style="font-size:12px;font-weight:600;">S/ {{d.value}}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:9.5px;color:#7A6B58;margin-top:10px;">Fuente: SIAF-MEF e INEI (proyecciones poblacionales), elaboración propia. Gasto nominal devengado (soles corrientes, 2025). PP 0030 Seguridad Ciudadana.</div>
+      </div>
+
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Que el gasto en seguridad de un distrito no varíe con su nivel real de delincuencia no es, en buena medida, una anomalía de gestión: es un resultado previsible de cómo el Estado peruano arma su presupuesto. El monto que una municipalidad puede destinar a serenazgo un año no se decide mirando cuántas denuncias hubo el mes pasado. Se fija con cerca de un año de anticipación, tomando como base lo gastado en los años previos, con ajustes graduales. No existe un mecanismo que reabra ese presupuesto si en marzo se dispara un pico de delitos en un distrito puntual.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">A eso se suma de dónde sale la plata. Buena parte de lo que un distrito puede poner en serenazgo depende de cuánto recauda por sí mismo: impuesto predial, alcabala, arbitrios. Un distrito con base tributaria robusta puede sostener una planilla de serenos amplia aunque su incidencia sea baja; uno con poca recaudación queda con las manos atadas aunque concentre más denuncias. No es casualidad que Trujillo distrito, que recauda lo más alto de la provincia, aparezca entre los que más margen tienen, ni que Alto Trujillo, el de recaudación más magra, aparezca al fondo. La necesidad de seguridad y la capacidad de pagarla son dos variables que no tienen por qué coincidir, y en Trujillo no coinciden.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Hay un tercer eslabón: tener presupuesto aprobado no es lo mismo que gastarlo. Entre la asignación y el patrullero en la calle media una cadena de trámites —contrataciones, procesos logísticos— que exige capacidad técnica instalada, en promedio mayor en municipios de más solvencia. Lo que un vecino ve reflejado en serenos y cámaras se explica mejor por la riqueza tributaria de su municipio que por cuántos delitos se denuncian en su cuadra.</p>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">No es que no gasten: es qué gasto se traba</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Vale una precisión, porque el problema no es que las municipalidades no gasten. La Municipalidad Provincial de Trujillo, por caso, ha ido mejorando su capacidad de ejecución del programa de seguridad ciudadana, aunque partiendo de muy abajo: de un 32.4% de avance en 2023 pasó a 55.0% en 2024 y a 76.4% en 2025.</p>
+
+      <div style="margin:8px 0 28px;break-inside:avoid;">
+        <div style="font-size:10px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:4px;">FIGURA 4</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;margin-bottom:16px;">Avance de ejecución PP 0030 — Municipalidad Provincial de Trujillo (2023-2025)</div>
+        <div style="display:flex;align-items:flex-end;gap:36px;height:150px;padding-left:8px;position:relative;">
+          <div style="position:absolute;left:0;right:0;bottom:{{fig13.metaBottom}}px;border-top:2px dashed #7A6B58;"></div>
+          <div style="position:absolute;right:0;bottom:{{fig13.metaBottom}}px;transform:translateY(-100%);font-size:10px;color:#7A6B58;">Meta referencial (75%)</div>
+          <sc-for list="{{fig13.bars}}" as="b" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+              <div style="font-size:12px;font-weight:700;">{{b.label}}</div>
+              <div style="width:60px;height:{{b.height}}px;background:{{b.color}};border-radius:2px 2px 0 0;"></div>
+              <div style="font-size:11px;color:#7A6B58;">{{b.year}}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:9.5px;color:#7A6B58;margin-top:14px;">Fuente: SIAF-MEF, elaboración propia. Devengado/PIM consolidado por rubros. Semáforo: verde ≥75%, naranja 60-74%, rojo &lt;60%. Montos nominales.</div>
+      </div>
+
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Y cuando se separa qué tipo de gasto avanza y cuál se atasca, el retrato se afina —y reaparece la distinción con la que abrió esta nota—. La planilla de serenazgo —el gasto corriente, los sueldos de los serenos— corre parejo y estable: alrededor del 89% de ejecución en 2024 y 88% en 2025. Lo que cuesta es el gasto de capital: patrulleros, cámaras, infraestructura. Ese es mucho más errático —pasó de 37.7% en 2024 a 91.6% en 2025— y, cuando finalmente se ejecuta, buena parte cae de golpe en diciembre, entre un cuarto y casi la mitad concentrado en el último mes del año. La operación cotidiana funciona; la inversión en capacidad nueva es la que se traba y se libera a los tirones. Es, justamente, el tipo de gasto en el que el gobierno regional concentra casi todo lo suyo.</p>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">Sin conclusión cómoda</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Queda un cuadro incómodo justamente porque no ofrece una moraleja fácil. Los distritos de Trujillo no reparten su gasto en seguridad siguiendo el mapa de las denuncias, y eso es verificable. Pero de ahí no se sigue ni que la plata esté echada en saco roto ni que exista un reparto evidentemente mejor esperando ser descubierto. Podría ser que la necesidad y el bolsillo no se encuentren; podría ser también que allí donde se ha gastado con constancia, ese gasto haya ayudado a mantener el delito a raya. Los mismos números admiten las dos lecturas, y el dato disponible no alcanza para elegir entre ellas.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 32px;">Lo que sí queda claro es de qué depende hoy la cifra que un vecino de Trujillo, de Florencia de Mora o de Víctor Larco ve traducida en serenos y cámaras: menos de cuántos delitos ocurren en su calle, y más de qué le toca hacer a cada nivel de gobierno dentro del sistema y de cuánto puede recaudar el municipio que la administra. No es la decisión de un funcionario en particular; es la lógica con la que está construido el sistema. Y esa lógica reparte primero los roles y recién después, si acaso, mira hacia dónde se denuncia.</p>
+
+      <div style="border-top:1px solid #DDCBAE;padding-top:18px;">
+        <div style="font-size:10px;letter-spacing:1px;color:#7A6B58;font-weight:600;margin-bottom:8px;">FUENTES Y METODOLOGÍA</div>
+        <p style="font-size:11px;color:#7A6B58;line-height:1.75;margin:0;">Gasto ejecutado del programa presupuestal 0030 (Reducción de delitos y faltas), SIAF-MEF, corte al 25 de junio de 2026. Denuncias policiales por distrito, SIDPOL-PNP, 2019-2025. Población proyectada, INEI. La composición de gasto por genérica (personal, bienes y servicios, activos, pensiones) corresponde al año fiscal 2025. Las cifras de gasto están en soles corrientes. Este texto es un spin-off periodístico de un reporte técnico de gestión más extenso sobre el PP 0030 en La Libertad — metodología completa disponible a solicitud, escríbenos por WhatsApp.</p>
+      </div>
+    </div>
+
+  </x-import>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const fig14 = [
+      { name: 'GORE La Libertad', personal: 2, bienes: 13, activos: 81, otros: 4, showPersonal: false, showBienes: true, bienesLabel: '13%', showActivos: true, activosLabel: '81%' },
+      { name: 'Víctor Larco', personal: 57, bienes: 12, activos: 31, otros: 0, showPersonal: true, personalLabel: '57%', showBienes: true, bienesLabel: '12%', showActivos: true, activosLabel: '31%' },
+      { name: 'Trujillo (MPT)', personal: 34, bienes: 49, activos: 16, otros: 1, showPersonal: true, personalLabel: '34%', showBienes: true, bienesLabel: '49%', showActivos: true, activosLabel: '16%' },
+      { name: 'Florencia de Mora', personal: 46, bienes: 45, activos: 9, otros: 0, showPersonal: true, personalLabel: '46%', showBienes: true, bienesLabel: '45%', showActivos: false, activosLabel: '' },
+      { name: 'Alto Trujillo', personal: 58, bienes: 37, activos: 4, otros: 1, showPersonal: true, personalLabel: '58%', showBienes: true, bienesLabel: '37%', showActivos: false, activosLabel: '' }
+    ];
+    const fig11Others = [
+      { x: 133, y: 176 }, { x: 152, y: 190 }, { x: 168, y: 168 }, { x: 190, y: 178 },
+      { x: 150, y: 246 }, { x: 213, y: 246 }, { x: 302, y: 165 }, { x: 118, y: 262 }
+    ];
+    const fig11Grid = [10, 66, 122, 178, 234].map(y => ({ y }));
+    const fig12 = [
+      { name: 'Víctor Larco', pct: 100, value: '96.50', color: '#A8472B' },
+      { name: 'Trujillo', pct: 35, value: '33.55', color: '#241A12' },
+      { name: 'Florencia de Mora', pct: 24, value: '23.42', color: '#D8A84E' },
+      { name: 'Alto Trujillo', pct: 9, value: '8.89', color: '#C68A3D' }
+    ];
+    const fig13 = {
+      metaBottom: 112,
+      bars: [
+        { label: '32.4%', height: 48, color: '#A8472B', year: '2023' },
+        { label: '55.0%', height: 82, color: '#C68A3D', year: '2024' },
+        { label: '76.4%', height: 114, color: '#4A7A5C', year: '2025' }
+      ]
+    };
+    return { fig14, fig11Others, fig11Grid, fig12, fig13 };
+  }
+}
+
+</script>
+<script>
+(async () => {
+  if (!document.title || !document.title.trim()) document.title = "Inmerse Noticia - Gasto Seguridad Trujillo";
+  // rAF raced with a short timeout: inside a cross-origin iframe (PrintMode),
+  // rAF can be throttled or paused even while the tab is focused, which would
+  // hang the scroll loop and never reach print(). Same pattern as
+  // buildExportSettleScript (export/shared.ts).
+  var raf = function () {
+    return Promise.race([
+      new Promise(function (r) { requestAnimationFrame(r); }),
+      new Promise(function (r) { setTimeout(r, 50); }),
+    ]);
+  };
+  var t0 = performance.now();
+  var mark = function (phase) {
+    var ms = Math.round(performance.now() - t0);
+    console.info('[autoprint]', phase, ms + 'ms');
+    try { parent.postMessage({ __omelette_autoprint: { phase: phase, ms: ms } }, '*'); } catch (e) {}
+  };
+  mark('start');
+  // Prepend so page-supplied @page / break rules (deck-stage's margin:0,
+  // author CSS) keep source-order precedence over the baseline.
+  const baseCss = document.createElement('style');
+  baseCss.textContent = "@media print {\n  figure, table { break-inside: avoid; }\n  *, *::before, *::after {\n    print-color-adjust: exact; -webkit-print-color-adjust: exact;\n    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;\n    animation-delay: -99s !important; animation-duration: .001s !important;\n    animation-iteration-count: 1 !important; animation-fill-mode: both !important;\n    animation-play-state: running !important; transition-duration: 0s !important;\n  }\n}";
+  document.head.prepend(baseCss);
+  if (document.readyState === 'loading') {
+    await new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
+  }
+  let ds = document.querySelector('deck-stage');
+  // whenDefined never resolves when nothing registers the element, so only
+  // await it when a <deck-stage> tag exists (and race a timeout regardless).
+  if (ds && !customElements.get('deck-stage')) {
+    try {
+      await Promise.race([
+        customElements.whenDefined('deck-stage'),
+        new Promise((r) => setTimeout(r, 3000)),
+      ]);
+    } catch (e) {}
+    ds = document.querySelector('deck-stage');
+  }
+  // dc-runtime assigns window.DCLogic at init and mounts into #dc-root on
+  // DOMContentLoaded; settle on that subtree so React has rendered before
+  // print(). Non-DC pages fall through to weighing body.
+  const isDc = !ds && 'DCLogic' in window;
+  const settleRoot = ds || (isDc ? document.getElementById('dc-root') : null) || document.body;
+  if (settleRoot) {
+    // Weigh only content children — skip script/style/template so inline
+    // Babel/CSS doesn't register as stable "content" before the framework
+    // has mounted anything.
+    const MEDIA = 'img,svg,canvas,video,picture,iframe,embed,object';
+    const weigh = () => {
+      let text = 0, media = 0;
+      for (const c of settleRoot.children) {
+        const t = c.tagName;
+        if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+        text += (c.textContent || '').trim().length;
+        media += c.querySelectorAll(MEDIA).length + (c.matches(MEDIA) ? 1 : 0);
+      }
+      return text + media * 100;
+    };
+    // "Non-zero and stable" alone is not sufficient to mean rendered: generic
+    // body can carry a static shell while async main content is pending, and
+    // #dc-root can carry the root DC's static text while child refs are still
+    // .sc-placeholder boxes. Gate generic on readyState 'complete', and never
+    // accept stability while a dc-runtime placeholder is present.
+    const isGeneric = settleRoot === document.body;
+    // A placeholder whose fetch failed (.sc-placeholder-error inside) keeps
+    // .sc-placeholder forever — don't wait on it. JS loop, not :has(), so an
+    // engine without :has() support can't throw out of the while and skip
+    // print() entirely.
+    var pendingPlaceholders = function () {
+      var all = settleRoot.querySelectorAll('.sc-placeholder'), n = 0;
+      for (var i = 0; i < all.length; i++)
+        if (!all[i].querySelector('.sc-placeholder-error')) n++;
+      return n;
+    };
+    const deadline = Date.now() + 15000;
+    let last = -1, stable = 0;
+    while (Date.now() < deadline) {
+      const n = weigh();
+      const ready =
+        (!isGeneric || document.readyState === 'complete') &&
+        pendingPlaceholders() === 0;
+      if (n > 0 && n === last && ready) { if (++stable >= 2) break; } else { stable = 0; }
+      last = n;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
+  mark('settle-done' + (settleRoot ? ' (errs=' + settleRoot.querySelectorAll('.sc-placeholder-error').length + ' pending=' + pendingPlaceholders() + ')' : ''));
+  // Project support.js may predate runtime default-seeding; push via bridge.
+  if (isDc && window.__dcSetProps && window.__dcRootName) {
+    try {
+      const dpEl = document.querySelector('script[data-dc-script]');
+      const meta = JSON.parse((dpEl && dpEl.getAttribute('data-props')) || '{}');
+      const bag = {};
+      for (const k in meta)
+        if (k[0] !== '$' && meta[k] && meta[k].default !== undefined)
+          bag[k] = meta[k].default;
+      if (Object.keys(bag).length) {
+        window.__dcSetProps(window.__dcRootName(), bag);
+        await new Promise((r) => setTimeout(r, 50));
+      }
+    } catch (e) {}
+  }
+  // Reveal content gated on scroll or visibility before printing. Lazy <img>,
+  // IntersectionObserver fade-ins, and collapsed <details> don't render while
+  // off-screen, so a long page would print with them blank or closed. Open
+  // every <details>, force native-lazy images eager, and scroll the document
+  // through its full height to trip lazy-load + IO; then wait (bounded) for the
+  // newly-triggered images. Inert for deck-stage (slides aren't scroll-gated).
+  try {
+    for (const d of document.querySelectorAll('details')) d.open = true;
+    for (const img of document.querySelectorAll('img[loading="lazy"]'))
+      img.loading = 'eager';
+    const scroller = document.scrollingElement || document.documentElement;
+    const full = Math.max(scroller.scrollHeight, document.body.scrollHeight);
+    const step = window.innerHeight || 800;
+    var scrollDeadline = Date.now() + 4000;
+    for (let y = 0; y <= full && Date.now() < scrollDeadline; y += step) {
+      window.scrollTo(0, y);
+      await raf();
+    }
+    window.scrollTo(0, 0);
+    await Promise.race([
+      Promise.all(
+        [...document.images].map((img) =>
+          img.complete
+            ? null
+            : new Promise((res) => {
+                img.addEventListener('load', res, { once: true });
+                img.addEventListener('error', res, { once: true });
+              })
+        )
+      ),
+      new Promise((r) => setTimeout(r, 4000)),
+    ]);
+  } catch (e) {}
+  mark('scroll-done');
+  try { await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 3000))]); } catch (e) {}
+  mark('fonts-done');
+  // Jump every animation to its end state so print() never captures a slide
+  // mid-entrance. Ordering matters: the 0s-transition style must be live
+  // BEFORE data-deck-active is set so attribute-keyed transitions don't
+  // start a (now-0s) run from the pre-active base.
+  const st = document.createElement('style');
+  st.textContent = '*,*::before,*::after{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;animation-play-state:running !important;transition-duration:0s !important}';
+  document.head.appendChild(st);
+  for (const d of document.querySelectorAll('deck-stage')) {
+    for (const c of d.children) {
+      const t = c.tagName;
+      if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+      c.setAttribute('data-deck-active', '');
+    }
+  }
+  // Re-append deck-stage's @page last so no author @page can add a margin and
+  // spill each full-bleed slide onto two sheets. Backstop for old copies.
+  if (ds) {
+    let pg = document.getElementById('deck-stage-print-page');
+    if (!pg) {
+      pg = document.createElement('style');
+      pg.textContent = '@page{size:' + (+ds.getAttribute('width') || 1920) +
+        'px ' + (+ds.getAttribute('height') || 1080) + 'px;margin:0}';
+    }
+    document.body.appendChild(pg);
+  }
+  try {
+    const sweep = () => {
+      for (const a of document.getAnimations()) {
+        try { a.finish(); } catch (e) {
+          try { a.currentTime = (a.effect && a.effect.getComputedTiming().duration) || 0; a.pause(); } catch (e2) {}
+        }
+      }
+    };
+    sweep();
+    await raf();
+    sweep();
+    await raf();
+  } catch (e) {}
+  // A document that owns its print CSS (the doc-page starter injects the
+  // meta at runtime; hand-rolled print designs author it) gets no automatic
+  // page geometry and keeps its forced breaks: strip the injected default
+  // @page — write time cannot see a runtime-injected meta — skip the frame
+  // override below, and skip the fakepage-flattening further down. What
+  // still applies: the print baseline and break-hygiene defaults (no @page
+  // in either; low specificity, so the document's own print CSS wins) and
+  // the break-inside relaxation on >page elements (avoid on those cannot
+  // be honored whoever authored it).
+  var ownsPrint = !!document.querySelector('meta[name="omelette-owns-print" i]');
+  if (ownsPrint) {
+    var dst = document.querySelector('style[data-omelette-print-defaults]');
+    if (dst && dst.textContent) {
+      dst.textContent = dst.textContent.replace(/@page\b[^{}]*\{[^}]*\}/, '');
+    }
+  }
+  // Size the PDF page to the rendered design unless the file opted into
+  // standard paper via @page{size:letter|A4|…} or declared print ownership
+  // via the meta above. Decks own their own @page.
+  // Wrappers (body, …) lose padding+margin so the frame sits at (0,0); the
+  // frame itself loses only margin — its padding is INSIDE the measured
+  // rect and must stay, or content shifts and leaves a gap at bottom/right.
+  var __m = null;
+  try { __m = (() => {
+  var STAMP = true;
+  var docEl = document.documentElement;
+  var doc = { width: docEl.scrollWidth, height: docEl.scrollHeight };
+  // Name-presence check, case-insensitive — the same contract as the
+  // instant-PDF path's runtime check in deck-stage-export.ts. The name is
+  // a string literal here because that file interpolates this script into
+  // its print script, so importing a shared constant from it would be a
+  // cycle; measure.test.ts pins the literal so the two cannot drift apart
+  // silently.
+  var ownsPrint = !!document.querySelector('meta[name="omelette-owns-print" i]');
+
+  var ds = document.querySelector('deck-stage');
+  if (ds) {
+    var dw = Number(ds.getAttribute('width')) || 1920;
+    var dh = Number(ds.getAttribute('height')) || 1080;
+    var n = typeof ds.length === 'number' ? ds.length : ds.children.length;
+    var idx = typeof ds.index === 'number' ? ds.index : 0;
+    var frames = [];
+    for (var i = 0; i < n; i++) frames.push({ left: 0, top: 0, width: dw, height: dh });
+    return { kind: 'deck', source: 'declared', doc: doc, frames: frames,
+      authored: frames.map(function(){return{width:true,height:true}}),
+      deck: { width: dw, height: dh, slideCount: n, index: idx },
+      signals: { paperPage: false, pxPage: false, ownsPrint: ownsPrint } };
+  }
+
+  // Declared kind: a doc-page tag names the kind outright, so no signal
+  // heuristics run (like the deck branch above, signals report false —
+  // they describe inferred classifications only). The tag alone is not
+  // trusted: the element must have upgraded (shadowRoot present), so a
+  // leftover tag whose script was deleted falls through to the heuristics
+  // that handle plain markup.
+  var stageSx = window.scrollX || 0, stageSy = window.scrollY || 0;
+  var dp = document.querySelector('doc-page');
+  if (dp && dp.shadowRoot) {
+    // Crop to the sheet, not the host — the desk around it is screen-only
+    // chrome that must not land in PNG exports.
+    var sheet = dp.shadowRoot.querySelector('.sheet');
+    var sr = (sheet || dp).getBoundingClientRect();
+    return { kind: 'paper-doc', source: 'declared', doc: doc,
+      frames: [{ left: sr.left + stageSx, top: sr.top + stageSy,
+        width: sr.width, height: sr.height }],
+      authored: [{ width: false, height: false }],
+      signals: { paperPage: false, pxPage: false, ownsPrint: ownsPrint } };
+  }
+  var paperPage = false, pxPage = false;
+  var eachRule = function (fn) {
+    for (var s = 0; s < document.styleSheets.length; s++) {
+      var rs; try { rs = document.styleSheets[s].cssRules; } catch (e) { continue; }
+      for (var r = 0; r < rs.length; r++) {
+        fn(rs[r]);
+        if (rs[r].cssRules) for (var n = 0; n < rs[r].cssRules.length; n++) fn(rs[r].cssRules[n]);
+      }
+    }
+  };
+  eachRule(function (r) {
+    if (r.type !== 6) return;
+    var m = /\bsize\s*:\s*([^;}]+)/i.exec(r.cssText || '');
+    if (!m) return;
+    if (/\b(letter|a[3-5]|legal|ledger)\b/i.test(m[1])) paperPage = true;
+    if (/\d+(?:\.\d+)?px\b/i.test(m[1])) pxPage = true;
+  });
+  var signals = { paperPage: paperPage, pxPage: pxPage, ownsPrint: ownsPrint };
+
+  var pxVal = function (v) {
+    var m = /^(\d+(?:\.\d+)?)px$/.exec(v || ''); return m ? +m[1] : 0;
+  };
+  var authoredPx = function (el, prop) {
+    if (pxVal(el.style[prop])) return true;
+    var attr = el.getAttribute(prop);
+    if (attr && /^\d+$/.test(attr)) return true;
+    var hit = false;
+    eachRule(function (r) {
+      if (hit || r.type !== 1 || !r.style) return;
+      try { if (el.matches(r.selectorText) && pxVal(r.style[prop])) hit = true; } catch (e) {}
+    });
+    return hit;
+  };
+
+  var el = document.body, rootPxW = false;
+  for (;;) {
+    var kids = [];
+    for (var c = 0; c < el.children.length; c++) {
+      var t = el.children[c].tagName;
+      if (t !== 'SCRIPT' && t !== 'STYLE' && t !== 'TEMPLATE') kids.push(el.children[c]);
+    }
+    if (kids.length !== 1 || !(kids[0] instanceof HTMLElement)) break;
+    if (STAMP) el.setAttribute('data-om-frame-wrap', '');
+    el = kids[0];
+    rootPxW = authoredPx(el, 'width');
+    if (rootPxW) break;
+  }
+  if (!rootPxW) rootPxW = authoredPx(el, 'width');
+
+  // @page{size:letter} alone is a flowing doc; with a px-width root it's a
+  // fixed sheet pretending to be paper — fall through and size to render.
+  if (paperPage && !rootPxW) {
+    return { kind: 'paper-doc', source: 'inferred', doc: doc, signals: signals,
+      frames: [{ left: 0, top: 0, width: doc.width, height: doc.height }],
+      authored: [{ width: false, height: false }] };
+  }
+
+  var sx = window.scrollX || 0, sy = window.scrollY || 0;
+  var rectOf = function (e) {
+    var r = e.getBoundingClientRect();
+    var oy; try { oy = getComputedStyle(e).overflowY; } catch (err) {}
+    var h = oy === 'visible' ? Math.max(r.height, e.scrollHeight || 0) : r.height;
+    return { left: r.left + sx, top: r.top + sy, width: r.width, height: h };
+  };
+
+  // Multi-frame: off unless the page opts in via data-om-multi-frame on the
+  // stop element — the explicit opt-in is what guards against card grids
+  // and pricing tables that match the geometry but aren't separate
+  // canvases. Two ways to name the frames, explicit first:
+  // 1. Descendants marked data-om-frame-export (the social-frames starter
+  //    marks each asset frame; shells/panels around them are presentation,
+  //    so nesting is expected). Document order.
+  // 2. Fallback, no marked descendants: direct children with an authored px
+  //    width AND height (the original geometry heuristic).
+  // Frames may be different sizes (a gallery mixes 1080×1920 stories with
+  // 728×90 banners); data-om-frame-label rides along for export filenames.
+  if (el.hasAttribute('data-om-multi-frame')) {
+    var visOk = function (e) {
+      var cs; try { cs = getComputedStyle(e); } catch (err) { return false; }
+      return cs.display !== 'none' && cs.visibility !== 'hidden' && cs.position !== 'fixed';
+    };
+    // A frame's crop is its VISUAL box — never the scrollHeight-inflated
+    // rect that rectOf computes for page roots. Shadow-DOM hover controls
+    // (image-slot's Replace bar parks 29px below its host) and similar
+    // escaping UI contribute scrollable overflow to the frame, and the
+    // inflated height both squashes the nominal-size resize and drags
+    // content below the frame into the crop. Zoom-independent; bit every
+    // slot-bearing frame.
+    var frameRectOf = function (e) {
+      var r = e.getBoundingClientRect();
+      return { left: r.left + sx, top: r.top + sy, width: r.width, height: r.height };
+    };
+    var pushCand = function (list, e) {
+      if (!visOk(e)) return;
+      var rc = frameRectOf(e);
+      if (rc.width < 2 || rc.height < 2) return;
+      var lbl = e.getAttribute('data-om-frame-label');
+      if (lbl) rc.label = lbl;
+      list.push(rc);
+    };
+    var cands = [];
+    var marked = el.querySelectorAll('[data-om-frame-export]');
+    if (marked.length) {
+      for (var mk = 0; mk < marked.length; mk++) pushCand(cands, marked[mk]);
+    } else {
+      for (var k = 0; k < el.children.length; k++) {
+        var ch = el.children[k];
+        if (!authoredPx(ch, 'width') || !authoredPx(ch, 'height')) continue;
+        pushCand(cands, ch);
+      }
+    }
+    if (cands.length >= 2) {
+      return { kind: 'multi-frame', source: 'inferred', doc: doc, signals: signals,
+        frames: cands, authored: cands.map(function(){return{width:true,height:true}}) };
+    }
+  }
+
+  if (STAMP) el.setAttribute('data-om-frame', '');
+  return { kind: 'single-canvas', source: 'inferred', doc: doc, signals: signals,
+    frames: [rectOf(el)],
+    authored: [{ width: rootPxW, height: authoredPx(el, 'height') }] };
+})(); } catch (e) {}
+  var frame = null;
+  if (!ownsPrint && __m && __m.kind === 'single-canvas') {
+    var f = __m.frames && __m.frames[0];
+    if (f && f.width >= 200 && f.height >= 200) {
+      frame = f;
+      var fst = document.createElement('style');
+      fst.textContent = '@media print{@page{size:' + Math.ceil(f.width) + 'px ' +
+        Math.ceil(f.height) + 'px;margin:0}' +
+        'html,body,[data-om-frame-wrap]{padding:0!important;margin:0!important;background:none!important}' +
+        '[data-om-frame]{margin:0!important}}';
+      document.body.appendChild(fst);
+    }
+  }
+  // Relax break-inside on oversized elements. An element taller than a
+  // printable page can't honor break-inside: avoid — browsers either overflow
+  // it or push it whole to the next page, leaving a blank gap, then break it
+  // anyway at an arbitrary point. After the final layout (content revealed,
+  // animations jumped), find elements taller than a page that still compute
+  // break-inside: avoid and reset them to auto, so the browser breaks them at
+  // their children's boundaries instead (children keep their own avoid). PAGE_PX
+  // is a conservative portrait estimate at 96 CSS px/in — Letter/A4 usable
+  // height minus our 0.5in margins — so only clearly-oversized elements are
+  // touched and under-page elements still stay whole. Skipped for decks (slides
+  // are sized to the page) and for fixed-size canvases (frame set, or an author
+  // px-based @page) — runs as before for flowing docs on letter/A4.
+  try {
+    if (!ds && !frame && !(__m && __m.signals && __m.signals.pxPage)) {
+      const PAGE_PX = 1024;
+      // Our print defaults add a real @page margin only when the source has
+      // no @page of its own; computed style can't tell us (it reports screen
+      // media), so read the injected rule directly.
+      const defaults = document.querySelector('style[data-omelette-print-defaults]');
+      const pageInset = /@page\s*\{[^}]*margin/.test(defaults ? defaults.textContent || '' : '');
+      const SEL = 'section,article,figure,table,pre,blockquote,[class~="card" i],[class~="page" i],[class~="sheet" i]';
+      for (const el of document.body.querySelectorAll(SEL)) {
+        if (el instanceof HTMLElement && el.offsetHeight > PAGE_PX) {
+          el.setAttribute('data-om-oversized', '');
+          // Fake-paged docs simulate sheets with over-tall break-after:page
+          // boxes; honoring the break spills half-blank pages and ends a
+          // colored box mid-sheet. Flow them, and (only when we own the page
+          // inset) drop the redundant padding/background via the rule below.
+          const cs = getComputedStyle(el);
+          // An owns-print doc's forced breaks are intentional sheet
+          // boundaries, never fake-paged simulation — don't strip them.
+          // The break-inside relaxation above still applies: avoid on a
+          // >page element is impossible to honor whoever authored it.
+          if (
+            !ownsPrint &&
+            (cs.breakAfter === 'page' || cs.pageBreakAfter === 'always')
+          ) {
+            el.setAttribute('data-om-fakepage', '');
+          }
+        }
+      }
+      const ost = document.createElement('style');
+      ost.textContent = '@media print{' +
+        '[data-om-oversized]{break-inside:auto !important;page-break-inside:auto !important}' +
+        '[data-om-fakepage]{break-after:auto !important;page-break-after:auto !important}' +
+        (pageInset ? '[data-om-fakepage]{padding:0 !important;background:none !important}' : '') +
+        '}';
+      document.head.appendChild(ost);
+    }
+  } catch (e) {}
+  // macOS Preview renders Skia-PDF Luminosity soft-masks as opaque grey boxes;
+  // swap the CSS that triggers them for Preview-safe forms.
+  try {
+    for (const el of document.body.querySelectorAll('*')) {
+      const cs = getComputedStyle(el);
+
+      if (cs.boxShadow !== 'none' && cs.filter === 'none') {
+        const outs = [], kept = [];
+        for (const s of cs.boxShadow.split(/,(?![^(]*[)])/)) {
+          const t = s.trim();
+          const m = t.match(/^(rgba?[(][^)]+[)]) (-?[0-9.]+px) (-?[0-9.]+px) ([0-9.]+px) -?[0-9.]+px$/);
+          if (m && parseFloat(m[4]) > 0) outs.push('drop-shadow(' + m[2] + ' ' + m[3] + ' ' + m[4] + ' ' + m[1] + ')');
+          else kept.push(t);
+        }
+        if (outs.length) {
+          el.style.setProperty('filter', outs.join(' '), 'important');
+          el.style.setProperty('box-shadow', kept.join(', ') || 'none', 'important');
+        }
+      }
+
+      const mask = cs.maskImage && cs.maskImage !== 'none' ? cs.maskImage : cs.webkitMaskImage;
+      if (mask && mask !== 'none' && cs.filter === 'none') el.style.setProperty('filter', 'opacity(1)', 'important');
+    }
+  } catch (e) {}
+  mark('print-calling');
+  setTimeout(() => { try { window.print(); } catch (e) {} }, 200);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <div data-screen-label="Portada" style="min-height:52vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px;gap:20px;">
+    <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">FASE IV · DOCUMENTO 2 DE 3</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:48px;">Proposal Template</div>
+    <div style="font-size:16px;color:#C9B79C;max-width:640px;line-height:1.6;">Dos variantes del mismo framework — propuesta comercial directa y TDR/licitación pública.</div>
+  </div>
+
+  <div data-screen-label="Variantes" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:48px;">Cuándo usar cada variante</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div style="background:#EBDFC9;border-radius:4px;padding:32px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:12px;">COMERCIAL DIRECTA</div>
+        <div style="font-size:14px;line-height:1.7;">Empresas, consultoras, investigadores y prensa, y contratación directa de gobiernos en montos menores. Tono cercano, rango de inversión visible desde el inicio.</div>
+      </div>
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:32px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#D8A84E;font-weight:600;margin-bottom:12px;">TDR / LICITACIÓN PÚBLICA (SEACE)</div>
+        <div style="font-size:14px;line-height:1.7;color:#C9B79C;">Procesos formales de gobiernos regionales/municipales con presupuesto referencial publicado. Estructura normada, responde punto por punto a los términos de referencia.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Framework" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Framework de 15 secciones</div>
+      <p style="font-size:14px;color:#7A6B58;margin-bottom:48px;max-width:680px;line-height:1.6;">Extensión estándar: 5-8 páginas, completa pero sin relleno. El orden no cambia entre variantes — solo el registro y el nivel de detalle en Inversión y Alcance.</p>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        <sc-for list="{{sections}}" as="s" hint-placeholder-count="15">
+          <div style="display:grid;grid-template-columns:32px 200px 1fr;gap:20px;padding:18px 0;border-bottom:1px solid #DDCBAE;align-items:baseline;">
+            <div style="font-family:'Spectral',serif;font-weight:700;color:#A8472B;">{{s.number}}</div>
+            <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;">{{s.name}}</div>
+            <div style="font-size:13px;color:#7A6B58;line-height:1.6;">{{s.guidance}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Inversion" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Cómo mostrar la inversión</div>
+    <p style="font-size:14px;color:#7A6B58;margin-bottom:32px;max-width:680px;line-height:1.6;">Rango, no cifra exacta — el precio final se cierra en la reunión de kickoff, una vez validado el alcance real.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div style="background:#EBDFC9;border-radius:4px;padding:28px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">EJEMPLO — COMERCIAL DIRECTA</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:20px;">S/ 8,000 – S/ 14,000</div>
+        <div style="font-size:12px;color:#7A6B58;margin-top:6px;">Según alcance final, a confirmar en reunión de kickoff.</div>
+      </div>
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:28px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#D8A84E;font-weight:600;margin-bottom:10px;">EJEMPLO — TDR / LICITACIÓN</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:20px;">Según presupuesto referencial</div>
+        <div style="font-size:12px;color:#C9B79C;margin-top:6px;">La oferta responde al monto ya publicado en el proceso — sin rango, se cotiza contra el TDR.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Gobernanza" style="background:#241A12;color:#F3EADA;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Gobernanza del proyecto — formal</div>
+      <p style="font-size:14px;color:#C9B79C;margin-bottom:40px;max-width:680px;line-height:1.6;">Todo proyecto define un Comité de Seguimiento desde la propuesta — no se improvisa a mitad de camino.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+        <div style="background:#3A2B1C;border-radius:4px;padding:24px;">
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:8px;">Comité de Seguimiento</div>
+          <div style="font-size:13px;color:#C9B79C;line-height:1.6;">Consultor Senior de Inmerge + contraparte designada por el cliente. Máximo 2 personas por lado.</div>
+        </div>
+        <div style="background:#3A2B1C;border-radius:4px;padding:24px;">
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:8px;">Cadencia</div>
+          <div style="font-size:13px;color:#C9B79C;line-height:1.6;">Reunión quincenal de avance, 30 minutos, con minuta escrita y acuerdos numerados.</div>
+        </div>
+        <div style="background:#3A2B1C;border-radius:4px;padding:24px;">
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:8px;">Escalación</div>
+          <div style="font-size:13px;color:#C9B79C;line-height:1.6;">Cualquier desviación de alcance o plazo se documenta y se escala al Comité antes de ejecutarse.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Recomendaciones" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">SIGUIENTE — FASE IV: CASE STUDY FRAMEWORK</div>
+      <p style="font-size:15px;color:#241A12;line-height:1.7;max-width:720px;margin:0;">Con la propuesta formalizada, el siguiente documento define cómo se documenta cada proyecto cerrado — la plantilla que convierte el primer diagnóstico de entrada en el primer caso de estudio citable.</p>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;">Inmerge — Proposal Template v1.0 — Fase IV, Documento 2 de 3 — 2026</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const sections = [
+      { number: 1, name: 'Resumen ejecutivo', guidance: '3 líneas: qué se propone, por qué importa, qué se recomienda decidir.' },
+      { number: 2, name: 'Situación actual', guidance: 'Contexto del cliente basado en lo observado en el diagnóstico previo, si existe.' },
+      { number: 3, name: 'Problema', guidance: 'El dolor específico en una frase — sin generalidades de industria.' },
+      { number: 4, name: 'Objetivos', guidance: 'Máximo 3, medibles, alineados a los KPIs del cliente.' },
+      { number: 5, name: 'Alcance', guidance: 'Qué incluye y qué no incluye — explícito, para evitar scope creep después.' },
+      { number: 6, name: 'Metodología', guidance: 'Referencia directa a las 5 fases del Método Acequia.' },
+      { number: 7, name: 'Entregables', guidance: 'Lista concreta, ligada al servicio del portafolio que corresponde.' },
+      { number: 8, name: 'Cronograma', guidance: 'Fechas por fase, no solo una fecha de entrega final.' },
+      { number: 9, name: 'Gobernanza', guidance: 'Comité de Seguimiento, cadencia y mecanismo de escalación (ver detalle abajo).' },
+      { number: 10, name: 'Roles', guidance: 'Quién de Inmerge y quién del cliente participa en cada fase.' },
+      { number: 11, name: 'Inversión', guidance: 'Rango de inversión en comercial directa; monto contra TDR en licitación pública (ver ejemplos abajo).' },
+      { number: 12, name: 'Supuestos', guidance: 'Condiciones que Inmerge asume ciertas — accesos, disponibilidad de información, plazos de respuesta del cliente.' },
+      { number: 13, name: 'Riesgos', guidance: 'Los 2-3 riesgos reales del proyecto, sin lista genérica de relleno.' },
+      { number: 14, name: 'Beneficios', guidance: 'Conectados directamente a los KPIs que le importan al decisor (ver Ideal Client Profiles).' },
+      { number: 15, name: 'Roadmap de implementación y próximos pasos', guidance: 'Qué pasa inmediatamente después de firmar — fecha de kickoff propuesta incluida.' }
+    ];
+    return { sections };
+  }
+}
+
+</script>
+</body>
+</html>

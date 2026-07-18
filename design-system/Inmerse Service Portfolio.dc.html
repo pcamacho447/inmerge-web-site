@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <div data-screen-label="Portada" style="min-height:52vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px;gap:20px;">
+    <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">FASE II · DOCUMENTO 2 DE 3</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:48px;">Service Portfolio</div>
+    <div style="font-size:16px;color:#C9B79C;max-width:640px;line-height:1.6;">Seis servicios que cubren el ciclo completo — de diagnóstico a operación sostenida.</div>
+  </div>
+
+  <div data-screen-label="Ciclo" style="max-width:1160px;margin:0 auto;padding:80px 48px;">
+    <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:24px;">EL CICLO COMPLETO</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0;">
+      <sc-for list="{{cycleSteps}}" as="step" hint-placeholder-count="6">
+        <div style="border-left:2px solid #A8472B;padding:0 16px 0 16px;">
+          <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg) translateX(-21px);margin-bottom:8px;"></div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:13px;line-height:1.4;margin-top:-8px;">{{step}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <sc-for list="{{services}}" as="svc" hint-placeholder-count="6">
+    <div data-screen-label="{{svc.name}}" style="max-width:1160px;margin:0 auto;padding:80px 48px;border-top:1px solid #DDCBAE;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;margin-bottom:16px;">
+        <div>
+          <div style="font-size:12px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:8px;">SERVICIO {{svc.number}}</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:30px;">{{svc.name}}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="background:#241A12;color:#D8A84E;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;">{{svc.maturity}}</div>
+          <div style="background:#EBDFC9;color:#7A6B58;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;">{{svc.pricingModel}}</div>
+        </div>
+      </div>
+      <p style="font-size:17px;line-height:1.7;color:#241A12;max-width:820px;margin:0 0 40px;">{{svc.summary}}</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;">
+        <div style="background:#EBDFC9;border-radius:4px;padding:24px;">
+          <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">PROBLEMA DE NEGOCIO</div>
+          <div style="font-size:14px;line-height:1.7;">{{svc.businessProblem}}</div>
+        </div>
+        <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:24px;">
+          <div style="font-size:12px;letter-spacing:1.5px;color:#D8A84E;font-weight:600;margin-bottom:10px;">VALOR DE NEGOCIO</div>
+          <div style="font-size:14px;line-height:1.7;color:#C9B79C;">{{svc.businessValue}}</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:32px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">CLIENTE IDEAL</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <sc-for list="{{svc.idealClient}}" as="ic" hint-placeholder-count="2">
+            <div style="border:1px solid #A8472B;color:#A8472B;border-radius:20px;padding:6px 16px;font-size:13px;">{{ic}}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-bottom:32px;">
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">ENTREGABLES</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{svc.deliverables}}" as="d" hint-placeholder-count="3"><li>{{d}}</li></sc-for>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">TECNOLOGÍAS</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <sc-for list="{{svc.technologies}}" as="t" hint-placeholder-count="3">
+              <div style="background:#EBDFC9;border-radius:3px;padding:4px 10px;font-size:12px;font-family:'IBM Plex Mono',monospace;">{{t}}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">PLAZO ESTIMADO</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;">{{svc.timeline}}</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;">
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">MÉTRICAS DE ÉXITO</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{svc.successMetrics}}" as="m" hint-placeholder-count="3"><li>{{m}}</li></sc-for>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">RESULTADOS ESPERADOS</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;">
+            <sc-for list="{{svc.expectedOutcomes}}" as="o" hint-placeholder-count="2"><li>{{o}}</li></sc-for>
+          </ul>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">RIESGOS</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;color:#7A6B58;">
+            <sc-for list="{{svc.risks}}" as="r" hint-placeholder-count="2"><li>{{r}}</li></sc-for>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:12px;letter-spacing:1.5px;color:#4A7A5C;font-weight:600;margin-bottom:10px;">EXTENSIONES / CROSS-SELL / UPSELL</div>
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:16px;color:#7A6B58;">
+            <sc-for list="{{svc.extensions}}" as="e" hint-placeholder-count="2"><li>{{e}}</li></sc-for>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+
+  <div data-screen-label="Recomendaciones" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">SIGUIENTE — FASE II: CONSULTING METHODOLOGY</div>
+      <p style="font-size:15px;color:#241A12;line-height:1.7;max-width:720px;margin:0;">Con los seis servicios definidos, el siguiente documento formaliza la metodología propia que los sostiene a todos — nombre, fases, roles, quality gates y criterios de éxito comunes.</p>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;">Inmerge — Service Portfolio v1.0 — Fase II, Documento 2 de 3 — 2026</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const cycleSteps = ['1. Diagnóstico', '2. Arquitectura de datos', '3. Producto analítico', '4. Gobierno de datos', '5. Capacitación en IA', '6. Sistema vivo'];
+    const services = [
+      {
+        number: '1',
+        name: 'Diagnóstico de Datos',
+        maturity: 'ENTRADA',
+        pricingModel: 'PRECIO FIJO — BAJO RIESGO',
+        summary: 'Evaluación inicial y acotada del estado real de los datos del cliente: fuentes, calidad, brechas y oportunidades — la puerta de entrada de bajo riesgo antes de cualquier proyecto mayor.',
+        businessProblem: 'El cliente sospecha que sus datos están dispersos o son poco confiables, pero no tiene un mapa claro de qué tan grave es el problema ni por dónde empezar.',
+        businessValue: 'Un mapa objetivo y citable del estado de sus datos, sin comprometerse todavía a un proyecto grande — reduce el riesgo percibido de contratar a Inmerge por primera vez.',
+        idealClient: ['Gobiernos regionales/municipales', 'Empresas y consultoras'],
+        deliverables: ['Inventario de fuentes de datos existentes', 'Informe de brechas y riesgos de calidad', 'Hoja de ruta priorizada de siguientes pasos'],
+        technologies: ['SQL', 'Python', 'NoSQL'],
+        timeline: '2-3 semanas',
+        successMetrics: ['N° de fuentes de datos mapeadas', 'N° de brechas críticas identificadas'],
+        expectedOutcomes: ['Cliente entiende con precisión su punto de partida', 'Base objetiva para decidir el siguiente servicio a contratar'],
+        risks: ['Cliente espera soluciones ya en esta fase, no solo diagnóstico', 'Acceso limitado a sistemas internos retrasa el mapeo'],
+        extensions: ['Puerta directa hacia Arquitectura de Datos en la Nube', 'Primer caso de estudio citable si el cliente autoriza su uso']
+      },
+      {
+        number: '2',
+        name: 'Arquitectura de Datos en la Nube',
+        maturity: 'FUNDACIONAL',
+        pricingModel: 'PRECIO FIJO POR ALCANCE',
+        summary: 'Diseño e implementación de la infraestructura de datos del cliente en AWS — desde ingesta y almacenamiento hasta los pipelines que alimentan reportes y dashboards.',
+        businessProblem: 'Los datos existen pero viven dispersos en hojas de cálculo, sistemas legados o bases sin estructura, sin un flujo confiable hacia donde se necesitan.',
+        businessValue: 'Una base técnica sólida y escalable que sostiene todos los servicios siguientes — sin esto, cualquier dashboard es solo una capa cosmética sobre datos frágiles.',
+        idealClient: ['Empresas y consultoras', 'Gobiernos regionales/municipales'],
+        deliverables: ['Pipelines de ingesta y transformación (ETL)', 'Modelo de datos documentado', 'Infraestructura desplegada en AWS'],
+        technologies: ['AWS', 'Python', 'SQL', 'NoSQL'],
+        timeline: '6-10 semanas según alcance',
+        successMetrics: ['Tiempo de actualización de datos (de manual a automatizado)', 'N° de fuentes integradas correctamente'],
+        expectedOutcomes: ['Flujo de datos automatizado y confiable', 'Base lista para dashboards o aplicaciones a medida'],
+        risks: ['Sistemas legados sin documentación alargan el trabajo', 'Dependencia de accesos y permisos del cliente'],
+        extensions: ['Habilita directamente el servicio de Dashboards Ejecutivos', 'Puede evolucionar a contrato de Sistema Vivo (mantenimiento)']
+      },
+      {
+        number: '3',
+        name: 'Dashboards y Aplicaciones Ejecutivas a Medida',
+        maturity: 'PRODUCTO PRINCIPAL',
+        pricingModel: 'PRECIO FIJO POR ALCANCE',
+        summary: 'Aplicaciones web con front y back end básico, alojadas en la nube, diseñadas según los servicios específicos que necesite cada cliente — desde un dashboard ejecutivo simple hasta una herramienta interna a medida.',
+        businessProblem: 'Las decisiones se toman con reportes estáticos, desactualizados o repartidos en múltiples archivos, sin una vista ejecutiva unificada y accesible desde cualquier dispositivo.',
+        businessValue: 'Un producto analítico vivo y accesible que el cliente y su equipo consultan directamente, sin depender de que alguien "les mande el Excel actualizado".',
+        idealClient: ['Gobiernos regionales/municipales', 'Empresas y consultoras'],
+        deliverables: ['Aplicación web desplegada en la nube (front + back end básico)', 'Dashboards ejecutivos con métricas priorizadas', 'Documentación de uso para el equipo del cliente'],
+        technologies: ['HTML', 'CSS', 'Python', 'AWS', 'SQL'],
+        timeline: '4-8 semanas según alcance',
+        successMetrics: ['Frecuencia de uso del dashboard por el equipo del cliente', 'Reducción de tiempo para generar un reporte ejecutivo'],
+        expectedOutcomes: ['Visibilidad en tiempo real de las métricas clave del cliente', 'Menos dependencia de reportes manuales'],
+        risks: ['Alcance mal definido puede crecer sin control ("scope creep")', 'Requiere mantenimiento continuo para no quedar obsoleto'],
+        extensions: ['Upsell natural hacia Sistema Vivo (mantenimiento y evolución continua)', 'Cross-sell hacia Capacitación en IA para que el equipo interno explote mejor la herramienta']
+      },
+      {
+        number: '4',
+        name: 'Gobierno y Calidad de Datos',
+        maturity: 'MADUREZ',
+        pricingModel: 'RETAINER MENSUAL',
+        summary: 'Estándares, documentación y procesos de trazabilidad que aseguran que los datos del cliente sigan siendo confiables y auditables después de que Inmerge entrega el sistema.',
+        businessProblem: 'Sin reglas claras de calidad y trazabilidad, los sistemas de datos se degradan con el tiempo — nadie sabe de dónde salió una cifra seis meses después de implementado.',
+        businessValue: 'Confianza sostenida en el tiempo: cada dato sigue siendo citable y defendible ante una auditoría, un directorio o un pedido de información pública.',
+        idealClient: ['Gobiernos regionales/municipales', 'Empresas y consultoras'],
+        deliverables: ['Diccionario de datos y estándares de calidad', 'Proceso documentado de trazabilidad por fuente', 'Reporte trimestral de salud de datos'],
+        technologies: ['SQL', 'NoSQL', 'Python'],
+        timeline: 'Continuo — revisión trimestral',
+        successMetrics: ['% de datos con fuente trazable', 'N° de incidencias de calidad detectadas y resueltas'],
+        expectedOutcomes: ['Datos que resisten una auditoría externa en cualquier momento', 'Menor dependencia de conocimiento tácito de una sola persona'],
+        risks: ['Requiere disciplina interna del cliente para mantenerse', 'Beneficio percibido es menos inmediato que un dashboard visible'],
+        extensions: ['Refuerza la venta de todos los demás servicios como "sello de calidad"', 'Puede combinarse con Sistema Vivo en un solo contrato de retención']
+      },
+      {
+        number: '5',
+        name: 'Capacitación en Herramientas de IA',
+        maturity: 'HABILITACIÓN DE EQUIPO',
+        pricingModel: 'PAQUETE POR SESIONES',
+        summary: 'Talleres prácticos para que el equipo del cliente use herramientas de IA como Claude en su trabajo diario — análisis, redacción de informes y automatización de tareas repetitivas.',
+        businessProblem: 'El cliente tiene acceso a herramientas de IA pero su equipo no sabe aplicarlas a su trabajo real, o las usa muy por debajo de su potencial.',
+        businessValue: 'Un equipo interno capaz de sostener y extender el trabajo de Inmerge entre proyectos, sin depender de un consultor externo para cada tarea pequeña.',
+        idealClient: ['Empresas y consultoras', 'Gobiernos regionales/municipales', 'Investigadores y prensa'],
+        deliverables: ['Talleres prácticos con casos reales del cliente', 'Guía de uso adaptada a sus flujos de trabajo', 'Sesión de seguimiento a 30 días'],
+        technologies: ['Claude', 'Python'],
+        timeline: '2-4 semanas',
+        successMetrics: ['% del equipo que adopta la herramienta después del taller', 'Reducción de tiempo en tareas repetitivas'],
+        expectedOutcomes: ['Equipo interno más autónomo y productivo', 'Relación continua con Inmerge más allá del proyecto original'],
+        risks: ['Adopción depende de la cultura interna del cliente', 'Requiere actualización si las herramientas de IA cambian rápido'],
+        extensions: ['Cross-sell natural tras cualquier otro servicio como cierre de proyecto', 'Puerta de entrada de bajo costo para investigadores y prensa']
+      },
+      {
+        number: '6',
+        name: 'Sistema Vivo — Mantenimiento y Evolución Continua',
+        maturity: 'RETENCIÓN',
+        pricingModel: 'RETAINER MENSUAL',
+        summary: 'Soporte continuo que mantiene actualizados los pipelines, dashboards y aplicaciones entregados — el sistema sigue vivo y relevante después del proyecto inicial.',
+        businessProblem: 'Los sistemas de datos entregados por un proyecto puntual se vuelven obsoletos en meses si nadie los actualiza cuando cambian las fuentes o las necesidades del cliente.',
+        businessValue: 'Ingreso recurrente para Inmerge y continuidad garantizada para el cliente — el sistema evoluciona con la organización en vez de quedar congelado el día de la entrega.',
+        idealClient: ['Gobiernos regionales/municipales', 'Empresas y consultoras'],
+        deliverables: ['Monitoreo y mantenimiento mensual de la infraestructura', 'Actualizaciones incrementales de dashboards y pipelines', 'Reporte mensual de salud del sistema'],
+        technologies: ['AWS', 'Python', 'SQL', 'R'],
+        timeline: 'Contrato continuo, revisión anual',
+        successMetrics: ['Uptime del sistema', 'Tiempo de respuesta ante incidencias'],
+        expectedOutcomes: ['Cliente retenido con ingreso recurrente y predecible', 'Sistema que sigue siendo confiable a medida que pasa el tiempo'],
+        risks: ['Requiere capacidad interna de Inmerge para atender varios contratos a la vez', 'Cliente puede subestimar el valor del mantenimiento frente al proyecto inicial'],
+        extensions: ['Base para renovar o ampliar el contrato con nuevos módulos', 'Fuente principal de referencias y casos de estudio a largo plazo']
+      }
+    ];
+    return { cycleSteps, services };
+  }
+}
+
+</script>
+</body>
+</html>

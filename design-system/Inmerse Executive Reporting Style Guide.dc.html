@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <div data-screen-label="Portada" style="min-height:52vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px;gap:20px;">
+    <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">FASE III · DOCUMENTO 3 DE 3</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:46px;">Executive Reporting Style Guide</div>
+    <div style="font-size:16px;color:#C9B79C;max-width:640px;line-height:1.6;">Estándares para el producto insignia de Inmerge: dashboards, KPIs, gráficos y storytelling de datos.</div>
+  </div>
+
+  <div data-screen-label="Dos Niveles" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:48px;">Dos niveles de dashboard</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:36px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#D8A84E;font-weight:600;margin-bottom:14px;">VISTA EJECUTIVA</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:20px;margin-bottom:10px;">Para el decisor final</div>
+        <ul style="font-size:14px;color:#C9B79C;line-height:1.8;margin:0;padding-left:16px;">
+          <li>Una sola pantalla, sin scroll ni filtros complejos</li>
+          <li>3 a 5 KPIs grandes, con meta y variación visibles</li>
+          <li>Cero jerga técnica — cada número lleva su conclusión al lado</li>
+        </ul>
+      </div>
+      <div style="background:#EBDFC9;border-radius:4px;padding:36px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:14px;">VISTA TÉCNICA</div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:20px;margin-bottom:10px;">Para el equipo operativo</div>
+        <ul style="font-size:14px;color:#241A12;line-height:1.8;margin:0;padding-left:16px;">
+          <li>Tablas filtrables y exportables por unidad, fuente o periodo</li>
+          <li>Detalle de trazabilidad — de dónde sale cada cifra</li>
+          <li>Acceso desde el mismo sistema, un clic más profundo que la vista ejecutiva</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Jerarquia" style="background:#EBDFC9;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Jerarquía de visualización</div>
+      <p style="font-size:14px;color:#7A6B58;margin-bottom:32px;max-width:680px;line-height:1.6;">El título de un gráfico es la conclusión, no la descripción de lo que contiene.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div style="background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;padding:28px;">
+          <div style="font-size:12px;letter-spacing:1.5px;color:#4A7A5C;font-weight:600;margin-bottom:10px;">ASÍ SÍ</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:17px;">"La ejecución presupuestal cayó 12% en abril"</div>
+        </div>
+        <div style="background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;padding:28px;">
+          <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">ASÍ NO</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:17px;">"Ejecución presupuestal mensual"</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#7A6B58;margin-top:20px;">Orden fijo en todo reporte: insight escrito → gráfico que lo respalda → fuente citada al pie. Nunca al revés.</div>
+    </div>
+  </div>
+
+  <div data-screen-label="Repertorio" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:48px;">Repertorio de visualización</div>
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <sc-for list="{{chartTypes}}" as="ch" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:180px 1fr 1fr;gap:24px;padding:24px 0;border-bottom:1px solid #DDCBAE;align-items:baseline;">
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:17px;">{{ch.name}}</div>
+          <div style="font-size:13px;color:#7A6B58;line-height:1.6;"><strong style="color:#241A12;">Uso:</strong> {{ch.use}}</div>
+          <div style="font-size:13px;color:#7A6B58;line-height:1.6;"><strong style="color:#A8472B;">Regla:</strong> {{ch.rule}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-screen-label="Storytelling" style="background:#241A12;color:#F3EADA;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Data storytelling — según el pedido del cliente</div>
+      <p style="font-size:14px;color:#C9B79C;margin-bottom:40px;max-width:680px;line-height:1.6;">El registro se ajusta al contexto: contenido de difusión gratuita puede ser narrativo, un informe pagado va directo si el cliente lo pide.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div style="background:#3A2B1C;border-radius:4px;padding:32px;">
+          <div style="font-size:12px;letter-spacing:1.5px;color:#D8A84E;font-weight:600;margin-bottom:14px;">NARRATIVO — CONTENIDO GRATUITO / DIFUSIÓN</div>
+          <p style="font-size:14px;line-height:1.8;color:#F3EADA;margin:0;font-style:italic;">"En 2025, tres de cada diez soles del presupuesto regional para agua potable quedaron sin ejecutar. Cruzamos los reportes del MEF con las metas físicas de cada proyecto para entender por qué — y encontramos un patrón que se repite en doce regiones."</p>
+        </div>
+        <div style="background:#3A2B1C;border-radius:4px;padding:32px;">
+          <div style="font-size:12px;letter-spacing:1.5px;color:#D8A84E;font-weight:600;margin-bottom:14px;">DIRECTO — A PEDIDO DEL CLIENTE</div>
+          <p style="font-size:14px;line-height:1.8;color:#F3EADA;margin:0;">Ejecución de agua potable 2025: 71% del presupuesto asignado. Brecha principal: expedientes técnicos observados (4 de 12 proyectos). Fuente: MEF, Consulta Amigable — corte 30/06.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Puente" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">PDF y dashboard vivo — igual peso</div>
+    <p style="font-size:14px;color:#7A6B58;margin-bottom:32px;max-width:720px;line-height:1.6;">Ninguno reemplaza al otro. El PDF viaja por email y WhatsApp; el dashboard vivo se actualiza solo. Cada uno lleva al otro.</p>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:center;">
+      <div style="background:#EBDFC9;border-radius:4px;padding:28px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:8px;">INFORME PDF</div>
+        <div style="font-size:14px;line-height:1.6;">Portada, resumen ejecutivo de 3 líneas, hallazgos citados — y un QR dinámico en la última página hacia el dashboard vivo.</div>
+      </div>
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:22px;color:#A8472B;">⇄</div>
+      <div style="background:#EBDFC9;border-radius:4px;padding:28px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:8px;">DASHBOARD VIVO</div>
+        <div style="font-size:14px;line-height:1.6;">Datos actualizados en la nube, con botón de exportar cualquier vista como imagen lista para compartir por WhatsApp.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Resumen Ejecutivo" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">REGLA FIJA — RESUMEN EJECUTIVO</div>
+      <p style="font-size:15px;color:#241A12;line-height:1.7;max-width:720px;margin:0 0 24px;">Todo informe abre con tres líneas: qué encontramos, por qué importa, qué se recomienda hacer — antes de cualquier tabla o gráfico.</p>
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;margin-top:48px;">FASE III COMPLETA — SIGUIENTE: FASE IV</div>
+      <p style="font-size:15px;color:#241A12;line-height:1.7;max-width:720px;margin:0;">Con marca, cliente, portafolio y comunicación definidos, Fase IV construye las herramientas comerciales de uso diario: Corporate Portfolio, Proposal Template y Case Study Framework.</p>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;">Inmerge — Executive Reporting Style Guide v1.0 — Fase III, Documento 3 de 3 — 2026</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const chartTypes = [
+      { name: 'Barras', use: 'Comparar categorías discretas — ejecución por área, proyecto o unidad.', rule: 'Ordenadas por valor, no alfabéticamente. Máximo 8 categorías visibles, el resto agrupado en "otros".' },
+      { name: 'Líneas', use: 'Series de tiempo — tendencia mensual o anual de un indicador.', rule: 'Máximo 3 líneas por gráfico. Eje Y desde cero salvo excepción explícitamente anotada.' },
+      { name: 'Mapas', use: 'Comparación geográfica entre regiones, provincias o municipios.', rule: 'Degradado en tonos tierra de la paleta (terracota/ocre/arena) — nunca semáforo rojo-verde genérico. Leyenda de rango siempre visible.' },
+      { name: 'Tablas', use: 'Cuando el usuario necesita el dato exacto, no la tendencia.', rule: 'Máximo 6 columnas visibles sin scroll horizontal. Alineación numérica a la derecha.' },
+      { name: 'Scorecards', use: 'Un KPI único que el decisor revisa todos los días.', rule: 'Número grande, meta al lado, variación vs. periodo anterior siempre visible.' }
+    ];
+    return { chartTypes };
+  }
+}
+
+</script>
+</body>
+</html>

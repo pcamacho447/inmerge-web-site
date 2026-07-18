@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <div data-screen-label="Portada" style="min-height:52vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px;gap:20px;">
+    <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">FASE III · DOCUMENTO 1 DE 3</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:48px;">Corporate Communication Guide</div>
+    <div style="font-size:16px;color:#C9B79C;max-width:640px;line-height:1.6;">Un mismo tono, en once canales — cálido y directo incluso frente al Estado.</div>
+  </div>
+
+  <div data-screen-label="Vocabulario" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:48px;">Vocabulario y principios de escritura</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+      <sc-for list="{{vocabRules}}" as="v" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;border-bottom:1px solid #DDCBAE;padding:16px 0;">
+          <div style="font-size:14px;color:#4A7A5C;"><strong>Sí:</strong> {{v.do}}</div>
+          <div style="font-size:14px;color:#A8472B;"><strong>No:</strong> {{v.dont}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-screen-label="Jerarquia" style="background:#EBDFC9;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:48px;">Jerarquía de mensajes</div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:32px 40px;">
+          <div style="font-size:12px;letter-spacing:2px;color:#D8A84E;font-weight:600;margin-bottom:10px;">MENSAJE CENTRAL</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:22px;">Los datos que mueven al Perú, verificables — no solo creíbles.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <div style="background:#F3EADA;border-radius:4px;padding:24px;">
+            <div style="font-size:12px;color:#A8472B;font-weight:600;margin-bottom:6px;">APOYO — SECTOR PÚBLICO</div>
+            <div style="font-size:13px;line-height:1.6;">Un informe que resiste una auditoría antes de que llegue Contraloría.</div>
+          </div>
+          <div style="background:#F3EADA;border-radius:4px;padding:24px;">
+            <div style="font-size:12px;color:#A8472B;font-weight:600;margin-bottom:6px;">APOYO — EMPRESAS</div>
+            <div style="font-size:13px;line-height:1.6;">Decisiones con el método a la vista, no una caja negra que confiar.</div>
+          </div>
+          <div style="background:#F3EADA;border-radius:4px;padding:24px;">
+            <div style="font-size:12px;color:#A8472B;font-weight:600;margin-bottom:6px;">APOYO — INVESTIGADORES/PRENSA</div>
+            <div style="font-size:13px;line-height:1.6;">La fuente y el cálculo, no solo la cifra final.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Formalidad Estado" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Formalidad frente al Estado</div>
+    <p style="font-size:15px;color:#7A6B58;line-height:1.7;max-width:720px;margin:0 0 40px;">El tono cálido y directo se mantiene incluso en comunicación oficial con gobiernos — es diferenciador de marca, no un descuido. Solo cambia el registro cuando el formato lo exige (TDR, resoluciones, actas).</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div style="background:#EBDFC9;border-radius:4px;padding:28px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#4A7A5C;font-weight:600;margin-bottom:10px;">ASÍ SÍ</div>
+        <div style="font-size:14px;line-height:1.7;font-style:italic;">"Buenos días, Ing. Rojas. Le comparto el diagnóstico que conversamos el lunes — el hallazgo principal está en la página 2, con la fuente de cada cifra citada."</div>
+      </div>
+      <div style="background:#EBDFC9;border-radius:4px;padding:28px;">
+        <div style="font-size:12px;letter-spacing:1.5px;color:#A8472B;font-weight:600;margin-bottom:10px;">ASÍ NO</div>
+        <div style="font-size:14px;line-height:1.7;font-style:italic;">"Por medio de la presente, cumplo en remitir a su Despacho el informe adjunto para los fines que estime pertinente."</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Canales" style="background:#241A12;color:#F3EADA;padding:120px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:56px;">Guía por canal</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+        <sc-for list="{{channels}}" as="c" hint-placeholder-count="11">
+          <div style="background:#3A2B1C;border-radius:4px;padding:24px;">
+            <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:6px;">{{c.name}}</div>
+            <div style="font-size:12px;color:#D8A84E;margin-bottom:14px;">{{c.tone}}</div>
+            <div style="font-size:12px;color:#C9B79C;line-height:1.6;margin-bottom:8px;"><strong style="color:#4A9C6A;">Así sí:</strong> {{c.doExample}}</div>
+            <div style="font-size:12px;color:#C9B79C;line-height:1.6;"><strong style="color:#D08A6E;">Así no:</strong> {{c.dontExample}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Firma" style="max-width:1160px;margin:0 auto;padding:120px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:36px;margin-bottom:16px;">Firma de email</div>
+    <p style="font-size:14px;color:#7A6B58;margin-bottom:32px;max-width:640px;line-height:1.6;">Plantilla lista para usar — reemplaza los campos entre corchetes con los datos reales.</p>
+    <div style="background:#F3EADA;border:1px solid #DDCBAE;border-radius:4px;padding:32px;max-width:460px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <div style="display:flex;gap:2px;"><div style="width:6px;height:6px;background:#D8A84E;transform:rotate(45deg);"></div></div>
+          <div style="display:flex;gap:2px;">
+            <div style="width:6px;height:6px;background:#C68A3D;transform:rotate(45deg);"></div>
+            <div style="width:6px;height:6px;background:#C68A3D;transform:rotate(45deg);"></div>
+            <div style="width:6px;height:6px;background:#C68A3D;transform:rotate(45deg);"></div>
+          </div>
+        </div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;letter-spacing:1.5px;">INMERGE</div>
+      </div>
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;">[Nombre Apellido]</div>
+      <div style="font-size:13px;color:#7A6B58;margin-top:2px;">[Cargo] — Inmerge</div>
+      <div style="font-size:12px;color:#7A6B58;margin-top:12px;line-height:1.8;">[nombre]@inmerge.pe<br>+51 [999 999 999]<br>Lima, Perú · inmerge.pe</div>
+      <div style="height:4px;width:64px;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 4px,transparent 4px 8px);border-radius:2px;margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div data-screen-label="Recomendaciones" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">SIGUIENTE — FASE III: DESIGN SYSTEM STRATEGY</div>
+      <p style="font-size:15px;color:#241A12;line-height:1.7;max-width:720px;margin:0;">Con el tono ya fijado por canal, el siguiente documento define los principios visuales que sostienen esa voz — sin entrar todavía a componentes de interfaz.</p>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;">Inmerge — Corporate Communication Guide v1.0 — Fase III, Documento 1 de 3 — 2026</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const vocabRules = [
+      { do: 'Frases cortas, conclusión primero.', dont: 'Párrafos largos que retrasan la idea principal.' },
+      { do: '"Diagnóstico", "hoja de ruta", "fuente citada".', dont: '"Sinergia", "solución integral", "disruptivo".' },
+      { do: 'Explicar la jerga técnica la primera vez que aparece.', dont: 'Asumir que el cliente ya conoce el término técnico.' },
+      { do: 'Cercanía real: "te cuento", "revisamos juntos".', dont: 'Modismos forzados o emojis para sonar "peruano".' },
+      { do: 'Reconocer un error y decir la acción concreta.', dont: 'Disculpas genéricas sin una acción detrás.' },
+      { do: 'Citar la fuente incluso en un mensaje casual.', dont: 'Dar una cifra sin decir de dónde sale.' }
+    ];
+    const channels = [
+      { name: 'Email', tone: 'Profesional y cálido, sin fórmulas rígidas', doExample: '"Adjunto el diagnóstico — el punto 3 es el que más pesa para la decisión."', dontExample: '"Por medio de la presente cumplo con remitir el informe adjunto."' },
+      { name: 'WhatsApp', tone: 'Directo, breve, humano', doExample: '"Hola, aquí el diagnóstico que conversamos. Revisa primero la página 3."', dontExample: '"Buenas!! 😊 Aquí tienes la info, cualquier cosa me avisas 🙌"' },
+      { name: 'LinkedIn', tone: 'Técnico pero legible, sin jerga de marketing', doExample: '"Un municipio ejecutó 12% más presupuesto cruzando dos fuentes que nunca se habían cruzado."', dontExample: '"🚀 ¡Emocionados de anunciar nuestra alianza estratégica! #Innovation"' },
+      { name: 'Sitio web', tone: 'Claro, sin superlativos vacíos', doExample: '"Diagnóstico de datos en 2-3 semanas, con hoja de ruta priorizada."', dontExample: '"Somos líderes indiscutibles en soluciones disruptivas de vanguardia."' },
+      { name: 'Redes sociales', tone: 'Educativo, un dato real por publicación', doExample: 'Un dato público peruano citado con su fuente exacta.', dontExample: 'Frase motivacional genérica sin dato ni fuente.' },
+      { name: 'Propuestas', tone: 'Estructura clara, cero relleno', doExample: 'Alcance en 5 líneas, con precio y plazo explícitos.', dontExample: '"Nuestra propuesta de valor integral y sinérgica..."' },
+      { name: 'Talleres', tone: 'Participativo, con datos reales del cliente', doExample: '"Vamos a limpiar juntos una base tuya real, no un ejemplo genérico."', dontExample: '40 slides teóricas sin ejercicio práctico.' },
+      { name: 'Facilitación de reuniones', tone: 'Agenda clara, cierre con acuerdos escritos', doExample: '"Cerramos con 3 acuerdos y fecha de la próxima validación."', dontExample: 'Reunión que termina sin acuerdos ni fecha definida.' },
+      { name: 'Presentaciones a cliente', tone: 'Conclusión primero, detalle después', doExample: 'Slide 1 con la conclusión; el respaldo viene después.', dontExample: '20 minutos de contexto antes de decir la conclusión.' },
+      { name: 'Documentación técnica', tone: 'Precisa sin sacrificar claridad', doExample: 'Método explicado para que otro consultor pueda retomarlo.', dontExample: 'Documentación que solo el autor original entiende.' },
+      { name: 'Reportes de negocio', tone: 'Insight antes que gráfico, fuente siempre visible', doExample: 'Resumen ejecutivo de 3 líneas antes del detalle.', dontExample: '40 páginas de tablas sin una conclusión clara.' }
+    ];
+    return { vocabRules, channels };
+  }
+}
+
+</script>
+</body>
+</html>

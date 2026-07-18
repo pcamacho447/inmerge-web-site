@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #EBDFC9; }
+    doc-page:not(:defined) { visibility: hidden; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;display:flex;justify-content:center;padding:40px;background:#EBDFC9;">
+  <x-import component-from-global-scope="doc-page" from="./doc-page.js" size="letter" orientation="portrait" margin="0.9in" hint-size="850px,1100px">
+
+    <div slot="header" style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:18px;border-bottom:2px solid #241A12;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:16px;height:16px;background:#A8472B;transform:rotate(45deg);"></div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:22px;letter-spacing:2px;color:#241A12;">INMERGE</div>
+      </div>
+      <div style="text-align:right;font-size:11px;color:#7A6B58;line-height:1.6;">
+        Consultoría en datos y estrategia<br>Lima, Perú
+      </div>
+    </div>
+
+    <div style="min-height:6in;color:#241A12;">
+    </div>
+
+    <div slot="footer" style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid #DDCBAE;font-size:10px;color:#7A6B58;">
+      <div>inmerge.pe · contacto@inmerge.pe</div>
+      <div>+51 957 251 279 · Lima, Perú</div>
+    </div>
+
+  </x-import>
+</div>
+
+</x-dc>
+</body>
+</html>

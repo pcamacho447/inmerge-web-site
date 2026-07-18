@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #241A12; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%" data-uneditable="">
+
+  <section data-label="Portada" data-speaker-notes="Bienvenida e introducción del equipo Inmerge." style="width:1920px;height:1080px;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:44px;font-family:'IBM Plex Sans',sans-serif;position:relative;">
+    <sc-if value="{{showMarkOnly}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div></div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+        </div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{showWordmark}}" hint-placeholder-val="{{true}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div></div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          </div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          </div>
+        </div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;letter-spacing:2px;color:#F3EADA;">INMERGE</div>
+      </div>
+    </sc-if>
+    <div style="font-size:18px;letter-spacing:6px;color:#C68A3D;font-weight:600;">INMERGE</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <div style="display:flex;gap:10px;"><div style="width:26px;height:26px;background:#D8A84E;transform:rotate(45deg);border-radius:3px;"></div></div>
+      <div style="display:flex;gap:10px;">
+        <div style="width:26px;height:26px;background:#C68A3D;transform:rotate(45deg);border-radius:3px;"></div>
+        <div style="width:26px;height:26px;background:#C68A3D;transform:rotate(45deg);border-radius:3px;"></div>
+        <div style="width:26px;height:26px;background:#C68A3D;transform:rotate(45deg);border-radius:3px;"></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <div style="width:26px;height:26px;background:#A8472B;transform:rotate(45deg);border-radius:3px;"></div>
+        <div style="width:26px;height:26px;background:#A8472B;transform:rotate(45deg);border-radius:3px;"></div>
+        <div style="width:26px;height:26px;background:#A8472B;transform:rotate(45deg);border-radius:3px;"></div>
+        <div style="width:26px;height:26px;background:#A8472B;transform:rotate(45deg);border-radius:3px;"></div>
+        <div style="width:26px;height:26px;background:#A8472B;transform:rotate(45deg);border-radius:3px;"></div>
+      </div>
+    </div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:76px;line-height:1.15;max-width:1200px;">Diagnóstico de Datos Públicos</div>
+    <div style="font-family:'Spectral',serif;font-weight:500;font-size:28px;color:#D8A84E;">Presentado a [Cliente] · Julio 2026</div>
+  </section>
+
+  <section data-label="Agenda" data-speaker-notes="Recorrer los cuatro bloques de la presentación." style="width:1920px;height:1080px;background:#F3EADA;color:#241A12;display:flex;flex-direction:column;justify-content:center;padding:0 160px;font-family:'IBM Plex Sans',sans-serif;position:relative;">
+    <sc-if value="{{showMarkOnly}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div></div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+        </div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{showWordmark}}" hint-placeholder-val="{{true}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div></div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          </div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          </div>
+        </div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;letter-spacing:2px;color:#241A12;">INMERGE</div>
+      </div>
+    </sc-if>
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:52px;margin-bottom:80px;">Agenda</div>
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div style="display:flex;align-items:baseline;gap:40px;padding:32px 0;border-bottom:1px solid #DDCBAE;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:32px;color:#A8472B;width:80px;">01</div>
+        <div style="font-size:30px;">Contexto y objetivos</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:40px;padding:32px 0;border-bottom:1px solid #DDCBAE;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:32px;color:#A8472B;width:80px;">02</div>
+        <div style="font-size:30px;">Diagnóstico de datos</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:40px;padding:32px 0;border-bottom:1px solid #DDCBAE;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:32px;color:#A8472B;width:80px;">03</div>
+        <div style="font-size:30px;">Hallazgos principales</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:40px;padding:32px 0;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:32px;color:#A8472B;width:80px;">04</div>
+        <div style="font-size:30px;">Recomendaciones y próximos pasos</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="Divisor de sección" data-speaker-notes="Transición al bloque de diagnóstico." style="width:1920px;height:1080px;background:#A8472B;color:#F3EADA;display:flex;flex-direction:column;justify-content:center;padding:0 160px;font-family:'IBM Plex Sans',sans-serif;position:relative;">
+    <sc-if value="{{showMarkOnly}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div></div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+        </div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{showWordmark}}" hint-placeholder-val="{{true}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div></div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          </div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          </div>
+        </div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;letter-spacing:2px;color:#F3EADA;">INMERGE</div>
+      </div>
+    </sc-if>
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:34px;color:#241A12;margin-bottom:24px;">02</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:68px;max-width:1100px;line-height:1.2;">Diagnóstico de datos</div>
+  </section>
+
+  <section data-label="Contenido" data-speaker-notes="Explicar los tres pilares del enfoque." style="width:1920px;height:1080px;background:#F3EADA;color:#241A12;display:flex;flex-direction:column;padding:96px 160px;font-family:'IBM Plex Sans',sans-serif;position:relative;">
+    <sc-if value="{{showMarkOnly}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div></div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+        </div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{showWordmark}}" hint-placeholder-val="{{true}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div></div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          </div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          </div>
+        </div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;letter-spacing:2px;color:#241A12;">INMERGE</div>
+      </div>
+    </sc-if>
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:48px;margin-bottom:72px;">Nuestro enfoque</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:56px;flex:1;">
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="width:20px;height:20px;background:#A8472B;transform:rotate(45deg);"></div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:26px;">Levantamiento</div>
+        <div style="font-size:20px;color:#7A6B58;line-height:1.6;">Inventario completo de fuentes públicas, formatos y calidad de los datos disponibles.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="width:20px;height:20px;background:#C68A3D;transform:rotate(45deg);"></div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:26px;">Modelamiento</div>
+        <div style="font-size:20px;color:#7A6B58;line-height:1.6;">Estructuras y relaciones que conectan las fuentes con las decisiones de la institución.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="width:20px;height:20px;background:#D8A84E;transform:rotate(45deg);"></div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:26px;">Gobernanza</div>
+        <div style="font-size:20px;color:#7A6B58;line-height:1.6;">Reglas de acceso, calidad y actualización que sostienen el sistema en el tiempo.</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="Datos" data-speaker-notes="Compartir las tres cifras centrales del diagnóstico." style="width:1920px;height:1080px;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;padding:96px 160px;font-family:'IBM Plex Sans',sans-serif;position:relative;">
+    <sc-if value="{{showMarkOnly}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div></div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+        </div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{showWordmark}}" hint-placeholder-val="{{true}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div></div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          </div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          </div>
+        </div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;letter-spacing:2px;color:#F3EADA;">INMERGE</div>
+      </div>
+    </sc-if>
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:48px;margin-bottom:96px;">Hallazgos principales</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:56px;flex:1;">
+      <div style="display:flex;flex-direction:column;gap:16px;border-top:2px solid #C68A3D;padding-top:28px;">
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:96px;color:#D8A84E;">63%</div>
+        <div style="font-size:20px;color:#C9B79C;line-height:1.5;">de las fuentes no comparten un identificador común.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;border-top:2px solid #A8472B;padding-top:28px;">
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:96px;color:#D8A84E;">12</div>
+        <div style="font-size:20px;color:#C9B79C;line-height:1.5;">sistemas distintos concentran el 80% de la información.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;border-top:2px solid #D8A84E;padding-top:28px;">
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:96px;color:#D8A84E;">4</div>
+        <div style="font-size:20px;color:#C9B79C;line-height:1.5;">meses estimados para consolidar el modelo propuesto.</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="Cita" data-speaker-notes="Cerrar el bloque con una cita del cliente o del equipo." style="width:1920px;height:1080px;background:#C68A3D;color:#241A12;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 220px;gap:40px;font-family:'IBM Plex Sans',sans-serif;position:relative;">
+    <sc-if value="{{showMarkOnly}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div></div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+        </div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{showWordmark}}" hint-placeholder-val="{{true}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div></div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          </div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#241A12;transform:rotate(45deg);"></div>
+          </div>
+        </div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;letter-spacing:2px;color:#241A12;">INMERGE</div>
+      </div>
+    </sc-if>
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:44px;line-height:1.4;">"Los datos públicos solo generan valor cuando alguien asume la responsabilidad de organizarlos."</div>
+    <div style="font-size:20px;color:#4A3826;">— Equipo Inmerge</div>
+  </section>
+
+  <section data-label="Cierre" data-speaker-notes="Agradecer y compartir datos de contacto." style="width:1920px;height:1080px;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:36px;font-family:'IBM Plex Sans',sans-serif;position:relative;">
+    <sc-if value="{{showMarkOnly}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div></div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+        </div>
+        <div style="display:flex;gap:3px;">
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{showWordmark}}" hint-placeholder-val="{{true}}">
+      <div style="position:absolute;top:40px;right:40px;display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="display:flex;gap:3px;"><div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div></div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          </div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+            <div style="width:5px;height:5px;background:#F3EADA;transform:rotate(45deg);"></div>
+          </div>
+        </div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;letter-spacing:2px;color:#F3EADA;">INMERGE</div>
+      </div>
+    </sc-if>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <div style="display:flex;gap:8px;"><div style="width:18px;height:18px;background:#D8A84E;transform:rotate(45deg);border-radius:2px;"></div></div>
+      <div style="display:flex;gap:8px;">
+        <div style="width:18px;height:18px;background:#C68A3D;transform:rotate(45deg);border-radius:2px;"></div>
+        <div style="width:18px;height:18px;background:#C68A3D;transform:rotate(45deg);border-radius:2px;"></div>
+        <div style="width:18px;height:18px;background:#C68A3D;transform:rotate(45deg);border-radius:2px;"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="width:18px;height:18px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+        <div style="width:18px;height:18px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+        <div style="width:18px;height:18px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+        <div style="width:18px;height:18px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+        <div style="width:18px;height:18px;background:#A8472B;transform:rotate(45deg);border-radius:2px;"></div>
+      </div>
+    </div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:64px;">Gracias</div>
+    <div style="font-size:22px;color:#D8A84E;">contacto@inmerge.pe · www.inmerge.pe</div>
+  </section>
+
+</x-import>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;showLogo&quot;: {&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Logo&quot;},
+  &quot;logoStyle&quot;: {&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;wordmark&quot;,&quot;options&quot;:[&quot;mark&quot;,&quot;wordmark&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Logo&quot;}
+}">class Component extends DCLogic {
+  renderVals() {
+    const showLogo = this.props.showLogo ?? true;
+    const style = this.props.logoStyle ?? 'wordmark';
+    return {
+      showMarkOnly: showLogo && style === 'mark',
+      showWordmark: showLogo && style === 'wordmark'
+    };
+  }
+}</script>
+</body>
+</html>

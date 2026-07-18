@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #EBDFC9; }
+    doc-page:not(:defined) { visibility: hidden; }
+    * { font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-feature-settings: "liga" 0, "clig" 0; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;display:flex;justify-content:center;padding:40px;background:#EBDFC9;">
+  <x-import component-from-global-scope="doc-page" from="./doc-page.js" size="letter" orientation="portrait" margin="0.9in" hint-size="850px,1100px">
+
+    <div slot="header" style="display:flex;align-items:center;gap:6px;font-size:9px;letter-spacing:1px;color:#7A6B58;">
+      <div style="width:7px;height:7px;background:#A8472B;transform:rotate(45deg);"></div>
+      <div style="font-family:'Spectral',serif;font-weight:700;letter-spacing:1.5px;color:#241A12;">INMERGE</div>
+      <div>· SEGURIDAD CIUDADANA · LA LIBERTAD</div>
+    </div>
+    <div slot="footer" style="display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#7A6B58;">
+      <div>Inmerge — El dato, a la vista.</div>
+      <div>inmerge.pe</div>
+    </div>
+
+    <div style="color:#241A12;padding-top:0.35in;">
+      <div style="font-size:11px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:14px;">REPORTE GRATUITO · TRUJILLO 2019–2025</div>
+      <h1 style="font-family:'Spectral',serif;font-weight:800;font-size:34px;line-height:1.15;margin:0 0 18px;">En Trujillo, el gasto en seguridad no sigue al delito</h1>
+      <p style="font-family:'Spectral',serif;font-style:italic;font-weight:500;font-size:17px;line-height:1.6;color:#3A2B1C;margin:0 0 20px;">Los distritos con más denuncias no son los que más plata destinan por vecino a serenazgo, cámaras y patrullaje. Y los que más gastan por habitante están, en varios casos, entre los de menor incidencia. No es un misterio de gestión: es cómo está armado el presupuesto público —y quién, dentro de él, hace qué.</p>
+      <div style="height:3px;width:64px;background:#A8472B;margin-bottom:28px;"></div>
+
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Hay una manera sencilla de mirar cuánto le importa la seguridad a un municipio: cuánto pone, por cada vecino, para pagar serenos, comprar patrulleros o instalar cámaras. Y hay otra, igual de sencilla, de mirar cuánta seguridad hace falta: cuántos delitos denuncia la Policía en ese mismo distrito. Cuando se ponen las dos cifras una al lado de la otra para los distritos de la provincia de Trujillo, entre 2019 y 2025, aparece algo que descoloca. Las dos listas no se parecen.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Pero antes de mirarlas de cerca conviene detenerse en algo que suele pasar inadvertido: en Trujillo no todos los que gastan en seguridad gastan en lo mismo, ni les toca hacerlo.</p>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">Quién pone qué</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">El gobierno regional de La Libertad también ejecuta el programa presupuestal de seguridad ciudadana, y lo hace de una forma radicalmente distinta a la de cualquier municipio. En 2025, ocho de cada diez soles que destinó a seguridad —el 81.2%— fueron a activos: patrulleros, cámaras de videovigilancia, equipamiento, mobiliario. Apenas el 1.7% fue a personal. Los municipios hacen casi lo contrario: en el agregado de los distritos de Trujillo, más de la mitad del gasto es planilla, y en las municipalidades provinciales de la región lo que se pone en sueldos (34.5%) y en bienes y servicios (36.5%) supera con holgura lo que va a activos (28.2%).</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Ese contraste se lee como un degradado. En un extremo, el gobierno regional, casi puro comprador de equipamiento. En el otro, distritos como Alto Trujillo, donde casi seis de cada diez soles (58.5%) son sueldos y apenas alrededor del 4% son activos. En el medio, cada municipio con su mezcla: Víctor Larco pone el 57.4% de su gasto en personal, Florencia de Mora el 45.7%, y la Municipalidad Provincial de Trujillo —que destina proporcionalmente más a capital que sus pares— baja su planilla al 33.6%. No hay una sola forma "municipal" de gastar en seguridad; hay un abanico. Pero todas están más cerca del sueldo que del equipamiento, y ninguna se parece al perfil del gobierno regional.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Esta diferencia no es casualidad ni resultado de una decisión de gestión: responde a cómo la ley de seguridad ciudadana del país reparte los roles entre niveles de gobierno. La Ley 27933, que creó el Sistema Nacional de Seguridad Ciudadana en 2003 y fue actualizada por el Decreto Legislativo N° 1454 en 2018, le asigna al gobierno regional una función de coordinación —a través de un comité regional, el CORESEC, que articula a los distintos actores— pero no le entrega personal operativo propio ni un cuerpo de agentes bajo su mando. Por eso su gasto no incluye planillas de operadores: se concentra en comprar el equipamiento que otros —la Policía Nacional o los propios municipios— terminan usando en el terreno.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Los municipios, en cambio, sí cuentan con personal propio dedicado a la seguridad: el serenazgo, un servicio que gestionan directamente como parte de sus propias competencias. Esa es la razón estructural por la que, a medida que se baja de nivel —de las municipalidades provinciales a los distritos—, el gasto se inclina cada vez más hacia el pago de sueldos y menos hacia la compra de bienes: son ellos, y no el gobierno regional, quienes ponen y sostienen al personal que patrulla el territorio día a día.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Un mismo programa se traduce, así, en dos tipos de ejecución muy distintos porque cada nivel de gobierno tiene, por diseño normativo, una función diferente: uno abastece de herramientas, el otro opera con gente en la calle. No es que un nivel gaste "mejor" o "peor" que el otro, ni la elección discrecional de una autoridad: es la división de funciones que la propia legislación estableció para cada uno. Aclarado ese reparto, se entiende por qué la comparación reveladora ocurre entre municipios: son ellos los que sostienen el patrullaje cotidiano, y es entre ellos donde tiene sentido preguntar si quien enfrenta más delito pone más plata por vecino. Ahí aparece la sorpresa.</p>
+
+      <div style="margin:8px 0 28px;break-inside:avoid;">
+        <div style="font-size:10px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:4px;">FIGURA 1</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;margin-bottom:14px;">Cómo gasta en seguridad cada actor: GORE vs. municipios, Trujillo (2025)</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{fig14}}" as="row" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:1.15in 1fr;gap:10px;align-items:center;">
+              <div style="font-size:11px;">{{row.name}}</div>
+              <div style="display:flex;height:20px;border-radius:2px;overflow:hidden;">
+                <div style="width:{{row.personal}}%;background:#241A12;display:flex;align-items:center;justify-content:center;"><sc-if value="{{row.showPersonal}}" hint-placeholder-val="{{true}}"><div style="font-size:9px;color:#F3EADA;font-weight:600;">{{row.personalLabel}}</div></sc-if></div>
+                <div style="width:{{row.bienes}}%;background:#C68A3D;display:flex;align-items:center;justify-content:center;"><sc-if value="{{row.showBienes}}" hint-placeholder-val="{{true}}"><div style="font-size:9px;color:#241A12;font-weight:600;">{{row.bienesLabel}}</div></sc-if></div>
+                <div style="width:{{row.activos}}%;background:#A8472B;display:flex;align-items:center;justify-content:center;"><sc-if value="{{row.showActivos}}" hint-placeholder-val="{{true}}"><div style="font-size:9px;color:#F3EADA;font-weight:600;">{{row.activosLabel}}</div></sc-if></div>
+                <div style="width:{{row.otros}}%;background:#C9B79C;"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#7A6B58;"><div style="width:10px;height:10px;background:#241A12;"></div>Personal</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#7A6B58;"><div style="width:10px;height:10px;background:#C68A3D;"></div>Bienes y servicios</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#7A6B58;"><div style="width:10px;height:10px;background:#A8472B;"></div>Activos (capital)</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#7A6B58;"><div style="width:10px;height:10px;background:#C9B79C;"></div>Pensiones</div>
+        </div>
+        <div style="font-size:9.5px;color:#7A6B58;margin-top:8px;">Fuente: SIAF-MEF, elaboración propia. PP 0030 Seguridad Ciudadana, función Orden Público y Seguridad, devengado 2025.</div>
+      </div>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">Las dos listas que no se parecen</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Tomemos tres casos. El distrito de Trujillo —el casco urbano, no la provincia— es el que registra la tasa de denuncias más alta de todos: 31 delitos por cada mil habitantes al año, en promedio. Florencia de Mora, su vecino, registra bastante menos: 23 por mil. Uno esperaría que el primero gastara sensiblemente más por habitante en cuidar a su gente. No es lo que pasa. En el promedio de esos siete años, Trujillo gastó 22.82 soles por vecino en seguridad y Florencia de Mora, 22.89. Siete céntimos de diferencia. Gastan casi lo mismo, pese a convivir con niveles de delito distintos.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">El contraste se vuelve más marcado con Víctor Larco. Es uno de los distritos con menos denuncias de la provincia —11 por cada mil habitantes, de los más bajos— y, sin embargo, es por lejos el que más plata pone por vecino: casi 83 soles en el promedio del periodo, y hasta 96.50 en 2025. Es decir, más de tres veces y media lo que destina por habitante el distrito de Trujillo, que tiene casi el triple de denuncias.</p>
+
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:26px 30px;margin:8px 0 24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-style:italic;font-size:16px;line-height:1.55;">"El gráfico de dispersión es una nube sin pendiente, sin esa línea ascendente que uno esperaría si más delito llamara a más gasto."</div>
+      </div>
+
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">No se trata de dos o tres casos escogidos con pinza. Cuando se cruzan los once distritos de Trujillo para los que la Policía separa las denuncias —siete años de datos cada uno, unas 76 mediciones distrito-año—, la relación entre gasto por habitante y tasa de delito es prácticamente inexistente. La correlación ronda el cero: apenas -0.06 con el delito total y -0.08 con los delitos contra el patrimonio, que son los más asociados al trabajo de serenazgo. Ni positiva ni claramente negativa: plana.</p>
+
+      <div style="margin:8px 0 28px;break-inside:avoid;">
+        <div style="font-size:10px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:4px;">FIGURA 2</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;margin-bottom:14px;">Gasto en seguridad vs. incidencia delictiva: distritos de Trujillo (2019-2025)</div>
+        <svg viewBox="0 0 560 340" style="width:100%;max-width:5.6in;">
+          <line x1="50" y1="10" x2="50" y2="290" stroke="#DDCBAE" stroke-width="1"></line>
+          <line x1="50" y1="290" x2="540" y2="290" stroke="#DDCBAE" stroke-width="1"></line>
+          <sc-for list="{{fig11Grid}}" as="gy" hint-placeholder-count="5">
+            <line x1="50" y1="{{gy.y}}" x2="540" y2="{{gy.y}}" stroke="#EBDFC9" stroke-width="1"></line>
+          </sc-for>
+          <text x="10" y="295" font-size="10" fill="#7A6B58">0</text>
+          <text x="4" y="15" font-size="10" fill="#7A6B58">90</text>
+          <text x="45" y="308" font-size="10" fill="#7A6B58">7</text>
+          <text x="520" y="308" font-size="10" fill="#7A6B58">32</text>
+          <sc-for list="{{fig11Others}}" as="pt" hint-placeholder-count="6">
+            <circle cx="{{pt.x}}" cy="{{pt.y}}" r="6" fill="#C9B79C"></circle>
+          </sc-for>
+          <circle cx="461" cy="238" r="8" fill="#241A12"></circle>
+          <text x="440" y="222" font-size="11" font-weight="700" fill="#241A12">Trujillo</text>
+          <circle cx="270" cy="242" r="8" fill="#D8A84E"></circle>
+          <text x="220" y="228" font-size="11" font-weight="700" fill="#241A12">Florencia de Mora</text>
+          <circle cx="118" cy="60" r="8" fill="#A8472B"></circle>
+          <text x="128" y="52" font-size="11" font-weight="700" fill="#A8472B">Víctor Larco</text>
+          <text x="230" y="325" font-size="11" fill="#7A6B58">Tasa de denuncias (por 1,000 hab., promedio 2019-2025) →</text>
+          <text x="-160" y="24" font-size="11" fill="#7A6B58" transform="rotate(-90)">Gasto per cápita PP 0030 (S/) →</text>
+        </svg>
+        <div style="font-size:9.5px;color:#7A6B58;margin-top:6px;">Fuente: SIAF-MEF y SIDPOL-PNP, elaboración propia. Alto Trujillo excluido (SIDPOL no desagrega su delito del distrito El Porvenir).</div>
+      </div>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">Lo que el dato dice, y lo que no</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Es tentador leer esa nube plana como un veredicto. Quien quiera argumentar que la plata está mal repartida encontrará munición: el distrito con más denuncias gasta como uno con bastante menos, y el que menos delito tiene es el que más invierte por vecino. Pero quien quiera argumentar lo contrario también tiene una historia disponible, y conviene tomarla en serio antes de cerrar el caso.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Esa segunda historia es la de la disuasión. Un distrito podría gastar mucho por habitante precisamente porque en algún momento decidió invertir con fuerza y de forma sostenida en serenazgo, cámaras y patrullaje, y ese esfuerzo constante podría ser parte de por qué su tasa de delito se mantiene baja. Bajo esa lectura, gasto alto y delito bajo no serían una contradicción, sino la misma historia contada desde dos ángulos. Víctor Larco encajaría en ese molde tan bien como en el otro.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">El problema es que, con la información disponible, no hay forma de saber cuál de las dos historias es la correcta. Se observa el gasto y el delito en el mismo periodo, sin ningún cambio de política aislado que permita distinguir qué vino antes ni qué causó qué. Una correlación cercana a cero no permite concluir ninguna de las dos cosas por separado, y menos ambas a la vez. No prueba que la plata haya sido puesta donde no hacía falta, ni prueba lo contrario.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Lo que sí se puede afirmar, sin forzar el dato, es más modesto y más sólido: no se observa que el gasto en seguridad de estos distritos se distribuya en proporción a la necesidad que miden las denuncias policiales. Es un hecho descriptivo, verificable, que no depende de ninguna teoría sobre causas. La plata sigue algún otro criterio; simplemente no es el mapa del delito.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Conviene, además, una cautela sobre el propio termómetro. Las denuncias no son el delito real, sino el que la gente reporta, y la disposición a acercarse a una comisaría cambia de un distrito a otro —por confianza en la Policía, por costumbre, por cercanía— de un modo que puede estar ligado al nivel socioeconómico. La tasa de denuncias es un piso de la incidencia real, no la incidencia misma. Aun así, el patrón es lo bastante consistente año tras año como para no ser un accidente de un dato aislado.</p>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">De qué depende, entonces, la plata</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Si el gasto no sigue al delito, ¿qué sigue? La pista está en un cuarto distrito. Alto Trujillo es el más pobre de este grupo y también el que menos destina por habitante a seguridad: 8.89 soles en 2025. Es un distrito joven —recién figura por separado en los registros presupuestales desde 2023, cuando se independizó de El Porvenir— y todavía sin una base de recaudación propia consolidada. No tiene una tasa de delito medible por sí sola, porque la Policía todavía cuenta sus denuncias junto con las de El Porvenir; pero su presupuesto sí se ve, y es minúsculo.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Entre Víctor Larco y Alto Trujillo hay una brecha de más de diez a uno en gasto por habitante. Y lo que mejor la explica no es cuánto delito enfrenta cada uno, sino cuánto puede recaudar cada uno por su cuenta. Ahí aparece el diseño de fondo del sistema, que vale la pena mirar sin buscar culpables.</p>
+
+      <div style="margin:8px 0 28px;break-inside:avoid;">
+        <div style="font-size:10px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:4px;">FIGURA 3</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;margin-bottom:14px;">Brecha en gasto per cápita en seguridad: distritos foco, Trujillo (2025)</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <sc-for list="{{fig12}}" as="d" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:1.15in 1fr 0.65in;gap:12px;align-items:center;">
+              <div style="font-size:12px;">{{d.name}}</div>
+              <div style="background:#EBDFC9;height:16px;border-radius:2px;"><div style="width:{{d.pct}}%;height:100%;background:{{d.color}};border-radius:2px;"></div></div>
+              <div style="font-size:12px;font-weight:600;">S/ {{d.value}}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:9.5px;color:#7A6B58;margin-top:10px;">Fuente: SIAF-MEF e INEI (proyecciones poblacionales), elaboración propia. Gasto nominal devengado (soles corrientes, 2025). PP 0030 Seguridad Ciudadana.</div>
+      </div>
+
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Que el gasto en seguridad de un distrito no varíe con su nivel real de delincuencia no es, en buena medida, una anomalía de gestión: es un resultado previsible de cómo el Estado peruano arma su presupuesto. El monto que una municipalidad puede destinar a serenazgo un año no se decide mirando cuántas denuncias hubo el mes pasado. Se fija con cerca de un año de anticipación, tomando como base lo gastado en los años previos, con ajustes graduales. No existe un mecanismo que reabra ese presupuesto si en marzo se dispara un pico de delitos en un distrito puntual.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">A eso se suma de dónde sale la plata. Buena parte de lo que un distrito puede poner en serenazgo depende de cuánto recauda por sí mismo: impuesto predial, alcabala, arbitrios. Un distrito con base tributaria robusta puede sostener una planilla de serenos amplia aunque su incidencia sea baja; uno con poca recaudación queda con las manos atadas aunque concentre más denuncias. No es casualidad que Trujillo distrito, que recauda lo más alto de la provincia, aparezca entre los que más margen tienen, ni que Alto Trujillo, el de recaudación más magra, aparezca al fondo. La necesidad de seguridad y la capacidad de pagarla son dos variables que no tienen por qué coincidir, y en Trujillo no coinciden.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Hay un tercer eslabón: tener presupuesto aprobado no es lo mismo que gastarlo. Entre la asignación y el patrullero en la calle media una cadena de trámites —contrataciones, procesos logísticos— que exige capacidad técnica instalada, en promedio mayor en municipios de más solvencia. Lo que un vecino ve reflejado en serenos y cámaras se explica mejor por la riqueza tributaria de su municipio que por cuántos delitos se denuncian en su cuadra.</p>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">No es que no gasten: es qué gasto se traba</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Vale una precisión, porque el problema no es que las municipalidades no gasten. La Municipalidad Provincial de Trujillo, por caso, ha ido mejorando su capacidad de ejecución del programa de seguridad ciudadana, aunque partiendo de muy abajo: de un 32.4% de avance en 2023 pasó a 55.0% en 2024 y a 76.4% en 2025.</p>
+
+      <div style="margin:8px 0 28px;break-inside:avoid;">
+        <div style="font-size:10px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:4px;">FIGURA 4</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:15px;margin-bottom:16px;">Avance de ejecución PP 0030 — Municipalidad Provincial de Trujillo (2023-2025)</div>
+        <div style="display:flex;align-items:flex-end;gap:36px;height:150px;padding-left:8px;position:relative;">
+          <div style="position:absolute;left:0;right:0;bottom:{{fig13.metaBottom}}px;border-top:2px dashed #7A6B58;"></div>
+          <div style="position:absolute;right:0;bottom:{{fig13.metaBottom}}px;transform:translateY(-100%);font-size:10px;color:#7A6B58;">Meta referencial (75%)</div>
+          <sc-for list="{{fig13.bars}}" as="b" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+              <div style="font-size:12px;font-weight:700;">{{b.label}}</div>
+              <div style="width:60px;height:{{b.height}}px;background:{{b.color}};border-radius:2px 2px 0 0;"></div>
+              <div style="font-size:11px;color:#7A6B58;">{{b.year}}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:9.5px;color:#7A6B58;margin-top:14px;">Fuente: SIAF-MEF, elaboración propia. Devengado/PIM consolidado por rubros. Semáforo: verde ≥75%, naranja 60-74%, rojo &lt;60%. Montos nominales.</div>
+      </div>
+
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Y cuando se separa qué tipo de gasto avanza y cuál se atasca, el retrato se afina —y reaparece la distinción con la que abrió esta nota—. La planilla de serenazgo —el gasto corriente, los sueldos de los serenos— corre parejo y estable: alrededor del 89% de ejecución en 2024 y 88% en 2025. Lo que cuesta es el gasto de capital: patrulleros, cámaras, infraestructura. Ese es mucho más errático —pasó de 37.7% en 2024 a 91.6% en 2025— y, cuando finalmente se ejecuta, buena parte cae de golpe en diciembre, entre un cuarto y casi la mitad concentrado en el último mes del año. La operación cotidiana funciona; la inversión en capacidad nueva es la que se traba y se libera a los tirones. Es, justamente, el tipo de gasto en el que el gobierno regional concentra casi todo lo suyo.</p>
+
+      <h2 style="font-family:'Spectral',serif;font-weight:700;font-size:21px;margin:32px 0 14px;">Sin conclusión cómoda</h2>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 18px;">Queda un cuadro incómodo justamente porque no ofrece una moraleja fácil. Los distritos de Trujillo no reparten su gasto en seguridad siguiendo el mapa de las denuncias, y eso es verificable. Pero de ahí no se sigue ni que la plata esté echada en saco roto ni que exista un reparto evidentemente mejor esperando ser descubierto. Podría ser que la necesidad y el bolsillo no se encuentren; podría ser también que allí donde se ha gastado con constancia, ese gasto haya ayudado a mantener el delito a raya. Los mismos números admiten las dos lecturas, y el dato disponible no alcanza para elegir entre ellas.</p>
+      <p style="font-size:14.5px;line-height:1.85;margin:0 0 32px;">Lo que sí queda claro es de qué depende hoy la cifra que un vecino de Trujillo, de Florencia de Mora o de Víctor Larco ve traducida en serenos y cámaras: menos de cuántos delitos ocurren en su calle, y más de qué le toca hacer a cada nivel de gobierno dentro del sistema y de cuánto puede recaudar el municipio que la administra. No es la decisión de un funcionario en particular; es la lógica con la que está construido el sistema. Y esa lógica reparte primero los roles y recién después, si acaso, mira hacia dónde se denuncia.</p>
+
+      <div style="border-top:1px solid #DDCBAE;padding-top:18px;">
+        <div style="font-size:10px;letter-spacing:1px;color:#7A6B58;font-weight:600;margin-bottom:8px;">FUENTES Y METODOLOGÍA</div>
+        <p style="font-size:11px;color:#7A6B58;line-height:1.75;margin:0;">Gasto ejecutado del programa presupuestal 0030 (Reducción de delitos y faltas), SIAF-MEF, corte al 25 de junio de 2026. Denuncias policiales por distrito, SIDPOL-PNP, 2019-2025. Población proyectada, INEI. La composición de gasto por genérica (personal, bienes y servicios, activos, pensiones) corresponde al año fiscal 2025. Las cifras de gasto están en soles corrientes. Este texto es un spin-off periodístico de un reporte técnico de gestión más extenso sobre el PP 0030 en La Libertad — metodología completa disponible a solicitud, escríbenos por WhatsApp.</p>
+      </div>
+    </div>
+
+  </x-import>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const fig14 = [
+      { name: 'GORE La Libertad', personal: 2, bienes: 13, activos: 81, otros: 4, showPersonal: false, showBienes: true, bienesLabel: '13%', showActivos: true, activosLabel: '81%' },
+      { name: 'Víctor Larco', personal: 57, bienes: 12, activos: 31, otros: 0, showPersonal: true, personalLabel: '57%', showBienes: true, bienesLabel: '12%', showActivos: true, activosLabel: '31%' },
+      { name: 'Trujillo (MPT)', personal: 34, bienes: 49, activos: 16, otros: 1, showPersonal: true, personalLabel: '34%', showBienes: true, bienesLabel: '49%', showActivos: true, activosLabel: '16%' },
+      { name: 'Florencia de Mora', personal: 46, bienes: 45, activos: 9, otros: 0, showPersonal: true, personalLabel: '46%', showBienes: true, bienesLabel: '45%', showActivos: false, activosLabel: '' },
+      { name: 'Alto Trujillo', personal: 58, bienes: 37, activos: 4, otros: 1, showPersonal: true, personalLabel: '58%', showBienes: true, bienesLabel: '37%', showActivos: false, activosLabel: '' }
+    ];
+    const fig11Others = [
+      { x: 133, y: 176 }, { x: 152, y: 190 }, { x: 168, y: 168 }, { x: 190, y: 178 },
+      { x: 150, y: 246 }, { x: 213, y: 246 }, { x: 302, y: 165 }, { x: 118, y: 262 }
+    ];
+    const fig11Grid = [10, 66, 122, 178, 234].map(y => ({ y }));
+    const fig12 = [
+      { name: 'Víctor Larco', pct: 100, value: '96.50', color: '#A8472B' },
+      { name: 'Trujillo', pct: 35, value: '33.55', color: '#241A12' },
+      { name: 'Florencia de Mora', pct: 24, value: '23.42', color: '#D8A84E' },
+      { name: 'Alto Trujillo', pct: 9, value: '8.89', color: '#C68A3D' }
+    ];
+    const fig13 = {
+      metaBottom: 112,
+      bars: [
+        { label: '32.4%', height: 48, color: '#A8472B', year: '2023' },
+        { label: '55.0%', height: 82, color: '#C68A3D', year: '2024' },
+        { label: '76.4%', height: 114, color: '#4A7A5C', year: '2025' }
+      ]
+    };
+    return { fig14, fig11Others, fig11Grid, fig12, fig13 };
+  }
+}
+
+</script>
+</body>
+</html>

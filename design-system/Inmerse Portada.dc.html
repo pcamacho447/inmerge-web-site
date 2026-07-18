@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+    doc-page:not(:defined) { visibility: hidden; }
+  </style>
+</helmet>
+
+<x-import component-from-global-scope="doc-page" from="./doc-page.js" size="a4" margin="0" orientation="portrait" hint-size="100%,100%">
+  <div style="width:100%;height:100%;min-height:11.69in;background:#241A12;position:relative;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;">
+    <div style="position:absolute;inset:0;opacity:0.28;">
+      <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="portada-texture" shape="rect" placeholder="foto: friso de adobe / sitio arqueológico" style="width:100%;height:100%;display:block;" hint-size="100%,100%"></x-import>
+    </div>
+    <div style="position:absolute;inset:0;padding:64px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="display:flex;gap:3px;"><div style="width:9px;height:9px;background:#D8A84E;transform:rotate(45deg);"></div></div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:9px;height:9px;background:#C68A3D;transform:rotate(45deg);"></div>
+            <div style="width:9px;height:9px;background:#C68A3D;transform:rotate(45deg);"></div>
+            <div style="width:9px;height:9px;background:#C68A3D;transform:rotate(45deg);"></div>
+          </div>
+          <div style="display:flex;gap:3px;">
+            <div style="width:9px;height:9px;background:#A8472B;transform:rotate(45deg);"></div>
+            <div style="width:9px;height:9px;background:#A8472B;transform:rotate(45deg);"></div>
+            <div style="width:9px;height:9px;background:#A8472B;transform:rotate(45deg);"></div>
+            <div style="width:9px;height:9px;background:#A8472B;transform:rotate(45deg);"></div>
+            <div style="width:9px;height:9px;background:#A8472B;transform:rotate(45deg);"></div>
+          </div>
+        </div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:22px;letter-spacing:2.5px;color:#F3EADA;">INMERGE</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:18px;max-width:520px;">
+        <div style="font-size:14px;letter-spacing:3px;color:#D8A84E;font-weight:600;">INFORME ESTRATÉGICO</div>
+        <div style="font-family:'Spectral',serif;font-weight:700;font-size:48px;color:#F3EADA;line-height:1.15;">Diagnóstico de Datos Públicos 2026</div>
+        <div style="font-size:16px;color:#C9B79C;">Preparado para [Cliente]</div>
+        <div style="height:8px;width:110px;background-color:#241A12;background-image:repeating-linear-gradient(45deg,#A8472B 0 5px,transparent 5px 10px);margin-top:12px;"></div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;font-size:12px;color:#C9B79C;border-top:1px solid #4A3826;padding-top:20px;">
+        <div>Lima, Perú</div>
+        <div>16 de julio de 2026</div>
+      </div>
+    </div>
+  </div>
+</x-import>
+
+</x-dc>
+</body>
+</html>

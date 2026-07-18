@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <div data-screen-label="Portada" style="min-height:52vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px;gap:20px;">
+    <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">FASE V · DOCUMENTO 1 DE 2</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:48px;">Internal Knowledge System</div>
+    <div style="font-size:16px;color:#C9B79C;max-width:640px;line-height:1.6;">Carpetas locales simples, con metodología y playbooks como prioridad — la memoria operativa de Inmerge.</div>
+  </div>
+
+  <div data-screen-label="Principios" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:32px;margin-bottom:40px;">Principios de organización</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+      <div style="background:#EBDFC9;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:8px;">Numeración fija</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Carpetas raíz numeradas 00-05 — el orden nunca cambia, aunque el contenido crezca.</div>
+      </div>
+      <div style="background:#EBDFC9;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:8px;">Versión en el nombre</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Todo archivo vivo lleva versión: "Propuesta-MuniX-v2.pdf", nunca "final-final".</div>
+      </div>
+      <div style="background:#EBDFC9;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:8px;">Un dueño por carpeta</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Cada carpeta raíz tiene un responsable que decide qué entra y qué se archiva.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Arbol" style="background:#241A12;color:#F3EADA;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:32px;margin-bottom:16px;">Árbol de carpetas raíz</div>
+      <div style="font-size:14px;color:#C9B79C;margin-bottom:48px;max-width:680px;line-height:1.6;">Seis carpetas numeradas. Metodología y Playbooks (02) es la más profunda hoy — es la que un consultor abre a diario.</div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        <div style="display:grid;grid-template-columns:60px 240px 1fr;gap:20px;padding:20px 0;border-top:1px solid #4A3826;align-items:baseline;">
+          <div style="font-family:'IBM Plex Mono',monospace;color:#D8A84E;">00</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;">Marca</div>
+          <div style="font-size:13px;color:#C9B79C;">Brand Guidelines, logo, papelería, sitio web — todo lo ya construido.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:60px 240px 1fr;gap:20px;padding:20px 0;border-top:1px solid #4A3826;align-items:baseline;">
+          <div style="font-family:'IBM Plex Mono',monospace;color:#D8A84E;">01</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;">Ventas y Marketing</div>
+          <div style="font-size:13px;color:#C9B79C;">Propuestas enviadas, casos de estudio, mensajes por segmento, reportes gratuitos publicados.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:60px 240px 1fr;gap:20px;padding:20px 0;border-top:1px solid #4A3826;align-items:baseline;background:#3A2B1C;">
+          <div style="font-family:'IBM Plex Mono',monospace;color:#D8A84E;">02</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;">Metodología y Playbooks</div>
+          <div style="font-size:13px;color:#C9B79C;">Método Acequia: plantillas por fase, checklists de quality gate, lecciones aprendidas. Detalle abajo.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:60px 240px 1fr;gap:20px;padding:20px 0;border-top:1px solid #4A3826;align-items:baseline;">
+          <div style="font-family:'IBM Plex Mono',monospace;color:#D8A84E;">03</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;">Estándares Técnicos</div>
+          <div style="font-size:13px;color:#C9B79C;">Convenciones de código, diccionarios de datos, checklist de QA por servicio.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:60px 240px 1fr;gap:20px;padding:20px 0;border-top:1px solid #4A3826;align-items:baseline;">
+          <div style="font-family:'IBM Plex Mono',monospace;color:#D8A84E;">04</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;">Proyectos</div>
+          <div style="font-size:13px;color:#C9B79C;">Un subfolder por cliente/proyecto activo o cerrado, con su propia estructura interna estándar.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:60px 240px 1fr;gap:20px;padding:20px 0;border-top:1px solid #4A3826;border-bottom:1px solid #4A3826;align-items:baseline;">
+          <div style="font-family:'IBM Plex Mono',monospace;color:#D8A84E;">05</div>
+          <div style="font-family:'Spectral',serif;font-weight:600;">Training y QA</div>
+          <div style="font-size:13px;color:#C9B79C;">Onboarding de nuevas contrataciones, checklists de revisión de calidad, retros de proyecto.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Metodologia Detalle" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="font-size:12px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:12px;">02 — EN DETALLE</div>
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:32px;margin-bottom:16px;">Metodología y Playbooks</div>
+    <p style="font-size:14px;color:#7A6B58;max-width:680px;line-height:1.7;margin-bottom:48px;">La carpeta que un consultor abre en cada fase de cada proyecto — organizada por fase del Método Acequia, no por cliente.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;">
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:10px;">02.1 — Descubrimiento</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.8;">Plantilla de brief inicial · Guía de entrevista a stakeholders · Formato de diagnóstico de datos.</div>
+      </div>
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:10px;">02.2 — Diseño</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.8;">Plantilla de arquitectura de datos · Checklist de definición de KPIs · Wireframes base de dashboard.</div>
+      </div>
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:10px;">02.3 — Construcción</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.8;">Estándar de pipelines ETL · Convenciones de nombres AWS · Checklist de pruebas internas.</div>
+      </div>
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:10px;">02.4 — Validación y Transferencia</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.8;">Guion de taller de capacitación · Acta de aprobación del cliente · Plantilla de manual de uso.</div>
+      </div>
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:10px;">02.5 — Sostenimiento</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.8;">Formato de reporte trimestral de salud del sistema · Checklist de gobierno de datos.</div>
+      </div>
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:10px;">02.6 — Lecciones Aprendidas</div>
+        <div style="font-size:13px;color:#C9B79C;line-height:1.8;">Un archivo por proyecto cerrado: qué funcionó, qué no — insumo directo para actualizar las plantillas de arriba.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Acceso" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:32px;margin-bottom:16px;">Niveles de acceso</div>
+      <p style="font-size:14px;color:#7A6B58;max-width:680px;line-height:1.7;margin-bottom:40px;">Pensado para hoy (solo el fundador) y para cuando el equipo crezca — sin rediseñar la estructura después.</p>
+      <div style="display:flex;flex-direction:column;">
+        <div style="display:grid;grid-template-columns:200px repeat(6,1fr);gap:8px;padding:14px 0;font-size:11px;color:#7A6B58;font-weight:600;border-bottom:2px solid #241A12;">
+          <div></div><div>00</div><div>01</div><div>02</div><div>03</div><div>04</div><div>05</div>
+        </div>
+        <div style="display:grid;grid-template-columns:200px repeat(6,1fr);gap:8px;padding:16px 0;border-bottom:1px solid #DDCBAE;align-items:center;">
+          <div style="font-size:14px;font-weight:600;">Fundador</div>
+          <div>●</div><div>●</div><div>●</div><div>●</div><div>●</div><div>●</div>
+        </div>
+        <div style="display:grid;grid-template-columns:200px repeat(6,1fr);gap:8px;padding:16px 0;border-bottom:1px solid #DDCBAE;align-items:center;">
+          <div style="font-size:14px;font-weight:600;">Consultor Senior</div>
+          <div>○</div><div>●</div><div>●</div><div>●</div><div>●</div><div>●</div>
+        </div>
+        <div style="display:grid;grid-template-columns:200px repeat(6,1fr);gap:8px;padding:16px 0;border-bottom:1px solid #DDCBAE;align-items:center;">
+          <div style="font-size:14px;font-weight:600;">Data Scientist / Ingeniero</div>
+          <div>○</div><div>○</div><div>●</div><div>●</div><div>●</div><div>○</div>
+        </div>
+        <div style="display:grid;grid-template-columns:200px repeat(6,1fr);gap:8px;padding:16px 0;align-items:center;">
+          <div style="font-size:14px;font-weight:600;">Colaborador externo puntual</div>
+          <div>○</div><div>○</div><div>◐</div><div>○</div><div>◐</div><div>○</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#7A6B58;margin-top:20px;">● acceso completo · ◐ solo carpeta del proyecto asignado · ○ sin acceso</div>
+    </div>
+  </div>
+
+  <div data-screen-label="Otras areas" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="font-family:'Spectral',serif;font-weight:600;font-size:32px;margin-bottom:40px;">Resto de carpetas — resumen</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px;">
+      <div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:8px;">01 · Ventas y Marketing</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.7;">Subcarpetas: Propuestas enviadas (por cliente) · Casos de estudio publicados · Mensajes por segmento (gobiernos/empresas/prensa) · Reportes gratuitos (fuente de cada uno).</div>
+      </div>
+      <div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:8px;">03 · Estándares Técnicos</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.7;">Subcarpetas: Convenciones de código Python/SQL/R · Diccionario de datos maestro · Checklist de QA por servicio del portafolio.</div>
+      </div>
+      <div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:8px;">04 · Proyectos</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.7;">Un subfolder por cliente con la misma estructura interna: 01-Contrato, 02-Datos, 03-Entregables, 04-Comunicaciones.</div>
+      </div>
+      <div>
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:8px;">05 · Training y QA</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.7;">Subcarpetas: Onboarding de nueva contratación · Checklist de revisión previa a entrega · Retros trimestrales del equipo.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Recomendaciones" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">SIGUIENTE — FASE V: BUSINESS GROWTH ROADMAP</div>
+      <p style="font-size:15px;color:#241A12;line-height:1.7;max-width:720px;margin:0;">Con la base de conocimiento definida, el último documento traza el modelo de madurez de 5 etapas — cuándo esta estructura de carpetas evoluciona a una herramienta como Notion, y qué cambia en cada etapa de crecimiento. El Case Study Framework queda pendiente para cuando exista un primer proyecto real que documentar.</p>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;">Inmerge — Internal Knowledge System v1.0 — Fase V, Documento 1 de 2 — 2026</div>
+
+</div>
+
+</x-dc>
+</body>
+</html>

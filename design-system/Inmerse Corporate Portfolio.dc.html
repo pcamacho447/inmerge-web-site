@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #F3EADA; }
+    a { color: #A8472B; text-decoration: none; }
+    a:hover { color: #8A3820; text-decoration: underline; }
+  </style>
+</helmet>
+
+<div style="font-family:'IBM Plex Sans',sans-serif;background:#F3EADA;color:#241A12;">
+
+  <div data-screen-label="Portada" style="min-height:52vh;background:#241A12;color:#F3EADA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px 24px;gap:20px;">
+    <div style="font-size:13px;letter-spacing:4px;color:#C68A3D;font-weight:600;">FASE IV · DOCUMENTO 1 DE 3</div>
+    <div style="font-family:'Spectral',serif;font-weight:700;font-size:48px;">Corporate Portfolio</div>
+    <div style="font-size:16px;color:#C9B79C;max-width:640px;line-height:1.6;">Estructura y contenido de la presentación institucional — misma base para deck en vivo y dossier descargable.</div>
+  </div>
+
+  <div data-screen-label="Como usar" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="background:#EBDFC9;border-radius:4px;padding:32px 40px;">
+      <div style="font-size:12px;letter-spacing:1.5px;color:#7A6B58;font-weight:600;margin-bottom:10px;">CÓMO USAR ESTE DOCUMENTO</div>
+      <p style="font-size:14px;line-height:1.7;margin:0;max-width:760px;">El mismo orden y contenido sirve para ambos formatos: en el <strong>deck en vivo</strong>, cada sección es una slide con una idea grande; en el <strong>dossier descargable</strong>, la misma sección se expande con el texto completo aquí escrito. Sección de casos de estudio omitida intencionalmente — se incorpora con el primer proyecto documentado (ver Case Study Framework, siguiente documento).</p>
+    </div>
+  </div>
+
+  <div data-screen-label="Indice" style="max-width:1160px;margin:0 auto;padding:0 48px 96px;">
+    <div style="font-size:12px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">ESTRUCTURA — 9 SECCIONES</div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;">
+      <sc-for list="{{sections}}" as="s" hint-placeholder-count="9">
+        <div style="background:#241A12;color:#F3EADA;border-radius:20px;padding:8px 18px;font-size:13px;">{{s.number}}. {{s.name}}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-screen-label="Overview" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:12px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:12px;">1. PORTADA INSTITUCIONAL</div>
+      <div style="font-family:'Spectral',serif;font-weight:700;font-size:32px;margin-bottom:8px;">INMERGE</div>
+      <div style="font-family:'Spectral',serif;font-weight:600;font-size:18px;color:#A8472B;margin-bottom:10px;">El dato, a la vista.</div>
+      <div style="font-size:14px;color:#7A6B58;max-width:640px;line-height:1.7;">Consultoría en datos y estrategia para gobiernos regionales y municipales, empresas y consultoras, e investigadores y prensa en el Perú.</div>
+    </div>
+  </div>
+
+  <div data-screen-label="Problema" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="font-size:12px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:12px;">2. EL PROBLEMA QUE RESOLVEMOS</div>
+    <p style="font-family:'Spectral',serif;font-weight:600;font-size:24px;line-height:1.5;max-width:780px;margin:0;">Las decisiones que más afectan a la gente —presupuesto público, salud, educación, seguridad— hoy se toman con datos que casi nadie puede verificar.</p>
+  </div>
+
+  <div data-screen-label="Que hacemos" style="background:#241A12;color:#F3EADA;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:12px;letter-spacing:2px;color:#D8A84E;font-weight:600;margin-bottom:24px;">3. QUÉ HACEMOS</div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px;">
+        <sc-for list="{{services}}" as="sv" hint-placeholder-count="6">
+          <div style="background:#3A2B1C;border-radius:4px;padding:18px;">
+            <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);margin-bottom:10px;"></div>
+            <div style="font-family:'Spectral',serif;font-weight:600;font-size:13px;line-height:1.4;">{{sv}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Industrias" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="font-size:12px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:24px;">4. A QUIÉN SERVIMOS</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      <sc-for list="{{segments}}" as="seg" hint-placeholder-count="3">
+        <div style="background:#EBDFC9;border-radius:4px;padding:24px;">
+          <div style="font-family:'Spectral',serif;font-weight:600;font-size:16px;margin-bottom:8px;">{{seg.name}}</div>
+          <div style="font-size:13px;color:#7A6B58;line-height:1.6;">{{seg.line}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-screen-label="Como trabajamos" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:12px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:8px;">5. CÓMO TRABAJAMOS — MÉTODO ACEQUIA</div>
+      <div style="display:flex;gap:0;flex-wrap:wrap;margin-top:20px;">
+        <sc-for list="{{phases}}" as="ph" hint-placeholder-count="5">
+          <div style="flex:1;min-width:160px;border-left:2px solid #A8472B;padding-left:16px;margin-right:16px;">
+            <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;">{{ph}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Stack" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="font-size:12px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:20px;">6. STACK TECNOLÓGICO</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <sc-for list="{{stack}}" as="t" hint-placeholder-count="8">
+        <div style="background:#241A12;color:#D8A84E;border-radius:3px;padding:8px 16px;font-size:13px;font-family:'IBM Plex Mono',monospace;">{{t}}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-screen-label="Equipo" style="background:#241A12;color:#F3EADA;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:12px;letter-spacing:2px;color:#D8A84E;font-weight:600;margin-bottom:16px;">7. EQUIPO</div>
+      <p style="font-size:15px;color:#C9B79C;line-height:1.7;max-width:720px;margin-bottom:24px;">Un equipo compacto que cubre todo el ciclo — el mismo equipo que diseña ejecuta, no una capa comercial entre el cliente y quien hace el trabajo.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <sc-for list="{{roles}}" as="r" hint-placeholder-count="5">
+          <div style="background:#3A2B1C;border-radius:20px;padding:8px 18px;font-size:13px;">{{r}}</div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Modelo" style="max-width:1160px;margin:0 auto;padding:96px 48px;">
+    <div style="font-size:12px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:24px;">8. MODELO DE ENTREGA</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:8px;">1. Diagnóstico de entrada</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Alcance corto, precio bajo de riesgo.</div>
+      </div>
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:8px;">2. Proyecto de implementación</div>
+        <div style="font-size:13px;color:#C9B79C;line-height:1.6;">Precio premium accesible, método documentado.</div>
+      </div>
+      <div style="border:1px solid #DDCBAE;border-radius:4px;padding:24px;">
+        <div style="font-family:'Spectral',serif;font-weight:600;font-size:15px;margin-bottom:8px;">3. Sistema vivo</div>
+        <div style="font-size:13px;color:#7A6B58;line-height:1.6;">Retención mensual, evolución continua.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Ventajas" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:12px;letter-spacing:2px;color:#A8472B;font-weight:600;margin-bottom:24px;">9. VENTAJAS COMPETITIVAS</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;">
+        <sc-for list="{{advantages}}" as="a" hint-placeholder-count="4">
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:8px;height:8px;background:#A8472B;transform:rotate(45deg);margin-top:6px;flex-shrink:0;"></div>
+            <div style="font-size:14px;line-height:1.6;">{{a}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Contacto" style="max-width:1160px;margin:0 auto;padding:96px 48px;text-align:center;">
+    <div style="font-size:12px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">CONTACTO</div>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <div style="background:#241A12;color:#F3EADA;border-radius:4px;padding:20px 32px;font-family:'Spectral',serif;font-weight:600;font-size:16px;">Escríbenos por WhatsApp →</div>
+      <div style="border:1px solid #241A12;color:#241A12;border-radius:4px;padding:20px 32px;font-family:'Spectral',serif;font-weight:600;font-size:16px;">contacto@inmerge.pe</div>
+    </div>
+  </div>
+
+  <div data-screen-label="Recomendaciones" style="background:#EBDFC9;padding:96px 48px;">
+    <div style="max-width:1160px;margin:0 auto;">
+      <div style="font-size:13px;letter-spacing:2px;color:#7A6B58;font-weight:600;margin-bottom:20px;">SIGUIENTE — FASE IV: PROPOSAL TEMPLATE</div>
+      <p style="font-size:15px;color:#241A12;line-height:1.7;max-width:720px;margin:0;">Con la presentación institucional definida, el siguiente documento formaliza el framework de propuesta consultiva que se usa proyecto a proyecto.</p>
+    </div>
+  </div>
+
+  <div style="height:56px;width:100%;background-color:#EBDFC9;background-image:repeating-linear-gradient(45deg,#A8472B 0 12px,transparent 12px 24px),repeating-linear-gradient(-45deg,#C68A3D 0 12px,transparent 12px 24px);"></div>
+  <div style="padding:32px 48px;text-align:center;font-size:13px;color:#7A6B58;">Inmerge — Corporate Portfolio v1.0 — Fase IV, Documento 1 de 3 — 2026</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const sections = [
+      { number: 1, name: 'Portada institucional' }, { number: 2, name: 'El problema que resolvemos' },
+      { number: 3, name: 'Qué hacemos' }, { number: 4, name: 'A quién servimos' },
+      { number: 5, name: 'Cómo trabajamos' }, { number: 6, name: 'Stack tecnológico' },
+      { number: 7, name: 'Equipo' }, { number: 8, name: 'Modelo de entrega' },
+      { number: 9, name: 'Ventajas competitivas + Contacto' }
+    ];
+    const services = ['Diagnóstico de Datos', 'Arquitectura en la Nube', 'Dashboards y Apps', 'Gobierno de Datos', 'Capacitación en IA', 'Sistema Vivo'];
+    const segments = [
+      { name: 'Gobiernos regionales y municipales', line: 'Ejecución presupuestal y rendición de cuentas verificable.' },
+      { name: 'Empresas y consultoras', line: 'Decisiones de negocio con método a la vista.' },
+      { name: 'Investigadores y prensa', line: 'La fuente y el cálculo, no solo la cifra final.' }
+    ];
+    const phases = ['Descubrimiento', 'Diseño', 'Construcción', 'Validación y Transferencia', 'Sostenimiento'];
+    const stack = ['Python', 'SQL', 'NoSQL', 'HTML', 'CSS', 'R', 'AWS', 'Claude'];
+    const roles = ['Consultor Senior', 'Data Scientist', 'Ingeniero de Cloud', 'Software Engineer', 'Director de Diseño'];
+    const advantages = [
+      'Narrativa cultural propia (Mochica/Chimú) que ningún competidor local o global puede replicar.',
+      'Transparencia metodológica como promesa explícita — cada entregable cita su fuente.',
+      'Precio premium accesible para gobiernos regionales/municipales desatendidos por firmas globales.',
+      'El mismo equipo que diseña, ejecuta y responde por WhatsApp — sin capas comerciales de por medio.'
+    ];
+    return { sections, services, segments, phases, stack, roles, advantages };
+  }
+}
+
+</script>
+</body>
+</html>
