@@ -66,7 +66,7 @@ alter default privileges for role postgres in schema public revoke execute on fu
 - [ ] **Step 2: Aplicar la migración**
 
 Run: `npx supabase@latest db push --include-all --linked`
-Expected: `Applying migration 0005_column_grants_and_codes.sql...` sin errores.
+Expected: `Applying migration 0005_column_grants.sql...` sin errores.
 
 - [ ] **Step 3: Verificar que las columnas quedaron cerradas**
 
