@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200">
+  <title>Inmerge — símbolo de marca</title>
+  <desc>Pirámide escalonada de rombos: 1 oro (fila superior), 3 ocre (fila media), 5 terracota (fila base). Pura geometría, sin dependencia de fuente — reproducible con fidelidad total fuera del navegador.</desc>
+
+  <!-- Fila base: 5 rombos terracota -->
+  <rect x="32"  y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 48 144)"/>
+  <rect x="88"  y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 104 144)"/>
+  <rect x="144" y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 160 144)"/>
+  <rect x="200" y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 216 144)"/>
+  <rect x="256" y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 272 144)"/>
+
+  <!-- Fila media: 3 rombos ocre -->
+  <rect x="88"  y="72" width="32" height="32" fill="#C68A3D" transform="rotate(45 104 88)"/>
+  <rect x="144" y="72" width="32" height="32" fill="#C68A3D" transform="rotate(45 160 88)"/>
+  <rect x="200" y="72" width="32" height="32" fill="#C68A3D" transform="rotate(45 216 88)"/>
+
+  <!-- Fila superior: 1 rombo oro -->
+  <rect x="144" y="16" width="32" height="32" fill="#D8A84E" transform="rotate(45 160 32)"/>
+</svg>

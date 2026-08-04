@@ -1,0 +1,237 @@
+:root {
+  --bg: #f3eada;
+  --ink: #241a12;
+  --terracotta: #a8472b;
+  --terracotta-hover: #8a3820;
+  --gold: #d8a84e;
+  --ochre: #c68a3d;
+  --border: #ddcbae;
+  --muted: #7a6b58;
+  --cream2: #ebdfc9;
+  --brown2: #3a2b1c;
+  --tan-text: #c9b79c;
+  --green: #4a9c6a;
+  --rose: #d08a6e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+a {
+  color: var(--terracotta);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--terracotta-hover);
+  text-decoration: underline;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: rotate(45deg) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: rotate(45deg) scale(1.18);
+    opacity: 1;
+  }
+}
+.breathe-diamond {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes preloaderPulse {
+  0%,
+  100% {
+    transform: rotate(45deg) scale(1);
+  }
+  50% {
+    transform: rotate(45deg) scale(1.06);
+  }
+}
+@keyframes preloaderDots {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.preloader-mark {
+  animation: preloaderPulse 2.2s ease-in-out infinite;
+}
+.preloader-dot {
+  animation: preloaderDots 1.2s ease-in-out infinite;
+}
+
+@keyframes barPulse {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.preloader-bar {
+  transform-origin: bottom;
+  animation: barPulse 1.6s ease-in-out infinite;
+}
+.preloader-overlay {
+  transition: opacity 0.7s ease;
+}
+
+/* Hover feedback for interactive elements. All of this is inline-style-based
+   elsewhere in the app, and inline `style` always wins over a stylesheet
+   rule targeting the same property — so these deliberately only touch
+   properties the inline styles never set (filter/transform/box-shadow/
+   background-color-as-fill/text-decoration), instead of trying to override
+   an inline color or background directly, which would silently no-op. */
+.btn-hover {
+  transition:
+    filter 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+}
+.btn-hover:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 14px rgba(36, 26, 18, 0.18);
+}
+.btn-hover:active {
+  transform: scale(0.97);
+  filter: brightness(0.96);
+}
+
+.btn-outline-hover {
+  transition: background-color 0.15s ease;
+}
+.btn-outline-hover:hover,
+.btn-outline-hover:active {
+  background-color: var(--cream2);
+}
+
+.card-hover {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(36, 26, 18, 0.14);
+}
+.card-hover:active {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(36, 26, 18, 0.14);
+}
+
+/* Restores the background-fill-on-hover the original design had on list/
+   accordion rows (a proprietary `style-hover` prop in the source export
+   that doesn't exist in plain CSS) — same visual result, real :hover rule.
+   :active is the one that actually matters on touch screens — there's no
+   real hover on a phone, so without this a tapped row gives zero feedback. */
+.row-hover {
+  transition: background-color 0.2s ease;
+}
+.row-hover:hover,
+.row-hover:active {
+  background-color: var(--cream2);
+}
+
+.link-hover:hover,
+.link-hover:active {
+  text-decoration: underline;
+}
+
+/* Icon-only controls (close ✕, hamburger) — a soft circular fill so tapping
+   them on a touchscreen gives some visible feedback, same as everything
+   else now does. */
+.icon-btn-hover {
+  transition: background-color 0.15s ease;
+  border-radius: 50%;
+}
+.icon-btn-hover:hover,
+.icon-btn-hover:active {
+  background-color: var(--cream2);
+}
+
+.nav-desktop {
+  display: flex;
+}
+.nav-mobile-toggle {
+  display: none;
+}
+@media (max-width: 759px) {
+  .nav-desktop {
+    display: none;
+  }
+  .nav-mobile-toggle {
+    display: flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .breathe-diamond,
+  .preloader-mark,
+  .preloader-dot,
+  .preloader-bar {
+    animation: none !important;
+  }
+  .preloader-overlay {
+    transition: none !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

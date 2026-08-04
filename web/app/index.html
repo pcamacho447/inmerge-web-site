@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es-PE">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inmerge — Consultoría en Datos · Perú</title>
+    <meta
+      name="description"
+      content="Gobiernos, empresas e investigadores en el Perú decidiendo sobre datos verificables — no solo creíbles."
+    />
+    <link rel="canonical" href="https://inmerge.pe/" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Static site-wide defaults for social-link-preview crawlers (WhatsApp, Facebook,
+       Twitter/X, LinkedIn) — these do NOT execute JS, so every shared route falls back to
+       these tags regardless of which page was actually shared. Per-page <title>/description
+       are set client-side in each page via useDocumentHead (helps the browser tab and
+       Googlebot, which does execute JS, but not link-preview cards). True per-page social
+       cards would require prerendering/SSG, which this app doesn't have yet. -->
+    <meta property="og:site_name" content="Inmerge" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_PE" />
+    <meta property="og:url" content="https://inmerge.pe/" />
+    <meta property="og:title" content="Inmerge — Consultoría en Datos · Perú" />
+    <meta
+      property="og:description"
+      content="Gobiernos, empresas e investigadores en el Perú decidiendo sobre datos verificables — no solo creíbles."
+    />
+    <!-- No og:image yet — needs a real 1200×630 asset. A missing tag is safer than a broken
+       image link; some crawlers (notably WhatsApp) will auto-screenshot the page as a
+       fallback, others will show a text-only card. Add one before public launch. -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Inmerge — Consultoría en Datos · Perú" />
+    <meta
+      name="twitter:description"
+      content="Gobiernos, empresas e investigadores en el Perú decidiendo sobre datos verificables — no solo creíbles."
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "Inmerge",
+        "description": "Consultoría en datos para gobiernos, empresas e investigadores en el Perú: diagnóstico de datos, arquitectura en la nube, dashboards ejecutivos, gobierno de datos y capacitación en IA.",
+        "url": "https://inmerge.pe/",
+        "email": "contacto@inmerge.pe",
+        "telephone": "+51957251279",
+        "areaServed": {
+          "@type": "Country",
+          "name": "Perú"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Lima",
+          "addressCountry": "PE"
+        },
+        "sameAs": []
+      }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;0,800;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+dist
+node_modules
+public/*.svg
+# Deno Edge Functions — format with `deno fmt` instead, to match Deno's own
+# conventions and avoid two formatters fighting over the same files.
+supabase/functions

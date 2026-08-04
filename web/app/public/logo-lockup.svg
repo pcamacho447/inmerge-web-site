@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 250" width="320" height="250">
+  <title>Inmerge — lockup completo (símbolo + wordmark)</title>
+  <desc>
+    Símbolo (pirámide de rombos, geometría pura) + wordmark "INMERGE" en Spectral 700.
+    CAVEAT: el texto usa font-family con fallback a serif del sistema — se ve correcto
+    solo donde la fuente Spectral esté disponible (navegadores con la webfont cargada).
+    Para un asset verdaderamente portátil (firma de email, impresión, editor vectorial
+    sin acceso a la webfont), convertir el texto a paths en Illustrator/Figma antes de
+    distribuir — este entorno no tiene una herramienta de font-to-path disponible.
+    Para uso solo del símbolo, sin esa dependencia, usar logo-mark.svg en su lugar.
+  </desc>
+
+  <!-- Fila base: 5 rombos terracota -->
+  <rect x="32"  y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 48 144)"/>
+  <rect x="88"  y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 104 144)"/>
+  <rect x="144" y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 160 144)"/>
+  <rect x="200" y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 216 144)"/>
+  <rect x="256" y="128" width="32" height="32" fill="#A8472B" transform="rotate(45 272 144)"/>
+
+  <!-- Fila media: 3 rombos ocre -->
+  <rect x="88"  y="72" width="32" height="32" fill="#C68A3D" transform="rotate(45 104 88)"/>
+  <rect x="144" y="72" width="32" height="32" fill="#C68A3D" transform="rotate(45 160 88)"/>
+  <rect x="200" y="72" width="32" height="32" fill="#C68A3D" transform="rotate(45 216 88)"/>
+
+  <!-- Fila superior: 1 rombo oro -->
+  <rect x="144" y="16" width="32" height="32" fill="#D8A84E" transform="rotate(45 160 32)"/>
+
+  <!-- Wordmark — depende de la fuente Spectral, ver caveat en <desc> -->
+  <text x="160" y="222" text-anchor="middle" font-family="'Spectral', Georgia, 'Times New Roman', serif" font-weight="700" font-size="36" letter-spacing="3" fill="#241A12">INMERGE</text>
+</svg>

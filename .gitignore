@@ -20,6 +20,19 @@ pnpm-debug.log*
 .env.*
 !.env.example
 
+# Credenciales sueltas. NUNCA commitear: el repo es remoto y publicar una
+# contraseña la deja en el historial de git para siempre, aunque se borre
+# el archivo después.
+contraseña supabase.txt
+*contraseña*
+*password*.txt
+*credenciales*
+
+# Claude Code — machine-local settings (may hold tokens/env overrides).
+# .mcp.json is intentionally NOT ignored: it references ${SUPABASE_ACCESS_TOKEN}
+# rather than embedding it, so it is safe to commit and share.
+.claude/settings.local.json
+
 # Build output
 dist/
 build/
