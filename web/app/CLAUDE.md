@@ -125,7 +125,7 @@ Rationale: auth, data, and entitlements/downloads can all be built and tested en
 - [ ] **Upload the real premium PDFs** to the `report-files` bucket and set each report's `file_path` (only 1 test PDF/placeholder exists today).
 - [ ] **Replace the 2 illustrative premium reports** (`seguimiento-trimestral-educacion`, `radiografia-contratistas-infraestructura` in `0002_seed_premium_examples.sql`) with real editorial content once it exists.
 - [ ] **Define the manual-invoicing process** (boleta/factura by hand after each payment) — a written runbook, not code.
-- Hygiene (not code, but open): revoke the Supabase Personal Access Token (`sbp_…`) used for the B3 CLI deploy; commit the B3 changes (**git CLI now works** — v2.55.0 with worktree support, verified 2026-08-04; the earlier "git is not installed on this machine" note is obsolete); rotate the test account password (it was shared in a chat).
+- Hygiene: ✅ the B3 changes are committed (**git CLI works** — v2.55.0, verified 2026-08-04) and the repo now has a private GitHub remote at `pcamacho447/inmerge-website`. ✅ **The `pcamacho447@gmail.com` app-user password was rotated 2026-08-04** via the Admin API to a 32-char random value, existing sessions revoked (`auth.sessions` 1 → 0), and both directions verified: the new password signs in, the old one returns `Invalid login credentials`. The new value was never printed to the transcript — it went to a gitignored local file for the owner to move into a password manager. Still open: **revoke the Supabase Personal Access Token** (`sbp_…`) used for the B3 CLI deploy, and confirm the old password was not reused on supabase.com / email / elsewhere (rotating the app user does not cover those).
 
 ## Known open items (asset/decision-blocked, not code work)
 
