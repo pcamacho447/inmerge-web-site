@@ -42,23 +42,26 @@ async function ensureProfile(sessionUser) {
   const meta = sessionUser.user_metadata || {};
   if (!meta.full_name) return true; // nada que crear — sin metadata de registro
 
-  const { data: org, error: orgError } = await supabase
-    .from('organizations')
-    .insert({
-      billing_type: meta.billing_type || 'persona_natural',
-      legal_name: meta.full_name,
-      tax_id: meta.tax_id || null,
-      billing_email: sessionUser.email,
-    })
-    .select()
-    .single();
+  // El id se genera acá, no con .select() tras el insert: organizations_select_own
+  // (0001_init.sql) solo deja ver una organización a través de un `profiles` que
+  // ya apunte a ella, y ese `profiles` es justo el que estamos por crear. Pedir
+  // RETURNING obligaría a pasar esa policy de SELECT sobre la fila recién
+  // insertada, que nunca puede cumplirse todavía — huevo y gallina, siempre 42501.
+  const orgId = crypto.randomUUID();
+  const { error: orgError } = await supabase.from('organizations').insert({
+    id: orgId,
+    billing_type: meta.billing_type || 'persona_natural',
+    legal_name: meta.full_name,
+    tax_id: meta.tax_id || null,
+    billing_email: sessionUser.email,
+  });
 
   if (orgError) {
-    // 42501 = RLS rechazó el insert. Para una sesión supuestamente
-    // autenticada eso significa que Postgres nos vio como `anon`: el usuario
-    // de la sesión guardada ya no existe (usuario borrado, o proyecto
-    // reconstruido). Eso es basura, no un fallo transitorio — reintentarlo en
-    // cada getSession y cada cambio de visibilidad solo inunda la consola.
+    // 42501 = RLS rechazó el insert. Con el id generado acá esto ya no debería
+    // pasar para un alta legítima — si pasa, la sesión es basura (usuario
+    // borrado, o proyecto reconstruido). Eso no es un fallo transitorio —
+    // reintentarlo en cada getSession y cada cambio de visibilidad solo
+    // inunda la consola.
     if (orgError.code === '42501') {
       await supabase.auth.signOut();
       return false;
@@ -69,7 +72,7 @@ async function ensureProfile(sessionUser) {
 
   const { error: profileError } = await supabase
     .from('profiles')
-    .insert({ id: sessionUser.id, organization_id: org.id, full_name: meta.full_name });
+    .insert({ id: sessionUser.id, organization_id: orgId, full_name: meta.full_name });
   if (profileError) console.error('Failed to create profile on first login:', profileError);
   return true;
 }
