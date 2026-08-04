@@ -26,18 +26,19 @@
 
 ---
 
-### Task 1: Migración `0005` — permisos por columna y códigos no adivinables
+### Task 1: Migración `0005` — permisos por columna y default privileges
 
 **Files:**
-- Create: `web/app/supabase/migrations/0005_column_grants_and_codes.sql`
+- Create: `web/app/supabase/migrations/0005_column_grants.sql`
 
 **Interfaces:**
 - Consumes: `public.orders` (0003).
-- Produces: `orders` con INSERT restringido a `(user_id, kind, report_id, plan, method)`; `public.orders_set_amount()` que además acuña `code`; default privileges de `public` sin EXECUTE para `anon`/`authenticated`.
+- Produces: `orders` con INSERT restringido a `(user_id, kind, report_id, plan, method)`; default privileges de `public` sin EXECUTE para `anon`/`authenticated`.
+- **Nota de alcance:** este task NO toca `orders_set_amount()`. El cuerpo del trigger se define una sola vez, en Task 3 — `create or replace` exige el cuerpo completo, y redefinirlo en dos tasks duplicaría ~25 líneas. Lo que cierra C1 acá es el `revoke`: aunque el `default` de la columna siga generando códigos secuenciales hasta Task 3, el cliente ya no puede escribir `code`.
 
 - [ ] **Step 1: Escribir la migración**
 
-Crea `web/app/supabase/migrations/0005_column_grants_and_codes.sql`:
+Crea `web/app/supabase/migrations/0005_column_grants.sql`:
 
 ```sql
 -- Cierra C1/I4: RLS no tiene granularidad de columna, así que el trigger que
@@ -52,59 +53,6 @@ Crea `web/app/supabase/migrations/0005_column_grants_and_codes.sql`:
 
 revoke insert, update, delete on public.orders from anon, authenticated;
 grant insert (user_id, kind, report_id, plan, method) on public.orders to authenticated;
-
--- El código lo acuña el servidor. Antes venía de un `default` de columna, y un
--- default es sobreescribible por el cliente; una asignación en un BEFORE
--- trigger no lo es. Formato aleatorio en vez de secuencial: la secuencia
--- filtraba el volumen de ventas acumulado a cualquier cliente, y le daba al
--- atacante un blanco al que apuntar.
-create or replace function public.orders_set_amount()
-returns trigger
-language plpgsql
-set search_path = public
-as $$
-declare
-  v_price numeric(10, 2);
-  v_tier text;
-  v_code text;
-  v_try int := 0;
-begin
-  if new.kind = 'report' then
-    select price_pen, tier into v_price, v_tier from public.reports where id = new.report_id;
-    if v_tier is null then
-      raise exception 'El reporte % no existe', new.report_id;
-    end if;
-    if v_tier = 'free' then
-      raise exception 'El reporte % es gratuito — no se cobra', new.report_id;
-    end if;
-    if v_price is null then
-      raise exception 'El reporte % no tiene precio individual', new.report_id;
-    end if;
-  else
-    select price_pen into v_price from public.plans where id = new.plan;
-    if v_price is null then
-      raise exception 'El plan % no existe', new.plan;
-    end if;
-  end if;
-
-  -- extensions.gen_random_bytes: pgcrypto NO está en public, y esta función
-  -- fija search_path = public. Sin calificar el esquema, esto revienta.
-  loop
-    v_try := v_try + 1;
-    v_code := 'INM-' || to_char(now(), 'YY') || '-' || upper(substr(encode(extensions.gen_random_bytes(4), 'hex'), 1, 6));
-    exit when not exists (select 1 from public.orders where code = v_code);
-    if v_try >= 10 then
-      raise exception 'No se pudo generar un código de pedido único';
-    end if;
-  end loop;
-
-  new.code := v_code;
-  new.amount_pen := v_price;
-  new.status := 'pending';
-  new.approved_at := null;
-  return new;
-end;
-$$;
 
 -- Cierra I3: Supabase trae `alter default privileges ... grant execute on
 -- functions to anon, authenticated` para el esquema public. `create or replace`
@@ -134,24 +82,25 @@ select
 
 `puede_code`, `puede_notes` y `puede_created` deben ser `false`. `puede_method` debe ser `true` — si es `false`, el grant de columnas quedó mal y los clientes no podrán crear pedidos.
 
-- [ ] **Step 4: Verificar el formato del código nuevo**
+- [ ] **Step 4: Verificar que un pedido normal todavía se puede crear**
+
+El riesgo de revocar permisos es pasarse de largo y romper el checkout. Confirma que el camino legítimo sigue vivo:
 
 ```sql
 insert into public.orders (user_id, kind, report_id, method)
 select (select id from auth.users limit 1), 'report', id, 'deposit'
 from public.reports where slug = 'radiografia-contratistas-infraestructura'
-returning code;
+returning code, amount_pen;
 ```
 
-El código debe verse `INM-26-XXXXXX` con 6 hex en mayúscula, **no** `INM-2026-0007`. Después bórralo:
-`delete from public.orders where code like 'INM-26-%';`
+Debe insertar sin error, con `amount_pen = 180.00`. Después bórralo:
+`delete from public.orders where code = '<CODIGO_DEVUELTO>';`
 
 - [ ] **Step 5: Commit**
 
 ```bash
-npm run format
-git add web/app/supabase/migrations/0005_column_grants_and_codes.sql
-git commit -m "feat(db): restrict client INSERT to intent columns and mint unguessable order codes"
+git add web/app/supabase/migrations/0005_column_grants.sql
+git commit -m "feat(db): restrict client INSERT on orders to intent columns only"
 ```
 
 ---
