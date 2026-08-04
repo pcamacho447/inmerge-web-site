@@ -33,47 +33,22 @@ function saveMockState(userId, state) {
   localStorage.setItem(mockStateKey(userId), JSON.stringify(state));
 }
 
-// Crea profile/organization desde la metadata de registro la primera vez que
-// hay sesión. Devuelve false si la sesión resultó ser basura (ver el 42501).
-async function ensureProfile(sessionUser) {
-  const { data: existing } = await supabase.from('profiles').select('id').eq('id', sessionUser.id).maybeSingle();
-  if (existing) return true;
+// La creación de profile/organization vive en la BD (ensure_profile(),
+// migración 0006): es security definer, atómica e idempotente, así que dos
+// llamadas concurrentes no pueden duplicar la organización. Devuelve false si
+// la sesión es basura (usuario borrado o proyecto reconstruido), y en ese caso
+// cerramos sesión en vez de reintentar en cada getSession.
+async function ensureProfile() {
+  const { error } = await supabase.rpc('ensure_profile');
+  if (!error) return true;
 
-  const meta = sessionUser.user_metadata || {};
-  if (!meta.full_name) return true; // nada que crear — sin metadata de registro
-
-  // El id se genera acá, no con .select() tras el insert: organizations_select_own
-  // (0001_init.sql) solo deja ver una organización a través de un `profiles` que
-  // ya apunte a ella, y ese `profiles` es justo el que estamos por crear. Pedir
-  // RETURNING obligaría a pasar esa policy de SELECT sobre la fila recién
-  // insertada, que nunca puede cumplirse todavía — huevo y gallina, siempre 42501.
-  const orgId = crypto.randomUUID();
-  const { error: orgError } = await supabase.from('organizations').insert({
-    id: orgId,
-    billing_type: meta.billing_type || 'persona_natural',
-    legal_name: meta.full_name,
-    tax_id: meta.tax_id || null,
-    billing_email: sessionUser.email,
-  });
-
-  if (orgError) {
-    // 42501 = RLS rechazó el insert. Con el id generado acá esto ya no debería
-    // pasar para un alta legítima — si pasa, la sesión es basura (usuario
-    // borrado, o proyecto reconstruido). Eso no es un fallo transitorio —
-    // reintentarlo en cada getSession y cada cambio de visibilidad solo
-    // inunda la consola.
-    if (orgError.code === '42501') {
-      await supabase.auth.signOut();
-      return false;
-    }
-    console.error('Failed to create organization on first login:', orgError);
-    return true;
+  // 42501 = RLS/permisos rechazaron la llamada para una sesión supuestamente
+  // autenticada: Postgres nos vio como `anon`. Eso es una sesión zombi.
+  if (error.code === '42501' || error.code === 'PGRST301') {
+    await supabase.auth.signOut();
+    return false;
   }
-
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .insert({ id: sessionUser.id, organization_id: orgId, full_name: meta.full_name });
-  if (profileError) console.error('Failed to create profile on first login:', profileError);
+  console.error('ensure_profile failed:', error);
   return true;
 }
 
@@ -112,7 +87,7 @@ async function fetchProfileFields(userId) {
 }
 
 async function buildUser(sessionUser) {
-  const sessionValid = await ensureProfile(sessionUser);
+  const sessionValid = await ensureProfile();
   if (!sessionValid) return null; // sesión zombi: ya cerramos sesión
 
   const profileFields = await fetchProfileFields(sessionUser.id);
@@ -173,14 +148,16 @@ export function AuthProvider({ children }) {
       // profile/org creation happens later (ensureProfile, on first login).
       return { confirmEmailRequired: true };
     }
-    setUser(await buildUser(data.session.user));
+    // Igual que en login(): el listener de onAuthStateChange se encarga.
     return { confirmEmailRequired: false };
   }, []);
 
+  // No llamamos a buildUser acá: signInWithPassword dispara SIGNED_IN y el
+  // listener de onAuthStateChange ya reconstruye el usuario. Hacerlo en los dos
+  // lados ejecutaba todo el arranque dos veces por login.
   const login = useCallback(async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    setUser(await buildUser(data.user));
   }, []);
 
   const logout = useCallback(async () => {
