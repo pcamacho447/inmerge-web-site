@@ -4,7 +4,7 @@ import useOverlay from '../hooks/useOverlay.js';
 import { useAuth } from '../lib/auth.jsx';
 import { DEMO_MODE } from '../lib/demoMode.js';
 import { createOrder, ORDER_METHODS } from '../lib/orders.js';
-import { BANK_ACCOUNT, VERIFICATION_SLA, YAPE_PLIN } from '../data/bankDetails.js';
+import { BANK_ACCOUNT, BILLING_ENTITY, VERIFICATION_SLA, YAPE_PLIN } from '../data/bankDetails.js';
 import { waLink, waVoucherMessage } from '../data/content.js';
 
 // `kind`: 'report' | 'subscription'. `item` es una fila de `reports` o de
@@ -187,14 +187,6 @@ export default function CheckoutModal({ kind, item, onClose }) {
                 <dd style={{ margin: 0, fontFamily: "'IBM Plex Mono',monospace" }}>{BANK_ACCOUNT.cci}</dd>
                 <dt style={{ color: 'var(--muted)' }}>Titular</dt>
                 <dd style={{ margin: 0 }}>{BANK_ACCOUNT.holder}</dd>
-                {/* El RUC es opcional: mejor no mostrar la fila que mostrarla vacía
-                    a alguien que está a punto de transferir dinero. */}
-                {BANK_ACCOUNT.taxId && (
-                  <>
-                    <dt style={{ color: 'var(--muted)' }}>RUC</dt>
-                    <dd style={{ margin: 0, fontFamily: "'IBM Plex Mono',monospace" }}>{BANK_ACCOUNT.taxId}</dd>
-                  </>
-                )}
               </dl>
             ) : (
               <dl style={{ margin: '0 0 24px', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '10px 16px', fontSize: 13 }}>
@@ -203,6 +195,26 @@ export default function CheckoutModal({ kind, item, onClose }) {
                 <dt style={{ color: 'var(--muted)' }}>A nombre de</dt>
                 <dd style={{ margin: 0 }}>{YAPE_PLIN.holder}</dd>
               </dl>
+            )}
+
+            {/* Aplica a los dos métodos: pagues por transferencia o por Yape, el
+                comprobante lo emite la misma empresa. Va separado del titular de
+                la cuenta porque no son la misma entidad. */}
+            {BILLING_ENTITY.legalName && BILLING_ENTITY.taxId && (
+              <div
+                style={{
+                  borderTop: '1px solid var(--border)',
+                  paddingTop: 16,
+                  marginBottom: 24,
+                  fontSize: 12,
+                  color: 'var(--muted)',
+                  lineHeight: 1.6,
+                }}
+              >
+                Facturamos como <strong style={{ color: 'var(--ink)', fontWeight: 600 }}>{BILLING_ENTITY.legalName}</strong> — RUC{' '}
+                <span style={{ fontFamily: "'IBM Plex Mono',monospace", color: 'var(--ink)' }}>{BILLING_ENTITY.taxId}</span>. Si necesitas
+                factura, dinos al mandar la constancia.
+              </div>
             )}
 
             <div style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 16 }}>

@@ -11,11 +11,20 @@ export const BANK_ACCOUNT = {
   accountType: 'Cuenta Simple Soles',
   number: '611-3082499683',
   cci: '00361101308249968314',
+  // Titular de la CUENTA — persona natural. Tiene que decir exactamente lo que
+  // el banco muestra al transferir; si acá dijera la razón social, el cliente
+  // vería un nombre distinto al validar el destino y pensaría que se equivocó.
   holder: 'Paul Alonso Camacho Abadie',
-  // Sin RUC todavía. `null` y no un placeholder a propósito: el modal omite la
-  // fila entera cuando falta, en vez de mostrarle "FALTA CONFIGURAR" a alguien
-  // que está por transferir dinero. Ponlo acá cuando exista.
-  taxId: null,
+};
+
+// Quién EMITE el comprobante, que no es lo mismo que el titular de la cuenta.
+// Se separa a propósito: la cuenta es personal y la factura la emite la SAC, y
+// mostrarlos como si fueran lo mismo confundiría a un cliente empresa que está
+// cuadrando su sustento contable. `null` en cualquiera de los dos omite la
+// sección entera en el modal.
+export const BILLING_ENTITY = {
+  legalName: 'Servicios Inmerge SAC',
+  taxId: '20608620690',
 };
 
 export const YAPE_PLIN = {
