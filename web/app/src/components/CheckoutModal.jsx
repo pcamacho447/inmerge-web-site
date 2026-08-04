@@ -187,8 +187,14 @@ export default function CheckoutModal({ kind, item, onClose }) {
                 <dd style={{ margin: 0, fontFamily: "'IBM Plex Mono',monospace" }}>{BANK_ACCOUNT.cci}</dd>
                 <dt style={{ color: 'var(--muted)' }}>Titular</dt>
                 <dd style={{ margin: 0 }}>{BANK_ACCOUNT.holder}</dd>
-                <dt style={{ color: 'var(--muted)' }}>RUC</dt>
-                <dd style={{ margin: 0, fontFamily: "'IBM Plex Mono',monospace" }}>{BANK_ACCOUNT.taxId}</dd>
+                {/* El RUC es opcional: mejor no mostrar la fila que mostrarla vacía
+                    a alguien que está a punto de transferir dinero. */}
+                {BANK_ACCOUNT.taxId && (
+                  <>
+                    <dt style={{ color: 'var(--muted)' }}>RUC</dt>
+                    <dd style={{ margin: 0, fontFamily: "'IBM Plex Mono',monospace" }}>{BANK_ACCOUNT.taxId}</dd>
+                  </>
+                )}
               </dl>
             ) : (
               <dl style={{ margin: '0 0 24px', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '10px 16px', fontSize: 13 }}>
