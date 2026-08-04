@@ -1,0 +1,16 @@
+# Normaliza los fines de línea. Sin esto, en Windows cada `npm run format`
+# reescribe archivos a CRLF y git los reporta como modificados aunque no haya
+# cambiado una sola línea de código — diffs fantasma que esconden los cambios
+# de verdad. `text=auto eol=lf` guarda siempre LF en el repositorio; en el
+# disco cada quien ve lo que su editor espera.
+* text=auto eol=lf
+
+# Binarios: nunca tocar.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
