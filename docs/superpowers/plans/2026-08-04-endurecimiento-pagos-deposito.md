@@ -599,10 +599,10 @@ git commit -m "feat(db): block duplicate orders, verify amount on approval, fix 
 
 ---
 
-### Task 4: Migración `0008` — publicación y fuga de `file_path`
+### Task 4: Migración `0009` — publicación y fuga de `file_path`
 
 **Files:**
-- Create: `web/app/supabase/migrations/0008_published_and_file_path.sql`
+- Create: `web/app/supabase/migrations/0009_published_and_file_path.sql`
 - Modify: `web/app/src/hooks/useReports.js:15-18`
 
 **Interfaces:**
@@ -613,7 +613,7 @@ git commit -m "feat(db): block duplicate orders, verify amount on approval, fix 
 
 **Atención:** hoy los 7 reportes tienen `published_at = NULL`. El backfill del primer statement es obligatorio; sin él, el filtro deja el catálogo vacío y **nadie puede descargar nada**.
 
-Crea `web/app/supabase/migrations/0008_published_and_file_path.sql`:
+Crea `web/app/supabase/migrations/0009_published_and_file_path.sql`:
 
 ```sql
 -- BACKFILL PRIMERO. Los 7 reportes existentes tienen published_at NULL; sin
@@ -708,7 +708,7 @@ Expected: todo en verde. Levanta `npm run dev` y confirma que `/reportes` sigue 
 
 ```bash
 npm run format
-git add web/app/supabase/migrations/0008_published_and_file_path.sql web/app/src/hooks/useReports.js
+git add web/app/supabase/migrations/0009_published_and_file_path.sql web/app/src/hooks/useReports.js
 git commit -m "feat(db): gate access on published_at and stop exposing file_path to clients"
 ```
 
