@@ -4,6 +4,7 @@ import useOverlay from '../hooks/useOverlay.js';
 import { useAuth } from '../lib/auth.jsx';
 import { DEMO_MODE } from '../lib/demoMode.js';
 import { createOrder, ORDER_METHODS } from '../lib/orders.js';
+import { formatPEN } from '../lib/formatPEN.js';
 import { BANK_ACCOUNT, BILLING_ENTITY, VERIFICATION_SLA, YAPE_PLIN } from '../data/bankDetails.js';
 import { waLink, waVoucherMessage } from '../data/content.js';
 
@@ -69,6 +70,13 @@ export default function CheckoutModal({ kind, item, onClose }) {
     width: '100%',
     border: 'none',
   };
+
+  // Se muestra el método de la FILA, no el del estado local. createOrder
+  // reutiliza un pedido pendiente del mismo ítem sin importar el método, así
+  // que elegir Yape sobre un pedido creado como depósito mostraba
+  // instrucciones que contradicen lo guardado — y como `orders` no tiene policy
+  // de UPDATE, eso es incorregible después.
+  const shownMethod = order?.method ?? method;
 
   return (
     <div
@@ -171,11 +179,11 @@ export default function CheckoutModal({ kind, item, onClose }) {
             <div style={labelStyle}>PEDIDO GENERADO</div>
             <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontWeight: 500, fontSize: 26, marginBottom: 6 }}>{order.code}</div>
             <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 24 }}>
-              Deposita <strong style={{ color: 'var(--ink)' }}>S/ {order.amount_pen}</strong> y pon el código{' '}
+              Deposita <strong style={{ color: 'var(--ink)' }}>S/ {formatPEN(order.amount_pen)}</strong> y pon el código{' '}
               <strong style={{ color: 'var(--ink)' }}>{order.code}</strong> en el concepto. Es lo que nos permite reconocer tu pago.
             </div>
 
-            {method === ORDER_METHODS.DEPOSIT ? (
+            {shownMethod === ORDER_METHODS.DEPOSIT ? (
               <dl style={{ margin: '0 0 24px', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '10px 16px', fontSize: 13 }}>
                 <dt style={{ color: 'var(--muted)' }}>Banco</dt>
                 <dd style={{ margin: 0, fontWeight: 600 }}>{BANK_ACCOUNT.bank}</dd>
@@ -249,7 +257,7 @@ export default function CheckoutModal({ kind, item, onClose }) {
             <div style={labelStyle}>{kind === 'subscription' ? 'SUSCRIPCIÓN' : 'COMPRA DE REPORTE'}</div>
             <div style={titleStyle}>{title}</div>
             <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 15, color: 'var(--muted)', marginBottom: 24 }}>
-              S/ {price}
+              S/ {formatPEN(price)}
               <span style={{ fontSize: 12 }}>{periodSuffix}</span>
             </div>
 

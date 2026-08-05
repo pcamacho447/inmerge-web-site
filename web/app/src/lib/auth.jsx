@@ -95,9 +95,19 @@ async function buildUser(sessionUser) {
   const sessionValid = await ensureProfile();
   if (!sessionValid) return null; // sesión zombi: ya cerramos sesión
 
-  const profileFields = await fetchProfileFields(sessionUser.id);
-  const real = await fetchRealEntitlements(sessionUser.id);
-  const orders = await fetchOrders(sessionUser.id).catch(() => []);
+  const [profileFields, real] = await Promise.all([fetchProfileFields(sessionUser.id), fetchRealEntitlements(sessionUser.id)]);
+
+  // Antes esto era `.catch(() => [])`, y una falla de carga se veía IDÉNTICA a
+  // "no tienes pedidos" — justo en la página que existe para tranquilizar a
+  // alguien que acaba de depositar. Ahora se distingue.
+  let orders = [];
+  let ordersError = false;
+  try {
+    orders = await fetchOrders(sessionUser.id);
+  } catch (err) {
+    console.error('No se pudieron cargar los pedidos:', err);
+    ordersError = true;
+  }
 
   // Con la bandera apagada el mock no participa: una sola fuente de verdad.
   const mockState = DEMO_MODE ? loadMockState(sessionUser.id) : { subscription: null, purchases: [] };
@@ -111,6 +121,7 @@ async function buildUser(sessionUser) {
     subscription,
     purchases,
     orders,
+    ordersError,
   };
 }
 

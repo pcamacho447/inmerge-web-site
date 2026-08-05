@@ -1,3 +1,5 @@
+import { formatPEN } from '../lib/formatPEN.js';
+
 export const WA_LINK = 'https://wa.me/51957251279';
 
 // Prefilled WhatsApp message per CTA context — gives whoever replies instant
@@ -43,7 +45,7 @@ export function periodLabel(periodMonths) {
 // Mensaje de WhatsApp para mandar la constancia. Un link wa.me no puede
 // adjuntar la foto: abre el chat con el texto listo y el cliente adjunta.
 export function waVoucherMessage(order) {
-  return `Hola, deposité S/ ${order.amount_pen} por el pedido ${order.code}. Adjunto mi constancia.`;
+  return `Hola, deposité S/ ${formatPEN(order.amount_pen)} por el pedido ${order.code}. Adjunto mi constancia.`;
 }
 
 export const VALUES = [

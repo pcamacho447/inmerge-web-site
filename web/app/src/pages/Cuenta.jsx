@@ -3,13 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import useReports from '../hooks/useReports.js';
 import Footer from '../components/Footer.jsx';
-import { useAuth } from '../lib/auth.jsx';
+import { useAuth, isSubscriptionActive } from '../lib/auth.jsx';
 import { getReportDownloadUrl } from '../lib/downloadReport.js';
+import { formatPEN } from '../lib/formatPEN.js';
 import { waLink, waVoucherMessage } from '../data/content.js';
 import usePlans from '../hooks/usePlans.js';
 import CheckoutModal from '../components/CheckoutModal.jsx';
 import { DEMO_MODE } from '../lib/demoMode.js';
-import { isSubscriptionActive } from '../lib/auth.jsx';
 
 // La Edge Function responde en inglés y con vocabulario de sistema. Quien lee
 // esto ya pagó, así que se traduce a algo accionable. El resto de mensajes se
@@ -225,6 +225,22 @@ export default function Cuenta() {
           )}
         </div>
 
+        {user.ordersError && (
+          <div
+            style={{
+              marginBottom: 48,
+              border: '1px solid var(--terracotta)',
+              borderRadius: 4,
+              padding: 20,
+              fontSize: 14,
+              color: 'var(--muted)',
+              lineHeight: 1.6,
+            }}
+          >
+            No pudimos cargar tus pedidos. Recarga la página; si ya depositaste y sigue sin aparecer, escríbenos por WhatsApp.
+          </div>
+        )}
+
         {user.orders?.length > 0 && (
           <div style={{ marginBottom: 48 }}>
             <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, marginBottom: 16 }}>Pedidos</div>
@@ -252,7 +268,7 @@ export default function Cuenta() {
                       <div style={{ fontSize: 12, color: rechazado ? 'var(--terracotta)' : 'var(--muted)', marginTop: 4 }}>
                         {rechazado
                           ? `Rechazado: ${o.notes || 'sin motivo registrado'}`
-                          : `S/ ${o.amount_pen} · esperando verificación de tu depósito`}
+                          : `S/ ${formatPEN(o.amount_pen)} · esperando verificación de tu depósito`}
                       </div>
                     </div>
                     {!rechazado && (
