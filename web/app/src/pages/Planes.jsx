@@ -207,7 +207,8 @@ export default function Planes() {
 
         {desdePrecio !== null && (
           <div data-reveal="" style={{ textAlign: 'center', marginTop: 48, fontSize: 14, color: 'var(--muted)' }}>
-            ¿Prefieres no suscribirte? Los reportes premium también se pueden comprar individualmente desde S/ {desdePrecio} en la{' '}
+            ¿Prefieres no suscribirte? Los reportes premium también se pueden comprar individualmente desde S/ {formatPEN(desdePrecio)} en
+            la{' '}
             <Link to="/reportes" className="link-hover" style={{ fontWeight: 600 }}>
               página de Reportes
             </Link>
