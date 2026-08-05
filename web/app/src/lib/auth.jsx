@@ -34,17 +34,22 @@ function saveMockState(userId, state) {
 }
 
 // La creación de profile/organization vive en la BD (ensure_profile(),
-// migración 0006): es security definer, atómica e idempotente, así que dos
-// llamadas concurrentes no pueden duplicar la organización. Devuelve false si
-// la sesión es basura (usuario borrado o proyecto reconstruido), y en ese caso
-// cerramos sesión en vez de reintentar en cada getSession.
+// migración 0006 + 0008): es security definer, atómica e idempotente, así
+// que dos llamadas concurrentes no pueden duplicar la organización. Devuelve
+// false si la sesión es basura (usuario borrado o proyecto reconstruido), y en
+// ese caso cerramos sesión en vez de reintentar en cada getSession.
 async function ensureProfile() {
   const { error } = await supabase.rpc('ensure_profile');
   if (!error) return true;
 
-  // 42501 = RLS/permisos rechazaron la llamada para una sesión supuestamente
-  // autenticada: Postgres nos vio como `anon`. Eso es una sesión zombi.
-  if (error.code === '42501' || error.code === 'PGRST301') {
+  // P0002 = no_data_found: ensure_profile() (migración 0008) hace
+  // `select ... into strict ... from auth.users where id = v_uid` y Postgres
+  // levanta ese código solo cuando no hay fila. auth.uid() lee el `sub` del
+  // JWT directamente, sin consultar ninguna tabla, así que un usuario borrado
+  // (o un proyecto reconstruido) sigue teniendo un JWT sin expirar — nunca
+  // vemos un error de permisos acá, solo la ausencia de la fila. Esa es la
+  // sesión zombi real.
+  if (error.code === 'P0002') {
     await supabase.auth.signOut();
     return false;
   }
@@ -116,17 +121,27 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let active = true;
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!active) return;
-      setUser(session?.user ? await buildUser(session.user) : null);
-      setLoading(false);
-    });
-
+    // Un solo escritor. onAuthStateChange SIEMPRE emite un evento
+    // INITIAL_SESSION al suscribirse (ver GoTrueClient._emitInitialSession en
+    // @supabase/auth-js), con la sesión que haya o null si no hay ninguna —
+    // así que un getSession() aparte acá no aportaba nada salvo un segundo
+    // escritor: si al montar ya existía una sesión sin profile todavía (el
+    // caso real de producción, porque la confirmación de email está
+    // encendida: signup → email → clic en el link → aterrizas con sesión
+    // recién creada), getSession().then(...) y el INITIAL_SESSION del
+    // listener llamaban a buildUser() — y por lo tanto a ensure_profile() —
+    // en paralelo. `on conflict` protegía `profiles`, pero `organizations` no
+    // tiene ese resguardo, así que igual podía quedar una organización
+    // huérfana: exactamente el defecto que esta migración existe para cerrar.
+    // setLoading(false) va acá adentro, no en un then() aparte, para que
+    // cubra los tres casos (sesión válida, sin sesión, sesión zombi) sin
+    // dejar a ProtectedRoute colgado en `loading` para siempre.
     const {
       data: { subscription: authListener },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!active) return;
       setUser(session?.user ? await buildUser(session.user) : null);
+      setLoading(false);
     });
 
     return () => {
