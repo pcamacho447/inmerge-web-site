@@ -53,6 +53,22 @@ function checkExecuteDenied(error, label) {
   }
 }
 
+// Igual que checkExecuteDenied pero para INSERTs de `orders`: exige que el
+// rechazo sea específicamente un permiso de columna denegado (42501), no
+// cualquier error. En particular no debe poder pasar por una violación de
+// índice único (23505) — si el ítem elegido ya tiene un pedido pendiente,
+// orders_one_pending_per_item también tumbaría el insert, y el check quedaría
+// en verde aunque el grant de columna que en verdad se quiere probar se
+// hubiera restaurado por error. Ver hallazgo de code review, ronda 1.
+function checkColumnGrantDenied(error, label) {
+  const isUniqueViolation = error?.code === '23505' || /duplicate key value violates unique constraint/i.test(error?.message || '');
+  const isColumnGrantDenied = error?.code === '42501';
+  check(isColumnGrantDenied && !isUniqueViolation, label, error?.message);
+  if (isUniqueViolation) {
+    console.log('  ⚠ ese error es una violación de índice único (23505), no el permiso de columna que se quiere probar');
+  }
+}
+
 const { data: auth, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 if (authError) {
   console.error('✗ login falló:', authError.message);
@@ -60,8 +76,19 @@ if (authError) {
 }
 check(true, 'login del usuario de prueba', auth.user.id);
 
-const { data: premium } = await supabase.from('reports').select('id, slug, price_pen').eq('tier', 'premium').limit(1).single();
+const { data: premiums } = await supabase.from('reports').select('id, slug, price_pen').eq('tier', 'premium').order('created_at').limit(2);
+const [premium, premium2] = premiums || [];
 check(!!premium, 'hay un reporte premium en el catálogo', premium?.slug);
+// El check de inyección de `code` más abajo necesita un ÍTEM DISTINTO al del
+// pedido principal: si usara el mismo report_id, orders_one_pending_per_item
+// (índice único parcial sobre pedidos 'pending') también tumbaría el insert,
+// y el check pasaría por esa razón aunque el grant de columna que en verdad
+// prueba se hubiera restaurado por error. Ver hallazgo de code review, ronda 1.
+check(
+  !!premium2 && premium2.id !== premium?.id,
+  'hay un SEGUNDO reporte premium para aislar el check de inyección de código',
+  premium2?.slug,
+);
 
 // 1) Intentar mandar un monto falso al crear el pedido. Antes de Task 1 esto
 // se probaba insertando con amount_pen y confiando en que el trigger lo
@@ -151,12 +178,23 @@ check(!!errSub, 'el cliente NO puede insertar en subscriptions', errSub?.message
 // report_id, plan, method) — ni `code` ni `status` están en esa lista, así
 // que Postgres debe rechazar la sentencia ENTERA por permiso de columna antes
 // de que el trigger llegue a correr.
+//
+// Usa `premium2` (un ítem SIN pedido pendiente) a propósito, no `premium`: el
+// pedido principal de arriba ya dejó una fila 'pending' para
+// (user, 'report', premium.id), y orders_one_pending_per_item también
+// rechazaría un segundo insert sobre ESE mismo ítem — con un 23505 de índice
+// único, no con el permiso de columna que este check existe para probar. Si
+// se reusara `premium.id` acá, el check seguiría en verde aunque el grant de
+// `code` se restaurara por error: pasaría por la razón equivocada, exactamente
+// el defecto que esta tarea existe para eliminar. checkColumnGrantDenied
+// además exige que el error sea 42501 y rechaza explícitamente un 23505.
 const { data: conCodigo, error: errCodigo } = await supabase
   .from('orders')
-  .insert({ user_id: auth.user.id, kind: 'report', report_id: premium.id, method: 'deposit', code: 'INM-99-HACKED' })
+  .insert({ user_id: auth.user.id, kind: 'report', report_id: premium2.id, method: 'deposit', code: 'INM-99-HACKED' })
   .select()
   .single();
-check(!!errCodigo || conCodigo?.code !== 'INM-99-HACKED', 'el cliente NO puede elegir el código de su pedido', errCodigo?.message);
+checkColumnGrantDenied(errCodigo, 'el cliente NO puede elegir el código de su pedido');
+check(!conCodigo, 'ese intento no dejó ninguna fila creada con el código elegido por el cliente');
 
 const { error: errAprobado } = await supabase
   .from('orders')
@@ -177,21 +215,35 @@ const { data: upserted, error: upsertError } = await supabase
 check(!upserted || upserted.length === 0, 'el cliente NO puede aprobar su pedido vía upsert', upsertError?.message);
 
 // El precio de un reporte o de un plan es dinero: ni reports ni plans tienen
-// policy de UPDATE (0001/0003, solo SELECT). En la práctica los dos caminos
-// verificados son distintos y ambos válidos: `reports` no tiene NINGÚN grant
-// de tabla para UPDATE (0011 solo re-otorgó SELECT por columna), así que
-// revienta con permiso denegado antes de que RLS entre a jugar; `plans`
-// conserva el grant de tabla por defecto, así que ahí sí llega a RLS, que no
-// encuentra ninguna fila que una policy autorice a tocar y el UPDATE afecta 0
-// filas sin error. El check acepta cualquiera de las dos formas de "no pudo".
+// policy de UPDATE (0001/0003, solo SELECT). Verificado contra el proyecto
+// real: el mecanismo es IDÉNTICO en ambas tablas — `information_schema`
+// confirma que tanto `reports` como `plans` sí tienen el UPDATE de tabla Y de
+// columna (`price_pen` incluida) otorgado a anon/authenticated; ninguna de
+// las dos tiene grants revocados como sí los tiene `orders` (0005). Sin
+// policy de UPDATE, RLS filtra el UPDATE a 0 filas — sin error — en las dos.
+//
+// (Ronda 1 de code review encontró que el comentario anterior decía que
+// `reports` rechazaba con permiso de columna denegado, "antes de que RLS
+// entre a jugar" — falso, y probablemente un artefacto de copiar el
+// comentario del check de `file_path` de más abajo. Lo que en verdad pasaba:
+// este check encadenaba `.select()` sin columnas, que por defecto pide
+// `select=*` — y ESE `*` sí choca con el SELECT restringido de 0011 (que
+// excluye `file_path`), disparando un permission-denied que no tiene nada que
+// ver con el UPDATE que se quiere probar. Aislado con
+// `.select('id, price_pen')` — columnas que sí están en el grant de SELECT —
+// el UPDATE por sí solo vuelve con 0 filas, sin error, igual que `plans`.)
 const { data: precioEditado, error: precioEditadoError } = await supabase
   .from('reports')
   .update({ price_pen: 1 })
   .eq('id', premium.id)
-  .select();
+  .select('id, price_pen');
 check(!precioEditado || precioEditado.length === 0, 'el cliente NO puede editar el precio de un reporte', precioEditadoError?.message);
 
-const { data: planEditado, error: planEditadoError } = await supabase.from('plans').update({ price_pen: 1 }).eq('id', 'monthly').select();
+const { data: planEditado, error: planEditadoError } = await supabase
+  .from('plans')
+  .update({ price_pen: 1 })
+  .eq('id', 'monthly')
+  .select('id, price_pen');
 check(!planEditado || planEditado.length === 0, 'el cliente NO puede editar el precio de un plan', planEditadoError?.message);
 
 // file_path (la ruta interna del PDF en el bucket privado) fue revocado
