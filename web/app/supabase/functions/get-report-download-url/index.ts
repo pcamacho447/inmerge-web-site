@@ -12,16 +12,26 @@
 // back to the shared import for consistency with the other 3 functions.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*', // tighten to your real domain once deployed
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// El origen va fijado, no en '*': la función se despliega con --no-verify-jwt,
+// así que es accesible desde cualquier lado y el CORS es la única barrera de
+// navegador que queda. Agrega acá el dominio real cuando exista.
+const ALLOWED_ORIGINS = ['http://localhost:5173', 'https://inmerge.pe'];
+
+function corsFor(req: Request) {
+  const origin = req.headers.get('Origin') ?? '';
+  return {
+    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    Vary: 'Origin',
+  };
+}
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const SIGNED_URL_TTL_SECONDS = 300;
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsFor(req);
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const authHeader = req.headers.get('Authorization');
@@ -45,7 +55,18 @@ Deno.serve(async (req) => {
     });
   }
 
-  const { report_id } = await req.json();
+  // Sin esto, un cuerpo que no sea JSON lanza y el runtime emite un 500 SIN
+  // cabeceras CORS, así que el navegador reporta un error de CORS en vez del
+  // problema real.
+  let report_id: string | undefined;
+  try {
+    ({ report_id } = await req.json());
+  } catch {
+    return new Response(JSON.stringify({ error: 'Cuerpo inválido: se esperaba JSON' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
   if (!report_id) {
     return new Response(JSON.stringify({ error: 'report_id is required' }), {
       status: 400,
