@@ -79,16 +79,25 @@ check(true, 'login del usuario de prueba', auth.user.id);
 const { data: premiums } = await supabase.from('reports').select('id, slug, price_pen').eq('tier', 'premium').order('created_at').limit(2);
 const [premium, premium2] = premiums || [];
 check(!!premium, 'hay un reporte premium en el catálogo', premium?.slug);
-// El check de inyección de `code` más abajo necesita un ÍTEM DISTINTO al del
-// pedido principal: si usara el mismo report_id, orders_one_pending_per_item
-// (índice único parcial sobre pedidos 'pending') también tumbaría el insert,
-// y el check pasaría por esa razón aunque el grant de columna que en verdad
-// prueba se hubiera restaurado por error. Ver hallazgo de code review, ronda 1.
-check(
-  !!premium2 && premium2.id !== premium?.id,
-  'hay un SEGUNDO reporte premium para aislar el check de inyección de código',
-  premium2?.slug,
-);
+// Los checks de inyección de monto falso y de `code` más abajo necesitan un
+// ÍTEM DISTINTO al del pedido principal: si usaran el mismo report_id,
+// orders_one_pending_per_item (índice único parcial sobre pedidos 'pending')
+// también tumbaría el insert, y el check pasaría por esa razón aunque el
+// grant de columna que en verdad prueba se hubiera restaurado por error. Ver
+// hallazgo de code review, ronda 1 (originalmente solo para `code`; Important
+// 4 de la revisión final extendió el mismo motivo a la inyección de monto,
+// para que esa prueba corra completa incluso reutilizando el pedido
+// principal de una corrida anterior).
+check(!!premium2 && premium2.id !== premium?.id, 'hay un SEGUNDO reporte premium para aislar los checks de inyección', premium2?.slug);
+// Deferred minor de la revisión final: antes esto solo imprimía un ✗ y
+// seguía — con un único reporte premium en el catálogo, `premium2` queda
+// `undefined` y el resto del script revienta con un TypeError al leer
+// `premium2.id` varias líneas más abajo, en vez de salir con un mensaje
+// entendible. El resto de checks de este script asume que ambos existen.
+if (!premium || !premium2) {
+  console.error('Se necesitan al menos 2 reportes premium en el catálogo — el resto de checks depende de esto. Abortando.');
+  process.exit(1);
+}
 
 // 1) Intentar mandar un monto falso al crear el pedido. Antes de Task 1 esto
 // se probaba insertando con amount_pen y confiando en que el trigger lo
@@ -98,29 +107,76 @@ check(
 // permiso de columna ANTES de que el trigger llegue a correr. Confirmarlo así
 // es una garantía más fuerte que "el trigger lo corrigió": el cliente ni
 // siquiera puede intentarlo.
+//
+// Usa `premium2`, NO `premium`: este intento tiene que poder correr en
+// CUALQUIER corrida del script, incluida una que reutiliza un pedido
+// 'pending' que quedó de una corrida anterior para `premium.id` (ver más
+// abajo — el cliente no tiene DELETE sobre `orders`, así que esa fila nunca
+// se limpia sola). Si este intento apuntara a `premium.id` y ya hubiera un
+// pendiente ahí, correría el mismo riesgo que `checkColumnGrantDenied` existe
+// para evitar en el check de inyección de `code`: si el grant de columna
+// alguna vez se restaura por error, el insert moriría por 23505 (índice
+// único) en vez de 42501 (permiso de columna), y el check quedaría en verde
+// mintiendo sobre lo que en verdad prueba. `premium2` nunca recibe un insert
+// exitoso en este script (el check de inyección de `code` de más abajo
+// también apunta ahí y también falla sin dejar fila), así que se mantiene
+// limpio entre corridas y esta prueba corre completa siempre, sin
+// debilitarse por reutilización.
 const { data: montoFalso, error: montoFalsoError } = await supabase
   .from('orders')
-  .insert({ user_id: auth.user.id, kind: 'report', report_id: premium.id, method: 'deposit', amount_pen: 1 })
+  .insert({ user_id: auth.user.id, kind: 'report', report_id: premium2.id, method: 'deposit', amount_pen: 1 })
   .select()
   .single();
 check(!!montoFalsoError, 'el cliente NO puede mandar un monto falso al crear el pedido', montoFalsoError?.message);
 check(!montoFalso, 'ese intento no dejó ninguna fila creada');
 
-// Pedido real, sin tocar amount_pen: el trigger orders_set_amount lo calcula
-// desde reports.price_pen del lado del servidor.
-const { data: order, error: orderError } = await supabase
+// Reutilización del pedido real: el cliente NO tiene DELETE sobre `orders`
+// (0005/0012), así que una corrida anterior de este mismo script deja su
+// pedido de prueba 'pending' para siempre. Antes, la SEGUNDA corrida
+// intentaba insertar otro pedido para el mismo reporte premium, chocaba con
+// orders_one_pending_per_item (23505), y el script abortaba con
+// process.exit(1) — Important 4 de la revisión final: un harness que necesita
+// SQL manual entre corridas deja de correrse. Se busca un pendiente existente
+// para este ítem y, si existe, se reutiliza en vez de insertar; si no, se crea
+// uno nuevo (el trigger orders_set_amount calcula amount_pen desde
+// reports.price_pen del lado del servidor, sin tocar amount_pen desde acá).
+const { data: pendientesExistentes, error: pendienteError } = await supabase
   .from('orders')
-  .insert({ user_id: auth.user.id, kind: 'report', report_id: premium.id, method: 'deposit' })
-  .select()
-  .single();
-check(!orderError && !!order?.code, 'el cliente puede crear su pedido', orderError?.message || order?.code);
-if (!order) {
-  console.error('No se pudo crear el pedido de prueba — el resto de checks dependen de él. Abortando.');
+  .select('*')
+  .eq('user_id', auth.user.id)
+  .eq('kind', 'report')
+  .eq('report_id', premium.id)
+  .eq('status', 'pending')
+  .order('created_at', { ascending: false })
+  .limit(1);
+if (pendienteError) {
+  console.error('No se pudo buscar un pedido pendiente existente:', pendienteError.message);
   process.exit(1);
 }
+const pedidoReutilizable = pendientesExistentes?.[0] ?? null;
+
+let order;
+if (pedidoReutilizable) {
+  console.log(`(reutilizando el pedido pendiente existente ${pedidoReutilizable.code} en vez de crear uno nuevo)`);
+  order = pedidoReutilizable;
+  check(true, 'el cliente reutiliza su pedido pendiente existente en vez de duplicarlo', order.code);
+} else {
+  const { data: nuevoOrder, error: orderError } = await supabase
+    .from('orders')
+    .insert({ user_id: auth.user.id, kind: 'report', report_id: premium.id, method: 'deposit' })
+    .select()
+    .single();
+  check(!orderError && !!nuevoOrder?.code, 'el cliente puede crear su pedido', orderError?.message || nuevoOrder?.code);
+  if (!nuevoOrder) {
+    console.error('No se pudo crear el pedido de prueba — el resto de checks dependen de él. Abortando.');
+    process.exit(1);
+  }
+  order = nuevoOrder;
+}
+
 check(
   Number(order.amount_pen) === Number(premium.price_pen),
-  'el pedido se creó con el precio real del servidor, no uno inventado por el cliente',
+  'el pedido tiene el precio real del servidor, no uno inventado por el cliente',
   `amount_pen = ${order.amount_pen}`,
 );
 
@@ -227,7 +283,7 @@ check(!upserted || upserted.length === 0, 'el cliente NO puede aprobar su pedido
 // entre a jugar" — falso, y probablemente un artefacto de copiar el
 // comentario del check de `file_path` de más abajo. Lo que en verdad pasaba:
 // este check encadenaba `.select()` sin columnas, que por defecto pide
-// `select=*` — y ESE `*` sí choca con el SELECT restringido de 0011 (que
+// `select=*` — y ESE `*` sí choca con el SELECT restringido de 0009 (que
 // excluye `file_path`), disparando un permission-denied que no tiene nada que
 // ver con el UPDATE que se quiere probar. Aislado con
 // `.select('id, price_pen')` — columnas que sí están en el grant de SELECT —
@@ -247,7 +303,7 @@ const { data: planEditado, error: planEditadoError } = await supabase
 check(!planEditado || planEditado.length === 0, 'el cliente NO puede editar el precio de un plan', planEditadoError?.message);
 
 // file_path (la ruta interna del PDF en el bucket privado) fue revocado
-// columna por columna en 0011: select(id, slug, tag, title, summary, tier,
+// columna por columna en 0009: select(id, slug, tag, title, summary, tier,
 // price_pen, cover_image_path, published_at, created_at) — file_path no está.
 // Pedirla explícitamente debe tumbar la sentencia con permiso denegado.
 const { data: fileLeak, error: fileLeakError } = await supabase.from('reports').select('file_path').limit(1);
