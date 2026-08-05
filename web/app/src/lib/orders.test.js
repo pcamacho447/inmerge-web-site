@@ -6,6 +6,7 @@ const mockState = vi.hoisted(() => ({
   pendingRows: [],
   insertedRows: [],
   insertResult: { data: { id: 'o-nuevo', code: 'INM-2026-0007' }, error: null },
+  rpcCalls: [],
 }));
 
 // Stand-in mínimo del builder de PostgREST: cada filtro devuelve `this`, la
@@ -13,6 +14,12 @@ const mockState = vi.hoisted(() => ({
 vi.mock('./supabaseClient.js', () => ({
   supabase: {
     auth: { getUser: async () => ({ data: { user: { id: 'u-1' } }, error: null }) },
+    // createOrder llama a expire_own_stale_orders() (0010) antes de mirar si
+    // hay algo que reutilizar — ver src/lib/orders.js.
+    rpc: (name) => {
+      mockState.rpcCalls.push(name);
+      return Promise.resolve({ data: 0, error: null });
+    },
     from: () => ({
       select() {
         return this;
@@ -21,6 +28,9 @@ vi.mock('./supabaseClient.js', () => ({
         return this;
       },
       in() {
+        return this;
+      },
+      or() {
         return this;
       },
       order() {
@@ -49,6 +59,13 @@ describe('createOrder', () => {
   beforeEach(() => {
     mockState.pendingRows = [];
     mockState.insertedRows = [];
+    mockState.rpcCalls = [];
+  });
+
+  it('barre pedidos vencidos antes de mirar si hay algo que reutilizar', async () => {
+    await createOrder({ kind: 'report', itemId: 'r-1', method: 'deposit' });
+
+    expect(mockState.rpcCalls).toEqual(['expire_own_stale_orders']);
   });
 
   it('crea un pedido nuevo cuando no hay ninguno pendiente', async () => {
