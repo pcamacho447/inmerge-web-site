@@ -100,9 +100,22 @@ async function buildUser(sessionUser) {
   // Antes esto era `.catch(() => [])`, y una falla de carga se veía IDÉNTICA a
   // "no tienes pedidos" — justo en la página que existe para tranquilizar a
   // alguien que acaba de depositar. Ahora se distingue.
+  //
+  // expire_own_stale_orders() corre ACÁ, antes de fetchOrders, no solo dentro
+  // de createOrder: sin esto, un pedido creado y nunca pagado seguía
+  // 'pending' para siempre en /cuenta — con su código y "esperando
+  // verificación de tu depósito" — hasta que el cliente reabriera el modal de
+  // checkout, que es lo único que antes disparaba el vencimiento. Un cliente
+  // que solo visita /cuenta (el caso normal tras depositar) veía un pedido
+  // vencido presentado como pagable, depositaba, y approve_order() lo
+  // rechazaba por vencido con la plata ya en el banco. Es la misma llamada
+  // que createOrder ya hace (0010), SECURITY DEFINER pero acotada a
+  // `auth.uid()`, así que dispararla acá es igual de seguro.
   let orders = [];
   let ordersError = false;
   try {
+    const { error: expireError } = await supabase.rpc('expire_own_stale_orders');
+    if (expireError) throw new Error(expireError.message);
     orders = await fetchOrders(sessionUser.id);
   } catch (err) {
     console.error('No se pudieron cargar los pedidos:', err);
@@ -247,9 +260,11 @@ export function useAuth() {
   return ctx;
 }
 
-// Espeja has_access() en supabase/migrations/0004_approve_orders.sql —
-// mantenlos sincronizados. Este es el gate de UI; el gate real es la Edge
-// Function, que reconsulta has_access() del lado del servidor.
+// Espeja has_access() en supabase/migrations/0009_published_and_file_path.sql
+// (su redefinición más reciente — 0011 solo mueve el filtro de published_at a
+// la RLS policy de `reports`, no toca la función) — mantenlos sincronizados.
+// Este es el gate de UI; el gate real es la Edge Function, que reconsulta
+// has_access() del lado del servidor.
 export function isSubscriptionActive(subscription) {
   if (!subscription || subscription.status !== 'active') return false;
   // Sin periodo solo puede ser una suscripción del modo demo, que nunca toca la

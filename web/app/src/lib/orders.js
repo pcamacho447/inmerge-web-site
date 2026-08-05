@@ -1,10 +1,13 @@
 import { supabase } from './supabaseClient.js';
 
-// El cliente puede INSERTAR su propio pedido (RLS: orders_insert_own) y nada
-// más: no hay policy de UPDATE ni DELETE, y un trigger BEFORE INSERT
-// sobreescribe amount_pen desde la BD, así que el precio nunca viaja desde el
-// navegador. El acceso solo aparece cuando el dueño corre approve_order() como
-// service-role. Ver supabase/migrations/0003 y 0004.
+// El cliente puede INSERTAR su propio pedido, acotado columna por columna
+// (user_id, kind, report_id, plan, method — 0005_column_grants.sql), y nada
+// más: desde 0005 el UPDATE y el DELETE están REVOCADOS en la tabla completa
+// (no es solo "no hay policy" — el grant mismo no existe), y 0012 cierra
+// también TRUNCATE. Un trigger BEFORE INSERT sobreescribe amount_pen desde la
+// BD, así que el precio nunca viaja desde el navegador. El acceso solo
+// aparece cuando el dueño corre approve_order() como service-role. Ver
+// supabase/migrations/0003, 0004, 0005 y 0012.
 
 export const ORDER_METHODS = { DEPOSIT: 'deposit', YAPE_PLIN: 'yape_plin' };
 
@@ -64,14 +67,18 @@ export async function createOrder({ kind, itemId, method }) {
   return data;
 }
 
-// Solo pendientes y rechazados: los aprobados ya se reflejan como suscripción
-// o como reporte comprado, mostrarlos otra vez sería ruido.
+// Pendientes, rechazados Y vencidos: los aprobados ya se reflejan como
+// suscripción o como reporte comprado, mostrarlos otra vez sería ruido. Pero
+// un pedido 'expired' SÍ debe listarse — antes se filtraba fuera y el pedido
+// desaparecía sin explicación de /cuenta, justo la página que existe para
+// tranquilizar a alguien que acaba de depositar. Cuenta.jsx es quien decide
+// cómo se ve cada estado (vencido no ofrece "Enviar constancia").
 export async function fetchOrders(userId) {
   const { data, error } = await supabase
     .from('orders')
     .select('id, code, kind, report_id, plan, amount_pen, method, status, notes, created_at')
     .eq('user_id', userId)
-    .in('status', ['pending', 'rejected'])
+    .in('status', ['pending', 'rejected', 'expired'])
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
   return data || [];

@@ -249,6 +249,7 @@ export default function Cuenta() {
                 const item =
                   o.kind === 'subscription' ? plans.find((p) => p.id === o.plan)?.name : reports.find((r) => r.id === o.report_id)?.title;
                 const rechazado = o.status === 'rejected';
+                const vencido = o.status === 'expired';
                 return (
                   <div
                     key={o.id}
@@ -265,13 +266,15 @@ export default function Cuenta() {
                     <div>
                       <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 13, fontWeight: 500 }}>{o.code}</div>
                       <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 15, marginTop: 2 }}>{item ?? '—'}</div>
-                      <div style={{ fontSize: 12, color: rechazado ? 'var(--terracotta)' : 'var(--muted)', marginTop: 4 }}>
+                      <div style={{ fontSize: 12, color: rechazado || vencido ? 'var(--terracotta)' : 'var(--muted)', marginTop: 4 }}>
                         {rechazado
                           ? `Rechazado: ${o.notes || 'sin motivo registrado'}`
-                          : `S/ ${formatPEN(o.amount_pen)} · esperando verificación de tu depósito`}
+                          : vencido
+                            ? 'Vencido — genera un pedido nuevo para pagar.'
+                            : `S/ ${formatPEN(o.amount_pen)} · esperando verificación de tu depósito`}
                       </div>
                     </div>
-                    {!rechazado && (
+                    {!rechazado && !vencido && (
                       <a
                         href={waLink(waVoucherMessage(o))}
                         target="_blank"
