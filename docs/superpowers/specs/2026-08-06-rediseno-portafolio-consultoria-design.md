@@ -166,7 +166,13 @@ Las fases son secuenciales por dependencia real, no por preferencia:
 - **Desactivar la confirmación por correo permite cuentas con correos inexistentes.** Es aceptable para un lead magnet —el correo se valida al cotizar— pero implica que la lista de leads tendrá ruido. Es una decisión de negocio ya tomada, registrada acá para que no sorprenda.
 - **Dejar los pagos dormidos deja un subsistema sin ejercitar.** Sus tests siguen corriendo, pero nadie usa el flujo. Si algún día se reactiva, hay que re-verificarlo antes de confiar en él, no asumir que sigue bueno.
 - **Los textos del catálogo son un primer borrador.** El dueño confirmó que los ajustará después. Títulos, bajadas y cifras clave se derivan de los propios informes, pero se escriben para ser editados, no como definitivos.
-- **Los dos informes en Markdown no tienen PDF.** El entregable descargable definido por este spec es el PDF; `informe_estructura_gasto_lima_distrital` e `informe_fiscal_lima_distrital` solo existen en `.md`. El plan debe decidir si se convierten o si esas dos entradas quedan sin publicar hasta que exista el PDF — no puede asumirse que ya está resuelto.
+- **Los dos informes de Lima se convierten a PDF** (decisión del dueño). Solo existen en `.md` y el entregable definido por este spec es el PDF.
+
+  **Enfoque:** maquetar el Markdown como HTML con el sistema de marca del sitio —Spectral para títulos, IBM Plex para cuerpo, la paleta de tierra, el rombo— e imprimirlo a PDF con el navegador headless que el proyecto ya usa para verificación. Un `pandoc` genérico produciría un documento ajeno a la marca; esto produce uno consistente con los otros tres.
+
+  **Riesgo asumido y declarado:** los tres PDFs existentes fueron maquetados a mano y los convertidos no van a ser idénticos. La comparación lado a lado antes de publicar es parte del trabajo, no un extra — si el resultado desmerece al original, es mejor dejar esas dos entradas despublicadas que degradar contenido bueno.
+
+  Las figuras que referencian (`../../../figuras/…`) deben resolverse antes de convertir, o el PDF sale con imágenes rotas.
 - **Las figuras se referencian con rutas que no sobreviven al traslado.** `../../../figuras/…` resuelve solo desde `reportes/`. Al mover los activos hay que reescribirlas o las imágenes quedan rotas.
 - **`inmerge.pe` sigue sin resolver** (sin registros MX/A/NS). Afecta la imagen social, los `mailto:` de todo el sitio y el despliegue. No lo resuelve este spec.
 
