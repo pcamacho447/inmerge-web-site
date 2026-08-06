@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { DEMO_MODE } from '../lib/demoMode.js';
 
 export default function Registro() {
   useDocumentHead({ title: 'Crear cuenta — Inmerge', path: '/registro', noIndex: true });
@@ -52,7 +53,9 @@ export default function Registro() {
             marginBottom: 24,
           }}
         >
-          Cuenta real (Supabase) — la suscripción y compra de reportes siguen en modo de vista previa, sin pago real todavía.
+          {DEMO_MODE
+            ? 'Modo demo — los pagos son simulados, no se cobra nada.'
+            : 'Los pagos son por depósito bancario o Yape, y se activan a mano tras verificarlos.'}
         </div>
         <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', marginBottom: 12 }}>
           Crear cuenta
@@ -67,6 +70,28 @@ export default function Registro() {
             <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 20, marginBottom: 8 }}>Revisa tu correo.</div>
             <div style={{ fontSize: 14, color: 'var(--tan-text)', lineHeight: 1.6 }}>
               Te enviamos un enlace de confirmación a {email}. Confírmalo y después inicia sesión normalmente.
+            </div>
+            {/* Este aviso se muestra SIEMPRE, no solo cuando el correo ya existe.
+                Supabase responde "éxito" a un registro con un correo ya registrado
+                y no envía nada — a propósito, para que nadie pueda averiguar qué
+                direcciones tienen cuenta probándolas. Detectarlo y decirlo
+                reabriría esa fuga; mostrárselo a todos por igual rescata a quien
+                se registró dos veces sin revelar nada de nadie. */}
+            <div
+              style={{
+                fontSize: 13,
+                color: 'var(--tan-text)',
+                lineHeight: 1.6,
+                marginTop: 16,
+                paddingTop: 16,
+                borderTop: '1px solid rgba(243,234,218,0.2)',
+              }}
+            >
+              Si ya tenías una cuenta con ese correo, no te llegará nada nuevo.{' '}
+              <Link to="/login" className="link-hover" style={{ color: 'var(--bg)', fontWeight: 600 }}>
+                Inicia sesión
+              </Link>{' '}
+              con tu contraseña de siempre.
             </div>
           </div>
         ) : (

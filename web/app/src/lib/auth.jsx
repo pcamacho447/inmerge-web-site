@@ -184,7 +184,16 @@ export function AuthProvider({ children }) {
     if (error) throw error;
     if (!data.session) {
       // Email confirmation is on for this project — no session yet, so
-      // profile/org creation happens later (ensureProfile, on first login).
+      // profile/org creation happens later (ensure_profile, on first login).
+      //
+      // OJO: esta rama tiene DOS causas indistinguibles desde acá. La normal es
+      // "falta confirmar el correo". La otra es que el correo YA tenía cuenta:
+      // GoTrue devuelve éxito con un id inventado, `identities: []` y sin
+      // enviar ningún correo, para que nadie pueda descubrir qué direcciones
+      // están registradas probándolas una por una. Podríamos leer
+      // `data.user.identities.length === 0` y distinguirlas, pero hacerlo
+      // reabre esa fuga — así que Registro.jsx avisa de ambos casos a la vez,
+      // en un texto que se le muestra a todos por igual.
       return { confirmEmailRequired: true };
     }
     // Igual que en login(): el listener de onAuthStateChange se encarga.

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { DEMO_MODE } from '../lib/demoMode.js';
 
 export default function Login() {
   useDocumentHead({ title: 'Iniciar sesión — Inmerge', path: '/login', noIndex: true });
@@ -43,7 +44,9 @@ export default function Login() {
             marginBottom: 24,
           }}
         >
-          Cuenta real (Supabase) — la suscripción y compra de reportes siguen en modo de vista previa, sin pago real todavía.
+          {DEMO_MODE
+            ? 'Modo demo — los pagos son simulados, no se cobra nada.'
+            : 'Los pagos son por depósito bancario o Yape, y se activan a mano tras verificarlos.'}
         </div>
         <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', marginBottom: 32 }}>
           Iniciar sesión
