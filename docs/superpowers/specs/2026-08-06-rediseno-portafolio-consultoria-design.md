@@ -96,7 +96,9 @@ Es el corazón del rediseño y lo que resuelve tres problemas de una vez: los re
 
 4. **Portada generada, no fotografiada.** Una composición tipográfica derivada del título sobre la paleta, con el rombo.
 
-   **Mecanismo:** una ruta que renderiza la portada con `@vercel/og` a partir del slug, y devuelve una imagen cacheada. Es la misma pieza que sirve la imagen social de la Fase 4 — se construye una vez y se usa en los dos lugares. En desarrollo local, donde `@vercel/og` no corre, la tarjeta cae a la misma composición hecha con CSS, para que nadie tenga que desplegar para verla.
+   **Mecanismo:** se generan **en build**, no bajo demanda. Un script produce un PNG por reporte a partir de su slug y lo deja en `public/`, donde CloudFront lo sirve como archivo estático. La misma pieza produce la imagen social de la Fase 4 — se construye una vez y se usa en los dos lugares.
+
+   Se descartó `@vercel/og` (generación por petición) por dos razones: el hosting va a ser **AWS S3 + CloudFront**, no Vercel; y aunque fuera Vercel, las portadas de un catálogo estático no cambian entre visitas, así que generarlas en cada petición es más lento, más caro y con arranque en frío, sin ninguna ventaja. Generar en build funciona en cualquier hosting.
 
    Elimina los siete rectángulos rayados para siempre y no depende de que exista fotografía.
 
@@ -132,9 +134,17 @@ Ninguno de estos cambia la estructura; todos elevan el resultado.
 1. **El friso deja de ser papel tapiz.** Aparece 5-6 veces por página; deja de puntuar y se vuelve ruido. Reducirlo a los cortes que de verdad separan secciones.
 2. **Contraste legible en "Método Acequia".** Los números `01`-`05` son marrón oscuro sobre marrón oscuro.
 3. **Arreglar la grilla huérfana de `/reportes`:** 5 elementos en 4 columnas dejan uno solo con tres huecos al lado.
-4. **`og:image` generada por página** con `@vercel/og`, reutilizando el sistema de portadas de la Fase 2. Hoy no hay ninguna, y **WhatsApp es el canal principal**: cada link compartido sale en blanco.
+4. **`og:image` por página**, generada en build con el mismo script de portadas de la Fase 2. Hoy no hay ninguna, y **WhatsApp es el canal principal**: cada link compartido sale en blanco.
 5. **Respaldo sin JavaScript.** `[data-reveal] { opacity: 0 }` sin `<noscript>` deja la página vacía si el JS falla.
-6. **Vercel Web Analytics y Speed Insights.** Hoy no hay ningún dato sobre qué páginas se visitan — se estaría rediseñando a ciegas.
+6. **Analítica.** Hoy no hay ningún dato sobre qué páginas se visitan — se estaría rediseñando a ciegas. Debe funcionar sobre hosting estático (no depender de la plataforma), así que Vercel Analytics queda descartado por el cambio a AWS.
+
+## El hosting es AWS, y el sitio debe ser agnóstico
+
+El dueño despliega en **AWS (S3 + CloudFront)**, coherente con que vende arquitectura sobre AWS como servicio. Consecuencias vinculantes para todo el trabajo:
+
+- **Nada puede depender de una plataforma concreta.** El build produce estáticos que funcionan igual en S3, Vercel o cualquier CDN. Sin funciones de plataforma, sin `@vercel/og`, sin adaptadores.
+- **Las rutas nuevas necesitan configuración de CloudFront.** `/reportes/:slug` no existe como objeto en S3: un enlace profundo devuelve 403 hasta que la distribución responda `index.html` para 403/404. **Es el error clásico de SPA en CloudFront** y muerde el día del despliegue, no antes. El plan no configura AWS —eso es del dueño— pero sí debe dejarlo escrito donde se vea.
+- **El despliegue queda fuera de alcance de estos planes.** Es trabajo de infraestructura que el dueño hace esta semana con su propia competencia.
 
 ---
 
