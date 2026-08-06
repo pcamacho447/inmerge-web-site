@@ -46,3 +46,7 @@ logs/
 # el proyecto real vive en web/app/supabase/. Ignorarlo en cualquier nivel
 # evita commitear un linked-project.json suelto por correrlo desde la raiz.
 supabase/.temp/
+
+# Worktrees de Claude Code: son checkouts completos del propio repo.
+# Sin esto, un `git add -A` desde la raiz intenta commitear una copia entera.
+.claude/worktrees/
