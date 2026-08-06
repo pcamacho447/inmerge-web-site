@@ -41,3 +41,8 @@ out/
 # Logs
 *.log
 logs/
+
+# Artefacto del CLI de Supabase. Se crea donde sea que se corra el comando;
+# el proyecto real vive en web/app/supabase/. Ignorarlo en cualquier nivel
+# evita commitear un linked-project.json suelto por correrlo desde la raiz.
+supabase/.temp/

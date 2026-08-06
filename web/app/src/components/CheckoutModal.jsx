@@ -1,11 +1,57 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useOverlay from '../hooks/useOverlay.js';
 import { useAuth } from '../lib/auth.jsx';
 import { DEMO_MODE } from '../lib/demoMode.js';
 import { createOrder, ORDER_METHODS } from '../lib/orders.js';
+import { formatPEN } from '../lib/formatPEN.js';
 import { BANK_ACCOUNT, BILLING_ENTITY, VERIFICATION_SLA, YAPE_PLIN } from '../data/bankDetails.js';
 import { waLink, waVoucherMessage } from '../data/content.js';
+
+// El CCI son 20 dígitos y quien los lee está en un celular: es el paso con más
+// probabilidad de error de todo el flujo, y un CCI mal tecleado es una
+// transferencia fallida que hay que desenredar a mano.
+function CopyRow({ label, value, mono }) {
+  const [copiado, setCopiado] = useState(false);
+
+  async function copiar() {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 1800);
+    } catch {
+      setCopiado(false); // navegador sin permiso de portapapeles: el texto sigue visible
+    }
+  }
+
+  return (
+    <>
+      <dt style={{ color: 'var(--muted)' }}>{label}</dt>
+      <dd style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: mono ? "'IBM Plex Mono',monospace" : undefined }}>{value}</span>
+        <button
+          type="button"
+          onClick={copiar}
+          aria-label={`Copiar ${label}`}
+          className="btn-outline-hover"
+          style={{
+            border: '1px solid var(--border)',
+            background: 'none',
+            color: 'var(--muted)',
+            borderRadius: 3,
+            padding: '2px 8px',
+            fontSize: 11,
+            fontWeight: 600,
+            cursor: 'pointer',
+            fontFamily: "'IBM Plex Sans',sans-serif",
+          }}
+        >
+          {copiado ? 'copiado' : 'copiar'}
+        </button>
+      </dd>
+    </>
+  );
+}
 
 // `kind`: 'report' | 'subscription'. `item` es una fila de `reports` o de
 // `plans`; ambas traen el precio en `price_pen`.
@@ -18,6 +64,14 @@ export default function CheckoutModal({ kind, item, onClose }) {
   const [order, setOrder] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Al cambiar de paso, el botón que tenía el foco se desmonta y el foco cae al
+  // <body>. La trampa de foco de useOverlay solo intercepta Tab cuando el
+  // elemento activo es el primero o el último del diálogo, así que con el foco
+  // en body ninguna rama aplica y Tab se escapa a la página de atrás.
+  useEffect(() => {
+    modalRef.current?.focus();
+  }, [step, modalRef]);
 
   const price = item.price_pen;
   const periodSuffix = kind === 'subscription' ? ` / ${item.period}` : '';
@@ -69,6 +123,13 @@ export default function CheckoutModal({ kind, item, onClose }) {
     width: '100%',
     border: 'none',
   };
+
+  // Se muestra el método de la FILA, no el del estado local. createOrder
+  // reutiliza un pedido pendiente del mismo ítem sin importar el método, así
+  // que elegir Yape sobre un pedido creado como depósito mostraba
+  // instrucciones que contradicen lo guardado — y como `orders` no tiene policy
+  // de UPDATE, eso es incorregible después.
+  const shownMethod = order?.method ?? method;
 
   return (
     <div
@@ -171,27 +232,24 @@ export default function CheckoutModal({ kind, item, onClose }) {
             <div style={labelStyle}>PEDIDO GENERADO</div>
             <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontWeight: 500, fontSize: 26, marginBottom: 6 }}>{order.code}</div>
             <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 24 }}>
-              Deposita <strong style={{ color: 'var(--ink)' }}>S/ {order.amount_pen}</strong> y pon el código{' '}
+              Deposita <strong style={{ color: 'var(--ink)' }}>S/ {formatPEN(order.amount_pen)}</strong> y pon el código{' '}
               <strong style={{ color: 'var(--ink)' }}>{order.code}</strong> en el concepto. Es lo que nos permite reconocer tu pago.
             </div>
 
-            {method === ORDER_METHODS.DEPOSIT ? (
+            {shownMethod === ORDER_METHODS.DEPOSIT ? (
               <dl style={{ margin: '0 0 24px', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '10px 16px', fontSize: 13 }}>
                 <dt style={{ color: 'var(--muted)' }}>Banco</dt>
                 <dd style={{ margin: 0, fontWeight: 600 }}>{BANK_ACCOUNT.bank}</dd>
                 <dt style={{ color: 'var(--muted)' }}>Tipo</dt>
                 <dd style={{ margin: 0 }}>{BANK_ACCOUNT.accountType}</dd>
-                <dt style={{ color: 'var(--muted)' }}>Número</dt>
-                <dd style={{ margin: 0, fontFamily: "'IBM Plex Mono',monospace" }}>{BANK_ACCOUNT.number}</dd>
-                <dt style={{ color: 'var(--muted)' }}>CCI</dt>
-                <dd style={{ margin: 0, fontFamily: "'IBM Plex Mono',monospace" }}>{BANK_ACCOUNT.cci}</dd>
+                <CopyRow label="Número" value={BANK_ACCOUNT.number} mono />
+                <CopyRow label="CCI" value={BANK_ACCOUNT.cci} mono />
                 <dt style={{ color: 'var(--muted)' }}>Titular</dt>
                 <dd style={{ margin: 0 }}>{BANK_ACCOUNT.holder}</dd>
               </dl>
             ) : (
               <dl style={{ margin: '0 0 24px', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '10px 16px', fontSize: 13 }}>
-                <dt style={{ color: 'var(--muted)' }}>Yape / Plin</dt>
-                <dd style={{ margin: 0, fontFamily: "'IBM Plex Mono',monospace", fontWeight: 600 }}>{YAPE_PLIN.phone}</dd>
+                <CopyRow label="Yape / Plin" value={YAPE_PLIN.phone} mono />
                 <dt style={{ color: 'var(--muted)' }}>A nombre de</dt>
                 <dd style={{ margin: 0 }}>{YAPE_PLIN.holder}</dd>
               </dl>
@@ -249,7 +307,7 @@ export default function CheckoutModal({ kind, item, onClose }) {
             <div style={labelStyle}>{kind === 'subscription' ? 'SUSCRIPCIÓN' : 'COMPRA DE REPORTE'}</div>
             <div style={titleStyle}>{title}</div>
             <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 15, color: 'var(--muted)', marginBottom: 24 }}>
-              S/ {price}
+              S/ {formatPEN(price)}
               <span style={{ fontSize: 12 }}>{periodSuffix}</span>
             </div>
 
@@ -260,8 +318,8 @@ export default function CheckoutModal({ kind, item, onClose }) {
             )}
 
             {user && !DEMO_MODE && (
-              <div style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Cómo vas a pagar</div>
+              <fieldset style={{ marginBottom: 20, border: 'none', padding: 0, margin: '0 0 20px' }}>
+                <legend style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, padding: 0 }}>Cómo vas a pagar</legend>
                 {[
                   { value: ORDER_METHODS.DEPOSIT, label: 'Depósito o transferencia bancaria' },
                   { value: ORDER_METHODS.YAPE_PLIN, label: 'Yape o Plin' },
@@ -291,10 +349,14 @@ export default function CheckoutModal({ kind, item, onClose }) {
                     {option.label}
                   </label>
                 ))}
-              </div>
+              </fieldset>
             )}
 
-            {error && <div style={{ fontSize: 13, color: 'var(--terracotta)', marginBottom: 16, lineHeight: 1.6 }}>{error}</div>}
+            {error && (
+              <div role="alert" style={{ fontSize: 13, color: 'var(--terracotta)', marginBottom: 16, lineHeight: 1.6 }}>
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"

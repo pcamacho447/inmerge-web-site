@@ -15,6 +15,10 @@ export default function useReports() {
     supabase
       .from('reports')
       .select('id, slug, tag, title, summary, tier, price_pen, cover_image_path, published_at')
+      // Se seleccionaba published_at pero nunca se filtraba, así que un
+      // borrador aparecía en el catálogo público apenas se insertaba.
+      .not('published_at', 'is', null)
+      .lte('published_at', new Date().toISOString())
       .order('created_at')
       .then(({ data, error: fetchError }) => {
         if (!active) return;

@@ -9,6 +9,7 @@ import Footer from '../components/Footer.jsx';
 import ImagePlaceholder from '../components/ImagePlaceholder.jsx';
 import CheckoutModal from '../components/CheckoutModal.jsx';
 import { useAuth, hasAccess } from '../lib/auth.jsx';
+import { formatPEN } from '../lib/formatPEN.js';
 import { waLink } from '../data/content.js';
 
 export default function Reportes() {
@@ -191,7 +192,7 @@ export default function Reportes() {
                       }}
                     >
                       <div style={{ width: 7, height: 7, background: 'var(--terracotta)', transform: 'rotate(45deg)' }} />
-                      Comprar por depósito — S/ {r.price_pen}
+                      Comprar por depósito — S/ {formatPEN(r.price_pen)}
                     </button>
                   )}
                 </div>

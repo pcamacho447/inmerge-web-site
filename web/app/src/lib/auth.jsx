@@ -33,47 +33,27 @@ function saveMockState(userId, state) {
   localStorage.setItem(mockStateKey(userId), JSON.stringify(state));
 }
 
-// Crea profile/organization desde la metadata de registro la primera vez que
-// hay sesión. Devuelve false si la sesión resultó ser basura (ver el 42501).
-async function ensureProfile(sessionUser) {
-  const { data: existing } = await supabase.from('profiles').select('id').eq('id', sessionUser.id).maybeSingle();
-  if (existing) return true;
+// La creación de profile/organization vive en la BD (ensure_profile(),
+// migración 0006 + 0008): es security definer, atómica e idempotente, así
+// que dos llamadas concurrentes no pueden duplicar la organización. Devuelve
+// false si la sesión es basura (usuario borrado o proyecto reconstruido), y en
+// ese caso cerramos sesión en vez de reintentar en cada getSession.
+async function ensureProfile() {
+  const { error } = await supabase.rpc('ensure_profile');
+  if (!error) return true;
 
-  const meta = sessionUser.user_metadata || {};
-  if (!meta.full_name) return true; // nada que crear — sin metadata de registro
-
-  // El id se genera acá, no con .select() tras el insert: organizations_select_own
-  // (0001_init.sql) solo deja ver una organización a través de un `profiles` que
-  // ya apunte a ella, y ese `profiles` es justo el que estamos por crear. Pedir
-  // RETURNING obligaría a pasar esa policy de SELECT sobre la fila recién
-  // insertada, que nunca puede cumplirse todavía — huevo y gallina, siempre 42501.
-  const orgId = crypto.randomUUID();
-  const { error: orgError } = await supabase.from('organizations').insert({
-    id: orgId,
-    billing_type: meta.billing_type || 'persona_natural',
-    legal_name: meta.full_name,
-    tax_id: meta.tax_id || null,
-    billing_email: sessionUser.email,
-  });
-
-  if (orgError) {
-    // 42501 = RLS rechazó el insert. Con el id generado acá esto ya no debería
-    // pasar para un alta legítima — si pasa, la sesión es basura (usuario
-    // borrado, o proyecto reconstruido). Eso no es un fallo transitorio —
-    // reintentarlo en cada getSession y cada cambio de visibilidad solo
-    // inunda la consola.
-    if (orgError.code === '42501') {
-      await supabase.auth.signOut();
-      return false;
-    }
-    console.error('Failed to create organization on first login:', orgError);
-    return true;
+  // P0002 = no_data_found: ensure_profile() (migración 0008) hace
+  // `select ... into strict ... from auth.users where id = v_uid` y Postgres
+  // levanta ese código solo cuando no hay fila. auth.uid() lee el `sub` del
+  // JWT directamente, sin consultar ninguna tabla, así que un usuario borrado
+  // (o un proyecto reconstruido) sigue teniendo un JWT sin expirar — nunca
+  // vemos un error de permisos acá, solo la ausencia de la fila. Esa es la
+  // sesión zombi real.
+  if (error.code === 'P0002') {
+    await supabase.auth.signOut();
+    return false;
   }
-
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .insert({ id: sessionUser.id, organization_id: orgId, full_name: meta.full_name });
-  if (profileError) console.error('Failed to create profile on first login:', profileError);
+  console.error('ensure_profile failed:', error);
   return true;
 }
 
@@ -112,12 +92,35 @@ async function fetchProfileFields(userId) {
 }
 
 async function buildUser(sessionUser) {
-  const sessionValid = await ensureProfile(sessionUser);
+  const sessionValid = await ensureProfile();
   if (!sessionValid) return null; // sesión zombi: ya cerramos sesión
 
-  const profileFields = await fetchProfileFields(sessionUser.id);
-  const real = await fetchRealEntitlements(sessionUser.id);
-  const orders = await fetchOrders(sessionUser.id).catch(() => []);
+  const [profileFields, real] = await Promise.all([fetchProfileFields(sessionUser.id), fetchRealEntitlements(sessionUser.id)]);
+
+  // Antes esto era `.catch(() => [])`, y una falla de carga se veía IDÉNTICA a
+  // "no tienes pedidos" — justo en la página que existe para tranquilizar a
+  // alguien que acaba de depositar. Ahora se distingue.
+  //
+  // expire_own_stale_orders() corre ACÁ, antes de fetchOrders, no solo dentro
+  // de createOrder: sin esto, un pedido creado y nunca pagado seguía
+  // 'pending' para siempre en /cuenta — con su código y "esperando
+  // verificación de tu depósito" — hasta que el cliente reabriera el modal de
+  // checkout, que es lo único que antes disparaba el vencimiento. Un cliente
+  // que solo visita /cuenta (el caso normal tras depositar) veía un pedido
+  // vencido presentado como pagable, depositaba, y approve_order() lo
+  // rechazaba por vencido con la plata ya en el banco. Es la misma llamada
+  // que createOrder ya hace (0010), SECURITY DEFINER pero acotada a
+  // `auth.uid()`, así que dispararla acá es igual de seguro.
+  let orders = [];
+  let ordersError = false;
+  try {
+    const { error: expireError } = await supabase.rpc('expire_own_stale_orders');
+    if (expireError) throw new Error(expireError.message);
+    orders = await fetchOrders(sessionUser.id);
+  } catch (err) {
+    console.error('No se pudieron cargar los pedidos:', err);
+    ordersError = true;
+  }
 
   // Con la bandera apagada el mock no participa: una sola fuente de verdad.
   const mockState = DEMO_MODE ? loadMockState(sessionUser.id) : { subscription: null, purchases: [] };
@@ -131,6 +134,7 @@ async function buildUser(sessionUser) {
     subscription,
     purchases,
     orders,
+    ordersError,
   };
 }
 
@@ -141,17 +145,27 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let active = true;
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!active) return;
-      setUser(session?.user ? await buildUser(session.user) : null);
-      setLoading(false);
-    });
-
+    // Un solo escritor. onAuthStateChange SIEMPRE emite un evento
+    // INITIAL_SESSION al suscribirse (ver GoTrueClient._emitInitialSession en
+    // @supabase/auth-js), con la sesión que haya o null si no hay ninguna —
+    // así que un getSession() aparte acá no aportaba nada salvo un segundo
+    // escritor: si al montar ya existía una sesión sin profile todavía (el
+    // caso real de producción, porque la confirmación de email está
+    // encendida: signup → email → clic en el link → aterrizas con sesión
+    // recién creada), getSession().then(...) y el INITIAL_SESSION del
+    // listener llamaban a buildUser() — y por lo tanto a ensure_profile() —
+    // en paralelo. `on conflict` protegía `profiles`, pero `organizations` no
+    // tiene ese resguardo, así que igual podía quedar una organización
+    // huérfana: exactamente el defecto que esta migración existe para cerrar.
+    // setLoading(false) va acá adentro, no en un then() aparte, para que
+    // cubra los tres casos (sesión válida, sin sesión, sesión zombi) sin
+    // dejar a ProtectedRoute colgado en `loading` para siempre.
     const {
       data: { subscription: authListener },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!active) return;
       setUser(session?.user ? await buildUser(session.user) : null);
+      setLoading(false);
     });
 
     return () => {
@@ -173,14 +187,16 @@ export function AuthProvider({ children }) {
       // profile/org creation happens later (ensureProfile, on first login).
       return { confirmEmailRequired: true };
     }
-    setUser(await buildUser(data.session.user));
+    // Igual que en login(): el listener de onAuthStateChange se encarga.
     return { confirmEmailRequired: false };
   }, []);
 
+  // No llamamos a buildUser acá: signInWithPassword dispara SIGNED_IN y el
+  // listener de onAuthStateChange ya reconstruye el usuario. Hacerlo en los dos
+  // lados ejecutaba todo el arranque dos veces por login.
   const login = useCallback(async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    setUser(await buildUser(data.user));
   }, []);
 
   const logout = useCallback(async () => {
@@ -244,9 +260,11 @@ export function useAuth() {
   return ctx;
 }
 
-// Espeja has_access() en supabase/migrations/0004_approve_orders.sql —
-// mantenlos sincronizados. Este es el gate de UI; el gate real es la Edge
-// Function, que reconsulta has_access() del lado del servidor.
+// Espeja has_access() en supabase/migrations/0009_published_and_file_path.sql
+// (su redefinición más reciente — 0011 solo mueve el filtro de published_at a
+// la RLS policy de `reports`, no toca la función) — mantenlos sincronizados.
+// Este es el gate de UI; el gate real es la Edge Function, que reconsulta
+// has_access() del lado del servidor.
 export function isSubscriptionActive(subscription) {
   if (!subscription || subscription.status !== 'active') return false;
   // Sin periodo solo puede ser una suscripción del modo demo, que nunca toca la

@@ -8,6 +8,7 @@ import CheckoutModal from '../components/CheckoutModal.jsx';
 import { useAuth, isSubscriptionActive } from '../lib/auth.jsx';
 import usePlans from '../hooks/usePlans.js';
 import useReports from '../hooks/useReports.js';
+import { formatPEN } from '../lib/formatPEN.js';
 
 export default function Planes() {
   useReveal();
@@ -147,7 +148,8 @@ export default function Planes() {
                   {plan.name.toUpperCase()}
                 </div>
                 <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 40, marginBottom: 4 }}>
-                  S/ {plan.price_pen} <span style={{ fontSize: 16, fontWeight: 400, color: 'var(--muted)' }}>/ {plan.period}</span>
+                  S/ {formatPEN(plan.price_pen)}{' '}
+                  <span style={{ fontSize: 16, fontWeight: 400, color: 'var(--muted)' }}>/ {plan.period}</span>
                 </div>
                 <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 28 }}>{plan.description}</div>
                 <ul
@@ -205,7 +207,8 @@ export default function Planes() {
 
         {desdePrecio !== null && (
           <div data-reveal="" style={{ textAlign: 'center', marginTop: 48, fontSize: 14, color: 'var(--muted)' }}>
-            ¿Prefieres no suscribirte? Los reportes premium también se pueden comprar individualmente desde S/ {desdePrecio} en la{' '}
+            ¿Prefieres no suscribirte? Los reportes premium también se pueden comprar individualmente desde S/ {formatPEN(desdePrecio)} en
+            la{' '}
             <Link to="/reportes" className="link-hover" style={{ fontWeight: 600 }}>
               página de Reportes
             </Link>
