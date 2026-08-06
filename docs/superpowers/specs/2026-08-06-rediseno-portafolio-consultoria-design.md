@@ -22,13 +22,23 @@ Un director de gobierno regional no llega buscando un PDF de S/180. Llega pregun
 
 Re-encuadrar la biblioteca de reportes convierte una línea de ingreso fallida en el motor de credibilidad del negocio que sí paga. Casi no requiere contenido nuevo — requiere presentarlo distinto.
 
-## Bloqueador que este spec no puede resolver
+## El contenido existe (actualizado 2026-08-06)
 
-**Los reportes no existen todavía.** La tabla `reports` tiene 7 filas, pero solo **un archivo** en el bucket (un PDF de relleno subido para pruebas), y 2 de esas 7 filas son ejemplos inventados en `0002_seed_premium_examples.sql`.
+Cuando se redactó la primera versión de este spec, la tabla `reports` tenía 7 filas inventadas y un solo PDF de relleno. **Eso cambió:** en `reportes/` hay material real y de buena calidad.
 
-El rediseño puede completarse y quedar esperando, pero **el cuello de botella del negocio son los PDFs**, no la página. Ningún trabajo de este spec sustituye escribirlos.
+- **3 PDFs terminados:** estructura de gasto ministerial, por niveles de gobierno, y recaudación propia (todos 2018-2025).
+- **4 informes en Markdown:** gasto distrital de Lima, fiscal de Lima, un anexo técnico, y `REPORTE_SSIV.md`.
+- **3 anexos Sankey interactivos** (Plotly) con flujos de gasto público.
+- **181 figuras** en `C:\papx\mef2026\mef_2026\deliverables\figuras\` — los informes las referencian con rutas relativas (`../../../figuras/…`) que solo resuelven desde esa carpeta.
 
-Consecuencia de diseño: todo lo que se construya acá debe verse digno con **cero, uno o siete** reportes publicados. Nada puede depender de tener una biblioteca llena.
+El contenido es investigación seria sobre datos del SIAF-MEF, con voz editorial propia y hallazgos que se sostienen solos. **No es material de relleno: es el mejor argumento de venta que tiene el negocio.**
+
+**Dos consecuencias prácticas:**
+
+1. **El catálogo de la base no corresponde a nada real.** Las 7 filas actuales nombran reportes que no existen ("Ejecución presupuestal regional 2025", "La Libertad", "Ministerio de Defensa"). Se reemplazan por los informes reales — no se completan. Los slugs viejos no se preservan: no se han publicado en ninguna parte.
+2. **Los activos viven fuera del repositorio.** PDFs, figuras y anexos hay que traerlos al proyecto o servirlos desde Storage. Las rutas relativas de los Markdown no sobreviven al traslado y hay que reescribirlas.
+
+Sigue vigente el criterio de diseño: todo debe verse digno con **cero, uno o siete** reportes publicados. Nada puede depender de tener la biblioteca llena.
 
 ## Decisiones tomadas
 
@@ -43,8 +53,8 @@ Consecuencia de diseño: todo lo que se construya acá debe verse digno con **ce
 ## Alcance excluido (YAGNI)
 
 - **Rediseño de identidad.** Ver arriba.
-- **Librería de gráficos.** La cifra clave se resuelve tipográficamente (ver Fase 2); un motor de visualización es desproporcionado para 7 reportes.
-- **Lectura del reporte completo en la web.** El PDF sigue siendo el entregable; la página lo presenta y lo entrega.
+- **Motor de gráficos propio.** La cifra clave se resuelve tipográficamente (ver Fase 2). Los Sankey son la excepción y usan Plotly porque ya vienen hechos con él — no se construye nada nuevo.
+- **Lectura del informe completo en la web.** El PDF sigue siendo el entregable; la página lo presenta y lo entrega. Se evaluó publicarlo entero —el contenido lo merece— y se descartó por una razón concreta: si todo el análisis se lee sin registrarse, la cuenta deja de ser un intercambio y el lead magnet no capta nada. Los Sankey cubren la necesidad de mostrar capacidad sin entregar el razonamiento.
 - **CMS o panel de edición.** El contenido se administra por SQL, como hoy.
 
 ---
@@ -90,7 +100,13 @@ Es el corazón del rediseño y lo que resuelve tres problemas de una vez: los re
 
 6. **`/reportes` pasa de tienda a índice de portafolio.** Sin precios, sin distinción premium, con la cifra clave asomando en cada tarjeta.
 
-7. **El modelo de derechos se colapsa, y hay que decirlo explícitamente.** Hoy `has_access()` distingue tres vías: reporte gratuito, compra individual, o suscripción vigente. Si todo es gratis a cambio de cuenta, esas tres ramas se reducen a una sola pregunta: **¿hay sesión y el reporte está publicado?**
+7. **Los anexos Sankey son la prueba pública.** Se muestran **sin exigir cuenta**, a diferencia del análisis escrito. Esa asimetría es deliberada: el diagrama demuestra capacidad de un vistazo y no revela el razonamiento, así que la cuenta sigue siendo un intercambio real por el informe. Es lo más diferenciador del sitio — ningún competidor peruano publica flujos de gasto público navegables.
+
+   **No se sirven tal como están.** Cada archivo pesa 4.86 MB, de los cuales **los datos son 10 KB y el resto es la librería Plotly empaquetada**. Incrustarlos por `iframe` mandaría 14.6 MB para mostrar 30 KB de información. Además tienen lienzo fijo de `1450×900px`, o sea inservibles en móvil — donde estará la mayoría del tráfico.
+
+   **Enfoque:** extraer el payload de datos de cada anexo (la llamada a `Plotly.newPlot`), guardarlo como JSON, y renderizarlo con **una sola** copia de Plotly cargada aparte y compartida por los tres. El lienzo pasa a ser responsivo. Resultado: ~30 KB de datos más una librería que se cachea una vez, en vez de 14.6 MB.
+
+8. **El modelo de derechos se colapsa, y hay que decirlo explícitamente.** Hoy `has_access()` distingue tres vías: reporte gratuito, compra individual, o suscripción vigente. Si todo es gratis a cambio de cuenta, esas tres ramas se reducen a una sola pregunta: **¿hay sesión y el reporte está publicado?**
 
    Esto no es cosmético — `get-report-download-url` llama a `has_access()` para decidir si entrega el archivo, así que la función tiene que cambiar o seguirá negando descargas de los reportes marcados `premium`.
 
@@ -138,12 +154,15 @@ Las fases son secuenciales por dependencia real, no por preferencia:
 6. La página se lee entera con JavaScript deshabilitado.
 7. `npm test`, `npm run lint` y `npm run build` en verde.
 8. El sitio se ve digno con **cero** reportes publicados.
+9. Los Sankey se ven y se navegan **en un teléfono**, y la página que los contiene no descarga más de una copia de Plotly.
+10. El catálogo en pantalla corresponde uno a uno con informes que existen en disco. Ninguna fila nombra algo que no se pueda descargar.
 
 ## Riesgos conocidos
 
 - **Desactivar la confirmación por correo permite cuentas con correos inexistentes.** Es aceptable para un lead magnet —el correo se valida al cotizar— pero implica que la lista de leads tendrá ruido. Es una decisión de negocio ya tomada, registrada acá para que no sorprenda.
 - **Dejar los pagos dormidos deja un subsistema sin ejercitar.** Sus tests siguen corriendo, pero nadie usa el flujo. Si algún día se reactiva, hay que re-verificarlo antes de confiar en él, no asumir que sigue bueno.
-- **Las páginas por reporte no sirven de nada sin reportes.** Ver el bloqueador arriba.
+- **No está verificado que los informes sean publicables.** Existen y son buenos, pero nadie ha confirmado que estén terminados, revisados, ni que ninguno sea trabajo de un cliente que no deba salir. `REPORTE_SSIV.md` en particular no encaja con la nomenclatura del resto y no se ha abierto. **Confirmarlo antes de publicar es del dueño, no del implementador.**
+- **No se verificó si los 3 PDFs y los 4 Markdown cubren los mismos temas o son distintos.** Por los nombres parecen solaparse; el plan debe resolverlo antes de sembrar el catálogo, o saldrán entradas duplicadas.
 - **`inmerge.pe` sigue sin resolver** (sin registros MX/A/NS). Afecta la imagen social, los `mailto:` de todo el sitio y el despliegue. No lo resuelve este spec.
 
 ## Cuestiones abiertas que no son técnicas
