@@ -36,6 +36,10 @@ El contenido es investigación seria sobre datos del SIAF-MEF, con voz editorial
 **Dos consecuencias prácticas:**
 
 1. **El catálogo de la base no corresponde a nada real.** Las 7 filas actuales nombran reportes que no existen ("Ejecución presupuestal regional 2025", "La Libertad", "Ministerio de Defensa"). Se reemplazan por los informes reales — no se completan. Los slugs viejos no se preservan: no se han publicado en ninguna parte.
+
+   **Son investigaciones distintas, no versiones del mismo trabajo** (confirmado por el dueño), así que cada archivo es una entrada, guiándose por su nombre. Con dos excepciones que los nombres mismos delatan: `anexo_tecnico_estructura_gasto_lima_distrital.md` es **complemento** de `informe_estructura_gasto_lima_distrital` —el propio informe lo anuncia en su cierre— y no una entrada aparte; y `REPORTE_SSIV.md` **queda fuera por ahora** por decisión del dueño.
+
+   Los tres Sankey se adjuntan al informe que les corresponde según su nombre: `_3niveles` al de niveles de gobierno, `_ingreso` al de recaudación propia, y el general al de estructura de gasto.
 2. **Los activos viven fuera del repositorio.** PDFs, figuras y anexos hay que traerlos al proyecto o servirlos desde Storage. Las rutas relativas de los Markdown no sobreviven al traslado y hay que reescribirlas.
 
 Sigue vigente el criterio de diseño: todo debe verse digno con **cero, uno o siete** reportes publicados. Nada puede depender de tener la biblioteca llena.
@@ -161,8 +165,9 @@ Las fases son secuenciales por dependencia real, no por preferencia:
 
 - **Desactivar la confirmación por correo permite cuentas con correos inexistentes.** Es aceptable para un lead magnet —el correo se valida al cotizar— pero implica que la lista de leads tendrá ruido. Es una decisión de negocio ya tomada, registrada acá para que no sorprenda.
 - **Dejar los pagos dormidos deja un subsistema sin ejercitar.** Sus tests siguen corriendo, pero nadie usa el flujo. Si algún día se reactiva, hay que re-verificarlo antes de confiar en él, no asumir que sigue bueno.
-- **No está verificado que los informes sean publicables.** Existen y son buenos, pero nadie ha confirmado que estén terminados, revisados, ni que ninguno sea trabajo de un cliente que no deba salir. `REPORTE_SSIV.md` en particular no encaja con la nomenclatura del resto y no se ha abierto. **Confirmarlo antes de publicar es del dueño, no del implementador.**
-- **No se verificó si los 3 PDFs y los 4 Markdown cubren los mismos temas o son distintos.** Por los nombres parecen solaparse; el plan debe resolverlo antes de sembrar el catálogo, o saldrán entradas duplicadas.
+- **Los textos del catálogo son un primer borrador.** El dueño confirmó que los ajustará después. Títulos, bajadas y cifras clave se derivan de los propios informes, pero se escriben para ser editados, no como definitivos.
+- **Los dos informes en Markdown no tienen PDF.** El entregable descargable definido por este spec es el PDF; `informe_estructura_gasto_lima_distrital` e `informe_fiscal_lima_distrital` solo existen en `.md`. El plan debe decidir si se convierten o si esas dos entradas quedan sin publicar hasta que exista el PDF — no puede asumirse que ya está resuelto.
+- **Las figuras se referencian con rutas que no sobreviven al traslado.** `../../../figuras/…` resuelve solo desde `reportes/`. Al mover los activos hay que reescribirlas o las imágenes quedan rotas.
 - **`inmerge.pe` sigue sin resolver** (sin registros MX/A/NS). Afecta la imagen social, los `mailto:` de todo el sitio y el despliegue. No lo resuelve este spec.
 
 ## Cuestiones abiertas que no son técnicas
