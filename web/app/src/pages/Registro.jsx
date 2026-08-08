@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
 import { useAuth } from '../lib/auth.jsx';
-import { DEMO_MODE } from '../lib/demoMode.js';
 
 export default function Registro() {
   useDocumentHead({ title: 'Crear cuenta — Inmerge', path: '/registro', noIndex: true });
@@ -48,15 +47,13 @@ export default function Registro() {
             marginBottom: 24,
           }}
         >
-          {DEMO_MODE
-            ? 'Modo demo — los pagos son simulados, no se cobra nada.'
-            : 'Los pagos son por depósito bancario o Yape, y se activan a mano tras verificarlos.'}
+          Tu cuenta te da acceso a todos los reportes publicados, sin costo.
         </div>
         <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', marginBottom: 12 }}>
           Crear cuenta
         </div>
         <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 32 }}>
-          Usamos esto para emitir tu boleta o factura manualmente después de cada pago.
+          Usamos esto para tu perfil de facturación, por si más adelante contratas una consultoría.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
