@@ -114,9 +114,9 @@ export function AuthProvider({ children }) {
     // @supabase/auth-js), con la sesión que haya o null si no hay ninguna —
     // así que un getSession() aparte acá no aportaba nada salvo un segundo
     // escritor: si al montar ya existía una sesión sin profile todavía (el
-    // caso real de producción, porque la confirmación de email está
-    // encendida: signup → email → clic en el link → aterrizas con sesión
-    // recién creada), getSession().then(...) y el INITIAL_SESSION del
+    // caso real de producción hoy: recargar la página o volver al sitio con
+    // la sesión restaurada desde localStorage, antes de que ensure_profile()
+    // haya corrido alguna vez), getSession().then(...) y el INITIAL_SESSION del
     // listener llamaban a buildUser() — y por lo tanto a ensure_profile() —
     // en paralelo. `on conflict` protegía `profiles`, pero `organizations` no
     // tiene ese resguardo, así que igual podía quedar una organización
