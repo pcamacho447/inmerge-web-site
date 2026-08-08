@@ -1,18 +1,21 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase } from './supabaseClient.js';
 import { DEMO_MODE } from './demoMode.js';
-import { fetchOrders } from './orders.js';
 
-// Identidad, derechos y pedidos REALES. El pago es por depósito bancario con
-// verificación humana: el cliente crea un pedido (tabla `orders`, ver
-// lib/orders.js) y el dueño lo aprueba con approve_order() desde el SQL Editor,
-// que es lo único que escribe `subscriptions`/`purchases`. Nunca escribas esas
-// tablas desde acá.
+// Identidad REAL (Supabase Auth + profiles/organizations). El pago dormido es
+// por depósito bancario con verificación humana: el cliente crea un pedido
+// (tabla `orders`, ver lib/orders.js, dormido — solo lo llama CheckoutModal) y
+// el dueño lo aprueba con approve_order() desde el SQL Editor, que es lo único
+// que escribe `subscriptions`/`purchases`. Nunca escribas esas tablas desde
+// acá. Ya no se leen acá tampoco: ningún reader en src/ consulta
+// user.subscription/user.purchases/user.orders fuera del checkout simulado de
+// abajo, y el acceso real a un reporte lo decide has_access() del lado del
+// servidor al momento de la descarga — así que buildUser() ya no paga esos
+// round-trips en cada cambio de sesión.
 //
 // Con DEMO_MODE=true revive el checkout simulado que escribe en localStorage,
 // para mostrar el flujo sin que nadie deposite. Con la bandera apagada —el
-// default— el mock está COMPLETAMENTE fuera: sin unión mock∪real, que es lo que
-// antes hacía imposible saber qué acceso era de verdad.
+// default— el mock está COMPLETAMENTE fuera.
 
 const AuthContext = createContext(null);
 
@@ -57,22 +60,6 @@ async function ensureProfile() {
   return true;
 }
 
-// Lecturas reales vía RLS (*_select_own en 0001_init.sql). Los writes son
-// exclusivos de approve_order(). current_period_end es obligatorio acá: es lo
-// que distingue una suscripción vigente de una vencida, y has_access() lo
-// exige del lado del servidor.
-async function fetchRealEntitlements(userId) {
-  const [{ data: subs }, { data: purchases }] = await Promise.all([
-    supabase.from('subscriptions').select('plan, status, current_period_end').eq('user_id', userId).limit(1),
-    supabase.from('purchases').select('report_id').eq('user_id', userId).eq('status', 'paid'),
-  ]);
-  const sub = subs?.[0];
-  return {
-    subscription: sub ? { plan: sub.plan, status: sub.status, currentPeriodEnd: sub.current_period_end } : null,
-    purchases: (purchases || []).map((p) => p.report_id),
-  };
-}
-
 async function fetchProfileFields(userId) {
   const { data: profile } = await supabase.from('profiles').select('full_name, organization_id').eq('id', userId).maybeSingle();
   if (!profile) return { fullName: '', billingType: null, taxId: null };
@@ -95,46 +82,23 @@ async function buildUser(sessionUser) {
   const sessionValid = await ensureProfile();
   if (!sessionValid) return null; // sesión zombi: ya cerramos sesión
 
-  const [profileFields, real] = await Promise.all([fetchProfileFields(sessionUser.id), fetchRealEntitlements(sessionUser.id)]);
+  const profileFields = await fetchProfileFields(sessionUser.id);
 
-  // Antes esto era `.catch(() => [])`, y una falla de carga se veía IDÉNTICA a
-  // "no tienes pedidos" — justo en la página que existe para tranquilizar a
-  // alguien que acaba de depositar. Ahora se distingue.
-  //
-  // expire_own_stale_orders() corre ACÁ, antes de fetchOrders, no solo dentro
-  // de createOrder: sin esto, un pedido creado y nunca pagado seguía
-  // 'pending' para siempre en /cuenta — con su código y "esperando
-  // verificación de tu depósito" — hasta que el cliente reabriera el modal de
-  // checkout, que es lo único que antes disparaba el vencimiento. Un cliente
-  // que solo visita /cuenta (el caso normal tras depositar) veía un pedido
-  // vencido presentado como pagable, depositaba, y approve_order() lo
-  // rechazaba por vencido con la plata ya en el banco. Es la misma llamada
-  // que createOrder ya hace (0010), SECURITY DEFINER pero acotada a
-  // `auth.uid()`, así que dispararla acá es igual de seguro.
-  let orders = [];
-  let ordersError = false;
-  try {
-    const { error: expireError } = await supabase.rpc('expire_own_stale_orders');
-    if (expireError) throw new Error(expireError.message);
-    orders = await fetchOrders(sessionUser.id);
-  } catch (err) {
-    console.error('No se pudieron cargar los pedidos:', err);
-    ordersError = true;
-  }
-
-  // Con la bandera apagada el mock no participa: una sola fuente de verdad.
+  // Nada en src/ lee user.subscription/user.purchases fuera de subscribe()/
+  // purchaseReport() acá mismo (el checkout simulado de DEMO_MODE) — no hay
+  // lectura real de `subscriptions`/`purchases` ni de `orders` en cada cambio
+  // de sesión: esas tablas ya no gatean nada en la UI (el acceso real lo
+  // decide has_access() del lado del servidor al momento de la descarga), así
+  // que no vale la pena pagar el round-trip en el camino crítico de crear una
+  // cuenta. Con la bandera apagada (default) esto es null/[] sin tocar la BD.
   const mockState = DEMO_MODE ? loadMockState(sessionUser.id) : { subscription: null, purchases: [] };
-  const subscription = real.subscription ?? mockState.subscription;
-  const purchases = Array.from(new Set([...(mockState.purchases || []), ...real.purchases]));
 
   return {
     id: sessionUser.id,
     email: sessionUser.email,
     ...profileFields,
-    subscription,
-    purchases,
-    orders,
-    ordersError,
+    subscription: mockState.subscription,
+    purchases: mockState.purchases || [],
   };
 }
 
@@ -208,7 +172,7 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  // Estas tres son SOLO del modo demo. Si alguien las cablea en producción,
+  // Estas dos son SOLO del modo demo. Si alguien las cablea en producción,
   // revienta en desarrollo en vez de conceder acceso falso en silencio.
   function assertDemo(name) {
     if (!DEMO_MODE) {
@@ -221,16 +185,6 @@ export function AuthProvider({ children }) {
     setUser((u) => {
       if (!u) return u;
       const subscription = { plan, status: 'active', currentPeriodEnd: null };
-      saveMockState(u.id, { subscription, purchases: u.purchases });
-      return { ...u, subscription };
-    });
-  }, []);
-
-  const cancelSubscription = useCallback(() => {
-    assertDemo('cancelSubscription');
-    setUser((u) => {
-      if (!u) return u;
-      const subscription = { ...u.subscription, status: 'canceled' };
       saveMockState(u.id, { subscription, purchases: u.purchases });
       return { ...u, subscription };
     });
@@ -254,7 +208,7 @@ export function AuthProvider({ children }) {
     setUser(session?.user ? await buildUser(session.user) : null);
   }, []);
 
-  const value = { user, loading, signup, login, logout, subscribe, cancelSubscription, purchaseReport, refreshUser };
+  const value = { user, loading, signup, login, logout, subscribe, purchaseReport, refreshUser };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
