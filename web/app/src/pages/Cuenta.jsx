@@ -2,27 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import useReports from '../hooks/useReports.js';
+import useReportDownload from '../hooks/useReportDownload.js';
 import Footer from '../components/Footer.jsx';
 import { useAuth, isSubscriptionActive } from '../lib/auth.jsx';
-import { getReportDownloadUrl } from '../lib/downloadReport.js';
 import { formatPEN } from '../lib/formatPEN.js';
 import { waLink, waVoucherMessage } from '../data/content.js';
 import usePlans from '../hooks/usePlans.js';
 import CheckoutModal from '../components/CheckoutModal.jsx';
 import { DEMO_MODE } from '../lib/demoMode.js';
-
-// La Edge Function responde en inglés y con vocabulario de sistema. Quien lee
-// esto ya pagó, así que se traduce a algo accionable. El resto de mensajes se
-// deja pasar tal cual: son casos raros y el texto original ayuda a depurar.
-function mensajeDeDescarga(mensajeCrudo) {
-  if (mensajeCrudo.includes('not available yet')) {
-    return 'Este reporte todavía no tiene el archivo cargado. Escríbenos por WhatsApp y te lo enviamos.';
-  }
-  if (mensajeCrudo.includes('Not entitled')) {
-    return 'Tu acceso a este reporte no está activo. Si ya depositaste, mándanos la constancia.';
-  }
-  return mensajeCrudo;
-}
 
 export default function Cuenta() {
   useDocumentHead({ title: 'Mi cuenta — Inmerge', path: '/cuenta', noIndex: true });
@@ -30,25 +17,10 @@ export default function Cuenta() {
   const { reports } = useReports();
   const { plans } = usePlans();
   const navigate = useNavigate();
-  const [downloadingId, setDownloadingId] = useState(null);
-  const [downloadError, setDownloadError] = useState({ id: null, message: '' });
+  const { downloadingId, downloadError, handleDownload } = useReportDownload();
   const [renovando, setRenovando] = useState(null);
 
   if (!user) return null; // ProtectedRoute redirects before this ever renders
-
-  async function handleDownload(reportId) {
-    setDownloadError({ id: null, message: '' });
-    setDownloadingId(reportId);
-    try {
-      const url = await getReportDownloadUrl(reportId);
-      // Signed URL is short-lived (5 min) — open it now to start the download.
-      window.open(url, '_blank', 'noopener');
-    } catch (err) {
-      setDownloadError({ id: reportId, message: mensajeDeDescarga(err.message) });
-    } finally {
-      setDownloadingId(null);
-    }
-  }
 
   const plan = plans.find((p) => p.id === user.subscription?.plan);
   const subActiva = isSubscriptionActive(user.subscription);
