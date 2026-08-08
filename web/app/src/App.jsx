@@ -6,7 +6,6 @@ import Layout from './components/Layout.jsx';
 import Inicio from './pages/Inicio.jsx';
 import Servicios from './pages/Servicios.jsx';
 import Reportes from './pages/Reportes.jsx';
-import Planes from './pages/Planes.jsx';
 import Nosotros from './pages/Nosotros.jsx';
 import Contacto from './pages/Contacto.jsx';
 import Login from './pages/Login.jsx';
@@ -23,7 +22,6 @@ export default function App() {
           <Route path="/" element={<Inicio />} />
           <Route path="/servicios" element={<Servicios />} />
           <Route path="/reportes" element={<Reportes />} />
-          <Route path="/planes" element={<Planes />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/login" element={<Login />} />

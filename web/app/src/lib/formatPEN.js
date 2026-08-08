@@ -11,8 +11,8 @@
 // exactamente el número que la app le mostró, y approve_order rechazaría por
 // "MONTO NO COINCIDE". Mostrar céntimos solo cuando el valor no es entero
 // evita ese choque sin ensuciar el 99% de los precios de hoy, que sí lo son
-// (`S/ 2,390`, no `S/ 2,390.00`, para /planes en particular — ver el
-// comentario histórico que esto reemplaza).
+// (`S/ 2,390`, no `S/ 2,390.00`, para los precios de suscripción en
+// particular — ver el comentario histórico que esto reemplaza).
 export function formatPEN(valor) {
   if (valor === null || valor === undefined) return '—';
   const n = Number(valor);

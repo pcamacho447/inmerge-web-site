@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import useReports from '../hooks/useReports.js';
 import Footer from '../components/Footer.jsx';
@@ -186,7 +186,7 @@ export default function Cuenta() {
               <div style={{ fontSize: 14, color: 'var(--muted)' }}>
                 {venceTexto ? `Tu suscripción venció el ${venceTexto}.` : 'No tienes una suscripción activa.'}
               </div>
-              {venceTexto && plan ? (
+              {venceTexto && plan && (
                 <button
                   type="button"
                   onClick={() => setRenovando(plan)}
@@ -205,21 +205,6 @@ export default function Cuenta() {
                 >
                   Renovar por depósito
                 </button>
-              ) : (
-                <Link
-                  to="/planes"
-                  className="btn-hover"
-                  style={{
-                    background: 'var(--terracotta)',
-                    color: 'var(--bg)',
-                    borderRadius: 3,
-                    padding: '10px 20px',
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Ver planes
-                </Link>
               )}
             </div>
           )}

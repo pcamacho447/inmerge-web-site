@@ -64,11 +64,7 @@ export default function Reportes() {
         </div>
         <p style={{ fontSize: 17, color: 'var(--muted)', maxWidth: 600, lineHeight: 1.7, marginTop: 28 }}>
           Análisis narrativos de datos públicos peruanos, sin cliente de por medio — así trabajamos, a la vista de cualquiera. Además,
-          series premium con más profundidad — de a{' '}
-          <Link to="/planes" style={{ fontWeight: 600 }}>
-            un reporte suelto o por suscripción
-          </Link>
-          .
+          series premium con más profundidad, disponibles para descargar creando una cuenta.
         </p>
       </div>
 
@@ -122,14 +118,8 @@ export default function Reportes() {
       </div>
 
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '100px clamp(20px,5vw,40px) 140px' }}>
-        <div
-          data-reveal=""
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 40, flexWrap: 'wrap', gap: 16 }}
-        >
+        <div data-reveal="" style={{ marginBottom: 40 }}>
           <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(28px,3.6vw,40px)' }}>Reportes premium</div>
-          <Link to="/planes" style={{ fontSize: 14, fontWeight: 600 }}>
-            Ver planes →
-          </Link>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 32 }}>
           {premiumReports.map((r) => {

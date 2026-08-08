@@ -18,7 +18,6 @@ export const NAV_LINKS = [
   { to: '/', label: 'Inicio' },
   { to: '/servicios', label: 'Servicios' },
   { to: '/reportes', label: 'Reportes' },
-  { to: '/planes', label: 'Planes' },
   { to: '/nosotros', label: 'Nosotros' },
   { to: '/contacto', label: 'Contacto' },
 ];
