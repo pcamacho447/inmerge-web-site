@@ -1,32 +1,18 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import useReports from '../hooks/useReports.js';
 import useReportDownload from '../hooks/useReportDownload.js';
 import Footer from '../components/Footer.jsx';
-import { useAuth, isSubscriptionActive } from '../lib/auth.jsx';
-import { formatPEN } from '../lib/formatPEN.js';
-import { waLink, waVoucherMessage } from '../data/content.js';
-import usePlans from '../hooks/usePlans.js';
-import CheckoutModal from '../components/CheckoutModal.jsx';
-import { DEMO_MODE } from '../lib/demoMode.js';
+import { useAuth } from '../lib/auth.jsx';
 
 export default function Cuenta() {
   useDocumentHead({ title: 'Mi cuenta — Inmerge', path: '/cuenta', noIndex: true });
-  const { user, logout, cancelSubscription } = useAuth();
-  const { reports } = useReports();
-  const { plans } = usePlans();
+  const { user, logout } = useAuth();
+  const { reports, loading: reportsLoading, error: reportsError } = useReports();
   const navigate = useNavigate();
   const { downloadingId, downloadError, handleDownload } = useReportDownload();
-  const [renovando, setRenovando] = useState(null);
 
   if (!user) return null; // ProtectedRoute redirects before this ever renders
-
-  const plan = plans.find((p) => p.id === user.subscription?.plan);
-  const subActiva = isSubscriptionActive(user.subscription);
-  const vence = user.subscription?.currentPeriodEnd ? new Date(user.subscription.currentPeriodEnd) : null;
-  const venceTexto = vence ? vence.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : null;
-  const purchasedReports = reports.filter((r) => user.purchases.includes(r.id));
 
   async function handleLogout() {
     await logout();
@@ -36,21 +22,6 @@ export default function Cuenta() {
   return (
     <>
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '120px clamp(20px,5vw,40px) 60px' }}>
-        <div
-          style={{
-            background: 'var(--cream2)',
-            borderRadius: 3,
-            padding: '8px 12px',
-            fontSize: 11,
-            letterSpacing: 0.5,
-            color: 'var(--muted)',
-            marginBottom: 24,
-          }}
-        >
-          {DEMO_MODE
-            ? 'Modo demo — tu suscripción y compras acá son simuladas, no se cobró nada.'
-            : 'Los pedidos se activan a mano tras verificar el depósito.'}
-        </div>
         <div
           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 16, marginBottom: 8 }}
         >
@@ -76,140 +47,20 @@ export default function Cuenta() {
         </div>
         <div style={{ fontSize: 15, color: 'var(--muted)', marginBottom: 48 }}>{user.email}</div>
 
-        <div style={{ marginBottom: 48 }}>
-          <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, marginBottom: 16 }}>Suscripción</div>
-          {subActiva ? (
-            <div
-              style={{
-                border: '1px solid var(--border)',
-                borderRadius: 4,
-                padding: 24,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: 16,
-              }}
-            >
-              <div>
-                <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 18, marginBottom: 4 }}>
-                  {plan?.name ?? user.subscription.plan}
-                </div>
-                <div style={{ fontSize: 13, color: 'var(--green)', fontWeight: 600 }}>Activa</div>
-                {venceTexto && <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>Vence el {venceTexto}</div>}
-              </div>
-              {/* Con periodos prepagados no hay nada que cancelar: el acceso
-                  vence solo. Cancelar solo existe en el modo demo. */}
-              {DEMO_MODE ? (
-                <button
-                  type="button"
-                  onClick={cancelSubscription}
-                  className="btn-outline-hover"
-                  style={{
-                    background: 'none',
-                    border: '1px solid var(--border)',
-                    color: 'var(--muted)',
-                    borderRadius: 3,
-                    padding: '10px 20px',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    fontFamily: "'IBM Plex Sans',sans-serif",
-                  }}
-                >
-                  Cancelar suscripción
-                </button>
-              ) : (
-                plan && (
-                  <button
-                    type="button"
-                    onClick={() => setRenovando(plan)}
-                    className="btn-outline-hover"
-                    style={{
-                      background: 'none',
-                      border: '1px solid var(--border)',
-                      color: 'var(--ink)',
-                      borderRadius: 3,
-                      padding: '10px 20px',
-                      fontSize: 13,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      fontFamily: "'IBM Plex Sans',sans-serif",
-                    }}
-                  >
-                    Renovar por depósito
-                  </button>
-                )
-              )}
-            </div>
-          ) : (
-            <div
-              style={{
-                border: '1px solid var(--border)',
-                borderRadius: 4,
-                padding: 24,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: 16,
-              }}
-            >
-              <div style={{ fontSize: 14, color: 'var(--muted)' }}>
-                {venceTexto ? `Tu suscripción venció el ${venceTexto}.` : 'No tienes una suscripción activa.'}
-              </div>
-              {venceTexto && plan && (
-                <button
-                  type="button"
-                  onClick={() => setRenovando(plan)}
-                  className="btn-hover"
-                  style={{
-                    background: 'var(--terracotta)',
-                    color: 'var(--bg)',
-                    border: 'none',
-                    borderRadius: 3,
-                    padding: '10px 20px',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    fontFamily: "'IBM Plex Sans',sans-serif",
-                  }}
-                >
-                  Renovar por depósito
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-
-        {user.ordersError && (
-          <div
-            style={{
-              marginBottom: 48,
-              border: '1px solid var(--terracotta)',
-              borderRadius: 4,
-              padding: 20,
-              fontSize: 14,
-              color: 'var(--muted)',
-              lineHeight: 1.6,
-            }}
-          >
-            No pudimos cargar tus pedidos. Recarga la página; si ya depositaste y sigue sin aparecer, escríbenos por WhatsApp.
-          </div>
-        )}
-
-        {user.orders?.length > 0 && (
-          <div style={{ marginBottom: 48 }}>
-            <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, marginBottom: 16 }}>Pedidos</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: 'var(--border)' }}>
-              {user.orders.map((o) => {
-                const item =
-                  o.kind === 'subscription' ? plans.find((p) => p.id === o.plan)?.name : reports.find((r) => r.id === o.report_id)?.title;
-                const rechazado = o.status === 'rejected';
-                const vencido = o.status === 'expired';
-                return (
+        <div>
+          <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, marginBottom: 16 }}>Reportes disponibles</div>
+          {reportsLoading && <div style={{ fontSize: 14, color: 'var(--muted)' }}>Cargando reportes...</div>}
+          {reportsError && <div style={{ fontSize: 14, color: 'var(--rose)' }}>No se pudieron cargar los reportes: {reportsError}</div>}
+          {!reportsLoading &&
+            !reportsError &&
+            (reports.length === 0 ? (
+              <div style={{ fontSize: 14, color: 'var(--muted)' }}>Todavía no hay reportes publicados.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: 'var(--border)' }}>
+                {reports.map((r) => (
                   <div
-                    key={o.id}
+                    key={r.id}
+                    className="row-hover"
                     style={{
                       background: 'var(--bg)',
                       padding: 20,
@@ -221,100 +72,42 @@ export default function Cuenta() {
                     }}
                   >
                     <div>
-                      <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 13, fontWeight: 500 }}>{o.code}</div>
-                      <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 15, marginTop: 2 }}>{item ?? '—'}</div>
-                      <div style={{ fontSize: 12, color: rechazado || vencido ? 'var(--terracotta)' : 'var(--muted)', marginTop: 4 }}>
-                        {rechazado
-                          ? `Rechazado: ${o.notes || 'sin motivo registrado'}`
-                          : vencido
-                            ? 'Vencido — genera un pedido nuevo para pagar.'
-                            : `S/ ${formatPEN(o.amount_pen)} · esperando verificación de tu depósito`}
-                      </div>
+                      <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 15 }}>{r.title}</div>
+                      {/* Visible inline error, not a title="" tooltip — tooltips don't show on tap, so a
+                          mobile user tapping the button and getting a 403/404 would otherwise see nothing.
+                          The Edge Function's own message ("Not entitled…", "…not available yet") is surfaced. */}
+                      {downloadError.id === r.id && downloadError.message && (
+                        <div style={{ fontSize: 11, color: 'var(--terracotta)', marginTop: 4 }}>{downloadError.message}</div>
+                      )}
                     </div>
-                    {!rechazado && !vencido && (
-                      <a
-                        href={waLink(waVoucherMessage(o))}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn-outline-hover"
-                        style={{
-                          border: '1px solid var(--border)',
-                          color: 'var(--ink)',
-                          borderRadius: 3,
-                          padding: '8px 16px',
-                          fontSize: 13,
-                          fontWeight: 600,
-                          flexShrink: 0,
-                        }}
-                      >
-                        Enviar constancia
-                      </a>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleDownload(r.id)}
+                      disabled={downloadingId === r.id}
+                      className="btn-hover"
+                      style={{
+                        background: 'var(--terracotta)',
+                        color: 'var(--bg)',
+                        border: 'none',
+                        borderRadius: 3,
+                        padding: '8px 16px',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: downloadingId === r.id ? 'wait' : 'pointer',
+                        fontFamily: "'IBM Plex Sans',sans-serif",
+                        flexShrink: 0,
+                        opacity: downloadingId === r.id ? 0.7 : 1,
+                      }}
+                    >
+                      {downloadingId === r.id ? 'Generando…' : 'Descargar'}
+                    </button>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        <div>
-          <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, marginBottom: 16 }}>Reportes comprados</div>
-          {purchasedReports.length === 0 ? (
-            <div style={{ fontSize: 14, color: 'var(--muted)' }}>Aún no has comprado ningún reporte individual.</div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: 'var(--border)' }}>
-              {purchasedReports.map((r) => (
-                <div
-                  key={r.id}
-                  className="row-hover"
-                  style={{
-                    background: 'var(--bg)',
-                    padding: 20,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: 12,
-                  }}
-                >
-                  <div>
-                    <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 15 }}>{r.title}</div>
-                    {/* Visible inline error, not a title="" tooltip — tooltips don't show on tap, so a
-                        mobile user tapping the button and getting a 403/404 would otherwise see nothing.
-                        The Edge Function's own message ("Not entitled…", "…not available yet") is surfaced. */}
-                    {downloadError.id === r.id && downloadError.message && (
-                      <div style={{ fontSize: 11, color: 'var(--terracotta)', marginTop: 4 }}>{downloadError.message}</div>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleDownload(r.id)}
-                    disabled={downloadingId === r.id}
-                    className="btn-hover"
-                    style={{
-                      background: 'var(--terracotta)',
-                      color: 'var(--bg)',
-                      border: 'none',
-                      borderRadius: 3,
-                      padding: '8px 16px',
-                      fontSize: 13,
-                      fontWeight: 600,
-                      cursor: downloadingId === r.id ? 'wait' : 'pointer',
-                      fontFamily: "'IBM Plex Sans',sans-serif",
-                      flexShrink: 0,
-                      opacity: downloadingId === r.id ? 0.7 : 1,
-                    }}
-                  >
-                    {downloadingId === r.id ? 'Generando…' : 'Descargar'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            ))}
         </div>
       </div>
       <Footer borderTop />
-      {renovando && <CheckoutModal kind="subscription" item={renovando} onClose={() => setRenovando(null)} />}
     </>
   );
 }

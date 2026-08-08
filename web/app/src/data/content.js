@@ -22,25 +22,6 @@ export const NAV_LINKS = [
   { to: '/contacto', label: 'Contacto' },
 ];
 
-// Copy de los planes. El precio y la duración viven en la tabla `plans` de
-// Supabase: un precio acá que discrepe de la BD significaría que el cliente ve
-// un número y el trigger de pedidos le cobra otro. usePlans() los une.
-export const PLAN_COPY = {
-  monthly: {
-    description: 'Acceso a todos los reportes premium mientras estés suscrito.',
-    features: ['Todos los reportes premium publicados cada mes', 'Acceso inmediato a nuevas series', 'Renuevas solo si quieres'],
-  },
-  annual: {
-    badge: 'Ahorra ~20%',
-    description: 'La misma suscripción, un pago al año.',
-    features: ['Todo lo del plan mensual', 'Precio congelado por 12 meses', 'Un solo pago, sin recordatorios'],
-  },
-};
-
-export function periodLabel(periodMonths) {
-  return periodMonths === 12 ? 'año' : 'mes';
-}
-
 // Mensaje de WhatsApp para mandar la constancia. Un link wa.me no puede
 // adjuntar la foto: abre el chat con el texto listo y el cliente adjunta.
 export function waVoucherMessage(order) {

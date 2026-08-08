@@ -263,23 +263,3 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }
-
-// Espeja has_access() en supabase/migrations/0009_published_and_file_path.sql
-// (su redefinición más reciente — 0011 solo mueve el filtro de published_at a
-// la RLS policy de `reports`, no toca la función) — mantenlos sincronizados.
-// Este es el gate de UI; el gate real es la Edge Function, que reconsulta
-// has_access() del lado del servidor.
-export function isSubscriptionActive(subscription) {
-  if (!subscription || subscription.status !== 'active') return false;
-  // Sin periodo solo puede ser una suscripción del modo demo, que nunca toca la
-  // BD y por lo tanto no puede desbloquear una descarga real.
-  if (!subscription.currentPeriodEnd) return DEMO_MODE;
-  return new Date(subscription.currentPeriodEnd).getTime() > Date.now();
-}
-
-export function hasAccess(user, report) {
-  if (report.tier === 'free') return true;
-  if (!user) return false;
-  if (user.purchases?.includes(report.id)) return true;
-  return isSubscriptionActive(user.subscription);
-}
