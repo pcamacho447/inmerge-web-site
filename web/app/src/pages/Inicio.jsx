@@ -92,8 +92,6 @@ export default function Inicio() {
         </div>
       </div>
 
-      <Frieze border="#A8472B" upColor="#D8A84E" downColor="#C68A3D" medallionBg="#A8472B" medallionBorder="#F3EADA" />
-
       <div
         aria-hidden="true"
         style={{
@@ -244,7 +242,7 @@ export default function Inicio() {
                     fontFamily: "'Spectral',serif",
                     fontWeight: 800,
                     fontSize: 72,
-                    color: 'var(--brown2)',
+                    color: 'var(--gold)',
                     lineHeight: 1,
                     marginBottom: 20,
                   }}
@@ -334,8 +332,6 @@ export default function Inicio() {
           </a>
         </div>
       </div>
-
-      <Frieze border="#D8A84E" upColor="#C68A3D" downColor="#A8472B" medallionBg="#D8A84E" medallionBorder="#241A12" />
 
       <Footer />
     </>
