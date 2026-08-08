@@ -18,7 +18,6 @@ export default function Registro() {
   const [taxId, setTaxId] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [confirmEmailSent, setConfirmEmailSent] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -26,12 +25,8 @@ export default function Registro() {
     setSubmitting(true);
     setError('');
     try {
-      const result = await signup({ fullName: fullName.trim(), email: email.trim(), password, billingType, taxId: taxId.trim() });
-      if (result.confirmEmailRequired) {
-        setConfirmEmailSent(true);
-      } else {
-        navigate(location.state?.redirectTo || '/cuenta');
-      }
+      await signup({ fullName: fullName.trim(), email: email.trim(), password, billingType, taxId: taxId.trim() });
+      navigate(location.state?.redirectTo || '/cuenta');
     } catch (err) {
       setError(err.message || 'No se pudo crear la cuenta.');
     } finally {
@@ -64,152 +59,120 @@ export default function Registro() {
           Usamos esto para emitir tu boleta o factura manualmente después de cada pago.
         </p>
 
-        {confirmEmailSent ? (
-          <div style={{ background: 'var(--ink)', color: 'var(--bg)', borderRadius: 4, padding: 32 }}>
-            <div style={{ width: 14, height: 14, background: 'var(--green)', transform: 'rotate(45deg)', marginBottom: 16 }} />
-            <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 20, marginBottom: 8 }}>Revisa tu correo.</div>
-            <div style={{ fontSize: 14, color: 'var(--tan-text)', lineHeight: 1.6 }}>
-              Te enviamos un enlace de confirmación a {email}. Confírmalo y después inicia sesión normalmente.
-            </div>
-            {/* Este aviso se muestra SIEMPRE, no solo cuando el correo ya existe.
-                Supabase responde "éxito" a un registro con un correo ya registrado
-                y no envía nada — a propósito, para que nadie pueda averiguar qué
-                direcciones tienen cuenta probándolas. Detectarlo y decirlo
-                reabriría esa fuga; mostrárselo a todos por igual rescata a quien
-                se registró dos veces sin revelar nada de nadie. */}
-            <div
-              style={{
-                fontSize: 13,
-                color: 'var(--tan-text)',
-                lineHeight: 1.6,
-                marginTop: 16,
-                paddingTop: 16,
-                borderTop: '1px solid rgba(243,234,218,0.2)',
-              }}
-            >
-              Si ya tenías una cuenta con ese correo, no te llegará nada nuevo.{' '}
-              <Link to="/login" className="link-hover" style={{ color: 'var(--bg)', fontWeight: 600 }}>
-                Inicia sesión
-              </Link>{' '}
-              con tu contraseña de siempre.
-            </div>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <input
-              required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Nombre completo"
-              style={{
-                border: '1px solid var(--border)',
-                background: '#FFFFFF',
-                borderRadius: 3,
-                padding: 16,
-                fontSize: 14,
-                fontFamily: "'IBM Plex Sans',sans-serif",
-              }}
-            />
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tucorreo@empresa.com"
-              style={{
-                border: '1px solid var(--border)',
-                background: '#FFFFFF',
-                borderRadius: 3,
-                padding: 16,
-                fontSize: 14,
-                fontFamily: "'IBM Plex Sans',sans-serif",
-              }}
-            />
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Contraseña (mínimo 6 caracteres)"
-              style={{
-                border: '1px solid var(--border)',
-                background: '#FFFFFF',
-                borderRadius: 3,
-                padding: 16,
-                fontSize: 14,
-                fontFamily: "'IBM Plex Sans',sans-serif",
-              }}
-            />
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <input
+            required
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Nombre completo"
+            style={{
+              border: '1px solid var(--border)',
+              background: '#FFFFFF',
+              borderRadius: 3,
+              padding: 16,
+              fontSize: 14,
+              fontFamily: "'IBM Plex Sans',sans-serif",
+            }}
+          />
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="tucorreo@empresa.com"
+            style={{
+              border: '1px solid var(--border)',
+              background: '#FFFFFF',
+              borderRadius: 3,
+              padding: 16,
+              fontSize: 14,
+              fontFamily: "'IBM Plex Sans',sans-serif",
+            }}
+          />
+          <input
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Contraseña (mínimo 6 caracteres)"
+            style={{
+              border: '1px solid var(--border)',
+              background: '#FFFFFF',
+              borderRadius: 3,
+              padding: 16,
+              fontSize: 14,
+              fontFamily: "'IBM Plex Sans',sans-serif",
+            }}
+          />
 
-            <div style={{ display: 'flex', gap: 1, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
-              {[
-                { value: 'persona_natural', label: 'Persona natural' },
-                { value: 'empresa', label: 'Empresa' },
-              ].map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setBillingType(opt.value)}
-                  className={billingType === opt.value ? undefined : 'btn-outline-hover'}
-                  style={{
-                    flex: 1,
-                    padding: '12px 8px',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    fontFamily: "'IBM Plex Sans',sans-serif",
-                    border: 'none',
-                    cursor: 'pointer',
-                    background: billingType === opt.value ? 'var(--ink)' : '#FFFFFF',
-                    color: billingType === opt.value ? 'var(--bg)' : 'var(--ink)',
-                  }}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-
-            {billingType === 'empresa' && (
-              <input
-                required
-                value={taxId}
-                onChange={(e) => setTaxId(e.target.value)}
-                placeholder="RUC (para factura)"
+          <div style={{ display: 'flex', gap: 1, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
+            {[
+              { value: 'persona_natural', label: 'Persona natural' },
+              { value: 'empresa', label: 'Empresa' },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setBillingType(opt.value)}
+                className={billingType === opt.value ? undefined : 'btn-outline-hover'}
                 style={{
-                  border: '1px solid var(--border)',
-                  background: '#FFFFFF',
-                  borderRadius: 3,
-                  padding: 16,
-                  fontSize: 14,
+                  flex: 1,
+                  padding: '12px 8px',
+                  fontSize: 13,
+                  fontWeight: 600,
                   fontFamily: "'IBM Plex Sans',sans-serif",
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: billingType === opt.value ? 'var(--ink)' : '#FFFFFF',
+                  color: billingType === opt.value ? 'var(--bg)' : 'var(--ink)',
                 }}
-              />
-            )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
 
-            {error && <div style={{ fontSize: 13, color: 'var(--rose)' }}>{error}</div>}
-
-            <button
-              type="submit"
-              disabled={submitting}
-              className="btn-hover"
+          {billingType === 'empresa' && (
+            <input
+              required
+              value={taxId}
+              onChange={(e) => setTaxId(e.target.value)}
+              placeholder="RUC (para factura)"
               style={{
-                background: 'var(--terracotta)',
-                color: 'var(--bg)',
-                textAlign: 'center',
+                border: '1px solid var(--border)',
+                background: '#FFFFFF',
                 borderRadius: 3,
                 padding: 16,
-                fontSize: 15,
-                fontWeight: 600,
+                fontSize: 14,
                 fontFamily: "'IBM Plex Sans',sans-serif",
-                cursor: submitting ? 'default' : 'pointer',
-                border: 'none',
-                opacity: submitting ? 0.7 : 1,
               }}
-            >
-              {submitting ? 'Creando cuenta...' : 'Crear cuenta'}
-            </button>
-          </form>
-        )}
+            />
+          )}
+
+          {error && <div style={{ fontSize: 13, color: 'var(--rose)' }}>{error}</div>}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="btn-hover"
+            style={{
+              background: 'var(--terracotta)',
+              color: 'var(--bg)',
+              textAlign: 'center',
+              borderRadius: 3,
+              padding: 16,
+              fontSize: 15,
+              fontWeight: 600,
+              fontFamily: "'IBM Plex Sans',sans-serif",
+              cursor: submitting ? 'default' : 'pointer',
+              border: 'none',
+              opacity: submitting ? 0.7 : 1,
+            }}
+          >
+            {submitting ? 'Creando cuenta...' : 'Crear cuenta'}
+          </button>
+        </form>
 
         <div style={{ fontSize: 14, color: 'var(--muted)', marginTop: 24 }}>
           ¿Ya tienes cuenta?{' '}

@@ -174,7 +174,15 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  // Returns { confirmEmailRequired: boolean } on success; throws on real errors.
+  // La confirmación por correo está desactivada en el proyecto: signUp deja
+  // sesión iniciada de inmediato y el listener de onAuthStateChange construye
+  // el usuario. No hay rama de "revisa tu correo" porque no hay correo.
+  //
+  // Un correo ya registrado sigue devolviendo éxito sin sesión y sin crear
+  // nada — GoTrue lo hace a propósito, para que nadie descubra qué direcciones
+  // tienen cuenta probándolas. Ese caso se detecta acá y se convierte en un
+  // error accionable, porque sin sesión el usuario se quedaría mirando un
+  // formulario que "funcionó" y no lo llevó a ninguna parte.
   const signup = useCallback(async ({ fullName, email, password, billingType, taxId }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -183,21 +191,8 @@ export function AuthProvider({ children }) {
     });
     if (error) throw error;
     if (!data.session) {
-      // Email confirmation is on for this project — no session yet, so
-      // profile/org creation happens later (ensure_profile, on first login).
-      //
-      // OJO: esta rama tiene DOS causas indistinguibles desde acá. La normal es
-      // "falta confirmar el correo". La otra es que el correo YA tenía cuenta:
-      // GoTrue devuelve éxito con un id inventado, `identities: []` y sin
-      // enviar ningún correo, para que nadie pueda descubrir qué direcciones
-      // están registradas probándolas una por una. Podríamos leer
-      // `data.user.identities.length === 0` y distinguirlas, pero hacerlo
-      // reabre esa fuga — así que Registro.jsx avisa de ambos casos a la vez,
-      // en un texto que se le muestra a todos por igual.
-      return { confirmEmailRequired: true };
+      throw new Error('Ese correo ya tiene una cuenta. Inicia sesión con tu contraseña.');
     }
-    // Igual que en login(): el listener de onAuthStateChange se encarga.
-    return { confirmEmailRequired: false };
   }, []);
 
   // No llamamos a buildUser acá: signInWithPassword dispara SIGNED_IN y el
