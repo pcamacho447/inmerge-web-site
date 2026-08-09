@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    include: ['src/**/*.test.{js,jsx}'],
+    include: ['src/**/*.test.{js,jsx}', 'scripts/**/*.test.mjs'],
     setupFiles: ['./src/test-setup.js'],
     // supabaseClient.js lanza al importarse si faltan. El cliente se construye
     // pero estos tests no hacen red.
