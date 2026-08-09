@@ -69,7 +69,14 @@ export default function Reportes() {
           </div>
         )}
         {!reportsLoading && !reportsError && reports.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 32 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 380px))',
+              justifyContent: 'start',
+              gap: 32,
+            }}
+          >
             {reports.map((r) => (
               <Link
                 key={r.id}
