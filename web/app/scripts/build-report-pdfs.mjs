@@ -64,7 +64,11 @@ function renderMarkdown(md) {
       missing.push(href);
       return `<p class="caption">[falta la figura: ${basename(href)}]</p>`;
     }
-    return `<img src="${toFileUrl(disk)}" alt="${text || ''}"><div class="caption">${text || ''}</div>`;
+    // alt="" a propósito: el <div class="caption"> que sigue ya repite el
+    // mismo texto de forma visible. Ponerlo también en alt hace que un
+    // lector de pantalla lo diga dos veces; alt vacío marca la imagen como
+    // decorativa y deja que el caption sea la única descripción leída.
+    return `<img src="${toFileUrl(disk)}" alt=""><div class="caption">${text || ''}</div>`;
   };
   // El primer <h1> del markdown es el título, y brandPage() ya lo pone arriba.
   // Dejarlo en el cuerpo lo duplicaría en la primera página.
@@ -107,28 +111,77 @@ async function main() {
     // PDF salía chico y sin ellas. Escribir el HTML a disco y navegar con
     // goto() le da al documento un origen file:// real, que sí puede cargar
     // imágenes file:// vecinas.
-    const tmpHtml = join(OUT_DIR, `.tmp-${r.slug}.html`);
-    writeFileSync(tmpHtml, brandPage({ title, kicker: r.kicker, runningHead: r.runningHead, bodyHtml: html }));
-    const page = await browser.newPage();
-    await page.goto(toFileUrl(tmpHtml), { waitUntil: 'networkidle' });
+    //
+    // El nombre lleva el pid: dos corridas concurrentes del script no deben
+    // pisarse el mismo archivo temporal (una podría leer lo que la otra
+    // todavía está escribiendo).
     const out = join(OUT_DIR, `${r.slug}.pdf`);
-    await page.pdf({
-      path: out,
-      format: 'A4',
-      printBackground: true,
-      displayHeaderFooter: true,
-      headerTemplate: `<div style="font-family:'IBM Plex Sans',sans-serif;font-size:7pt;letter-spacing:1.2pt;color:#7A6B58;width:100%;padding:0 18mm;">${r.runningHead} · REPORTE INMERGE</div>`,
-      footerTemplate: `<div style="font-family:'IBM Plex Sans',sans-serif;font-size:7.5pt;color:#7A6B58;width:100%;padding:0 18mm;display:flex;justify-content:space-between;"><span>Inmerge · El dato, a la vista.</span><span>inmerge.pe</span></div>`,
-      margin: { top: '22mm', bottom: '20mm', left: '18mm', right: '18mm' },
+    const tmpHtml = join(OUT_DIR, `.tmp-${r.slug}-${process.pid}.html`);
+    writeFileSync(tmpHtml, brandPage({ title, kicker: r.kicker, runningHead: r.runningHead, bodyHtml: html }));
+
+    const page = await browser.newPage();
+    // El bug de arriba (setContent + file://) ya nos mordió una vez y era
+    // invisible: exit 0, PDF "generado", figuras rotas por dentro. Esto lo
+    // convierte en una comprobación automática: si Chromium rechaza cargar
+    // alguna imagen local durante el render, no hay que confiar en que
+    // alguien abra el PDF a mano para notarlo. Se filtra a file:// nada más
+    // porque el <link> de Google Fonts es una petición de red aparte que
+    // puede fallar sin conexión sin que eso sea este problema — y si falla,
+    // el PDF sale igual, solo con la tipografía de reserva del sistema.
+    const resourceFailures = [];
+    page.on('requestfailed', (req) => {
+      if (req.url().startsWith('file://')) {
+        resourceFailures.push(`${req.url()} — ${req.failure()?.errorText ?? 'sin detalle'}`);
+      }
     });
-    await page.close();
-    rmSync(tmpHtml);
-    console.log(`✓ ${out}`);
+
+    try {
+      await page.goto(toFileUrl(tmpHtml), { waitUntil: 'networkidle' });
+      // requestfailed no alcanza solo: se probó a propósito apuntando una
+      // figura a una ruta que existe pero no es una imagen cargable (una
+      // carpeta con el mismo nombre), y Chromium respondió con status 0 en
+      // vez de disparar requestfailed — el <img> queda ahí, mudo, sin pintar
+      // nada. La verdad de fondo es el DOM: si naturalWidth quedó en 0, la
+      // figura no se ve, sea cual sea el mecanismo interno del fallo.
+      const brokenImages = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('img'))
+          .filter((img) => img.naturalWidth === 0)
+          .map((img) => img.getAttribute('src')),
+      );
+      for (const src of brokenImages) {
+        resourceFailures.push(`${src} — la imagen no pintó ningún píxel (naturalWidth 0)`);
+      }
+      await page.pdf({
+        path: out,
+        format: 'A4',
+        printBackground: true,
+        displayHeaderFooter: true,
+        headerTemplate: `<div style="font-family:'IBM Plex Sans',sans-serif;font-size:7pt;letter-spacing:1.2pt;color:#7A6B58;width:100%;padding:0 18mm;">${r.runningHead} · REPORTE INMERGE</div>`,
+        footerTemplate: `<div style="font-family:'IBM Plex Sans',sans-serif;font-size:7.5pt;color:#7A6B58;width:100%;padding:0 18mm;display:flex;justify-content:space-between;"><span>Inmerge · El dato, a la vista.</span><span>inmerge.pe</span></div>`,
+        margin: { top: '22mm', bottom: '20mm', left: '18mm', right: '18mm' },
+      });
+    } finally {
+      // Pase lo que pase (éxito, goto roto, pdf roto), no dejar el archivo
+      // temporal tirado ni la página del navegador abierta.
+      await page.close();
+      rmSync(tmpHtml);
+    }
+
+    if (resourceFailures.length) {
+      failed = true;
+      console.error(`✗ ${r.slug}: Chromium rechazó ${resourceFailures.length} recurso(s) local(es) al renderizar:`);
+      for (const f of resourceFailures) console.error(`    ${f}`);
+      console.error('  El PDF se generó igual, pero con huecos: no lo publiques así.');
+    } else {
+      console.log(`✓ ${out}`);
+    }
   }
 
   await browser.close();
   if (failed) {
-    console.error('\nHubo figuras faltantes. Los PDFs se generaron igual, pero con huecos: no los publiques así.');
+    console.error(
+      '\nHubo figuras faltantes o recursos locales rechazados por Chromium. Los PDFs se generaron igual, pero con huecos: no los publiques así.',
+    );
     process.exit(1);
   }
 }
