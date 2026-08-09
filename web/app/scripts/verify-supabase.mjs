@@ -53,10 +53,12 @@ if (reportsError) {
   console.log(`✓ reports table reachable — ${reports.length} row(s) (${freeCount} free, ${premiumCount} premium):`);
   reports.forEach((r) => console.log(`  - [${r.tier}] ${r.slug} — ${r.title}`));
   if (freeCount !== 5) {
-    console.warn('  ⚠ expected exactly 5 free rows (from 0001_init.sql) — check that migration ran cleanly.');
+    console.warn('  ⚠ expected exactly 5 free rows (the real catalogue from 0015_real_catalogue.sql) — check that migration ran cleanly.');
   }
-  if (premiumCount !== 2) {
-    console.warn('  ⚠ expected exactly 2 premium rows (from 0002_seed_premium_examples.sql) — has that migration been run yet?');
+  if (premiumCount !== 0) {
+    console.warn(
+      '  ⚠ expected 0 premium rows — 0015_real_catalogue.sql replaced the 2 illustrative premium rows from 0002 with 5 free ones; every report is free with an account since 0013.',
+    );
   }
 }
 

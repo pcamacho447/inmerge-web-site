@@ -95,6 +95,19 @@ async function main() {
     console.log(`✓ ${r.slug}.png`);
   }
 
+  // La imagen por defecto del sitio: es la que ve WhatsApp para CUALQUIER ruta,
+  // porque no ejecuta JS y nunca ve lo que escribe useDocumentHead.
+  await page.setContent(
+    coverPage({
+      title: 'Inmerge',
+      subtitle: 'Consultoría en datos y estrategia. Análisis del gasto público peruano, con cada cifra a la vista.',
+      keyFigure: null,
+    }),
+    { waitUntil: 'networkidle' },
+  );
+  writeFileSync(join(HERE, '../public/og-default.png'), await page.screenshot({ type: 'png' }));
+  console.log('✓ og-default.png');
+
   await browser.close();
   console.log(`\n${reports.length} portada(s) en public/covers/`);
 
