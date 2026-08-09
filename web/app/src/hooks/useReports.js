@@ -14,7 +14,7 @@ export default function useReports() {
     let active = true;
     supabase
       .from('reports')
-      .select('id, slug, tag, title, summary, tier, price_pen, cover_image_path, published_at')
+      .select('id, slug, tag, title, summary, tier, price_pen, cover_image_path, published_at, key_figure, key_figure_label')
       // Se seleccionaba published_at pero nunca se filtraba, así que un
       // borrador aparecía en el catálogo público apenas se insertaba.
       .not('published_at', 'is', null)

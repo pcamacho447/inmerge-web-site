@@ -2,11 +2,8 @@ import { Link } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import useReports from '../hooks/useReports.js';
-import useReportDownload from '../hooks/useReportDownload.js';
 import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
-import ImagePlaceholder from '../components/ImagePlaceholder.jsx';
-import { useAuth } from '../lib/auth.jsx';
 import { waLink } from '../data/content.js';
 
 export default function Reportes() {
@@ -16,9 +13,7 @@ export default function Reportes() {
     description: 'Análisis narrativos de datos públicos peruanos — crea una cuenta gratis para descargarlos.',
     path: '/reportes',
   });
-  const { user } = useAuth();
   const { reports, loading: reportsLoading, error: reportsError } = useReports();
-  const { downloadingId, downloadError, handleDownload } = useReportDownload();
 
   return (
     <>
@@ -47,71 +42,77 @@ export default function Reportes() {
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '80px clamp(20px,5vw,40px) 140px' }}>
         {reportsLoading && <div style={{ fontSize: 14, color: 'var(--muted)' }}>Cargando reportes...</div>}
         {reportsError && <div style={{ fontSize: 14, color: 'var(--rose)' }}>No se pudieron cargar los reportes: {reportsError}</div>}
-        {/* minmax a 240px (no 260) es deliberado: con el catálogo real de 7 reportes
-            publicados, 240 mantiene 4 columnas a ancho completo (4 llenas + 1 fila
-            de 3, un solo hueco). Subir el minmax para forzar 3 columnas — la
-            corrección obvia cuando el catálogo tenía 5 reportes — deja acá un
-            reporte solo con DOS huecos al lado en vez de uno: peor, no mejor. */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 32 }}>
-          {reports.map((r) => (
-            <div key={r.id} data-reveal="" className="card-hover" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ width: '100%', aspectRatio: '4/3' }}>
-                {/* No cover_image_path yet for any report — real photography is a
-                    known open item (see CLAUDE.md). Swap for a real <img> once
-                    it exists and a public covers bucket is set up. */}
-                <ImagePlaceholder label={`Portada — ${r.title}`} />
-              </div>
-              <div style={{ padding: '20px 0 0' }}>
-                <div style={{ fontSize: 11, letterSpacing: 1.5, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 10 }}>
-                  {r.tag}
-                </div>
-                <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, lineHeight: 1.3, marginBottom: 12 }}>
-                  {r.title}
-                </div>
-                <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 20 }}>{r.summary}</div>
-                {user ? (
-                  <button
-                    type="button"
-                    onClick={() => handleDownload(r.id)}
-                    disabled={downloadingId === r.id}
-                    className="link-hover"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      fontFamily: "'IBM Plex Sans',sans-serif",
-                      cursor: downloadingId === r.id ? 'wait' : 'pointer',
-                      background: 'none',
-                      border: 'none',
-                      color: 'inherit',
-                      padding: 0,
-                    }}
-                  >
-                    <div style={{ width: 7, height: 7, background: 'var(--terracotta)', transform: 'rotate(45deg)' }} />
-                    {downloadingId === r.id ? 'Generando…' : 'Descargar reporte'}
-                  </button>
-                ) : (
-                  <Link
-                    to="/registro"
-                    state={{ redirectTo: '/reportes' }}
-                    className="link-hover"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}
-                  >
-                    <div style={{ width: 7, height: 7, background: 'var(--terracotta)', transform: 'rotate(45deg)' }} />
-                    Crear cuenta para descargar
-                  </Link>
-                )}
-                {/* Mensaje inline, no un title="" que un móvil nunca ve en un tap —
-                    la falla del mismo defecto que ya se corrigió una vez en /cuenta. */}
-                {downloadError.id === r.id && downloadError.message && (
-                  <div style={{ fontSize: 11, color: 'var(--terracotta)', marginTop: 8 }}>{downloadError.message}</div>
-                )}
-              </div>
+        {!reportsLoading && !reportsError && reports.length === 0 && (
+          <div style={{ border: '1px solid var(--border)', borderRadius: 3, padding: 'clamp(32px,6vw,56px)', textAlign: 'center' }}>
+            <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(20px,3vw,26px)', marginBottom: 12 }}>
+              Estamos preparando la biblioteca.
             </div>
-          ))}
-        </div>
+            <div style={{ fontSize: 15, color: 'var(--muted)', lineHeight: 1.6, maxWidth: '48ch', margin: '0 auto 24px' }}>
+              Los primeros informes sobre gasto público peruano se publican en las próximas semanas. Mientras tanto, podemos conversar sobre
+              tus datos.
+            </div>
+            <Link
+              to="/contacto"
+              className="btn-hover"
+              style={{
+                display: 'inline-block',
+                background: 'var(--terracotta)',
+                color: 'var(--bg)',
+                borderRadius: 3,
+                padding: '14px 24px',
+                fontSize: 15,
+                fontWeight: 600,
+              }}
+            >
+              Conversemos
+            </Link>
+          </div>
+        )}
+        {!reportsLoading && !reportsError && reports.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 32 }}>
+            {reports.map((r) => (
+              <Link
+                key={r.id}
+                to={`/reportes/${r.slug}`}
+                data-reveal=""
+                className="card-hover"
+                style={{ display: 'flex', flexDirection: 'column', color: 'inherit', textDecoration: 'none' }}
+              >
+                <img
+                  src={`/covers/${r.slug}.png`}
+                  alt=""
+                  loading="lazy"
+                  width={1200}
+                  height={630}
+                  style={{ width: '100%', height: 'auto', display: 'block', borderBottom: '1px solid var(--border)' }}
+                />
+                <div style={{ padding: '20px 0 0' }}>
+                  <div style={{ fontSize: 11, letterSpacing: 1.5, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 10 }}>
+                    {r.tag}
+                  </div>
+                  <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, lineHeight: 1.3, marginBottom: 12 }}>
+                    {r.title}
+                  </div>
+                  {r.key_figure && (
+                    <div
+                      style={{
+                        fontFamily: "'Spectral',serif",
+                        fontWeight: 700,
+                        fontSize: 32,
+                        color: 'var(--terracotta)',
+                        lineHeight: 1,
+                        marginBottom: 8,
+                      }}
+                    >
+                      {r.key_figure}
+                    </div>
+                  )}
+                  <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6 }}>{r.summary}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       <div
