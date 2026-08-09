@@ -114,7 +114,7 @@ Las filas de prueba de pago (`purchases`/`orders`/`subscriptions`) que quedaron 
 
 El proyecto pasó al formato nuevo de claves de Supabase: `sb_publishable_…` (donde antes iba la anon key) y `sb_secret_…` (donde antes iba la `service_role` JWT), ambas en `web/app/.env.local` bajo los mismos nombres de variable de siempre (`VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) — lo que cambió es el formato del valor, no el nombre de la variable. Verificado: `@supabase/supabase-js` acepta `sb_secret_…` en el lugar donde antes iba el JWT de `service_role` (salta RLS, lista buckets, escribe en Storage, igual que antes).
 
-**Nunca corras `supabase projects api-keys`.** Imprime las claves **legacy** (JWT) en texto plano, con o sin `--reveal` — le pasó a este proyecto dos veces (2026-08-04 durante el endurecimiento de pagos, y de nuevo en el primer intento de la Tarea 5 de este plan). Si necesitas una clave, pídesela al dueño o léela de `.env.local` — nunca la imprimas ni la peguntes por ese comando.
+**Nunca corras `supabase projects api-keys`.** Imprime las claves **legacy** (JWT) en texto plano, con o sin `--reveal` — le pasó a este proyecto dos veces (2026-08-04 durante el endurecimiento de pagos, y de nuevo en el primer intento de la Tarea 5 de este plan). Si necesitas una clave, pídesela al dueño o léela de `.env.local` — nunca la imprimas ni la preguntes por ese comando.
 
 Si las claves legacy ya están desactivadas para este proyecto no se verificó en este plan — no asumas ninguna de las dos cosas; confírmalo antes de depender de ello.
 
