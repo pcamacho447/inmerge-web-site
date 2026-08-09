@@ -87,11 +87,28 @@ export function brandPage({ title, kicker, runningHead, bodyHtml }) {
 `;
 }
 
+// El tamaño de fuente de la cifra clave está tarado a cifras cortas como
+// "34.9%" o "S/ 620": a 96px, una cifra larga como "S/ 128,400 millones" no
+// entra en una línea, se parte en dos, empuja el resto de la composición
+// hacia arriba y aprieta la línea de atribución contra el borde inferior — se
+// vio al renderizar ese caso exacto. El umbral de 14 caracteres es el largo
+// de "97 de cada 100" (la cifra más larga real del catálogo hoy), que a 96px
+// entra holgada en una línea; por eso ese tamaño no se toca. Por encima de
+// eso se reduce en dos escalones, calibrados renderizando y mirando el
+// resultado, no por fórmula: cada escalón se eligió para que la cifra siga
+// cabiendo en una sola línea sin arrastrar el layout.
+function figureFontSize(text) {
+  const len = (text || '').length;
+  if (len <= 14) return 96;
+  if (len <= 22) return 68;
+  return 52;
+}
+
 export function coverPage({ title, subtitle, keyFigure }) {
   // 1200x630 es la proporción que exigen WhatsApp, Facebook y X para la imagen
   // social. La misma pieza sirve de portada en el catálogo, así que se genera
   // una sola vez y se usa en los dos lugares.
-  const figureBlock = keyFigure ? `<div class="figure">${esc(keyFigure)}</div>` : '';
+  const figureBlock = keyFigure ? `<div class="figure" style="font-size:${figureFontSize(keyFigure)}px">${esc(keyFigure)}</div>` : '';
   return `<!doctype html>
 <html lang="es">
 <head>

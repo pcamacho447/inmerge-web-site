@@ -14,6 +14,7 @@ import { dirname, join, resolve } from 'node:path';
 import { createClient } from '@supabase/supabase-js';
 import { chromium } from 'playwright';
 import { coverPage } from './lib/brandPage.mjs';
+import { fontRendered } from './lib/fontsLoaded.mjs';
 
 const HERE = resolve(fileURLToPath(new URL('.', import.meta.url)));
 const OUT_DIR = join(HERE, '../public/covers');
@@ -72,9 +73,9 @@ async function main() {
   // evento — el archivo sale, con las dimensiones correctas, pero con la
   // tipografía equivocada. `waitUntil: 'networkidle'` no lo garantiza porque
   // la fuente puede llegar a tiempo para la red pero no para el layout, o
-  // viceversa. La verdad de fondo es document.fonts: si Spectral e IBM Plex
-  // Sans no están en el set de fuentes cargadas, la portada no es válida,
-  // aunque el PNG exista.
+  // viceversa. `fontRendered()` mide el resultado pintado en vez de preguntarle
+  // al navegador si él cree que salió bien (ver scripts/lib/fontsLoaded.mjs:
+  // document.fonts.check() pasa en falso positivo cuando la hoja nunca cargó).
   const fontFailures = [];
 
   for (const r of reports) {
@@ -83,11 +84,9 @@ async function main() {
     const subtitle = (r.summary || '').split(/(?<=\.)\s/)[0] || '';
     await page.setContent(coverPage({ title: r.title, subtitle, keyFigure: r.key_figure }), { waitUntil: 'networkidle' });
 
-    const fontsOk = await page.evaluate(async () => {
-      await document.fonts.ready;
-      return document.fonts.check('700 64px Spectral') && document.fonts.check('400 21px "IBM Plex Sans"');
-    });
-    if (!fontsOk) {
+    const titleOk = await fontRendered(page, 'Spectral', { weight: 700, size: 64 });
+    const bodyOk = await fontRendered(page, 'IBM Plex Sans', { weight: 400, size: 21 });
+    if (!titleOk || !bodyOk) {
       fontFailures.push(r.slug);
     }
 
