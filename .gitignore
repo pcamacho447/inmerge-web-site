@@ -50,3 +50,7 @@ supabase/.temp/
 # Worktrees de Claude Code: son checkouts completos del propio repo.
 # Sin esto, un `git add -A` desde la raiz intenta commitear una copia entera.
 .claude/worktrees/
+
+# PDFs generados a partir de los informes en Markdown (build-report-pdfs.mjs).
+# Son artefactos de build de decenas de MB; viven en Storage, no en git.
+reportes/generado/

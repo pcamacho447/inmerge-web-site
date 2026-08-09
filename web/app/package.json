@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "build:pdfs": "node scripts/build-report-pdfs.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
@@ -32,6 +33,7 @@
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
     "jsdom": "^30.0.1",
+    "marked": "^18.0.9",
     "playwright": "^1.62.1",
     "prettier": "^3.3.3",
     "vite": "^5.4.8",
