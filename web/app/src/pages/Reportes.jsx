@@ -70,10 +70,14 @@ export default function Reportes() {
         )}
         {!reportsLoading && !reportsError && reports.length > 0 && (
           <div
+            // Flex y no grid, por una razón concreta: grid reparte la fila en pistas iguales y el
+            // sobrante SIEMPRE termina dentro de las pistas. Con 2 reportes eso estiraba cada
+            // pista a 564px y, como la tarjeta está topada en 380, las separaba 216px en vez de
+            // los 32 de siempre. Topar la tarjeta no lo arregla: encoge la tarjeta, no la pista.
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              justifyItems: 'start',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-start',
               gap: 32,
             }}
           >
@@ -83,7 +87,21 @@ export default function Reportes() {
                 to={`/reportes/${r.slug}`}
                 data-reveal=""
                 className="card-hover"
-                style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 380, color: 'inherit', textDecoration: 'none' }}
+                // La base es 300 y no 380 porque flex corta la línea con la BASE, antes de
+                // repartir el sobrante: con base 380 solo entrarían dos tarjetas por fila
+                // (380*3 + 64 de gaps = 1204 > 1160 de contenido) y volveríamos al problema que
+                // este layout vino a resolver. Con base 300 entran tres (300*3 + 64 = 964),
+                // crecen hasta ~365 para llenar la fila, y maxWidth las frena en 380 cuando sobra
+                // espacio: fila incompleta, o un catálogo de un solo reporte, donde si no la
+                // tarjeta se inflaría a los 1160px enteros.
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flex: '1 1 300px',
+                  maxWidth: 380,
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
               >
                 <img
                   src={`/covers/${r.slug}.png`}
