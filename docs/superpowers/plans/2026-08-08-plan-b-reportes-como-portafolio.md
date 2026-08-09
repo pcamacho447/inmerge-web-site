@@ -925,11 +925,18 @@ node scripts/test-download-url.mjs <correo-de-prueba> <contraseña> de-donde-vie
 
 Esperado: **200 con una URL firmada**. Si da 403, `has_access()` está negando (revisa `published_at`); si da 404, el `file_path` no coincide con el objeto en el bucket.
 
-- [ ] **Paso 7: Commit**
+- [ ] **Paso 7: Corregir el slug muerto en el script de prueba**
+
+`web/app/scripts/test-download-url.mjs` cita en su comentario de uso (linea 6) el slug
+`seguimiento-trimestral-educacion`, que la Tarea 2 acaba de borrar. Quien copie esa
+linea va a recibir un 404 y va a creer que la descarga esta rota. Cambialo por
+`de-donde-viene-la-plata`, que existe y esta publicado.
+
+- [ ] **Paso 8: Commit**
 
 ```bash
 npm run format
-git add web/app/scripts/upload-report-files.mjs web/app/supabase/migrations/0016_publish_catalogue.sql
+git add web/app/scripts/upload-report-files.mjs web/app/supabase/migrations/0016_publish_catalogue.sql web/app/scripts/test-download-url.mjs
 git commit -m "feat: upload the real report PDFs and publish the catalogue"
 ```
 
@@ -1587,7 +1594,7 @@ Crear `web/app/src/pages/Reporte.test.jsx`:
 ```jsx
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Reporte from './Reporte.jsx';
 
 vi.mock('../components/SankeyChart.jsx', () => ({ default: () => <div data-testid="sankey" /> }));
@@ -1619,6 +1626,14 @@ function show() {
 }
 
 describe('Reporte', () => {
+  // Sin esto, cada test hereda el mockUser del anterior: el caso "sin sesion"
+  // pasaria solo por venir despues de otro que tampoco tenia sesion, y el dia
+  // que alguien reordene los tests, empiezan a fallar sin que nada cambie.
+  beforeEach(() => {
+    mockState = { report: REPORT, loading: false, notFound: false, error: '' };
+    mockUser = null;
+  });
+
   it('muestra la cifra clave y su explicación', () => {
     mockState = { report: REPORT, loading: false, notFound: false, error: '' };
     show();
