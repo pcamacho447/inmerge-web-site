@@ -11,58 +11,57 @@
 -- así que una entrada despublicada no es descargable ni por un usuario con
 -- sesión — que es justo lo que queremos mientras no haya archivo.
 --
--- Dos de las siete filas viejas ('seguimiento-trimestral-educacion' y
--- 'radiografia-contratistas-infraestructura') tienen filas de PRUEBA en
--- `purchases` (0001) y `orders` (0003) que referencian su id sin ON DELETE
--- CASCADE. Este plan no toca la capa de pago dormida, así que en vez de
--- borrar esas dos filas se las UPDATEa en el sitio: mismo id, contenido
--- nuevo. La referencia de la fila de prueba sigue siendo válida (apunta a un
--- reporte que existe), y ni `purchases` ni `orders` se tocan. Las otras
--- cinco filas viejas no tienen referencias y se borran normalmente.
+-- Nota de historial: la primera versión de esta migración (aplicada tal
+-- cual a esta base de datos) no podía hacer el DELETE simple de abajo,
+-- porque dos de las siete filas viejas tenían filas de PRUEBA en
+-- `purchases`/`orders` referenciando su id sin ON DELETE CASCADE, y esa
+-- versión las esquivó con un UPDATE en el sitio. Esas filas de prueba se
+-- limpiaron por separado (autorizado por el dueño del proyecto — eran
+-- artefactos de la verificación de pago B3/B4, sin dinero real), lo que deja
+-- este DELETE simple como la migración correcta para cualquier base nueva:
+-- en una base fresca no existen esas filas de prueba (0001/0002 no las
+-- siembran), así que el DELETE de las 7 filas nunca choca con una FK.
 
 begin;
 
--- Las dos filas con referencias de prueba se reescriben en el sitio en vez
--- de borrarse: mismo id, contenido del catálogo real.
-update public.reports set
-  slug = 'un-estado-tres-oficios',
-  title = 'Un Estado, tres oficios',
-  summary = 'El gasto público peruano por nivel de gobierno (2018-2025). El Gobierno Nacional administra la deuda, los regionales son la planilla del Estado, y los locales son el constructor: la mitad de cada sol municipal se va a obra.',
-  tier = 'free',
-  price_pen = null,
-  file_path = null,
-  published_at = null,
-  key_figure = '50.5%',
-  key_figure_label = 'del gasto de los gobiernos locales es inversión: la mitad de cada sol municipal se va a obra.',
-  sources = '[{"nombre": "SIAF-SP, Ministerio de Economía y Finanzas", "url": "https://www.mef.gob.pe/es/portal-de-transparencia-economica"}]'::jsonb
-where id = '90bad7bc-093a-469f-b4b5-a4fb081d4f9f'; -- era 'seguimiento-trimestral-educacion'
-
-update public.reports set
-  slug = 'de-donde-viene-la-plata',
-  title = 'De dónde viene la plata',
-  summary = 'La recaudación propia del Estado peruano (2018-2025). Fuera de los impuestos que recauda la SUNAT, el mayor recurso propio del Estado no es un impuesto ni una renta: es deuda.',
-  tier = 'free',
-  price_pen = null,
-  file_path = null,
-  published_at = null,
-  key_figure = '34.9%',
-  key_figure_label = 'de los recursos propios del Estado son deuda, no impuestos ni canon.',
-  sources = '[{"nombre": "SIAF-SP, Ministerio de Economía y Finanzas", "url": "https://www.mef.gob.pe/es/portal-de-transparencia-economica"}]'::jsonb
-where id = '0b0f0112-32b3-4ebd-a013-9e3bc01dfb43'; -- era 'radiografia-contratistas-infraestructura'
-
--- Las cinco filas viejas sin referencias se borran normalmente.
 delete from public.reports
 where slug in (
   'ejecucion-presupuestal-regional-2025',
   'gasto-publico-la-libertad',
   'gobiernos-provinciales-distritales',
   'gasto-ministerio-defensa',
-  'proyectos-inversion-publica-estancados'
+  'proyectos-inversion-publica-estancados',
+  'radiografia-contratistas-infraestructura',
+  'seguimiento-trimestral-educacion'
 );
 
--- Las tres entradas restantes del catálogo real se insertan de cero.
+-- `on conflict (slug) do nothing`: si esta migración se corriera dos veces
+-- sobre la misma base (por ejemplo, un re-run manual accidental), el
+-- segundo INSERT no debe reventar por la unicidad de slug. El DELETE de
+-- arriba ya es idempotente por sí mismo (borra si existe, no hace nada si
+-- no); esto solo iguala esa propiedad en el INSERT.
 insert into public.reports (slug, title, summary, tier, key_figure, key_figure_label, sources, published_at)
 values
+  (
+    'un-estado-tres-oficios',
+    'Un Estado, tres oficios',
+    'El gasto público peruano por nivel de gobierno (2018-2025). El Gobierno Nacional administra la deuda, los regionales son la planilla del Estado, y los locales son el constructor: la mitad de cada sol municipal se va a obra.',
+    'free',
+    '50.5%',
+    'del gasto de los gobiernos locales es inversión: la mitad de cada sol municipal se va a obra.',
+    '[{"nombre": "SIAF-SP, Ministerio de Economía y Finanzas", "url": "https://www.mef.gob.pe/es/portal-de-transparencia-economica"}]'::jsonb,
+    null
+  ),
+  (
+    'de-donde-viene-la-plata',
+    'De dónde viene la plata',
+    'La recaudación propia del Estado peruano (2018-2025). Fuera de los impuestos que recauda la SUNAT, el mayor recurso propio del Estado no es un impuesto ni una renta: es deuda.',
+    'free',
+    '34.9%',
+    'de los recursos propios del Estado son deuda, no impuestos ni canon.',
+    '[{"nombre": "SIAF-SP, Ministerio de Economía y Finanzas", "url": "https://www.mef.gob.pe/es/portal-de-transparencia-economica"}]'::jsonb,
+    null
+  ),
   (
     'en-que-gasta-el-estado-central',
     'En qué gasta el Estado central',
@@ -92,6 +91,7 @@ values
     'gasta al año por habitante el distrito típico de Lima y Callao, no los S/ 1,077 del promedio.',
     '[{"nombre": "SIAF-SP, Ministerio de Economía y Finanzas", "url": "https://www.mef.gob.pe/es/portal-de-transparencia-economica"}, {"nombre": "Población proyectada 2018-2026, INEI", "url": "https://www.inei.gob.pe/"}]'::jsonb,
     null
-  );
+  )
+on conflict (slug) do nothing;
 
 commit;
