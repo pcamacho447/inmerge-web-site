@@ -1,6 +1,10 @@
 dist
 node_modules
 public/*.svg
+# JSON compacto a propósito: son los datos de los Sankey que sirve la CDN.
+# Prettier los indenta y casi los duplica de tamaño, justo lo contrario de
+# por qué se extrajeron del HTML de 4.64 MB.
+public/sankey/*.json
 # Deno Edge Functions — format with `deno fmt` instead, to match Deno's own
 # conventions and avoid two formatters fighting over the same files.
 supabase/functions

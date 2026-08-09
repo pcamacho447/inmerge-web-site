@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "build:pdfs": "node scripts/build-report-pdfs.mjs",
-    "build:covers": "node scripts/build-covers.mjs"
+    "build:covers": "node scripts/build-covers.mjs",
+    "build:sankey": "node scripts/extract-sankey.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
