@@ -72,8 +72,8 @@ export default function Reportes() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 380px))',
-              justifyContent: 'start',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              justifyItems: 'start',
               gap: 32,
             }}
           >
@@ -83,7 +83,7 @@ export default function Reportes() {
                 to={`/reportes/${r.slug}`}
                 data-reveal=""
                 className="card-hover"
-                style={{ display: 'flex', flexDirection: 'column', color: 'inherit', textDecoration: 'none' }}
+                style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 380, color: 'inherit', textDecoration: 'none' }}
               >
                 <img
                   src={`/covers/${r.slug}.png`}
