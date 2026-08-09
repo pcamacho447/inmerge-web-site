@@ -32,7 +32,7 @@ function setCanonical(href) {
 // meta tag persists across client-side navigations, so a page that doesn't
 // pass noIndex must still overwrite whatever a previously-visited page (e.g.
 // the 404) left behind, or it would inherit that page's noindex by accident.
-export default function useDocumentHead({ title, description, path = '/', noIndex = false }) {
+export default function useDocumentHead({ title, description, path = '/', image, noIndex = false }) {
   useEffect(() => {
     if (title) {
       document.title = title;
@@ -47,6 +47,13 @@ export default function useDocumentHead({ title, description, path = '/', noInde
     const url = `${SITE_URL}${path}`;
     setMeta('property', 'og:url', url);
     setCanonical(url);
+    // og:image/twitter:image necesitan URL absoluta — un crawler de redes
+    // sociales no resuelve una ruta relativa contra el dominio del sitio.
+    if (image) {
+      const imageUrl = `${SITE_URL}${image}`;
+      setMeta('property', 'og:image', imageUrl);
+      setMeta('name', 'twitter:image', imageUrl);
+    }
     setMeta('name', 'robots', noIndex ? 'noindex, nofollow' : 'index, follow');
-  }, [title, description, path, noIndex]);
+  }, [title, description, path, image, noIndex]);
 }
