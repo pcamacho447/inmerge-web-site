@@ -3,7 +3,7 @@
 // on your machine, it's never sent to anyone but your own Supabase project.
 //
 // Usage: node scripts/test-download-url.mjs <email> <password> <report-slug>
-// Example: node scripts/test-download-url.mjs you@example.com yourpassword seguimiento-trimestral-educacion
+// Example: node scripts/test-download-url.mjs you@example.com yourpassword de-donde-viene-la-plata
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
