@@ -73,7 +73,10 @@ export function extractPlotlyPayload(html) {
   const layout = JSON.parse(layoutBlock.text);
 
   // El lienzo fijo de 1450x900 es lo que vuelve inservibles estos diagramas en
-  // un teléfono. Se quita acá para que el contenedor mande.
+  // un teléfono. Se quita acá para que el contenedor mande. `autosize` se
+  // borra también aunque el brief solo pedía width/height: Plotly lo exporta
+  // en `false` junto al lienzo fijo, y dejarlo en `false` bloquearía la
+  // responsividad tan bien como el ancho y el alto que sí se pidió quitar.
   delete layout.width;
   delete layout.height;
   delete layout.autosize;
