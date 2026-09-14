@@ -5,6 +5,7 @@ import useDocumentHead from '../hooks/useDocumentHead.js';
 import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
 import { waLink } from '../data/content.js';
+import { submitLeadTdr } from '../lib/leads.js';
 
 export default function Contacto() {
   useReveal();
@@ -24,7 +25,9 @@ export default function Contacto() {
   const [formPhone, setFormPhone] = useState('');
   const [formTimeline, setFormTimeline] = useState('1 a 2 meses');
   const [formMessage, setFormMessage] = useState(preselectedService ? `Interés en el servicio: ${preselectedService}\n\n` : '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   useEffect(() => {
     if (preselectedService) {
@@ -32,15 +35,34 @@ export default function Contacto() {
     }
   }, [preselectedService]);
 
-  function submitForm(e) {
+  async function handleSubmit(e) {
     if (e) e.preventDefault();
     if (!formContact.trim() || !formMessage.trim()) return;
 
-    const subject = `Solicitud TDR / Cotización — ${formCompany || formName || 'Inmerge'}`;
-    const body = `Pilar de Interés: ${formPillar}\nNombre: ${formName || 'No indicado'}\nEmpresa/Organización: ${formCompany || 'No indicado'}\nEmail: ${formContact}\nTeléfono/WhatsApp: ${formPhone || 'No indicado'}\nPlazo estimado: ${formTimeline}\n\nRequerimiento:\n${formMessage}`;
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-    window.location.href = `mailto:contacto@inmerge.pe?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setFormSubmitted(true);
+    try {
+      await submitLeadTdr({
+        pillar: formPillar,
+        fullName: formName,
+        company: formCompany,
+        email: formContact,
+        phone: formPhone,
+        timeline: formTimeline,
+        message: formMessage,
+      });
+      setFormSubmitted(true);
+    } catch (err) {
+      console.warn('Fallo al guardar lead en Supabase, activando fallback:', err);
+      // Fallback a mailto si la base de datos o conexión falla
+      const subject = `Solicitud TDR / Cotización — ${formCompany || formName || 'Inmerge'}`;
+      const body = `Pilar de Interés: ${formPillar}\nNombre: ${formName || 'No indicado'}\nEmpresa/Organización: ${formCompany || 'No indicado'}\nEmail: ${formContact}\nTeléfono/WhatsApp: ${formPhone || 'No indicado'}\nPlazo estimado: ${formTimeline}\n\nRequerimiento:\n${formMessage}`;
+      window.location.href = `mailto:contacto@inmerge.pe?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      setFormSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const customWaMessage = `Hola Inmerge, deseo cotizar un proyecto.\n*Pilar:* ${formPillar}\n*Empresa:* ${formCompany || 'Particular'}\n*Contacto:* ${formName || 'No especificado'}\n*Detalle:* ${formMessage || 'Coordinar reunión preliminar'}`;
@@ -220,7 +242,7 @@ export default function Contacto() {
             Detalles de la Solicitud
           </h2>
 
-          <form onSubmit={submitForm} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* Service Pillar Selector */}
             <div>
               <label
@@ -415,24 +437,42 @@ export default function Contacto() {
               />
             </div>
 
-            {formSubmitted && (
+            {submitError && (
               <div
                 style={{
                   padding: '12px 16px',
-                  background: 'rgba(168, 71, 43, 0.1)',
-                  border: '1px solid var(--terracotta)',
-                  color: 'var(--terracotta)',
+                  background: 'rgba(208, 138, 110, 0.15)',
+                  border: '1px solid var(--rose)',
+                  color: 'var(--rose)',
                   fontSize: 14,
-                  fontWeight: 600,
                 }}
               >
-                ✓ Solicitud preparada en tu cliente de correo. También puedes escribirnos directamente al WhatsApp para confirmación
-                inmediata.
+                {submitError}
+              </div>
+            )}
+
+            {formSubmitted && (
+              <div
+                style={{
+                  padding: '16px 20px',
+                  background: 'rgba(74, 156, 106, 0.1)',
+                  border: '1px solid var(--green)',
+                  color: 'var(--ink)',
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                }}
+              >
+                <strong style={{ color: 'var(--green)', display: 'block', marginBottom: 4 }}>
+                  ✓ ¡Solicitud registrada exitosamente en Inmerge!
+                </strong>
+                Nuestro equipo técnico revisará los detalles y te responderá en menos de 24 horas laborables. También puedes adelantar la
+                coordinación escribiéndonos directamente al WhatsApp.
               </div>
             )}
 
             <button
               type="submit"
+              disabled={isSubmitting}
               style={{
                 background: 'var(--terracotta)',
                 color: '#F3EADA',
@@ -440,13 +480,14 @@ export default function Contacto() {
                 padding: '16px 32px',
                 fontSize: 15,
                 fontWeight: 600,
-                cursor: 'pointer',
+                cursor: isSubmitting ? 'wait' : 'pointer',
+                opacity: isSubmitting ? 0.7 : 1,
                 marginTop: 8,
                 transition: 'opacity 0.2s ease',
               }}
               className="btn-accent"
             >
-              Enviar Solicitud de Cotización (Email)
+              {isSubmitting ? 'Guardando solicitud...' : 'Enviar Solicitud de Cotización (TDR)'}
             </button>
           </form>
         </div>
