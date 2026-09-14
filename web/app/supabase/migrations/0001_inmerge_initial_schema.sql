@@ -335,3 +335,80 @@
   GRANT SELECT ON public.client_projects TO authenticated;
   GRANT SELECT ON public.project_milestones TO authenticated;
   GRANT SELECT ON public.project_deliverables TO authenticated;
+
+
+  -- ------------------------------------------------------------------------------
+  -- 9. FUNCIÓN DE ADMINISTRACIÓN: CREAR MIEMBROS DEL EQUIPO
+  -- Permite dar de alta colaboradores (auditor, engineer, admin) de forma segura
+  -- ------------------------------------------------------------------------------
+  CREATE OR REPLACE FUNCTION public.create_staff_member(
+    p_email TEXT,
+    p_password TEXT,
+    p_full_name TEXT,
+    p_role TEXT DEFAULT 'auditor'
+  )
+  RETURNS UUID
+  SECURITY DEFINER
+  SET search_path = public, auth, extensions
+  LANGUAGE plpgsql
+  AS $$
+  DECLARE
+    v_user_id UUID := gen_random_uuid();
+  BEGIN
+    IF p_role NOT IN ('admin', 'auditor', 'engineer') THEN
+      RAISE EXCEPTION 'Rol inválido para miembro de equipo. Debe ser admin, auditor o engineer.';
+    END IF;
+
+    -- Si el usuario ya existe en auth.users, actualizamos su rol y perfil
+    IF EXISTS (SELECT 1 FROM auth.users WHERE email = p_email) THEN
+      SELECT id INTO v_user_id FROM auth.users WHERE email = p_email;
+      UPDATE public.profiles
+      SET role = p_role, full_name = p_full_name, updated_at = now()
+      WHERE id = v_user_id;
+      RETURN v_user_id;
+    END IF;
+
+    -- Insertar usuario nuevo en auth.users compatible con GoTrue
+    INSERT INTO auth.users (
+      id,
+      instance_id,
+      email,
+      encrypted_password,
+      email_confirmed_at,
+      raw_app_meta_data,
+      raw_user_meta_data,
+      created_at,
+      updated_at,
+      role,
+      aud,
+      confirmation_token,
+      recovery_token,
+      email_change_token_new,
+      email_change
+    ) VALUES (
+      v_user_id,
+      '00000000-0000-0000-0000-000000000000',
+      p_email,
+      crypt(p_password, gen_salt('bf')),
+      now(),
+      '{"provider":"email","providers":["email"]}'::jsonb,
+      jsonb_build_object('full_name', p_full_name, 'role', p_role),
+      now(),
+      now(),
+      'authenticated',
+      'authenticated',
+      '',
+      '',
+      '',
+      ''
+    );
+
+    -- Insertar o actualizar en public.profiles
+    INSERT INTO public.profiles (id, email, full_name, role)
+    VALUES (v_user_id, p_email, p_full_name, p_role)
+    ON CONFLICT (id) DO UPDATE
+    SET role = p_role, full_name = p_full_name, updated_at = now();
+
+    RETURN v_user_id;
+  END;
+  $$;
