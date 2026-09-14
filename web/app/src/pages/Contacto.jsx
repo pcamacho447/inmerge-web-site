@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Frieze from '../components/Frieze.jsx';
@@ -8,42 +9,64 @@ import { waLink } from '../data/content.js';
 export default function Contacto() {
   useReveal();
   useDocumentHead({
-    title: 'Contacto — Inmerge',
-    description:
-      'Escríbenos por WhatsApp o revisa cómo postular a un proceso formal o TDR con Inmerge, consultoría en datos en Lima, Perú.',
+    title: 'Contacto & Cotización TDR — Inmerge',
+    description: 'Solicita cotización o propuesta técnica para proyectos de Auditoría, Desarrollo Cloud y Ciencia de Datos en Lima, Perú.',
     path: '/contacto',
   });
-  const [formContact, setFormContact] = useState('');
-  const [formMessage, setFormMessage] = useState('');
+
+  const [searchParams] = useSearchParams();
+  const preselectedService = searchParams.get('servicio') || '';
+
+  const [formPillar, setFormPillar] = useState(preselectedService ? 'Especificado' : 'auditoria');
   const [formName, setFormName] = useState('');
+  const [formCompany, setFormCompany] = useState('');
+  const [formContact, setFormContact] = useState('');
+  const [formPhone, setFormPhone] = useState('');
+  const [formTimeline, setFormTimeline] = useState('1 a 2 meses');
+  const [formMessage, setFormMessage] = useState(preselectedService ? `Interés en el servicio: ${preselectedService}\n\n` : '');
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  function submitForm() {
+  useEffect(() => {
+    if (preselectedService) {
+      setFormMessage((prev) => (prev.includes(preselectedService) ? prev : `Interés en el servicio: ${preselectedService}\n\n${prev}`));
+    }
+  }, [preselectedService]);
+
+  function submitForm(e) {
+    if (e) e.preventDefault();
     if (!formContact.trim() || !formMessage.trim()) return;
-    const subject = `Consulta formal / TDR${formName.trim() ? ` — ${formName.trim()}` : ''}`;
-    const body = `Nombre y organización: ${formName || '(no indicado)'}\nContacto: ${formContact}\n\n${formMessage}`;
+
+    const subject = `Solicitud TDR / Cotización — ${formCompany || formName || 'Inmerge'}`;
+    const body = `Pilar de Interés: ${formPillar}\nNombre: ${formName || 'No indicado'}\nEmpresa/Organización: ${formCompany || 'No indicado'}\nEmail: ${formContact}\nTeléfono/WhatsApp: ${formPhone || 'No indicado'}\nPlazo estimado: ${formTimeline}\n\nRequerimiento:\n${formMessage}`;
+
     window.location.href = `mailto:contacto@inmerge.pe?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setFormSubmitted(true);
   }
 
+  const customWaMessage = `Hola Inmerge, deseo cotizar un proyecto.\n*Pilar:* ${formPillar}\n*Empresa:* ${formCompany || 'Particular'}\n*Contacto:* ${formName || 'No especificado'}\n*Detalle:* ${formMessage || 'Coordinar reunión preliminar'}`;
+  const customWaUrl = waLink(customWaMessage);
+
   return (
     <>
-      <div style={{ padding: '100px clamp(20px,5vw,40px) 80px', maxWidth: 1240, margin: '0 auto' }}>
-        <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 24 }}>CONTACTO</div>
-        <div
+      <div style={{ padding: '100px clamp(20px,5vw,40px) 60px', maxWidth: 1240, margin: '0 auto' }}>
+        <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 24 }}>
+          COTIZACIÓN & TDR
+        </div>
+        <h1
           style={{
             fontFamily: "'Spectral',serif",
             fontWeight: 700,
             fontSize: 'clamp(40px,7vw,88px)',
-            lineHeight: 1,
+            lineHeight: 1.05,
             letterSpacing: -1,
-            maxWidth: 900,
+            maxWidth: 960,
+            margin: '0 0 24px 0',
           }}
         >
-          Hablemos de tus datos.
-        </div>
-        <p style={{ fontSize: 17, color: 'var(--muted)', maxWidth: 560, lineHeight: 1.7, marginTop: 28 }}>
-          Respondemos directo, sin intermediarios — el mismo consultor que diseña, ejecuta.
+          Evaluación técnica y propuestas a medida.
+        </h1>
+        <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 640, lineHeight: 1.7, margin: 0 }}>
+          Respondemos directamente con el equipo de ingeniería y consultoría que ejecutará el proyecto — sin capas comerciales ni demoras.
         </p>
       </div>
 
@@ -53,182 +76,383 @@ export default function Contacto() {
         style={{
           maxWidth: 1240,
           margin: '0 auto',
-          padding: '100px clamp(20px,5vw,40px)',
+          padding: '80px clamp(20px,5vw,40px) 140px',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
           gap: 64,
         }}
       >
-        <div
-          data-reveal=""
-          className="card-hover"
-          style={{
-            background: 'var(--ink)',
-            color: 'var(--bg)',
-            borderRadius: 4,
-            padding: 56,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: 420,
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--gold)', fontWeight: 600, marginBottom: 20 }}>
-              RESPUESTA MÁS RÁPIDA
-            </div>
-            <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 32, lineHeight: 1.3, marginBottom: 16 }}>
-              Escríbenos por WhatsApp.
-            </div>
-            <div style={{ fontSize: 14, color: 'var(--tan-text)', lineHeight: 1.7 }}>
-              Sin formularios, sin esperar respuesta de un área comercial — hablas directo con quien va a resolver tu caso.
-            </div>
-          </div>
-          <a
-            href={waLink('Hola, vengo de la página de contacto de Inmerge y quiero conversar.')}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-hover"
+        {/* Left Column: Direct WhatsApp & Info */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+          <div
+            data-reveal=""
             style={{
-              background: 'var(--gold)',
-              color: 'var(--ink)',
-              borderRadius: 2,
-              padding: '18px 32px',
-              fontSize: 15,
-              fontWeight: 700,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 10,
-              width: 'fit-content',
-              marginTop: 32,
+              background: 'var(--ink)',
+              color: 'var(--bg)',
+              padding: 'clamp(32px, 5vw, 48px)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: 380,
             }}
           >
-            +51 957 251 279 →
-          </a>
-        </div>
-
-        <div data-reveal="" style={{ display: 'flex', flexDirection: 'column', gap: 1, background: 'var(--border)' }}>
-          <div style={{ background: 'var(--bg)', padding: 32 }}>
-            <div style={{ fontSize: 11, letterSpacing: 1.5, color: 'var(--muted)', fontWeight: 600, marginBottom: 8 }}>EMAIL</div>
-            <a href="mailto:contacto@inmerge.pe" style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 19 }}>
-              contacto@inmerge.pe
-            </a>
-          </div>
-          <div style={{ background: 'var(--bg)', padding: 32 }}>
-            <div style={{ fontSize: 11, letterSpacing: 1.5, color: 'var(--muted)', fontWeight: 600, marginBottom: 8 }}>UBICACIÓN</div>
-            <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 19 }}>Lima, Perú</div>
-          </div>
-          <div style={{ background: 'var(--bg)', padding: 32 }}>
-            <div style={{ fontSize: 11, letterSpacing: 1.5, color: 'var(--muted)', fontWeight: 600, marginBottom: 8 }}>
-              HORARIO DE RESPUESTA
+            <div>
+              <div
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 12,
+                  letterSpacing: 2,
+                  color: 'var(--gold)',
+                  fontWeight: 600,
+                  marginBottom: 16,
+                }}
+              >
+                CANAL INMEDIATO
+              </div>
+              <h2
+                style={{
+                  fontFamily: "'Spectral',serif",
+                  fontWeight: 700,
+                  fontSize: 'clamp(26px, 3vw, 36px)',
+                  lineHeight: 1.25,
+                  marginBottom: 16,
+                  color: '#F3EADA',
+                }}
+              >
+                Conversación directa por WhatsApp
+              </h2>
+              <p style={{ fontSize: 15, color: 'var(--tan-text)', lineHeight: 1.6, margin: 0 }}>
+                Ideal para coordinar reuniones exploratorias, compartir alcances de TDR o recibir un diagnóstico inicial de factibilidad.
+              </p>
             </div>
-            <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 19 }}>Lun–Vie, 9am–7pm (Perú)</div>
-          </div>
-        </div>
-      </div>
 
-      <Frieze
-        bg="var(--cream2)"
-        border="#241A12"
-        upColor="#A8472B"
-        downColor="#C68A3D"
-        medallionBg="#241A12"
-        medallionBorder="#D8A84E"
-        flip
-      />
-
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '120px clamp(20px,5vw,40px)' }}>
-        <div data-reveal="" style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 12 }}>
-          PARA LICITACIONES Y TDR
-        </div>
-        <div
-          data-reveal=""
-          style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(26px,3.4vw,38px)', marginBottom: 16 }}
-        >
-          ¿Proceso formal o TDR publicado?
-        </div>
-        <p data-reveal="" style={{ fontSize: 15, color: 'var(--muted)', lineHeight: 1.7, marginBottom: 40 }}>
-          Cuéntanos brevemente de qué se trata y te respondemos con la información que necesites para postular.
-        </p>
-
-        {formSubmitted ? (
-          <div data-reveal="" style={{ background: 'var(--ink)', color: 'var(--bg)', borderRadius: 4, padding: 40 }}>
-            <div style={{ width: 14, height: 14, background: 'var(--green)', transform: 'rotate(45deg)', marginBottom: 16 }} />
-            <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 20, marginBottom: 8 }}>Casi listo.</div>
-            <div style={{ fontSize: 14, color: 'var(--tan-text)', lineHeight: 1.6 }}>
-              Se abrió tu cliente de correo con el mensaje listo — solo confirma el envío y coordinamos por el medio que dejaste.
+            <div style={{ marginTop: 32 }}>
+              <a
+                href={customWaUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: 'var(--gold)',
+                  color: 'var(--ink)',
+                  padding: '16px 28px',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                className="btn-hover"
+              >
+                <span>Escribir por WhatsApp</span>
+                <span aria-hidden="true">→</span>
+              </a>
             </div>
           </div>
-        ) : (
-          <div data-reveal="" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <input
-              value={formName}
-              onChange={(e) => setFormName(e.target.value)}
-              placeholder="Nombre y organización"
+
+          <div
+            data-reveal=""
+            style={{
+              background: 'var(--cream2)',
+              border: '1px solid var(--border)',
+              padding: 32,
+            }}
+          >
+            <div
               style={{
-                border: '1px solid var(--border)',
-                background: '#FFFFFF',
-                borderRadius: 3,
-                padding: 16,
-                fontSize: 14,
-                fontFamily: "'IBM Plex Sans',sans-serif",
-              }}
-            />
-            <input
-              value={formContact}
-              onChange={(e) => setFormContact(e.target.value)}
-              placeholder="Correo o WhatsApp"
-              style={{
-                border: '1px solid var(--border)',
-                background: '#FFFFFF',
-                borderRadius: 3,
-                padding: 16,
-                fontSize: 14,
-                fontFamily: "'IBM Plex Sans',sans-serif",
-              }}
-            />
-            <textarea
-              value={formMessage}
-              onChange={(e) => setFormMessage(e.target.value)}
-              placeholder="Cuéntanos del proceso o TDR"
-              rows={4}
-              style={{
-                border: '1px solid var(--border)',
-                background: '#FFFFFF',
-                borderRadius: 3,
-                padding: 16,
-                fontSize: 14,
-                fontFamily: "'IBM Plex Sans',sans-serif",
-                resize: 'vertical',
-              }}
-            />
-            <button
-              type="button"
-              onClick={submitForm}
-              className="btn-hover"
-              style={{
-                background: 'var(--terracotta)',
-                color: 'var(--bg)',
-                textAlign: 'center',
-                borderRadius: 3,
-                padding: 16,
-                fontSize: 15,
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 11,
+                letterSpacing: 1.5,
+                color: 'var(--terracotta)',
                 fontWeight: 600,
-                fontFamily: "'IBM Plex Sans',sans-serif",
-                cursor: 'pointer',
-                width: 'fit-content',
-                paddingLeft: 32,
-                paddingRight: 32,
-                border: 'none',
+                marginBottom: 12,
               }}
             >
-              Enviar mensaje
-            </button>
+              DATOS INSTITUCIONALES
+            </div>
+            <div style={{ fontSize: 14, lineHeight: 1.8, color: 'var(--ink)' }}>
+              <div>
+                <strong>Firma:</strong> Inmerge Consultoría y Tecnología
+              </div>
+              <div>
+                <strong>Correo:</strong> contacto@inmerge.pe
+              </div>
+              <div>
+                <strong>Ubicación:</strong> Lima, Perú
+              </div>
+              <div>
+                <strong>Régimen:</strong> Facturación electrónica con RUC activo y habido
+              </div>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Right Column: Structured B2B Quote Form */}
+        <div
+          data-reveal=""
+          style={{
+            background: 'var(--bg)',
+            border: '1px solid var(--border)',
+            padding: 'clamp(32px, 5vw, 48px)',
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 12,
+              letterSpacing: 2,
+              color: 'var(--terracotta)',
+              fontWeight: 600,
+              marginBottom: 12,
+            }}
+          >
+            FORMULARIO DE REQUERIMIENTO
+          </div>
+          <h2
+            style={{
+              fontFamily: "'Spectral',serif",
+              fontWeight: 700,
+              fontSize: 'clamp(26px, 3vw, 36px)',
+              margin: '0 0 24px 0',
+              color: 'var(--ink)',
+            }}
+          >
+            Detalles de la Solicitud
+          </h2>
+
+          <form onSubmit={submitForm} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* Service Pillar Selector */}
+            <div>
+              <label
+                htmlFor="pillar-select"
+                style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
+              >
+                Pilar o Especialidad Principal *
+              </label>
+              <select
+                id="pillar-select"
+                value={formPillar}
+                onChange={(e) => setFormPillar(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: 'var(--cream2)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--ink)',
+                  fontSize: 14,
+                  fontFamily: "'IBM Plex Sans', sans-serif",
+                }}
+              >
+                <option value="auditoria">Pilar 01: Auditoría Técnica y de Datos</option>
+                <option value="desarrollo">Pilar 02: Desarrollo Tecnológico & Cloud (AWS)</option>
+                <option value="datos">Pilar 03: Ciencia de Datos & Inteligencia Artificial</option>
+                <option value="integral">Proyecto Integral / Múltiples Pilares</option>
+                <option value="otro">Otro Requerimiento Específico</option>
+              </select>
+            </div>
+
+            {/* Name & Company */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+              <div>
+                <label
+                  htmlFor="contact-name"
+                  style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
+                >
+                  Nombre y Cargo
+                </label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  placeholder="Ej. Carlos Mendoza, Gerente de TI"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'var(--cream2)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink)',
+                    fontSize: 14,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="contact-company"
+                  style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
+                >
+                  Empresa u Organización
+                </label>
+                <input
+                  id="contact-company"
+                  type="text"
+                  placeholder="Ej. Corporación Andina S.A."
+                  value={formCompany}
+                  onChange={(e) => setFormCompany(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'var(--cream2)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink)',
+                    fontSize: 14,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Email & Phone */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+              <div>
+                <label
+                  htmlFor="contact-email"
+                  style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
+                >
+                  Correo Electrónico *
+                </label>
+                <input
+                  id="contact-email"
+                  type="email"
+                  required
+                  placeholder="correo@empresa.com"
+                  value={formContact}
+                  onChange={(e) => setFormContact(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'var(--cream2)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink)',
+                    fontSize: 14,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="contact-phone"
+                  style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
+                >
+                  Teléfono / WhatsApp
+                </label>
+                <input
+                  id="contact-phone"
+                  type="tel"
+                  placeholder="+51 987 654 321"
+                  value={formPhone}
+                  onChange={(e) => setFormPhone(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'var(--cream2)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink)',
+                    fontSize: 14,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Timeline */}
+            <div>
+              <label
+                htmlFor="contact-timeline"
+                style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
+              >
+                Plazo Estimado de Ejecución
+              </label>
+              <select
+                id="contact-timeline"
+                value={formTimeline}
+                onChange={(e) => setFormTimeline(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: 'var(--cream2)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--ink)',
+                  fontSize: 14,
+                }}
+              >
+                <option value="Urgente (< 1 mes)">Inmediato / Urgente (&lt; 1 mes)</option>
+                <option value="1 a 2 meses">1 a 2 meses</option>
+                <option value="3 a 6 meses">3 a 6 meses</option>
+                <option value="Planificación anual">Planificación anual / Sin fecha fija</option>
+              </select>
+            </div>
+
+            {/* Requirements Message */}
+            <div>
+              <label
+                htmlFor="contact-message"
+                style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
+              >
+                Descripción del Requerimiento / Alcance *
+              </label>
+              <textarea
+                id="contact-message"
+                rows={5}
+                required
+                placeholder="Describe el estado de tus sistemas, fuentes de datos o el problema que buscas resolver..."
+                value={formMessage}
+                onChange={(e) => setFormMessage(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: 'var(--cream2)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--ink)',
+                  fontSize: 14,
+                  fontFamily: "'IBM Plex Sans', sans-serif",
+                  lineHeight: 1.5,
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {formSubmitted && (
+              <div
+                style={{
+                  padding: '12px 16px',
+                  background: 'rgba(168, 71, 43, 0.1)',
+                  border: '1px solid var(--terracotta)',
+                  color: 'var(--terracotta)',
+                  fontSize: 14,
+                  fontWeight: 600,
+                }}
+              >
+                ✓ Solicitud preparada en tu cliente de correo. También puedes escribirnos directamente al WhatsApp para confirmación
+                inmediata.
+              </div>
+            )}
+
+            <button
+              type="submit"
+              style={{
+                background: 'var(--terracotta)',
+                color: '#F3EADA',
+                border: 'none',
+                padding: '16px 32px',
+                fontSize: 15,
+                fontWeight: 600,
+                cursor: 'pointer',
+                marginTop: 8,
+                transition: 'opacity 0.2s ease',
+              }}
+              className="btn-accent"
+            >
+              Enviar Solicitud de Cotización (Email)
+            </button>
+          </form>
+        </div>
       </div>
 
-      <Footer borderTop />
+      <Footer />
     </>
   );
 }

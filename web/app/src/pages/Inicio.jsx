@@ -3,26 +3,35 @@ import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
-import { waLink, SERVICES, SEGMENTS, PHASES, VALUES, MARQUEE_ITEMS } from '../data/content.js';
+import ServicePillarCard from '../components/ServicePillarCard.jsx';
+import ArchitectureDiagram from '../components/ArchitectureDiagram.jsx';
+import { waLink, PILLARS, SEGMENTS, VALUES, MARQUEE_ITEMS } from '../data/content.js';
 
 export default function Inicio() {
   useReveal();
   useDocumentHead({
-    title: 'Inmerge — Consultoría en Datos · Perú',
-    description: 'Gobiernos, empresas e investigadores en el Perú decidiendo sobre datos verificables — no solo creíbles.',
+    title: 'Inmerge — Auditoría, Desarrollo Tecnológico & Ciencia de Datos',
+    description:
+      'Consultoría técnica de alto impacto en Lima, Perú: Auditoría de sistemas y datos, desarrollo cloud en AWS, software a medida y modelos de Machine Learning.',
     path: '/',
   });
 
+  const heroWa = waLink(
+    'Hola Inmerge, deseo conversar con un especialista técnico sobre un proyecto de auditoría, desarrollo o ciencia de datos.',
+  );
+
   return (
     <>
+      {/* Hero Section */}
       <div
         style={{
           position: 'relative',
           padding: '120px clamp(20px,5vw,40px) 80px',
-          minHeight: '78vh',
+          minHeight: '80vh',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
+          overflow: 'hidden',
         }}
       >
         <div
@@ -31,8 +40,8 @@ export default function Inicio() {
             right: -120,
             top: '50%',
             transform: 'translateY(-50%) rotate(45deg)',
-            width: 420,
-            height: 420,
+            width: 440,
+            height: 440,
             background: 'var(--ink)',
             opacity: 0.04,
           }}
@@ -42,56 +51,93 @@ export default function Inicio() {
           style={{
             position: 'absolute',
             right: 'clamp(16px,6vw,60px)',
-            top: '12%',
-            width: 'clamp(28px,6vw,60px)',
-            height: 'clamp(28px,6vw,60px)',
+            top: '14%',
+            width: 'clamp(32px,6vw,64px)',
+            height: 'clamp(32px,6vw,64px)',
             background: 'var(--terracotta)',
           }}
         />
         <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', width: '100%' }}>
-          <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 28 }}>
-            CONSULTORÍA EN DATOS · PERÚ
-          </div>
           <div
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 13,
+              letterSpacing: 3,
+              color: 'var(--terracotta)',
+              fontWeight: 600,
+              marginBottom: 24,
+              textTransform: 'uppercase',
+            }}
+          >
+            AUDITORÍA · DESARROLLO CLOUD · CIENCIA DE DATOS
+          </div>
+          <h1
             style={{
               fontFamily: "'Spectral',serif",
               fontWeight: 700,
-              fontSize: 'clamp(48px,9vw,140px)',
-              lineHeight: 0.98,
-              letterSpacing: -2,
-              margin: '0 0 clamp(20px,5vw,40px)',
+              fontSize: 'clamp(44px,7.8vw,110px)',
+              lineHeight: 1.02,
+              letterSpacing: -1.5,
+              margin: '0 0 clamp(24px,4vw,36px)',
+              color: 'var(--ink)',
+              maxWidth: 1050,
             }}
           >
-            Cada cifra,
+            Ingeniería de software,
             <br />
-            <span style={{ color: 'var(--terracotta)' }}>con su fuente</span>
-            <br />a la vista.
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 24 }}>
-            <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 440, lineHeight: 1.7, margin: 0 }}>
-              Gobiernos, empresas e investigadores en el Perú decidiendo sobre datos verificables — no solo creíbles.
+            <span style={{ color: 'var(--terracotta)' }}>auditoría de sistemas</span>
+            <br />e inteligencia de datos.
+          </h1>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 32 }}>
+            <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 520, lineHeight: 1.7, margin: 0 }}>
+              Construimos plataformas cloud robustas, auditamos la integridad de datos críticos y desplegamos modelos de IA orientados a
+              resultados reales de negocio.
             </p>
-            <a
-              href={waLink('Hola, vi la página de Inmerge y quiero conversar sobre datos verificables para mi organización.')}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-hover"
-              style={{
-                background: 'var(--terracotta)',
-                color: 'var(--bg)',
-                borderRadius: 2,
-                padding: '18px 34px',
-                fontSize: 15,
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Hablemos por WhatsApp →
-            </a>
+            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+              <Link
+                to="/contacto"
+                style={{
+                  background: 'var(--terracotta)',
+                  color: 'var(--bg)',
+                  padding: '16px 30px',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                className="btn-accent"
+              >
+                <span>Solicitar Cotización TDR</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+              <a
+                href={heroWa}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: 'transparent',
+                  color: 'var(--ink)',
+                  border: '1px solid var(--ink)',
+                  padding: '16px 26px',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                className="btn-outline"
+              >
+                <span>WhatsApp Directo</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Marquee Banner */}
       <div
         aria-hidden="true"
         style={{
@@ -105,15 +151,16 @@ export default function Inicio() {
         <div className="marquee-track">
           {MARQUEE_ITEMS.map((m, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '0 20px', whiteSpace: 'nowrap' }}>
-              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, color: 'var(--gold)' }}>{m}</div>
+              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 20, color: 'var(--gold)' }}>{m}</div>
               <div style={{ width: 8, height: 8, background: 'var(--terracotta)', transform: 'rotate(45deg)', flexShrink: 0 }} />
             </div>
           ))}
         </div>
       </div>
 
-      <div data-reveal="" style={{ padding: '140px clamp(20px,5vw,40px)' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto', position: 'relative' }}>
+      {/* Quote / Manifesto */}
+      <div data-reveal="" style={{ padding: '120px clamp(20px,5vw,40px)' }}>
+        <div style={{ maxWidth: 1050, margin: '0 auto', position: 'relative' }}>
           <div
             style={{
               fontFamily: "'Spectral',serif",
@@ -135,60 +182,119 @@ export default function Inicio() {
               zIndex: 1,
               fontFamily: "'Spectral',serif",
               fontWeight: 600,
-              fontSize: 'clamp(28px,4vw,46px)',
-              lineHeight: 1.35,
+              fontSize: 'clamp(26px,3.8vw,42px)',
+              lineHeight: 1.4,
               margin: 0,
+              color: 'var(--ink)',
             }}
           >
-            Las decisiones que más afectan a la gente —presupuesto público, salud, educación, seguridad— hoy se toman con datos que{' '}
-            <span style={{ color: 'var(--terracotta)' }}>casi nadie puede verificar.</span>
+            Las decisiones operativas y estratégicas de alto nivel no pueden depender de hojas de cálculo aisladas ni de sistemas opacos:{' '}
+            <span style={{ color: 'var(--terracotta)' }}>requieren arquitectura sólida, datos auditables y código verificable.</span>
           </p>
         </div>
       </div>
 
       <Frieze border="#D8A84E" upColor="#C68A3D" downColor="#A8472B" medallionBg="#D8A84E" medallionBorder="#241A12" />
 
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '60px clamp(20px,5vw,40px) 140px' }}>
+      {/* 3 Pillars Section */}
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '80px clamp(20px,5vw,40px) 120px' }}>
         <div
           data-reveal=""
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 56, flexWrap: 'wrap', gap: 16 }}
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 56, flexWrap: 'wrap', gap: 16 }}
         >
-          <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(32px,4vw,52px)' }}>Qué hacemos</div>
-          <Link to="/servicios" className="link-hover" style={{ fontSize: 14, fontWeight: 600 }}>
-            Portafolio completo →
-          </Link>
-        </div>
-        <div>
-          {SERVICES.map((s) => (
+          <div>
             <div
-              key={s.number}
-              data-reveal=""
-              className="row-hover"
               style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                gap: '10px 28px',
-                padding: '28px 8px',
-                borderTop: '1px solid var(--border)',
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 12,
+                color: 'var(--terracotta)',
+                letterSpacing: 2,
+                fontWeight: 600,
+                marginBottom: 8,
               }}
             >
-              <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 14, color: 'var(--terracotta)', flexShrink: 0 }}>
-                {s.number}
-              </div>
-              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(20px,2.6vw,32px)', flex: 1, minWidth: 220 }}>
-                {s.name}
-              </div>
-              <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, flex: 2, minWidth: 220 }}>{s.line}</div>
+              NUESTRA OFERTA ESTRATÉGICA
+            </div>
+            <h2 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,4.5vw,52px)', margin: 0 }}>
+              Los Tres Pilares de Inmerge
+            </h2>
+          </div>
+          <Link to="/servicios" className="link-hover" style={{ fontSize: 15, fontWeight: 600 }}>
+            Ver desglose de servicios →
+          </Link>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 24,
+          }}
+        >
+          {PILLARS.map((pillar) => (
+            <div key={pillar.id} data-reveal="">
+              <ServicePillarCard pillar={pillar} />
             </div>
           ))}
-          <div style={{ borderTop: '1px solid var(--border)' }} />
         </div>
       </div>
 
+      {/* Architecture & Flow Section */}
+      <div style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '100px clamp(20px,5vw,40px)' }}>
+        <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+          <div data-reveal="" style={{ maxWidth: 700, marginBottom: 40 }}>
+            <div
+              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--gold)', letterSpacing: 2, marginBottom: 12 }}
+            >
+              DISEÑO & INGENIERÍA
+            </div>
+            <h2
+              style={{
+                fontFamily: "'Spectral',serif",
+                fontWeight: 700,
+                fontSize: 'clamp(32px,4vw,52px)',
+                lineHeight: 1.1,
+                margin: '0 0 16px 0',
+              }}
+            >
+              De la ingestión cruda al producto vivo.
+            </h2>
+            <p style={{ fontSize: 16, color: 'rgba(243,234,218,0.8)', lineHeight: 1.6, margin: 0 }}>
+              Nuestras soluciones integran auditoría continua en cada capa del flujo técnico, asegurando que cada dato que alimenta tus
+              dashboards o modelos provenga de fuentes sanitizadas.
+            </p>
+          </div>
+
+          <div data-reveal="">
+            <ArchitectureDiagram />
+          </div>
+
+          <div data-reveal="" style={{ textAlign: 'center', marginTop: 40 }}>
+            <Link
+              to="/metodologia"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                color: 'var(--gold)',
+                fontSize: 15,
+                fontWeight: 600,
+                textDecoration: 'none',
+                borderBottom: '1px solid var(--gold)',
+                paddingBottom: 4,
+              }}
+            >
+              <span>Explorar nuestro stack tecnológico y metodología de 4 fases</span>
+              <span>→</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Segments Section */}
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {SEGMENTS.map((seg) => (
-          <div key={seg.name} style={{ padding: '100px clamp(20px,5vw,40px)', background: seg.bg, color: seg.fg }}>
+          <div key={seg.name} style={{ padding: '90px clamp(20px,5vw,40px)', background: seg.bg, color: seg.fg }}>
             <div
               data-reveal=""
               style={{
@@ -196,11 +302,11 @@ export default function Inicio() {
                 margin: '0 auto',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
-                gap: 48,
+                gap: 40,
                 alignItems: 'center',
               }}
             >
-              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(26px,3.2vw,40px)', lineHeight: 1.2 }}>
+              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(26px,3.2vw,38px)', lineHeight: 1.2 }}>
                 {seg.name}
               </div>
               <div>
@@ -209,76 +315,46 @@ export default function Inicio() {
                     fontFamily: "'Spectral',serif",
                     fontWeight: 600,
                     fontStyle: 'italic',
-                    fontSize: 'clamp(20px,2.2vw,28px)',
+                    fontSize: 'clamp(20px,2.2vw,26px)',
                     lineHeight: 1.4,
-                    marginBottom: 16,
+                    marginBottom: 14,
                   }}
                 >
                   &ldquo;{seg.quote}&rdquo;
                 </div>
-                <div style={{ fontSize: 14, opacity: 0.75, lineHeight: 1.6 }}>{seg.line}</div>
+                <div style={{ fontSize: 14, opacity: 0.8, lineHeight: 1.6 }}>{seg.line}</div>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '140px clamp(20px,5vw,40px)' }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto' }}>
-          <div
-            data-reveal=""
-            style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(32px,4vw,52px)', marginBottom: 16 }}
-          >
-            Método Acequia
-          </div>
-          <div data-reveal="" style={{ fontSize: 15, color: 'var(--tan-text)', marginBottom: 72, maxWidth: 600 }}>
-            Cinco fases, un quality gate en cada una — el dato fluye por un canal diseñado.
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 20 }}>
-            {PHASES.map((ph) => (
-              <div key={ph.number} data-reveal="" style={{ position: 'relative', padding: '0 12px 0 0' }}>
-                <div
-                  style={{
-                    fontFamily: "'Spectral',serif",
-                    fontWeight: 800,
-                    fontSize: 72,
-                    color: 'var(--gold)',
-                    lineHeight: 1,
-                    marginBottom: 20,
-                  }}
-                >
-                  {ph.number}
-                </div>
-                <div style={{ width: 10, height: 10, background: 'var(--gold)', transform: 'rotate(45deg)', marginBottom: 16 }} />
-                <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 18 }}>{ph.name}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       <Frieze border="#A8472B" upColor="#D8A84E" downColor="#C68A3D" medallionBg="#A8472B" medallionBorder="#F3EADA" />
 
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '140px clamp(20px,5vw,40px)' }}>
-        <div data-reveal="" style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(32px,4vw,52px)', marginBottom: 64 }}>
-          Lo que nos sostiene.
+      {/* Values Section */}
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '120px clamp(20px,5vw,40px)' }}>
+        <div data-reveal="" style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,4vw,52px)', marginBottom: 56 }}>
+          Principios de Ingeniería
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 1, background: 'var(--border)' }}>
           {VALUES.map((v) => (
-            <div key={v.name} data-reveal="" className="row-hover" style={{ background: 'var(--bg)', padding: 48 }}>
-              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 24, marginBottom: 14 }}>{v.name}</div>
-              <div style={{ fontSize: 15, color: 'var(--muted)', lineHeight: 1.7, maxWidth: 360 }}>{v.desc}</div>
+            <div key={v.name} data-reveal="" className="row-hover" style={{ background: 'var(--bg)', padding: 44 }}>
+              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, marginBottom: 12, color: 'var(--ink)' }}>
+                {v.name}
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.7, maxWidth: 360 }}>{v.desc}</div>
             </div>
           ))}
         </div>
       </div>
 
+      {/* Final CTA */}
       <div
         style={{
           position: 'relative',
           background: 'var(--ink)',
           color: 'var(--bg)',
-          padding: '160px clamp(20px,5vw,40px)',
+          padding: '140px clamp(20px,5vw,40px)',
           overflow: 'hidden',
         }}
       >
@@ -300,36 +376,51 @@ export default function Inicio() {
             style={{
               fontFamily: "'Spectral',serif",
               fontWeight: 700,
-              fontSize: 'clamp(32px,5vw,58px)',
-              marginBottom: 32,
+              fontSize: 'clamp(32px,5vw,56px)',
+              marginBottom: 24,
               lineHeight: 1.15,
             }}
           >
-            ¿Conversamos
-            <br />
-            sobre tus datos?
+            Iniciemos una evaluación técnica de tus sistemas y datos.
           </div>
-          <div data-reveal="" style={{ fontSize: 15, color: 'var(--tan-text)', marginBottom: 40 }}>
-            El mismo consultor que diseña, ejecuta — sin intermediarios.
+          <div data-reveal="" style={{ fontSize: 16, color: 'var(--tan-text)', marginBottom: 40, maxWidth: 560, margin: '0 auto 40px' }}>
+            Consultores e ingenieros senior trabajando directamente en tu arquitectura, sin intermediarios ni demoras.
           </div>
-          <a
-            data-reveal=""
-            href={waLink('Hola, quiero conversar sobre mis datos con Inmerge.')}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-hover"
-            style={{
-              background: 'var(--gold)',
-              color: 'var(--ink)',
-              borderRadius: 2,
-              padding: '20px 44px',
-              fontSize: 17,
-              fontWeight: 700,
-              display: 'inline-block',
-            }}
-          >
-            Escríbenos por WhatsApp
-          </a>
+          <div data-reveal="" style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <Link
+              to="/contacto"
+              style={{
+                background: 'var(--gold)',
+                color: 'var(--ink)',
+                borderRadius: 2,
+                padding: '18px 36px',
+                fontSize: 16,
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
+              className="btn-hover"
+            >
+              Solicitar Términos de Referencia (TDR)
+            </Link>
+            <a
+              href={heroWa}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                background: 'transparent',
+                color: 'var(--bg)',
+                border: '1px solid var(--bg)',
+                borderRadius: 2,
+                padding: '18px 32px',
+                fontSize: 16,
+                fontWeight: 600,
+                textDecoration: 'none',
+              }}
+              className="btn-outline"
+            >
+              Escribir a WhatsApp
+            </a>
+          </div>
         </div>
       </div>
 

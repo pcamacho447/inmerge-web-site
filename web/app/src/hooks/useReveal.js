@@ -3,20 +3,17 @@ import { useLocation } from 'react-router-dom';
 
 // Adds `.is-visible` to [data-reveal] elements as they scroll into view —
 // index.css keeps them at opacity 0 until then.
-//
-// A single querySelectorAll snapshot is NOT enough: since Phase B2 the report
-// catalog arrives from Supabase, so Reportes/Cuenta mount their cards after
-// the fetch resolves — well after this effect runs. Those late elements were
-// never observed and stayed invisible forever, which read as "the reports
-// don't load" even though the rows were in the DOM with their real titles.
-// The MutationObserver below picks up whatever appears later, so async content
-// reveals like everything else. Note that `prefers-reduced-motion` forces
-// opacity 1 in index.css, which masks this class of bug entirely — don't rely
-// on a reduced-motion machine to catch it. See useReveal.test.jsx.
 export default function useReveal() {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+      if (typeof document !== 'undefined') {
+        document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible'));
+      }
+      return;
+    }
+
     const intersection = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

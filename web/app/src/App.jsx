@@ -5,8 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Layout from './components/Layout.jsx';
 import Inicio from './pages/Inicio.jsx';
 import Servicios from './pages/Servicios.jsx';
-import Reportes from './pages/Reportes.jsx';
-import Reporte from './pages/Reporte.jsx';
+import Metodologia from './pages/Metodologia.jsx';
 import Nosotros from './pages/Nosotros.jsx';
 import Contacto from './pages/Contacto.jsx';
 import Login from './pages/Login.jsx';
@@ -22,8 +21,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Inicio />} />
           <Route path="/servicios" element={<Servicios />} />
-          <Route path="/reportes" element={<Reportes />} />
-          <Route path="/reportes/:slug" element={<Reporte />} />
+          <Route path="/metodologia" element={<Metodologia />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/login" element={<Login />} />

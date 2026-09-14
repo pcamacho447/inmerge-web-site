@@ -8,143 +8,163 @@ export function waLink(message) {
   return message ? `${WA_LINK}?text=${encodeURIComponent(message)}` : WA_LINK;
 }
 
-// Assumed production domain, based on the "contacto@inmerge.pe" address used
-// throughout the copy — the site isn't deployed yet. Update this in one place
-// if the real domain differs; sitemap.xml/robots.txt in public/ also
-// hardcode it and need updating to match.
 export const SITE_URL = 'https://inmerge.pe';
 
 export const NAV_LINKS = [
   { to: '/', label: 'Inicio' },
   { to: '/servicios', label: 'Servicios' },
-  { to: '/reportes', label: 'Reportes' },
+  { to: '/metodologia', label: 'Stack & Metodología' },
   { to: '/nosotros', label: 'Nosotros' },
   { to: '/contacto', label: 'Contacto' },
 ];
 
-// Mensaje de WhatsApp para mandar la constancia. Un link wa.me no puede
-// adjuntar la foto: abre el chat con el texto listo y el cliente adjunta.
 export function waVoucherMessage(order) {
   return `Hola, deposité S/ ${formatPEN(order.amount_pen)} por el pedido ${order.code}. Adjunto mi constancia.`;
 }
 
 export const VALUES = [
-  { name: 'Trazabilidad', desc: 'Todo número tiene una fuente citable, sin excepción.' },
-  { name: 'Cercanía', desc: 'Respondemos donde el cliente ya está — WhatsApp incluido.' },
-  { name: 'Precisión', desc: 'Preferimos "no lo sabemos aún" a una cifra bonita pero débil.' },
-  { name: 'Permanencia', desc: 'Diseñamos sistemas que el cliente puede operar sin nosotros después.' },
+  { name: 'Rigor y Trazabilidad', desc: 'Cada proceso, query y cálculo es auditable, citable y reproducible.' },
+  { name: 'Ingeniería Robusta', desc: 'Construimos sistemas resilientes sobre arquitecturas modernas y código probado.' },
+  { name: 'Inteligencia Práctica', desc: 'Aplicamos IA y ciencia de datos orientadas a resultados e impacto operativo real.' },
+  { name: 'Autonomía del Cliente', desc: 'Transferimos el conocimiento y la infraestructura para que operes sin dependencias.' },
+];
+
+export const PILLARS = [
+  {
+    id: 'auditoria',
+    number: '01',
+    title: 'Auditoría Técnica y de Datos',
+    subtitle: 'Garantía de integridad, seguridad y cumplimiento',
+    desc: 'Evaluación independiente de bases de datos, calidad de información, arquitectura de sistemas y seguridad cloud para eliminar riesgos operativos.',
+    tag: 'Auditoría & Calidad',
+    badge: 'Diagnóstico & Certificación',
+  },
+  {
+    id: 'desarrollo',
+    number: '02',
+    title: 'Desarrollo Tecnológico & Cloud',
+    subtitle: 'Software a medida, arquitectura AWS y plataformas web',
+    desc: 'Diseño y construcción de aplicaciones empresariales, microservicios e infraestructura escalable con altos estándares de ingeniería.',
+    tag: 'Ingeniería de Software',
+    badge: 'Arquitectura & Código',
+  },
+  {
+    id: 'datos',
+    number: '03',
+    title: 'Ciencia de Datos & Inteligencia Artificial',
+    subtitle: 'Modelos predictivos, analítica avanzada y dashboards ejecutivos',
+    desc: 'Implementación de Machine Learning, pipelines de IA y dashboards vivos para convertir flujos de datos en ventaja competitiva.',
+    tag: 'Analítica & Machine Learning',
+    badge: 'IA & Modelado',
+  },
 ];
 
 export const SERVICES = [
   {
     number: '01',
-    name: 'Diagnóstico de Datos',
-    line: 'Mapa objetivo del estado real de tus datos, en 2-3 semanas.',
-    timeline: '2-3 semanas',
+    pillarId: 'auditoria',
+    pillarName: 'Auditoría Técnica',
+    name: 'Auditoría de Calidad e Integridad de Datos',
+    line: 'Diagnóstico exhaustivo de consistencia, duplicados y reglas de negocio.',
+    timeline: '2 a 4 semanas',
     problem:
-      'El cliente sospecha que sus datos están dispersos o son poco confiables, pero no tiene un mapa claro de qué tan grave es el problema.',
-    value: 'Un mapa objetivo y citable del estado de sus datos, sin comprometerse todavía a un proyecto grande.',
-    deliverables: ['Inventario de fuentes', 'Informe de brechas', 'Hoja de ruta priorizada'],
+      'Las organizaciones operan con datos dispersos, inconsistentes o no validados, generando reportes erróneos y pérdidas financieras.',
+    value: 'Un dictamen técnico de auditoría y una matriz de remediación con evidencias reproducibles y reproducibilidad garantizada.',
+    deliverables: ['Inventario y perfilado de fuentes', 'Informe de inconsistencias y brechas', 'Plan de saneamiento de datos'],
   },
   {
     number: '02',
-    name: 'Arquitectura en la Nube',
-    line: 'Pipelines e infraestructura confiable sobre AWS.',
-    timeline: '6-10 semanas',
-    problem:
-      'Los datos existen pero viven dispersos en hojas de cálculo o sistemas legados, sin un flujo confiable hacia donde se necesitan.',
-    value: 'Una base técnica sólida y escalable que sostiene todos los servicios siguientes.',
-    deliverables: ['Pipelines ETL', 'Modelo de datos documentado', 'Infraestructura en AWS'],
+    pillarId: 'auditoria',
+    pillarName: 'Auditoría Técnica',
+    name: 'Auditoría de Sistemas y Seguridad Cloud',
+    line: 'Evaluación de arquitectura en AWS/GCP, vulnerabilidades y costos.',
+    timeline: '3 a 5 semanas',
+    problem: 'Sistemas con arquitectura opaca, configuraciones inseguras de nube y costos desbordados sin monitoreo adecuado.',
+    value: 'Identificación de vulnerabilidades críticas, optimización de presupuesto cloud y validación de buenas prácticas.',
+    deliverables: ['Análisis de postura de seguridad', 'Matriz de optimización de costos AWS', 'Recomendaciones de arquitectura'],
   },
   {
     number: '03',
-    name: 'Dashboards y Apps Ejecutivas',
-    line: 'Producto analítico vivo, a medida de cada cliente.',
-    timeline: '4-8 semanas',
-    problem: 'Las decisiones se toman con reportes estáticos y desactualizados, sin una vista ejecutiva unificada.',
-    value: 'Un producto analítico vivo que el cliente consulta directamente, sin depender de un Excel actualizado a mano.',
-    deliverables: ['App web en la nube', 'Dashboards ejecutivos', 'Documentación de uso'],
+    pillarId: 'desarrollo',
+    pillarName: 'Desarrollo Tecnológico',
+    name: 'Arquitectura en la Nube & Pipelines (AWS)',
+    line: 'Infraestructura serverless, contenedores y pipelines de datos.',
+    timeline: '4 a 8 semanas',
+    problem: 'Flujos manuales de datos e infraestructuras legadas incapaces de escalar ante picos de demanda o integración.',
+    value: 'Arquitectura moderna en AWS (ECS, Lambda, RDS, S3) con alta disponibilidad y despliegues automatizados.',
+    deliverables: ['Infraestructura como código (IaC)', 'Pipelines ETL/ELT automatizados', 'Manual de operación y arquitectura'],
   },
   {
     number: '04',
-    name: 'Gobierno de Datos',
-    line: 'Estándares que aseguran datos citables en el tiempo.',
-    timeline: 'Continuo — trimestral',
-    problem: 'Sin reglas claras de calidad, los sistemas de datos se degradan con el tiempo y pierden trazabilidad.',
-    value: 'Confianza sostenida: cada dato sigue siendo citable ante una auditoría o directorio.',
-    deliverables: ['Diccionario de datos', 'Proceso de trazabilidad', 'Reporte trimestral de salud'],
+    pillarId: 'desarrollo',
+    pillarName: 'Desarrollo Tecnológico',
+    name: 'Desarrollo de Software & Plataformas Web',
+    line: 'Aplicaciones empresariales, portales a medida y APIs robustas.',
+    timeline: '6 a 12 semanas',
+    problem: 'Herramientas genéricas que no calzan con los procesos de negocio o plataformas obsoletas con deuda técnica.',
+    value: 'Software a medida desarrollado en React, Node/Python y PostgreSQL con pruebas automatizadas y diseño premium.',
+    deliverables: ['Aplicación web funcional en producción', 'Suite de pruebas automatizadas', 'Documentación de APIs y código'],
   },
   {
     number: '05',
-    name: 'Capacitación en IA',
-    line: 'Tu equipo usando Claude en su trabajo diario.',
-    timeline: '2-4 semanas',
-    problem: 'El equipo del cliente tiene acceso a herramientas de IA pero no sabe aplicarlas a su trabajo real.',
-    value: 'Un equipo interno capaz de sostener y extender el trabajo entre proyectos.',
-    deliverables: ['Talleres con casos reales', 'Guía adaptada al flujo del cliente', 'Sesión de seguimiento'],
+    pillarId: 'datos',
+    pillarName: 'Ciencia de Datos & IA',
+    name: 'Modelos Predictivos & Machine Learning',
+    line: 'Algoritmos de clasificación, forecasting y scoring automatizado.',
+    timeline: '4 a 8 semanas',
+    problem: 'Decisiones basadas en intuición debido a la falta de modelos capaces de anticipar tendencias o comportamientos.',
+    value: 'Modelos entrenados con validación estadística rigurosa listos para inferencia en tiempo real o en batch.',
+    deliverables: ['Modelo ML calibrado y evaluado', 'Pipeline de reentrenamiento continuo', 'Métricas de precisión y soporte'],
   },
   {
     number: '06',
-    name: 'Sistema Vivo',
-    line: 'Mantenimiento y evolución continua del sistema entregado.',
-    timeline: 'Contrato continuo',
-    problem: 'Los sistemas entregados por un proyecto puntual quedan obsoletos en meses si nadie los actualiza.',
-    value: 'Ingreso recurrente para Inmerge y continuidad garantizada para el cliente.',
-    deliverables: ['Monitoreo mensual', 'Actualizaciones incrementales', 'Reporte de salud del sistema'],
+    pillarId: 'datos',
+    pillarName: 'Ciencia de Datos & IA',
+    name: 'Dashboards Ejecutivos & Visualización de Datos',
+    line: 'Interfaces interactivas vivas para control operativo y estratégico.',
+    timeline: '3 a 6 semanas',
+    problem: 'Directores y gerentes esperando días por reportes estáticos en hojas de cálculo propensas a errores.',
+    value: 'Dashboards web interactivos en tiempo real con permisos por rol y actualización automática.',
+    deliverables: ['Dashboard web responsive interactivo', 'Conexión a bases de datos en vivo', 'Capacitación a usuarios clave'],
   },
 ];
 
 export const SEGMENTS = [
   {
-    name: 'Gobiernos regionales y municipales',
-    quote: 'Un informe que resiste una auditoría antes de que llegue Contraloría.',
-    line: 'Ejecución presupuestal y rendición de cuentas verificable.',
+    name: 'Corporativos y Medianas Empresas',
+    quote: 'Sistemas que escalan y datos que resisten una auditoría de directorio.',
+    line: 'Desarrollo a medida, analítica predictiva y optimización de infraestructura en la nube.',
     bg: '#241A12',
     fg: '#F3EADA',
   },
   {
-    name: 'Empresas y consultoras',
-    quote: 'Decisiones con el método a la vista, no una caja negra.',
-    line: 'Analítica que escala sin depender de una sola persona.',
+    name: 'Sector Público y Organismos',
+    quote: 'Trazabilidad rigurosa y cumplimiento normativo verificable.',
+    line: 'Auditoría de sistemas, calidad de bases de datos fiscales y plataformas de transparencia.',
     bg: '#EBDFC9',
     fg: '#241A12',
   },
   {
-    name: 'Investigadores y prensa',
-    quote: 'La fuente y el cálculo, no solo la cifra final.',
-    line: 'Apoyo técnico puntual sin comprometer tu independencia.',
+    name: 'Startups & Empresas Tecnológicas',
+    quote: 'Velocidad de entrega sin comprometer la arquitectura ni la seguridad.',
+    line: 'Desarrollo full-stack, ingeniería de datos e integración de IA generativa.',
     bg: '#A8472B',
     fg: '#F3EADA',
   },
 ];
 
-export const PHASES = [
-  { number: '01', name: 'Descubrimiento' },
-  { number: '02', name: 'Diseño' },
-  { number: '03', name: 'Construcción' },
-  { number: '04', name: 'Validación y Transferencia' },
-  { number: '05', name: 'Sostenimiento' },
-];
-
 export const MARQUEE_ITEMS = [
-  'GOBIERNOS REGIONALES',
-  'EMPRESAS Y CONSULTORAS',
-  'INVESTIGADORES Y PRENSA',
-  'GOBIERNOS REGIONALES',
-  'EMPRESAS Y CONSULTORAS',
-  'INVESTIGADORES Y PRENSA',
+  'AUDITORÍA TÉCNICA',
+  'DESARROLLO CLOUD',
+  'CIENCIA DE DATOS',
+  'MACHINE LEARNING',
+  'ARQUITECTURA AWS',
+  'CALIDAD DE INFORMACIÓN',
 ];
-
-// The report catalog itself no longer lives here — src/hooks/useReports.js
-// fetches it live from Supabase's `reports` table (supabase/migrations/
-// 0001_init.sql + 0002_seed_premium_examples.sql), which is now the only
-// source of truth. This used to be a duplicated static array that could
-// drift from the database; don't reintroduce that.
 
 export const ROLES = [
-  { name: 'Consultor Senior', desc: 'Lidera la relación con el cliente y la calidad estratégica.' },
-  { name: 'Data Scientist', desc: 'Diagnóstico, modelado de datos y métricas.' },
-  { name: 'Ingeniero de Cloud', desc: 'Arquitectura e infraestructura en AWS.' },
-  { name: 'Software Engineer', desc: 'Construcción de dashboards y aplicaciones.' },
-  { name: 'Director de Diseño', desc: 'Diseño visual y experiencia de cada entregable.' },
+  { name: 'Lead Auditor & Data Strategist', desc: 'Lidera auditorías técnicas, gobernanza y diagnóstico de datos.' },
+  { name: 'Cloud & DevOps Architect', desc: 'Diseño de infraestructura escalable y pipelines en AWS.' },
+  { name: 'Senior Data Scientist', desc: 'Modelado estadístico, Machine Learning e integración de IA.' },
+  { name: 'Full-Stack Engineer', desc: 'Desarrollo de aplicaciones web de alto rendimiento y APIs.' },
 ];
