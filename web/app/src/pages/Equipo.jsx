@@ -3,7 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { waLink } from '../data/content.js';
 import {
+  fetchRegisteredClients,
   fetchTeamLeads,
   updateLeadStatus,
   fetchTeamProjects,
@@ -12,6 +14,8 @@ import {
   updateMilestoneStatus,
   uploadDeliverableFile,
   createDeliverableRecord,
+  fetchStaffMembers,
+  createStaffMember,
 } from '../lib/team.js';
 
 const PILLAR_LABELS = {
@@ -30,14 +34,23 @@ const STATUS_COLORS = {
   DESCARTADO: { bg: 'rgba(0,0,0,0.05)', text: 'var(--muted)', border: 'var(--border)' },
 };
 
+const MILESTONE_STATUS_COLORS = {
+  PENDIENTE: { bg: 'rgba(0,0,0,0.04)', text: 'var(--muted)', border: 'var(--border)' },
+  EN_PROCESO: { bg: 'rgba(198, 138, 61, 0.15)', text: 'var(--ochre)', border: 'var(--ochre)' },
+  COMPLETADO: { bg: 'rgba(46, 117, 89, 0.15)', text: '#2E7559', border: '#2E7559' },
+  BLOQUEADO: { bg: 'rgba(168, 71, 43, 0.15)', text: 'var(--terracotta)', border: 'var(--terracotta)' },
+};
+
 export default function Equipo() {
   useDocumentHead({ title: 'Panel de Equipo & Consultores — Inmerge', path: '/equipo', noIndex: true });
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('leads'); // 'leads' | 'projects' | 'new_project'
+  const [activeTab, setActiveTab] = useState('leads'); // 'leads' | 'projects' | 'new_project' | 'team'
   const [leads, setLeads] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [staffList, setStaffList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusMsg, setStatusMsg] = useState(null);
@@ -74,6 +87,15 @@ export default function Equipo() {
   const [delivFile, setDelivFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
+  // New Staff Member Form State (Admins only)
+  const [newStaff, setNewStaff] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    role: 'engineer',
+  });
+  const [staffSubmitting, setStaffSubmitting] = useState(false);
+
   useEffect(() => {
     loadData();
   }, []);
@@ -82,12 +104,19 @@ export default function Equipo() {
     setLoading(true);
     setError(null);
     try {
-      const [leadsData, projsData] = await Promise.all([
+      const [leadsData, projsData, clientsData] = await Promise.all([
         fetchTeamLeads().catch(() => []),
         fetchTeamProjects().catch(() => []),
+        fetchRegisteredClients().catch(() => []),
       ]);
       setLeads(leadsData);
       setProjects(projsData);
+      setClients(clientsData);
+
+      if (user?.role === 'admin') {
+        const staffData = await fetchStaffMembers().catch(() => []);
+        setStaffList(staffData);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -95,7 +124,7 @@ export default function Equipo() {
     }
   }
 
-  async function handleUpdateLead(leadId, newStatus, currentNotes) {
+  async function handleUpdateLead(leadId, newStatus) {
     try {
       await updateLeadStatus(leadId, { status: newStatus });
       setLeads((prev) =>
@@ -107,10 +136,33 @@ export default function Equipo() {
     }
   }
 
+  function handleConvertLeadToProject(lead) {
+    const matchedClient = clients.find(
+      (c) => c.email && c.email.toLowerCase() === lead.email?.toLowerCase()
+    );
+
+    setNewProj({
+      clientId: matchedClient ? matchedClient.id : (clients[0]?.id || ''),
+      title: `${PILLAR_LABELS[lead.pillar] || 'Proyecto'} — ${lead.company || lead.full_name || 'Cliente'}`,
+      pillar: ['auditoria', 'desarrollo', 'datos', 'integral'].includes(lead.pillar) ? lead.pillar : 'auditoria',
+      description: `Requerimiento TDR: ${lead.message || 'Sin descripción'}\n\nContacto: ${lead.full_name || 'N/A'} (${lead.email || 'N/A'}${lead.phone ? `, Tel: ${lead.phone}` : ''})\nPlazo estimado: ${lead.timeline || 'A coordinar'}`,
+      targetCompletionDate: '',
+      techLeadName: user?.fullName || 'Inmerge Tech Lead',
+      techLeadContact: user?.email || 'contacto@inmerge.pe',
+    });
+
+    setActiveTab('new_project');
+    if (matchedClient) {
+      showTemporaryMsg(`Lead vinculado automáticamente con el cliente registrado: ${matchedClient.full_name || matchedClient.email}`);
+    } else {
+      showTemporaryMsg(`Datos del lead pre-cargados. Selecciona el cliente correspondiente o solicita su registro previo.`);
+    }
+  }
+
   async function handleCreateProject(e) {
     e.preventDefault();
     if (!newProj.clientId || !newProj.title) {
-      alert('Por favor completa el ID del cliente y el título del proyecto.');
+      alert('Por favor selecciona un cliente registrado e ingresa el título del proyecto.');
       return;
     }
 
@@ -126,7 +178,7 @@ export default function Equipo() {
         techLeadName: user?.fullName || 'Inmerge Tech Lead',
         techLeadContact: user?.email || 'contacto@inmerge.pe',
       });
-      loadData();
+      await loadData();
       setActiveTab('projects');
     } catch (err) {
       alert(`Error al crear proyecto: ${err.message}`);
@@ -149,9 +201,19 @@ export default function Equipo() {
       });
       showTemporaryMsg('Hito agregado correctamente.');
       setNewMilestone({ projectId: '', title: '', description: '', dueDate: '' });
-      loadData();
+      await loadData();
     } catch (err) {
       alert(`Error al agregar hito: ${err.message}`);
+    }
+  }
+
+  async function handleUpdateMilestone(milestoneId, newStatus) {
+    try {
+      await updateMilestoneStatus(milestoneId, newStatus);
+      showTemporaryMsg('Estado de hito actualizado.');
+      await loadData();
+    } catch (err) {
+      alert(`Error al actualizar hito: ${err.message}`);
     }
   }
 
@@ -166,7 +228,6 @@ export default function Equipo() {
     try {
       let filePath = null;
       if (delivFile) {
-        const fileExt = delivFile.name.split('.').pop();
         const safeName = `${newDeliv.projectId}/${Date.now()}_${delivFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
         filePath = await uploadDeliverableFile(delivFile, safeName);
       }
@@ -193,11 +254,42 @@ export default function Equipo() {
         notes: '',
       });
       setDelivFile(null);
-      loadData();
+      await loadData();
     } catch (err) {
       alert(`Error al publicar entregable: ${err.message}`);
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleCreateStaff(e) {
+    e.preventDefault();
+    if (!newStaff.fullName || !newStaff.email || !newStaff.password) {
+      alert('Por favor completa todos los campos del formulario de colaborador.');
+      return;
+    }
+
+    setStaffSubmitting(true);
+    try {
+      await createStaffMember({
+        fullName: newStaff.fullName,
+        email: newStaff.email,
+        password: newStaff.password,
+        role: newStaff.role,
+      });
+
+      showTemporaryMsg(`Colaborador ${newStaff.fullName} (${newStaff.email}) dado de alta exitosamente con rol ${newStaff.role}.`);
+      setNewStaff({
+        fullName: '',
+        email: '',
+        password: '',
+        role: 'engineer',
+      });
+      await loadData();
+    } catch (err) {
+      alert(`Error al registrar colaborador: ${err.message}`);
+    } finally {
+      setStaffSubmitting(false);
     }
   }
 
@@ -398,6 +490,41 @@ export default function Equipo() {
           >
             + Crear Proyecto / Entregable
           </button>
+
+          {user?.role === 'admin' && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('team')}
+              style={{
+                background: 'none',
+                border: 'none',
+                borderBottom: activeTab === 'team' ? '3px solid var(--terracotta)' : '3px solid transparent',
+                padding: '12px 20px',
+                fontSize: 15,
+                fontWeight: activeTab === 'team' ? 700 : 500,
+                color: activeTab === 'team' ? 'var(--terracotta)' : 'var(--muted)',
+                cursor: 'pointer',
+                fontFamily: "'IBM Plex Sans', sans-serif",
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <span>Gestión de Colaboradores</span>
+              <span
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 11,
+                  padding: '2px 6px',
+                  borderRadius: 10,
+                  background: activeTab === 'team' ? 'var(--terracotta)' : 'var(--border)',
+                  color: activeTab === 'team' ? '#fff' : 'var(--ink)',
+                }}
+              >
+                {staffList.length}
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Content Tabs */}
@@ -432,6 +559,13 @@ export default function Equipo() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {leads.map((lead) => {
                       const color = STATUS_COLORS[lead.status] || STATUS_COLORS.NUEVO;
+                      const matchedClient = clients.find(
+                        (c) => c.email && c.email.toLowerCase() === lead.email?.toLowerCase()
+                      );
+
+                      const leadWaMsg = `Hola ${lead.full_name || 'estimado(a)'}, te saluda ${user?.fullName || 'el equipo técnico'} de Inmerge. Recibimos tu solicitud para "${PILLAR_LABELS[lead.pillar] || lead.pillar}"${lead.company ? ` en ${lead.company}` : ''}. ¿Podemos agendar una breve llamada técnica para revisar los requerimientos?`;
+                      const leadWaUrl = waLink(leadWaMsg);
+
                       return (
                         <div
                           key={lead.id}
@@ -445,7 +579,7 @@ export default function Equipo() {
                         >
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
                             <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
                                 <span
                                   style={{
                                     fontFamily: "'IBM Plex Mono', monospace",
@@ -463,6 +597,35 @@ export default function Equipo() {
                                 <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--terracotta)', fontWeight: 600 }}>
                                   {PILLAR_LABELS[lead.pillar] || lead.pillar}
                                 </span>
+                                {matchedClient ? (
+                                  <span
+                                    style={{
+                                      fontFamily: "'IBM Plex Mono', monospace",
+                                      fontSize: 11,
+                                      padding: '2px 8px',
+                                      borderRadius: 4,
+                                      background: 'rgba(46, 117, 89, 0.12)',
+                                      color: '#2E7559',
+                                      border: '1px solid #2E7559',
+                                    }}
+                                  >
+                                    ✓ Cuenta Cliente Vinculada
+                                  </span>
+                                ) : (
+                                  <span
+                                    style={{
+                                      fontFamily: "'IBM Plex Mono', monospace",
+                                      fontSize: 11,
+                                      padding: '2px 8px',
+                                      borderRadius: 4,
+                                      background: 'rgba(0,0,0,0.04)',
+                                      color: 'var(--muted)',
+                                      border: '1px solid var(--border)',
+                                    }}
+                                  >
+                                    Prospecto nuevo
+                                  </span>
+                                )}
                               </div>
                               <h3 style={{ margin: '4px 0', fontSize: 18, fontWeight: 700 }}>
                                 {lead.company ? `${lead.company} — ` : ''}{lead.full_name || 'Solicitud Anónima'}
@@ -492,28 +655,69 @@ export default function Equipo() {
                               {lead.timeline && <span>⏱️ Plazo: <strong style={{ color: 'var(--ink)' }}>{lead.timeline}</strong></span>}
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <label style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace" }}>Cambiar estado:</label>
-                              <select
-                                value={lead.status}
-                                onChange={(e) => handleUpdateLead(lead.id, e.target.value, lead.notes)}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                              <a
+                                href={leadWaUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 style={{
-                                  padding: '6px 12px',
-                                  borderRadius: 4,
-                                  border: '1px solid var(--border)',
-                                  background: '#fff',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 6,
+                                  background: '#25D366',
+                                  color: '#fff',
+                                  padding: '6px 14px',
+                                  borderRadius: 20,
                                   fontSize: 12,
-                                  fontFamily: "'IBM Plex Mono', monospace",
                                   fontWeight: 600,
+                                  textDecoration: 'none',
+                                  fontFamily: "'IBM Plex Sans', sans-serif",
                                 }}
                               >
-                                <option value="NUEVO">NUEVO</option>
-                                <option value="EN_REVISION">EN_REVISION</option>
-                                <option value="CONTACTADO">CONTACTADO</option>
-                                <option value="PROPUESTA_ENVIADA">PROPUESTA_ENVIADA</option>
-                                <option value="CERRADO_GANADO">CERRADO_GANADO</option>
-                                <option value="DESCARTADO">DESCARTADO</option>
-                              </select>
+                                💬 WhatsApp Directo
+                              </a>
+
+                              <button
+                                type="button"
+                                onClick={() => handleConvertLeadToProject(lead)}
+                                style={{
+                                  background: 'var(--terracotta)',
+                                  color: '#fff',
+                                  border: 'none',
+                                  padding: '6px 14px',
+                                  borderRadius: 20,
+                                  fontSize: 12,
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  fontFamily: "'IBM Plex Sans', sans-serif",
+                                }}
+                              >
+                                Convertir en Proyecto →
+                              </button>
+
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <label style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace" }}>Estado:</label>
+                                <select
+                                  value={lead.status}
+                                  onChange={(e) => handleUpdateLead(lead.id, e.target.value)}
+                                  style={{
+                                    padding: '6px 10px',
+                                    borderRadius: 4,
+                                    border: '1px solid var(--border)',
+                                    background: '#fff',
+                                    fontSize: 12,
+                                    fontFamily: "'IBM Plex Mono', monospace",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  <option value="NUEVO">NUEVO</option>
+                                  <option value="EN_REVISION">EN_REVISION</option>
+                                  <option value="CONTACTADO">CONTACTADO</option>
+                                  <option value="PROPUESTA_ENVIADA">PROPUESTA_ENVIADA</option>
+                                  <option value="CERRADO_GANADO">CERRADO_GANADO</option>
+                                  <option value="DESCARTADO">DESCARTADO</option>
+                                </select>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -547,71 +751,156 @@ export default function Equipo() {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                    {projects.map((proj) => (
-                      <div
-                        key={proj.id}
-                        style={{
-                          background: 'var(--cream2)',
-                          borderRadius: 8,
-                          padding: '24px',
-                          border: '1px solid var(--border)',
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-                          <div>
-                            <span
-                              style={{
-                                fontFamily: "'IBM Plex Mono', monospace",
-                                fontSize: 11,
-                                padding: '2px 8px',
-                                borderRadius: 4,
-                                background: 'rgba(168,71,43,0.1)',
-                                color: 'var(--terracotta)',
-                                border: '1px solid var(--terracotta)',
-                                fontWeight: 700,
-                                marginRight: 8,
-                              }}
-                            >
-                              {proj.status}
-                            </span>
-                            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
-                              Pilar: <strong>{PILLAR_LABELS[proj.pillar] || proj.pillar}</strong>
-                            </span>
-                            <h3 style={{ margin: '8px 0 4px', fontSize: 20, fontFamily: "'Spectral', serif", fontWeight: 700 }}>
-                              {proj.title}
-                            </h3>
-                            <div style={{ fontSize: 13, color: 'var(--muted)' }}>
-                              Cliente: <strong style={{ color: 'var(--ink)' }}>{proj.client?.email || proj.client_id}</strong>
-                              {proj.client?.company && ` (${proj.client.company})`}
+                    {projects.map((proj) => {
+                      const totalMilestones = proj.milestones?.length || 0;
+                      const completedMilestones = proj.milestones?.filter((m) => m.status === 'COMPLETADO').length || 0;
+                      const progressPct = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
+
+                      return (
+                        <div
+                          key={proj.id}
+                          style={{
+                            background: 'var(--cream2)',
+                            borderRadius: 8,
+                            padding: '24px',
+                            border: '1px solid var(--border)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
+                            <div>
+                              <span
+                                style={{
+                                  fontFamily: "'IBM Plex Mono', monospace",
+                                  fontSize: 11,
+                                  padding: '2px 8px',
+                                  borderRadius: 4,
+                                  background: 'rgba(168,71,43,0.1)',
+                                  color: 'var(--terracotta)',
+                                  border: '1px solid var(--terracotta)',
+                                  fontWeight: 700,
+                                  marginRight: 8,
+                                }}
+                              >
+                                {proj.status}
+                              </span>
+                              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
+                                Pilar: <strong>{PILLAR_LABELS[proj.pillar] || proj.pillar}</strong>
+                              </span>
+                              <h3 style={{ margin: '8px 0 4px', fontSize: 20, fontFamily: "'Spectral', serif", fontWeight: 700 }}>
+                                {proj.title}
+                              </h3>
+                              <div style={{ fontSize: 13, color: 'var(--muted)' }}>
+                                Cliente: <strong style={{ color: 'var(--ink)' }}>{proj.client?.full_name ? `${proj.client.full_name} (${proj.client.email})` : (proj.client?.email || proj.client_id)}</strong>
+                                {proj.client?.company && ` — ${proj.client.company}`}
+                              </div>
+                            </div>
+
+                            <div style={{ textAlign: 'right', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                              <div>Inicio: {proj.start_date || 'N/A'}</div>
+                              {proj.target_completion_date && <div>Entrega estimada: {proj.target_completion_date}</div>}
                             </div>
                           </div>
 
-                          <div style={{ textAlign: 'right', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
-                            <div>Inicio: {proj.start_date || 'N/A'}</div>
-                            {proj.target_completion_date && <div>Entrega estimada: {proj.target_completion_date}</div>}
+                          {proj.description && (
+                            <p style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 16, whiteSpace: 'pre-line' }}>
+                              {proj.description}
+                            </p>
+                          )}
+
+                          {/* Progress Bar */}
+                          <div style={{ margin: '16px 0', background: '#fff', padding: 14, borderRadius: 6, border: '1px solid var(--border)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, fontSize: 12, fontFamily: "'IBM Plex Mono', monospace" }}>
+                              <span>Avance de Hitos: <strong>{completedMilestones} de {totalMilestones} completados</strong></span>
+                              <span style={{ fontWeight: 700, color: 'var(--terracotta)' }}>{progressPct}%</span>
+                            </div>
+                            <div style={{ width: '100%', height: 6, background: 'var(--cream2)', borderRadius: 3, overflow: 'hidden' }}>
+                              <div
+                                style={{
+                                  width: `${progressPct}%`,
+                                  height: '100%',
+                                  background: 'var(--terracotta)',
+                                  transition: 'width 0.3s ease',
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Milestones Accordion / List */}
+                          {proj.milestones && proj.milestones.length > 0 && (
+                            <div style={{ marginBottom: 16 }}>
+                              <div style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginBottom: 8, fontWeight: 600 }}>
+                                HITOS DE TRABAJO:
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                {proj.milestones.map((m) => {
+                                  const mColor = MILESTONE_STATUS_COLORS[m.status] || MILESTONE_STATUS_COLORS.PENDIENTE;
+                                  return (
+                                    <div
+                                      key={m.id}
+                                      style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        background: '#fff',
+                                        padding: '8px 12px',
+                                        borderRadius: 4,
+                                        border: '1px solid rgba(0,0,0,0.06)',
+                                        fontSize: 13,
+                                        flexWrap: 'wrap',
+                                        gap: 8,
+                                      }}
+                                    >
+                                      <div>
+                                        <strong>{m.title}</strong>
+                                        {m.due_date && (
+                                          <span style={{ marginLeft: 8, color: 'var(--muted)', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace" }}>
+                                            (Fecha: {m.due_date})
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <select
+                                          value={m.status}
+                                          onChange={(e) => handleUpdateMilestone(m.id, e.target.value)}
+                                          style={{
+                                            padding: '4px 8px',
+                                            borderRadius: 4,
+                                            border: `1px solid ${mColor.border}`,
+                                            background: mColor.bg,
+                                            color: mColor.text,
+                                            fontSize: 11,
+                                            fontFamily: "'IBM Plex Mono', monospace",
+                                            fontWeight: 700,
+                                          }}
+                                        >
+                                          <option value="PENDIENTE">PENDIENTE</option>
+                                          <option value="EN_PROCESO">EN_PROCESO</option>
+                                          <option value="COMPLETADO">COMPLETADO</option>
+                                          <option value="BLOQUEADO">BLOQUEADO</option>
+                                        </select>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Deliverables summary */}
+                          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 13 }}>
+                            <div>
+                              📍 <strong>{totalMilestones} Hitos</strong> registrados
+                            </div>
+                            <div>
+                              📦 <strong>{proj.deliverables?.length || 0} Entregables</strong> publicados
+                            </div>
+                            <div>
+                              👨‍💻 Tech Lead: <strong>{proj.tech_lead_name || 'Inmerge Lead'}</strong> ({proj.tech_lead_contact || 'contacto@inmerge.pe'})
+                            </div>
                           </div>
                         </div>
-
-                        {proj.description && (
-                          <p style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 16 }}>
-                            {proj.description}
-                          </p>
-                        )}
-
-                        {/* Milestones count and Deliverables */}
-                        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 13 }}>
-                          <div>
-                            📍 <strong>{proj.milestones?.length || 0} Hitos</strong> registrados
-                          </div>
-                          <div>
-                            📦 <strong>{proj.deliverables?.length || 0} Entregables</strong> publicados
-                          </div>
-                          <div>
-                            👨‍💻 Tech Lead: <strong>{proj.tech_lead_name || 'Inmerge Lead'}</strong>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -635,11 +924,9 @@ export default function Equipo() {
                   <form onSubmit={handleCreateProject} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     <div>
                       <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-                        UUID de Usuario Cliente *
+                        Cliente Asignado (Seleccionar Usuario Registrado) *
                       </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
+                      <select
                         value={newProj.clientId}
                         onChange={(e) => setNewProj({ ...newProj, clientId: e.target.value })}
                         required
@@ -649,10 +936,22 @@ export default function Equipo() {
                           borderRadius: 4,
                           border: '1px solid var(--border)',
                           fontSize: 13,
-                          fontFamily: "'IBM Plex Mono', monospace",
                           boxSizing: 'border-box',
+                          background: '#fff',
                         }}
-                      />
+                      >
+                        <option value="">-- Seleccionar Cliente ({clients.length} disponibles) --</option>
+                        {clients.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.full_name ? `${c.full_name} (${c.email})` : c.email} {c.company ? `— ${c.company}` : ''}
+                          </option>
+                        ))}
+                      </select>
+                      {clients.length === 0 && (
+                        <div style={{ fontSize: 11, color: 'var(--terracotta)', marginTop: 4 }}>
+                          Nota: No hay cuentas de cliente registradas aún. El cliente puede registrarse en /registro.
+                        </div>
+                      )}
                     </div>
 
                     <div>
@@ -704,7 +1003,7 @@ export default function Equipo() {
                         Descripción del Alcance
                       </label>
                       <textarea
-                        rows={3}
+                        rows={4}
                         placeholder="Objetivos técnicos, infraestructura evaluada y entregables acordados..."
                         value={newProj.description}
                         onChange={(e) => setNewProj({ ...newProj, description: e.target.value })}
@@ -789,7 +1088,7 @@ export default function Equipo() {
                             boxSizing: 'border-box',
                           }}
                         >
-                          <option value="">-- Seleccionar --</option>
+                          <option value="">-- Seleccionar Proyecto --</option>
                           {projects.map((p) => (
                             <option key={p.id} value={p.id}>{p.title}</option>
                           ))}
@@ -929,11 +1228,11 @@ export default function Equipo() {
                               boxSizing: 'border-box',
                             }}
                           >
-                            <option value="PDF">PDF / Informe</option>
-                            <option value="DASHBOARD_URL">Dashboard URL</option>
+                            <option value="PDF">PDF / Informe Técnico</option>
+                            <option value="DASHBOARD_URL">Dashboard BI URL</option>
                             <option value="REPO">Repositorio Git</option>
                             <option value="DATASET">Dataset / CSV</option>
-                            <option value="DOCUMENTO">Documento</option>
+                            <option value="DOCUMENTO">Documento Técnico</option>
                           </select>
                         </div>
 
@@ -1014,6 +1313,182 @@ export default function Equipo() {
                         {uploading ? 'Subiendo archivo...' : 'Publicar Entregable'}
                       </button>
                     </form>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: TEAM MANAGEMENT (ADMINS ONLY) */}
+            {activeTab === 'team' && user?.role === 'admin' && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
+                {/* Form: Register New Staff */}
+                <div
+                  style={{
+                    background: 'var(--cream2)',
+                    padding: 24,
+                    borderRadius: 8,
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: '0 0 16px', color: 'var(--ink)' }}>
+                    Alta de Nuevo Colaborador / Consultor
+                  </h3>
+                  <form onSubmit={handleCreateStaff} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                        Nombre Completo *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Andrea Valdivia"
+                        value={newStaff.fullName}
+                        onChange={(e) => setNewStaff({ ...newStaff, fullName: e.target.value })}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 13,
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                        Correo Institucional *
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="colaborador@inmerge.pe"
+                        value={newStaff.email}
+                        onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 13,
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                        Contraseña Inicial *
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="Contraseña segura"
+                        value={newStaff.password}
+                        onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })}
+                        required
+                        minLength={6}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 13,
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                        Rol Asignado *
+                      </label>
+                      <select
+                        value={newStaff.role}
+                        onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 13,
+                          boxSizing: 'border-box',
+                        }}
+                      >
+                        <option value="engineer">Ingeniero de Software / Cloud (engineer)</option>
+                        <option value="auditor">Auditor Técnico & Datos (auditor)</option>
+                        <option value="admin">Administrador General (admin)</option>
+                      </select>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={staffSubmitting}
+                      style={{
+                        background: 'var(--terracotta)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 20,
+                        padding: '10px 20px',
+                        fontSize: 14,
+                        fontWeight: 600,
+                        cursor: staffSubmitting ? 'not-allowed' : 'pointer',
+                        marginTop: 8,
+                      }}
+                    >
+                      {staffSubmitting ? 'Registrando...' : 'Registrar Colaborador'}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Staff List Table */}
+                <div
+                  style={{
+                    background: 'var(--cream2)',
+                    padding: 24,
+                    borderRadius: 8,
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: '0 0 16px', color: 'var(--ink)' }}>
+                    Equipo Interno ({staffList.length})
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {staffList.map((st) => (
+                      <div
+                        key={st.id}
+                        style={{
+                          background: '#fff',
+                          padding: '12px 16px',
+                          borderRadius: 6,
+                          border: '1px solid rgba(0,0,0,0.06)',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          gap: 8,
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 14 }}>{st.full_name || 'Sin nombre'}</div>
+                          <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: "'IBM Plex Mono', monospace" }}>{st.email}</div>
+                        </div>
+                        <span
+                          style={{
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontSize: 11,
+                            padding: '2px 8px',
+                            borderRadius: 4,
+                            background: st.role === 'admin' ? 'rgba(168,71,43,0.1)' : 'rgba(198,138,61,0.15)',
+                            color: st.role === 'admin' ? 'var(--terracotta)' : 'var(--ochre)',
+                            border: `1px solid ${st.role === 'admin' ? 'var(--terracotta)' : 'var(--ochre)'}`,
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {st.role}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>

@@ -1,6 +1,23 @@
 import { supabase } from './supabaseClient.js';
 
 /**
+ * Consulta la lista de clientes registrados en la plataforma.
+ */
+export async function fetchRegisteredClients() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, email, full_name, company, phone, role')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error al obtener clientes registrados:', error);
+    throw new Error(error.message || 'No se pudieron cargar los clientes');
+  }
+
+  return data || [];
+}
+
+/**
  * Consulta todas las solicitudes de cotización / TDRs para el equipo de consultores.
  */
 export async function fetchTeamLeads() {
@@ -228,6 +245,47 @@ export async function createDeliverableRecord({
   if (error) {
     console.error('Error al registrar entregable:', error);
     throw new Error(error.message || 'No se pudo registrar el entregable.');
+  }
+
+  return data;
+}
+
+/**
+ * Consulta la lista de miembros del equipo interno (staff).
+ */
+export async function fetchStaffMembers() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, email, full_name, role, created_at')
+    .in('role', ['admin', 'auditor', 'engineer'])
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error al obtener miembros del equipo:', error);
+    throw new Error(error.message || 'No se pudo cargar la lista del equipo');
+  }
+
+  return data || [];
+}
+
+/**
+ * Registra un nuevo colaborador interno mediante RPC seguro.
+ */
+export async function createStaffMember({ email, password, fullName, role = 'engineer' }) {
+  if (!email || !password || !fullName) {
+    throw new Error('Correo, contraseña y nombre completo son obligatorios.');
+  }
+
+  const { data, error } = await supabase.rpc('create_staff_member', {
+    new_email: email,
+    new_password: password,
+    new_full_name: fullName,
+    new_role: role,
+  });
+
+  if (error) {
+    console.error('Error al registrar colaborador:', error);
+    throw new Error(error.message || 'No se pudo registrar el colaborador.');
   }
 
   return data;
