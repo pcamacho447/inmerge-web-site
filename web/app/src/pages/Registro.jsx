@@ -47,13 +47,13 @@ export default function Registro() {
             marginBottom: 24,
           }}
         >
-          Tu cuenta te da acceso a todos los reportes publicados, sin costo.
+          Portal de seguimiento de proyectos, auditorías e informes técnicos.
         </div>
         <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', marginBottom: 12 }}>
           Crear cuenta
         </div>
         <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 32 }}>
-          Usamos esto para tu perfil de facturación, por si más adelante contratas una consultoría.
+          Registra tu cuenta corporativa para acceder al seguimiento de tus proyectos y entregables.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

@@ -108,7 +108,20 @@ export default function Login() {
               fontFamily: "'IBM Plex Sans',sans-serif",
             }}
           />
-          {error && <div style={{ fontSize: 13, color: 'var(--rose)' }}>{error}</div>}
+          {error && (
+            <div
+              style={{
+                fontSize: 13,
+                color: 'var(--rose)',
+                background: 'rgba(208, 138, 110, 0.12)',
+                padding: '10px 14px',
+                borderRadius: 4,
+                border: '1px solid var(--rose)',
+              }}
+            >
+              {typeof error === 'string' ? error : (error?.message || 'Tus credenciales son incorrectas.')}
+            </div>
+          )}
           <button
             type="submit"
             disabled={submitting}
