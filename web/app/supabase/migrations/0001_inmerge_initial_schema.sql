@@ -412,3 +412,42 @@
     RETURN v_user_id;
   END;
   $$;
+
+  -- ------------------------------------------------------------------------------
+  -- 10. TABLA DE AUDITORÍA Y TRAZABILIDAD (TEAM ACTIVITY LOGS)
+  -- Registra cambios en proyectos, estados de leads y entregables técnicos
+  -- ------------------------------------------------------------------------------
+  CREATE TABLE IF NOT EXISTS public.team_activity_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    action TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    entity_id UUID,
+    details JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+
+  ALTER TABLE public.team_activity_logs ENABLE ROW LEVEL SECURITY;
+
+  DROP POLICY IF EXISTS "Staff View Activity Logs" ON public.team_activity_logs;
+  CREATE POLICY "Staff View Activity Logs"
+    ON public.team_activity_logs FOR SELECT
+    TO authenticated
+    USING (public.is_staff());
+
+  DROP POLICY IF EXISTS "Staff Insert Activity Logs" ON public.team_activity_logs;
+  CREATE POLICY "Staff Insert Activity Logs"
+    ON public.team_activity_logs FOR INSERT
+    TO authenticated
+    WITH CHECK (public.is_staff());
+
+  -- ------------------------------------------------------------------------------
+  -- 11. ÍNDICES DE RENDIMIENTO Y CONSULTAS
+  -- ------------------------------------------------------------------------------
+  CREATE INDEX IF NOT EXISTS idx_leads_tdr_status_created ON public.leads_tdr (status, created_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_client_projects_client_status ON public.client_projects (client_id, status);
+  CREATE INDEX IF NOT EXISTS idx_project_milestones_proj_status ON public.project_milestones (project_id, status);
+  CREATE INDEX IF NOT EXISTS idx_project_deliverables_proj ON public.project_deliverables (project_id);
+  CREATE INDEX IF NOT EXISTS idx_activity_logs_created ON public.team_activity_logs (created_at DESC);
+
+  GRANT SELECT, INSERT ON public.team_activity_logs TO authenticated;
