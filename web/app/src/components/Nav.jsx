@@ -41,12 +41,32 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
             {link.label}
           </Link>
         ))}
+        {user?.isStaff && (
+          <Link
+            to="/equipo"
+            className="link-hover"
+            style={{
+              color: 'var(--terracotta)',
+              fontWeight: pathname === '/equipo' ? 700 : 600,
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            <span>Panel Equipo</span>
+            <span style={{ fontSize: 10, background: 'var(--terracotta)', color: '#fff', padding: '1px 5px', borderRadius: 3, fontFamily: "'IBM Plex Mono', monospace" }}>
+              STAFF
+            </span>
+          </Link>
+        )}
         <Link
-          to={user ? '/cuenta' : '/login'}
+          to={user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login'}
           className="link-hover"
-          style={{ color: 'var(--ink)', fontWeight: pathname === '/cuenta' ? 600 : 400, flexShrink: 0, whiteSpace: 'nowrap' }}
+          style={{ color: 'var(--ink)', fontWeight: (pathname === '/cuenta' || pathname === '/equipo') ? 600 : 400, flexShrink: 0, whiteSpace: 'nowrap' }}
         >
-          {user ? 'Mi cuenta' : 'Iniciar sesión'}
+          {user ? (user.isStaff ? 'Portal Clientes' : 'Mi cuenta') : 'Iniciar sesión'}
         </Link>
       </div>
       <a

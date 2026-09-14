@@ -73,8 +73,25 @@ export default function MobileMenu({ onClose }) {
             {link.label}
           </Link>
         ))}
+        {user?.isStaff && (
+          <Link
+            to="/equipo"
+            onClick={onClose}
+            className="row-hover"
+            style={{
+              fontFamily: "'Spectral',serif",
+              fontWeight: 600,
+              fontSize: 22,
+              color: 'var(--terracotta)',
+              padding: '18px 0',
+              borderTop: '1px solid var(--border)',
+            }}
+          >
+            Panel Equipo [STAFF]
+          </Link>
+        )}
         <Link
-          to={user ? '/cuenta' : '/login'}
+          to={user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login'}
           onClick={onClose}
           className="row-hover"
           style={{
@@ -87,7 +104,7 @@ export default function MobileMenu({ onClose }) {
             borderBottom: '1px solid var(--border)',
           }}
         >
-          {user ? 'Mi cuenta' : 'Iniciar sesión'}
+          {user ? (user.isStaff ? 'Portal de Clientes' : 'Mi cuenta') : 'Iniciar sesión'}
         </Link>
       </div>
       <a

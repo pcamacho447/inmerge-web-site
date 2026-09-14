@@ -1,0 +1,1028 @@
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import useDocumentHead from '../hooks/useDocumentHead.js';
+import Footer from '../components/Footer.jsx';
+import { useAuth } from '../lib/auth.jsx';
+import {
+  fetchTeamLeads,
+  updateLeadStatus,
+  fetchTeamProjects,
+  createTeamProject,
+  addProjectMilestone,
+  updateMilestoneStatus,
+  uploadDeliverableFile,
+  createDeliverableRecord,
+} from '../lib/team.js';
+
+const PILLAR_LABELS = {
+  auditoria: '01. Auditoría Técnica & Datos',
+  desarrollo: '02. Desarrollo Cloud & AWS',
+  datos: '03. Datos & IA',
+  integral: 'Solución Integral',
+};
+
+const STATUS_COLORS = {
+  NUEVO: { bg: 'rgba(168, 71, 43, 0.1)', text: 'var(--terracotta)', border: 'var(--terracotta)' },
+  EN_REVISION: { bg: 'rgba(198, 138, 61, 0.12)', text: 'var(--ochre)', border: 'var(--ochre)' },
+  CONTACTADO: { bg: 'rgba(216, 168, 78, 0.15)', text: '#9B7322', border: 'var(--gold)' },
+  PROPUESTA_ENVIADA: { bg: 'rgba(74, 114, 186, 0.1)', text: '#345995', border: '#345995' },
+  CERRADO_GANADO: { bg: 'rgba(46, 117, 89, 0.12)', text: '#2E7559', border: '#2E7559' },
+  DESCARTADO: { bg: 'rgba(0,0,0,0.05)', text: 'var(--muted)', border: 'var(--border)' },
+};
+
+export default function Equipo() {
+  useDocumentHead({ title: 'Panel de Equipo & Consultores — Inmerge', path: '/equipo', noIndex: true });
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState('leads'); // 'leads' | 'projects' | 'new_project'
+  const [leads, setLeads] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [statusMsg, setStatusMsg] = useState(null);
+
+  // New Project Form State
+  const [newProj, setNewProj] = useState({
+    clientId: '',
+    title: '',
+    pillar: 'auditoria',
+    description: '',
+    targetCompletionDate: '',
+    techLeadName: user?.fullName || 'Inmerge Tech Lead',
+    techLeadContact: user?.email || 'contacto@inmerge.pe',
+  });
+
+  // Milestone Form State
+  const [newMilestone, setNewMilestone] = useState({
+    projectId: '',
+    title: '',
+    description: '',
+    dueDate: '',
+  });
+
+  // Deliverable Upload Form State
+  const [newDeliv, setNewDeliv] = useState({
+    projectId: '',
+    milestoneId: '',
+    title: '',
+    fileType: 'PDF',
+    externalUrl: '',
+    version: 'v1.0',
+    notes: '',
+  });
+  const [delivFile, setDelivFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  async function loadData() {
+    setLoading(true);
+    setError(null);
+    try {
+      const [leadsData, projsData] = await Promise.all([
+        fetchTeamLeads().catch(() => []),
+        fetchTeamProjects().catch(() => []),
+      ]);
+      setLeads(leadsData);
+      setProjects(projsData);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleUpdateLead(leadId, newStatus, currentNotes) {
+    try {
+      await updateLeadStatus(leadId, { status: newStatus });
+      setLeads((prev) =>
+        prev.map((l) => (l.id === leadId ? { ...l, status: newStatus } : l))
+      );
+      showTemporaryMsg('Estado del lead actualizado con éxito.');
+    } catch (err) {
+      alert(`Error al actualizar lead: ${err.message}`);
+    }
+  }
+
+  async function handleCreateProject(e) {
+    e.preventDefault();
+    if (!newProj.clientId || !newProj.title) {
+      alert('Por favor completa el ID del cliente y el título del proyecto.');
+      return;
+    }
+
+    try {
+      const created = await createTeamProject(newProj);
+      showTemporaryMsg(`Proyecto "${created.title}" creado exitosamente.`);
+      setNewProj({
+        clientId: '',
+        title: '',
+        pillar: 'auditoria',
+        description: '',
+        targetCompletionDate: '',
+        techLeadName: user?.fullName || 'Inmerge Tech Lead',
+        techLeadContact: user?.email || 'contacto@inmerge.pe',
+      });
+      loadData();
+      setActiveTab('projects');
+    } catch (err) {
+      alert(`Error al crear proyecto: ${err.message}`);
+    }
+  }
+
+  async function handleAddMilestone(e) {
+    e.preventDefault();
+    if (!newMilestone.projectId || !newMilestone.title) {
+      alert('Selecciona un proyecto e ingresa el título del hito.');
+      return;
+    }
+
+    try {
+      await addProjectMilestone({
+        projectId: newMilestone.projectId,
+        title: newMilestone.title,
+        description: newMilestone.description,
+        dueDate: newMilestone.dueDate || null,
+      });
+      showTemporaryMsg('Hito agregado correctamente.');
+      setNewMilestone({ projectId: '', title: '', description: '', dueDate: '' });
+      loadData();
+    } catch (err) {
+      alert(`Error al agregar hito: ${err.message}`);
+    }
+  }
+
+  async function handleUploadDeliverable(e) {
+    e.preventDefault();
+    if (!newDeliv.projectId || !newDeliv.title) {
+      alert('Selecciona el proyecto e ingresa el nombre del entregable.');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      let filePath = null;
+      if (delivFile) {
+        const fileExt = delivFile.name.split('.').pop();
+        const safeName = `${newDeliv.projectId}/${Date.now()}_${delivFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        filePath = await uploadDeliverableFile(delivFile, safeName);
+      }
+
+      await createDeliverableRecord({
+        projectId: newDeliv.projectId,
+        milestoneId: newDeliv.milestoneId || null,
+        title: newDeliv.title,
+        fileType: newDeliv.fileType,
+        filePath,
+        externalUrl: newDeliv.externalUrl || null,
+        version: newDeliv.version || 'v1.0',
+        notes: newDeliv.notes || '',
+      });
+
+      showTemporaryMsg('Entregable publicado y disponible para el cliente.');
+      setNewDeliv({
+        projectId: '',
+        milestoneId: '',
+        title: '',
+        fileType: 'PDF',
+        externalUrl: '',
+        version: 'v1.0',
+        notes: '',
+      });
+      setDelivFile(null);
+      loadData();
+    } catch (err) {
+      alert(`Error al publicar entregable: ${err.message}`);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function showTemporaryMsg(msg) {
+    setStatusMsg(msg);
+    setTimeout(() => setStatusMsg(null), 4000);
+  }
+
+  async function handleLogout() {
+    await logout();
+    navigate('/');
+  }
+
+  return (
+    <>
+      <div style={{ maxWidth: 1120, margin: '0 auto', padding: '120px clamp(20px,5vw,40px) 80px' }}>
+        {/* Header Bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 16, marginBottom: 12 }}>
+          <div>
+            <div
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 12,
+                color: 'var(--terracotta)',
+                letterSpacing: 2,
+                marginBottom: 6,
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <span>PANEL DE EQUIPO & CONSULTORÍA</span>
+              <span
+                style={{
+                  background: 'var(--terracotta)',
+                  color: '#fff',
+                  fontSize: 10,
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {user?.role || 'STAFF'}
+              </span>
+            </div>
+            <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,42px)', margin: 0 }}>
+              Gestión Operativa de Auditorías & Proyectos
+            </h1>
+          </div>
+
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <Link
+              to="/cuenta"
+              style={{
+                fontSize: 13,
+                fontFamily: "'IBM Plex Mono', monospace",
+                color: 'var(--ink)',
+                textDecoration: 'none',
+                borderBottom: '1px dotted var(--terracotta)',
+              }}
+            >
+              Vista de Cliente →
+            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="btn-outline-hover"
+              style={{
+                background: 'none',
+                border: '1px solid var(--border)',
+                color: 'var(--ink)',
+                borderRadius: 20,
+                padding: '8px 18px',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontFamily: "'IBM Plex Sans',sans-serif",
+              }}
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+
+        <div style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 32 }}>
+          Consultor conectado: <strong style={{ color: 'var(--ink)' }}>{user?.email}</strong> ({user?.fullName || 'Inmerge Staff'})
+        </div>
+
+        {/* Feedback Alert */}
+        {statusMsg && (
+          <div
+            style={{
+              padding: '12px 18px',
+              borderRadius: 8,
+              background: 'rgba(46, 117, 89, 0.15)',
+              border: '1px solid #2E7559',
+              color: '#1b4d3a',
+              marginBottom: 24,
+              fontSize: 14,
+              fontWeight: 500,
+            }}
+          >
+            ✓ {statusMsg}
+          </div>
+        )}
+
+        {/* Navigation Tabs */}
+        <div
+          style={{
+            display: 'flex',
+            gap: 12,
+            borderBottom: '1px solid var(--border)',
+            marginBottom: 36,
+            overflowX: 'auto',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveTab('leads')}
+            style={{
+              background: 'none',
+              border: 'none',
+              borderBottom: activeTab === 'leads' ? '3px solid var(--terracotta)' : '3px solid transparent',
+              padding: '12px 20px',
+              fontSize: 15,
+              fontWeight: activeTab === 'leads' ? 700 : 500,
+              color: activeTab === 'leads' ? 'var(--terracotta)' : 'var(--muted)',
+              cursor: 'pointer',
+              fontFamily: "'IBM Plex Sans', sans-serif",
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span>Bandeja de Leads & TDR</span>
+            <span
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 11,
+                padding: '2px 6px',
+                borderRadius: 10,
+                background: activeTab === 'leads' ? 'var(--terracotta)' : 'var(--border)',
+                color: activeTab === 'leads' ? '#fff' : 'var(--ink)',
+              }}
+            >
+              {leads.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('projects')}
+            style={{
+              background: 'none',
+              border: 'none',
+              borderBottom: activeTab === 'projects' ? '3px solid var(--terracotta)' : '3px solid transparent',
+              padding: '12px 20px',
+              fontSize: 15,
+              fontWeight: activeTab === 'projects' ? 700 : 500,
+              color: activeTab === 'projects' ? 'var(--terracotta)' : 'var(--muted)',
+              cursor: 'pointer',
+              fontFamily: "'IBM Plex Sans', sans-serif",
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span>Proyectos & Auditorías</span>
+            <span
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 11,
+                padding: '2px 6px',
+                borderRadius: 10,
+                background: activeTab === 'projects' ? 'var(--terracotta)' : 'var(--border)',
+                color: activeTab === 'projects' ? '#fff' : 'var(--ink)',
+              }}
+            >
+              {projects.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('new_project')}
+            style={{
+              background: 'none',
+              border: 'none',
+              borderBottom: activeTab === 'new_project' ? '3px solid var(--terracotta)' : '3px solid transparent',
+              padding: '12px 20px',
+              fontSize: 15,
+              fontWeight: activeTab === 'new_project' ? 700 : 500,
+              color: activeTab === 'new_project' ? 'var(--terracotta)' : 'var(--muted)',
+              cursor: 'pointer',
+              fontFamily: "'IBM Plex Sans', sans-serif",
+            }}
+          >
+            + Crear Proyecto / Entregable
+          </button>
+        </div>
+
+        {/* Content Tabs */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
+            <p>Cargando información del equipo técnico...</p>
+          </div>
+        ) : (
+          <>
+            {/* TAB 1: LEADS TDR */}
+            {activeTab === 'leads' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: 0 }}>
+                    Solicitudes de Cotización Recibidas ({leads.length})
+                  </h2>
+                </div>
+
+                {leads.length === 0 ? (
+                  <div
+                    style={{
+                      padding: 40,
+                      textAlign: 'center',
+                      background: 'var(--cream2)',
+                      borderRadius: 8,
+                      border: '1px dashed var(--border)',
+                    }}
+                  >
+                    <p style={{ color: 'var(--muted)', margin: 0 }}>No hay solicitudes de cotización registradas aún.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {leads.map((lead) => {
+                      const color = STATUS_COLORS[lead.status] || STATUS_COLORS.NUEVO;
+                      return (
+                        <div
+                          key={lead.id}
+                          style={{
+                            background: 'var(--cream2)',
+                            borderRadius: 8,
+                            padding: '24px',
+                            border: '1px solid var(--border)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                                <span
+                                  style={{
+                                    fontFamily: "'IBM Plex Mono', monospace",
+                                    fontSize: 11,
+                                    padding: '3px 8px',
+                                    borderRadius: 4,
+                                    background: color.bg,
+                                    color: color.text,
+                                    border: `1px solid ${color.border}`,
+                                    fontWeight: 700,
+                                  }}
+                                >
+                                  {lead.status}
+                                </span>
+                                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--terracotta)', fontWeight: 600 }}>
+                                  {PILLAR_LABELS[lead.pillar] || lead.pillar}
+                                </span>
+                              </div>
+                              <h3 style={{ margin: '4px 0', fontSize: 18, fontWeight: 700 }}>
+                                {lead.company ? `${lead.company} — ` : ''}{lead.full_name || 'Solicitud Anónima'}
+                              </h3>
+                            </div>
+
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
+                                {new Date(lead.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div style={{ background: '#fff', padding: 14, borderRadius: 6, marginBottom: 14, border: '1px solid rgba(0,0,0,0.06)' }}>
+                            <div style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginBottom: 4 }}>
+                              DESCRIPCIÓN DEL REQUERIMIENTO / TDR:
+                            </div>
+                            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'var(--ink)' }}>
+                              {lead.message}
+                            </p>
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, fontSize: 13 }}>
+                            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', color: 'var(--muted)' }}>
+                              <span>📧 <strong style={{ color: 'var(--ink)' }}>{lead.email}</strong></span>
+                              {lead.phone && <span>📞 <strong style={{ color: 'var(--ink)' }}>{lead.phone}</strong></span>}
+                              {lead.timeline && <span>⏱️ Plazo: <strong style={{ color: 'var(--ink)' }}>{lead.timeline}</strong></span>}
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <label style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace" }}>Cambiar estado:</label>
+                              <select
+                                value={lead.status}
+                                onChange={(e) => handleUpdateLead(lead.id, e.target.value, lead.notes)}
+                                style={{
+                                  padding: '6px 12px',
+                                  borderRadius: 4,
+                                  border: '1px solid var(--border)',
+                                  background: '#fff',
+                                  fontSize: 12,
+                                  fontFamily: "'IBM Plex Mono', monospace",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                <option value="NUEVO">NUEVO</option>
+                                <option value="EN_REVISION">EN_REVISION</option>
+                                <option value="CONTACTADO">CONTACTADO</option>
+                                <option value="PROPUESTA_ENVIADA">PROPUESTA_ENVIADA</option>
+                                <option value="CERRADO_GANADO">CERRADO_GANADO</option>
+                                <option value="DESCARTADO">DESCARTADO</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 2: PROJECTS & AUDITS */}
+            {activeTab === 'projects' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: 0 }}>
+                    Proyectos en Curso & Auditorías ({projects.length})
+                  </h2>
+                </div>
+
+                {projects.length === 0 ? (
+                  <div
+                    style={{
+                      padding: 40,
+                      textAlign: 'center',
+                      background: 'var(--cream2)',
+                      borderRadius: 8,
+                      border: '1px dashed var(--border)',
+                    }}
+                  >
+                    <p style={{ color: 'var(--muted)', margin: 0 }}>No hay proyectos activos registrados.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                    {projects.map((proj) => (
+                      <div
+                        key={proj.id}
+                        style={{
+                          background: 'var(--cream2)',
+                          borderRadius: 8,
+                          padding: '24px',
+                          border: '1px solid var(--border)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
+                          <div>
+                            <span
+                              style={{
+                                fontFamily: "'IBM Plex Mono', monospace",
+                                fontSize: 11,
+                                padding: '2px 8px',
+                                borderRadius: 4,
+                                background: 'rgba(168,71,43,0.1)',
+                                color: 'var(--terracotta)',
+                                border: '1px solid var(--terracotta)',
+                                fontWeight: 700,
+                                marginRight: 8,
+                              }}
+                            >
+                              {proj.status}
+                            </span>
+                            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
+                              Pilar: <strong>{PILLAR_LABELS[proj.pillar] || proj.pillar}</strong>
+                            </span>
+                            <h3 style={{ margin: '8px 0 4px', fontSize: 20, fontFamily: "'Spectral', serif", fontWeight: 700 }}>
+                              {proj.title}
+                            </h3>
+                            <div style={{ fontSize: 13, color: 'var(--muted)' }}>
+                              Cliente: <strong style={{ color: 'var(--ink)' }}>{proj.client?.email || proj.client_id}</strong>
+                              {proj.client?.company && ` (${proj.client.company})`}
+                            </div>
+                          </div>
+
+                          <div style={{ textAlign: 'right', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                            <div>Inicio: {proj.start_date || 'N/A'}</div>
+                            {proj.target_completion_date && <div>Entrega estimada: {proj.target_completion_date}</div>}
+                          </div>
+                        </div>
+
+                        {proj.description && (
+                          <p style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 16 }}>
+                            {proj.description}
+                          </p>
+                        )}
+
+                        {/* Milestones count and Deliverables */}
+                        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 13 }}>
+                          <div>
+                            📍 <strong>{proj.milestones?.length || 0} Hitos</strong> registrados
+                          </div>
+                          <div>
+                            📦 <strong>{proj.deliverables?.length || 0} Entregables</strong> publicados
+                          </div>
+                          <div>
+                            👨‍💻 Tech Lead: <strong>{proj.tech_lead_name || 'Inmerge Lead'}</strong>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 3: CREATE PROJECT / ADD DELIVERABLE */}
+            {activeTab === 'new_project' && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
+                {/* Form 1: New Project */}
+                <div
+                  style={{
+                    background: 'var(--cream2)',
+                    padding: 24,
+                    borderRadius: 8,
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: '0 0 16px', color: 'var(--ink)' }}>
+                    1. Registrar Nuevo Proyecto
+                  </h3>
+                  <form onSubmit={handleCreateProject} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                        UUID de Usuario Cliente *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
+                        value={newProj.clientId}
+                        onChange={(e) => setNewProj({ ...newProj, clientId: e.target.value })}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 13,
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                        Nombre del Proyecto / Auditoría *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Auditoría Integral de Base de Datos y AWS"
+                        value={newProj.title}
+                        onChange={(e) => setNewProj({ ...newProj, title: e.target.value })}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 13,
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                        Pilar Estratégico *
+                      </label>
+                      <select
+                        value={newProj.pillar}
+                        onChange={(e) => setNewProj({ ...newProj, pillar: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 13,
+                          boxSizing: 'border-box',
+                        }}
+                      >
+                        <option value="auditoria">01. Auditoría Técnica & Datos</option>
+                        <option value="desarrollo">02. Desarrollo Cloud & AWS</option>
+                        <option value="datos">03. Datos & IA</option>
+                        <option value="integral">Solución Integral Multi-pilar</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                        Descripción del Alcance
+                      </label>
+                      <textarea
+                        rows={3}
+                        placeholder="Objetivos técnicos, infraestructura evaluada y entregables acordados..."
+                        value={newProj.description}
+                        onChange={(e) => setNewProj({ ...newProj, description: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 13,
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                        Fecha Estimada de Entrega
+                      </label>
+                      <input
+                        type="date"
+                        value={newProj.targetCompletionDate}
+                        onChange={(e) => setNewProj({ ...newProj, targetCompletionDate: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 13,
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      style={{
+                        background: 'var(--terracotta)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 20,
+                        padding: '10px 20px',
+                        fontSize: 14,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        marginTop: 8,
+                      }}
+                    >
+                      Guardar Proyecto
+                    </button>
+                  </form>
+                </div>
+
+                {/* Form 2: Add Milestone & Upload Deliverable */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                  {/* Milestone Form */}
+                  <div
+                    style={{
+                      background: 'var(--cream2)',
+                      padding: 24,
+                      borderRadius: 8,
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: '0 0 16px', color: 'var(--ink)' }}>
+                      2. Agregar Hito a Proyecto
+                    </h3>
+                    <form onSubmit={handleAddMilestone} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                          Seleccionar Proyecto *
+                        </label>
+                        <select
+                          value={newMilestone.projectId}
+                          onChange={(e) => setNewMilestone({ ...newMilestone, projectId: e.target.value })}
+                          required
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            borderRadius: 4,
+                            border: '1px solid var(--border)',
+                            fontSize: 13,
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <option value="">-- Seleccionar --</option>
+                          {projects.map((p) => (
+                            <option key={p.id} value={p.id}>{p.title}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                          Título del Hito *
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Fase 01 — Diagnóstico de Queries y Rendimiento"
+                          value={newMilestone.title}
+                          onChange={(e) => setNewMilestone({ ...newMilestone, title: e.target.value })}
+                          required
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            borderRadius: 4,
+                            border: '1px solid var(--border)',
+                            fontSize: 13,
+                            boxSizing: 'border-box',
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                          Fecha Límite
+                        </label>
+                        <input
+                          type="date"
+                          value={newMilestone.dueDate}
+                          onChange={(e) => setNewMilestone({ ...newMilestone, dueDate: e.target.value })}
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            borderRadius: 4,
+                            border: '1px solid var(--border)',
+                            fontSize: 13,
+                            boxSizing: 'border-box',
+                          }}
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        style={{
+                          background: 'var(--ink)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 20,
+                          padding: '9px 18px',
+                          fontSize: 13,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        + Añadir Hito
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Deliverable Form */}
+                  <div
+                    style={{
+                      background: 'var(--cream2)',
+                      padding: 24,
+                      borderRadius: 8,
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: '0 0 16px', color: 'var(--ink)' }}>
+                      3. Publicar Entregable / Informe Técnico
+                    </h3>
+                    <form onSubmit={handleUploadDeliverable} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                          Proyecto Destino *
+                        </label>
+                        <select
+                          value={newDeliv.projectId}
+                          onChange={(e) => setNewDeliv({ ...newDeliv, projectId: e.target.value })}
+                          required
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            borderRadius: 4,
+                            border: '1px solid var(--border)',
+                            fontSize: 13,
+                            boxSizing: 'border-box',
+                          }}
+                        >
+                          <option value="">-- Seleccionar Proyecto --</option>
+                          {projects.map((p) => (
+                            <option key={p.id} value={p.id}>{p.title}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                          Nombre del Entregable *
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Informe_Auditoria_Arquitectura_Cloud_v1.0.pdf"
+                          value={newDeliv.title}
+                          onChange={(e) => setNewDeliv({ ...newDeliv, title: e.target.value })}
+                          required
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            borderRadius: 4,
+                            border: '1px solid var(--border)',
+                            fontSize: 13,
+                            boxSizing: 'border-box',
+                          }}
+                        />
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                            Tipo
+                          </label>
+                          <select
+                            value={newDeliv.fileType}
+                            onChange={(e) => setNewDeliv({ ...newDeliv, fileType: e.target.value })}
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              borderRadius: 4,
+                              border: '1px solid var(--border)',
+                              fontSize: 13,
+                              boxSizing: 'border-box',
+                            }}
+                          >
+                            <option value="PDF">PDF / Informe</option>
+                            <option value="DASHBOARD_URL">Dashboard URL</option>
+                            <option value="REPO">Repositorio Git</option>
+                            <option value="DATASET">Dataset / CSV</option>
+                            <option value="DOCUMENTO">Documento</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                            Versión
+                          </label>
+                          <input
+                            type="text"
+                            value={newDeliv.version}
+                            onChange={(e) => setNewDeliv({ ...newDeliv, version: e.target.value })}
+                            placeholder="v1.0"
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              borderRadius: 4,
+                              border: '1px solid var(--border)',
+                              fontSize: 13,
+                              boxSizing: 'border-box',
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {newDeliv.fileType === 'PDF' || newDeliv.fileType === 'DATASET' || newDeliv.fileType === 'DOCUMENTO' ? (
+                        <div>
+                          <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                            Subir Archivo a Storage Seguro
+                          </label>
+                          <input
+                            type="file"
+                            onChange={(e) => setDelivFile(e.target.files?.[0] || null)}
+                            style={{
+                              width: '100%',
+                              padding: '6px',
+                              fontSize: 12,
+                              boxSizing: 'border-box',
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                            URL Externa (Dashboard / Repositorio)
+                          </label>
+                          <input
+                            type="url"
+                            placeholder="https://lookerstudio.google.com/..."
+                            value={newDeliv.externalUrl}
+                            onChange={(e) => setNewDeliv({ ...newDeliv, externalUrl: e.target.value })}
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              borderRadius: 4,
+                              border: '1px solid var(--border)',
+                              fontSize: 13,
+                              boxSizing: 'border-box',
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      <button
+                        type="submit"
+                        disabled={uploading}
+                        style={{
+                          background: 'var(--terracotta)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 20,
+                          padding: '10px 20px',
+                          fontSize: 14,
+                          fontWeight: 600,
+                          cursor: uploading ? 'not-allowed' : 'pointer',
+                          opacity: uploading ? 0.7 : 1,
+                        }}
+                      >
+                        {uploading ? 'Subiendo archivo...' : 'Publicar Entregable'}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <Footer />
+    </>
+  );
+}

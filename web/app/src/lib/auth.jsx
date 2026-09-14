@@ -41,56 +41,66 @@ function saveMockState(userId, state) {
 // que dos llamadas concurrentes no pueden duplicar la organización. Devuelve
 // false si la sesión es basura (usuario borrado o proyecto reconstruido), y en
 // ese caso cerramos sesión en vez de reintentar en cada getSession.
-async function ensureProfile() {
-  const { error } = await supabase.rpc('ensure_profile');
-  if (!error) return true;
+async function ensureProfile(sessionUser) {
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('id, role')
+      .eq('id', sessionUser.id)
+      .maybeSingle();
 
-  // P0002 = no_data_found: ensure_profile() (migración 0008) hace
-  // `select ... into strict ... from auth.users where id = v_uid` y Postgres
-  // levanta ese código solo cuando no hay fila. auth.uid() lee el `sub` del
-  // JWT directamente, sin consultar ninguna tabla, así que un usuario borrado
-  // (o un proyecto reconstruido) sigue teniendo un JWT sin expirar — nunca
-  // vemos un error de permisos acá, solo la ausencia de la fila. Esa es la
-  // sesión zombi real.
-  if (error.code === 'P0002') {
-    await supabase.auth.signOut();
-    return false;
+    if (error) {
+      console.warn('Profiles check error:', error.message);
+      return true;
+    }
+
+    if (!profile) {
+      // Si el trigger de la BD aún no creó el perfil o es un usuario preexistente
+      await supabase.from('profiles').insert({
+        id: sessionUser.id,
+        email: sessionUser.email,
+        full_name: sessionUser.user_metadata?.full_name || sessionUser.email?.split('@')[0] || '',
+        role: sessionUser.user_metadata?.role || 'client',
+      }).maybeSingle();
+    }
+    return true;
+  } catch (err) {
+    console.warn('ensureProfile exception:', err);
+    return true;
   }
-  console.error('ensure_profile failed:', error);
-  return true;
 }
 
 async function fetchProfileFields(userId) {
-  const { data: profile } = await supabase.from('profiles').select('full_name, organization_id').eq('id', userId).maybeSingle();
-  if (!profile) return { fullName: '', billingType: null, taxId: null };
-
-  let billingType = null;
-  let taxId = null;
-  if (profile.organization_id) {
-    const { data: org } = await supabase
-      .from('organizations')
-      .select('billing_type, tax_id')
-      .eq('id', profile.organization_id)
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('full_name, company, phone, role')
+      .eq('id', userId)
       .maybeSingle();
-    billingType = org?.billing_type ?? null;
-    taxId = org?.tax_id ?? null;
+
+    if (error || !profile) {
+      return { fullName: '', company: '', phone: '', role: 'client', isStaff: false };
+    }
+
+    const role = profile.role || 'client';
+    const isStaff = ['admin', 'auditor', 'engineer'].includes(role);
+
+    return {
+      fullName: profile.full_name || '',
+      company: profile.company || '',
+      phone: profile.phone || '',
+      role,
+      isStaff,
+    };
+  } catch {
+    return { fullName: '', company: '', phone: '', role: 'client', isStaff: false };
   }
-  return { fullName: profile.full_name || '', billingType, taxId };
 }
 
 async function buildUser(sessionUser) {
-  const sessionValid = await ensureProfile();
-  if (!sessionValid) return null; // sesión zombi: ya cerramos sesión
-
+  await ensureProfile(sessionUser);
   const profileFields = await fetchProfileFields(sessionUser.id);
 
-  // Nada en src/ lee user.subscription/user.purchases fuera de subscribe()/
-  // purchaseReport() acá mismo (el checkout simulado de DEMO_MODE) — no hay
-  // lectura real de `subscriptions`/`purchases` ni de `orders` en cada cambio
-  // de sesión: esas tablas ya no gatean nada en la UI (el acceso real lo
-  // decide has_access() del lado del servidor al momento de la descarga), así
-  // que no vale la pena pagar el round-trip en el camino crítico de crear una
-  // cuenta. Con la bandera apagada (default) esto es null/[] sin tocar la BD.
   const mockState = DEMO_MODE ? loadMockState(sessionUser.id) : { subscription: null, purchases: [] };
 
   return {

@@ -11,6 +11,7 @@ import Contacto from './pages/Contacto.jsx';
 import Login from './pages/Login.jsx';
 import Registro from './pages/Registro.jsx';
 import Cuenta from './pages/Cuenta.jsx';
+import Equipo from './pages/Equipo.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 export default function App() {
@@ -31,6 +32,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Cuenta />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/equipo"
+            element={
+              <ProtectedRoute requireStaff>
+                <Equipo />
               </ProtectedRoute>
             }
           />

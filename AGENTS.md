@@ -22,7 +22,8 @@ Consulte las especificaciones técnicas del entorno en:
   - `/nosotros` (Nosotros): Manifiesto de ingeniería, compromisos técnicos y perfiles senior.
   - `/contacto` (Contacto & TDR): Formulario estructurado con selector de pilares y enlace con mensaje pre-rellenado a WhatsApp.
 - **Rutas de Autenticación & Clientes:**
-  - `/login`, `/registro`, `/cuenta` (Portal de Clientes): Destinado al seguimiento de proyectos y auditorías en curso.
+  - `/login`, `/registro`, `/cuenta` (Portal de Clientes): Seguimiento exclusivo de proyectos propios, cronogramas e informes técnicos.
+  - `/equipo` (Panel de Colaboradores & Consultores): Gestión técnica de leads TDR, creación de proyectos y publicación de entregables (requiere rol `admin`, `auditor` o `engineer`).
 - **Restricción de Negocio:** No reintroducir catálogos de reportes fiscales ni descargas cerradas de PDFs.
 
 ---
@@ -44,6 +45,6 @@ Consulte las especificaciones técnicas del entorno en:
 ---
 
 ## 4. Estándares de Código y Calidad
-1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 9 suites de pruebas deben pasar al 100%.
+1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 12 suites de pruebas (59+ tests) deben pasar al 100%.
 2. **Build de Producción:** Verificar que `npm run build` compile limpiamente sin errores de bundling.
 3. **Formato y Linter:** Mantener conformidad con `npm run lint` y `npm run format`.

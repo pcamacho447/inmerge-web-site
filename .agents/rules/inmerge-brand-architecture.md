@@ -34,13 +34,23 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 
 ---
 
-## 4. Estándares de Testing (Vitest + Testing Library)
+## 4. Arquitectura de Base de Datos y Supabase
+- **Esquema Inicial Maestro:** [`web/app/supabase/migrations/0001_inmerge_initial_schema.sql`](file:///c:/papx/inmerge-website/inmerge/web/app/supabase/migrations/0001_inmerge_initial_schema.sql)
+- **Idempotencia de Esquema:**
+  - Utilizar siempre `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` en `public.profiles` para evitar discrepancias con plantillas predeterminadas de Supabase.
+  - Roles soportados: `profiles.role IN ('client', 'auditor', 'engineer', 'admin')`.
+  - Bucket privado `project-deliverables` con políticas de lectura restringidas a clientes asignados y equipo técnico.
+
+---
+
+## 5. Estándares de Testing (Vitest + Testing Library)
 - **Defensiva para jsdom:** En componentes que invoquen `useReveal`, asegurarse de que `IntersectionObserver` esté protegido o mockeado en [`src/test-setup.js`](file:///c:/papx/inmerge-website/inmerge/web/app/src/test-setup.js).
 - **Comandos de Verificación:**
   ```bash
   cd web/app
-  npm test          # Ejecuta suite completa (48+ tests)
+  npm test          # Ejecuta suite completa (12 suites, 59+ tests)
   npm run build     # Valida el bundle de producción en Vite
   npm run lint      # Verifica ausencia de warnings de ESLint
   npm run format    # Aplica formato consistente con Prettier
   ```
+

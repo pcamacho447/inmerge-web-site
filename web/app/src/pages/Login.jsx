@@ -4,6 +4,8 @@ import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
 import { useAuth } from '../lib/auth.jsx';
 
+import { supabase } from '../lib/supabaseClient.js';
+
 export default function Login() {
   useDocumentHead({ title: 'Iniciar sesión — Inmerge', path: '/login', noIndex: true });
   const { login } = useAuth();
@@ -21,9 +23,36 @@ export default function Login() {
     setError('');
     try {
       await login(email.trim(), password);
-      navigate(location.state?.redirectTo || '/cuenta');
+
+      // Si el usuario venía con un redirectTo específico, respetar esa ruta
+      if (location.state?.redirectTo) {
+        navigate(location.state.redirectTo);
+        return;
+      }
+
+      // Redirección inteligente según el rol del usuario
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', authUser.id)
+          .maybeSingle();
+
+        const role = profile?.role || 'client';
+        if (['admin', 'auditor', 'engineer'].includes(role)) {
+          navigate('/equipo');
+          return;
+        }
+      }
+
+      navigate('/cuenta');
     } catch (err) {
-      setError(err.message || 'No se pudo iniciar sesión.');
+      if (err.message?.toLowerCase().includes('invalid login credentials') || err.message?.toLowerCase().includes('invalid grant') || err.status === 400) {
+        setError('Tus credenciales son incorrectas.');
+      } else {
+        setError(err.message || 'Tus credenciales son incorrectas.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -43,7 +72,7 @@ export default function Login() {
             marginBottom: 24,
           }}
         >
-          Tu cuenta te da acceso a todos los reportes publicados, sin costo.
+          Portal seguro de seguimiento de proyectos, auditorías y entregables técnicos.
         </div>
         <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', marginBottom: 32 }}>
           Iniciar sesión
