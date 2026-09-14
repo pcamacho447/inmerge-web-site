@@ -5,6 +5,9 @@ import { supabase } from './supabaseClient.js';
 vi.mock('./supabaseClient.js', () => ({
   supabase: {
     from: vi.fn(),
+    functions: {
+      invoke: vi.fn().mockResolvedValue({ data: { success: true }, error: null }),
+    },
   },
 }));
 
@@ -25,11 +28,12 @@ describe('leads.js - submitLeadTdr', () => {
     );
   });
 
-  it('successfully sanitizes and inserts lead into Supabase', async () => {
+  it('successfully sanitizes, inserts lead and triggers notify-lead-tdr', async () => {
+    const mockLeadData = { id: 'lead-123', email: 'cliente@empresa.com', status: 'NUEVO' };
     const mockInsert = vi.fn().mockReturnValue({
       select: vi.fn().mockReturnValue({
         single: vi.fn().mockResolvedValue({
-          data: { id: 'lead-123', email: 'cliente@empresa.com', status: 'NUEVO' },
+          data: mockLeadData,
           error: null,
         }),
       }),
@@ -63,5 +67,8 @@ describe('leads.js - submitLeadTdr', () => {
         status: 'NUEVO',
       },
     ]);
+    expect(supabase.functions.invoke).toHaveBeenCalledWith('notify-lead-tdr', {
+      body: { record: mockLeadData },
+    });
   });
 });

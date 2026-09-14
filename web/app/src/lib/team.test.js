@@ -11,6 +11,8 @@ import {
   createDeliverableRecord,
   fetchStaffMembers,
   createStaffMember,
+  fetchTeamActivityLogs,
+  logTeamActivity,
 } from './team.js';
 import { supabase } from './supabaseClient.js';
 
@@ -18,6 +20,12 @@ vi.mock('./supabaseClient.js', () => ({
   supabase: {
     from: vi.fn(),
     rpc: vi.fn(),
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'staff-user-1' } }, error: null }),
+    },
+    functions: {
+      invoke: vi.fn().mockResolvedValue({ data: { success: true }, error: null }),
+    },
     storage: {
       from: vi.fn(),
     },
@@ -51,13 +59,19 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
     expect(leads).toEqual(mockData);
   });
 
-  it('updateLeadStatus actualiza estado y notas de un lead', async () => {
+  it('updateLeadStatus actualiza estado y notas de un lead y registra auditoría', async () => {
     const mockUpdated = { id: 'lead-1', status: 'EN_REVISION', notes: 'Asignado a auditor senior' };
     const singleMock = vi.fn().mockResolvedValue({ data: mockUpdated, error: null });
     const selectMock = vi.fn().mockReturnValue({ single: singleMock });
     const eqMock = vi.fn().mockReturnValue({ select: selectMock });
     const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
-    supabase.from.mockReturnValue({ update: updateMock });
+    const insertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'leads_tdr') return { update: updateMock };
+      if (table === 'team_activity_logs') return { insert: insertMock };
+      return {};
+    });
 
     const result = await updateLeadStatus('lead-1', { status: 'EN_REVISION', notes: 'Asignado a auditor senior' });
     expect(supabase.from).toHaveBeenCalledWith('leads_tdr');
@@ -72,7 +86,13 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
     const singleMock = vi.fn().mockResolvedValue({ data: mockProject, error: null });
     const selectMock = vi.fn().mockReturnValue({ single: singleMock });
     const insertMock = vi.fn().mockReturnValue({ select: selectMock });
-    supabase.from.mockReturnValue({ insert: insertMock });
+    const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'client_projects') return { insert: insertMock };
+      if (table === 'team_activity_logs') return { insert: logInsertMock };
+      return {};
+    });
 
     const res = await createTeamProject({
       clientId: 'usr-123',
@@ -96,22 +116,31 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
     expect(path).toBe('reports/proj1.pdf');
   });
 
-  it('createDeliverableRecord registra un entregable en la base de datos', async () => {
+  it('createDeliverableRecord registra un entregable, loggea auditoría y dispara notify-deliverable', async () => {
     const mockDeliv = { id: 'deliv-1', title: 'Informe Final', file_type: 'PDF' };
     const singleMock = vi.fn().mockResolvedValue({ data: mockDeliv, error: null });
     const selectMock = vi.fn().mockReturnValue({ single: singleMock });
     const insertMock = vi.fn().mockReturnValue({ select: selectMock });
-    supabase.from.mockReturnValue({ insert: insertMock });
+    const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'project_deliverables') return { insert: insertMock };
+      if (table === 'team_activity_logs') return { insert: logInsertMock };
+      return {};
+    });
 
     const res = await createDeliverableRecord({
       projectId: 'proj-1',
       title: 'Informe Final',
       fileType: 'PDF',
       filePath: 'reports/proj1.pdf',
+      clientEmail: 'cliente@empresa.com',
+      clientName: 'Cliente Juan',
     });
 
     expect(supabase.from).toHaveBeenCalledWith('project_deliverables');
     expect(res).toEqual(mockDeliv);
+    expect(supabase.functions.invoke).toHaveBeenCalledWith('notify-deliverable', expect.any(Object));
   });
 
   it('fetchStaffMembers consulta los miembros del equipo interno', async () => {
@@ -134,6 +163,8 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
     await expect(createStaffMember({})).rejects.toThrow('Correo, contraseña y nombre completo son obligatorios.');
 
     supabase.rpc.mockResolvedValue({ data: 'staff-uuid-123', error: null });
+    const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+    supabase.from.mockImplementation(() => ({ insert: logInsertMock }));
 
     const res = await createStaffMember({
       email: 'nuevo@inmerge.pe',
@@ -149,5 +180,19 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       new_role: 'engineer',
     });
     expect(res).toBe('staff-uuid-123');
+  });
+
+  it('fetchTeamActivityLogs consulta los registros recientes de auditoría', async () => {
+    const mockLogs = [
+      { id: 'log-1', action: 'PROJECT_CREATED', entity_type: 'project', created_at: '2026-09-14T10:00:00Z' },
+    ];
+    const limitMock = vi.fn().mockResolvedValue({ data: mockLogs, error: null });
+    const orderMock = vi.fn().mockReturnValue({ limit: limitMock });
+    const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+    supabase.from.mockReturnValue({ select: selectMock });
+
+    const logs = await fetchTeamActivityLogs({ limit: 20 });
+    expect(supabase.from).toHaveBeenCalledWith('team_activity_logs');
+    expect(logs).toEqual(mockLogs);
   });
 });

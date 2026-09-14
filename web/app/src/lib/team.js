@@ -18,6 +18,56 @@ export async function fetchRegisteredClients() {
 }
 
 /**
+ * Registra una entrada inmutable en la bitácora de auditoría (team_activity_logs).
+ */
+export async function logTeamActivity({ action, entityType, entityId = null, details = {} }) {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    await supabase.from('team_activity_logs').insert({
+      user_id: user?.id || null,
+      action,
+      entity_type: entityType,
+      entity_id: entityId,
+      details,
+    });
+  } catch (err) {
+    console.warn('Activity logging warning:', err);
+  }
+}
+
+/**
+ * Consulta los registros recientes de la bitácora de auditoría.
+ */
+export async function fetchTeamActivityLogs({ limit = 50 } = {}) {
+  const { data, error } = await supabase
+    .from('team_activity_logs')
+    .select(`
+      id,
+      action,
+      entity_type,
+      entity_id,
+      details,
+      created_at,
+      author:user_id (
+        id,
+        email,
+        full_name,
+        role
+      )
+    `)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error al obtener logs de auditoría:', error);
+    throw new Error(error.message || 'No se pudieron cargar los registros de auditoría');
+  }
+
+  return data || [];
+}
+
+/**
  * Consulta todas las solicitudes de cotización / TDRs para el equipo de consultores.
  */
 export async function fetchTeamLeads() {
@@ -54,6 +104,14 @@ export async function updateLeadStatus(leadId, { status, notes, assignedTo }) {
     console.error('Error al actualizar lead:', error);
     throw new Error(error.message || 'No se pudo actualizar el estado del lead');
   }
+
+  // Registrar en bitácora de auditoría
+  logTeamActivity({
+    action: 'LEAD_STATUS_UPDATED',
+    entityType: 'lead',
+    entityId: leadId,
+    details: { new_status: status, notes, assigned_to: assignedTo, email: data?.email, full_name: data?.full_name },
+  });
 
   return data;
 }
@@ -138,6 +196,14 @@ export async function createTeamProject({
     throw new Error(error.message || 'No se pudo registrar el proyecto.');
   }
 
+  // Registrar en bitácora de auditoría
+  logTeamActivity({
+    action: 'PROJECT_CREATED',
+    entityType: 'project',
+    entityId: data.id,
+    details: { title, pillar, client_id: clientId, tech_lead_name: techLeadName },
+  });
+
   return data;
 }
 
@@ -167,6 +233,13 @@ export async function addProjectMilestone({ projectId, title, description = '', 
     throw new Error(error.message || 'No se pudo agregar el hito al proyecto.');
   }
 
+  logTeamActivity({
+    action: 'MILESTONE_CREATED',
+    entityType: 'milestone',
+    entityId: data.id,
+    details: { project_id: projectId, title, due_date: dueDate },
+  });
+
   return data;
 }
 
@@ -185,6 +258,13 @@ export async function updateMilestoneStatus(milestoneId, status) {
     console.error('Error al actualizar hito:', error);
     throw new Error(error.message || 'No se pudo actualizar el hito.');
   }
+
+  logTeamActivity({
+    action: 'MILESTONE_STATUS_UPDATED',
+    entityType: 'milestone',
+    entityId: milestoneId,
+    details: { new_status: status, title: data.title, project_id: data.project_id },
+  });
 
   return data;
 }
@@ -222,6 +302,9 @@ export async function createDeliverableRecord({
   externalUrl = null,
   version = 'v1.0',
   notes = '',
+  project = null,
+  clientEmail = null,
+  clientName = null,
 }) {
   if (!projectId || !title || !fileType) {
     throw new Error('Proyecto, título y tipo de archivo son obligatorios.');
@@ -245,6 +328,28 @@ export async function createDeliverableRecord({
   if (error) {
     console.error('Error al registrar entregable:', error);
     throw new Error(error.message || 'No se pudo registrar el entregable.');
+  }
+
+  // Registrar en bitácora de auditoría
+  logTeamActivity({
+    action: 'DELIVERABLE_PUBLISHED',
+    entityType: 'deliverable',
+    entityId: data.id,
+    details: { project_id: projectId, title, file_type: fileType, version },
+  });
+
+  // Disparar Edge Function notify-deliverable de forma asíncrona no-bloqueante
+  if (supabase.functions && typeof supabase.functions.invoke === 'function') {
+    supabase.functions
+      .invoke('notify-deliverable', {
+        body: {
+          deliverable: data,
+          project,
+          clientEmail,
+          clientName,
+        },
+      })
+      .catch((fnErr) => console.warn('Deliverable notification warning:', fnErr));
   }
 
   return data;
@@ -287,6 +392,13 @@ export async function createStaffMember({ email, password, fullName, role = 'eng
     console.error('Error al registrar colaborador:', error);
     throw new Error(error.message || 'No se pudo registrar el colaborador.');
   }
+
+  logTeamActivity({
+    action: 'STAFF_REGISTERED',
+    entityType: 'profile',
+    entityId: typeof data === 'string' ? data : null,
+    details: { email, full_name: fullName, role },
+  });
 
   return data;
 }

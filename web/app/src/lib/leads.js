@@ -38,5 +38,12 @@ export async function submitLeadTdr({
     throw new Error(error.message || 'Error al guardar la solicitud en el servidor.');
   }
 
+  // Invocación asíncrona no-bloqueante a la Edge Function de notificación
+  if (supabase.functions && typeof supabase.functions.invoke === 'function') {
+    supabase.functions
+      .invoke('notify-lead-tdr', { body: { record: data } })
+      .catch((fnErr) => console.warn('Notification trigger warning:', fnErr));
+  }
+
   return { success: true, lead: data };
 }

@@ -16,6 +16,7 @@ import {
   createDeliverableRecord,
   fetchStaffMembers,
   createStaffMember,
+  fetchTeamActivityLogs,
 } from '../lib/team.js';
 
 const PILLAR_LABELS = {
@@ -41,16 +42,27 @@ const MILESTONE_STATUS_COLORS = {
   BLOQUEADO: { bg: 'rgba(168, 71, 43, 0.15)', text: 'var(--terracotta)', border: 'var(--terracotta)' },
 };
 
+const ACTIVITY_ACTION_BADGES = {
+  LEAD_STATUS_UPDATED: { label: 'LEAD ACTUALIZADO', bg: 'rgba(216, 168, 78, 0.15)', text: '#9B7322', border: 'var(--gold)' },
+  PROJECT_CREATED: { label: 'PROYECTO CREADO', bg: 'rgba(168, 71, 43, 0.1)', text: 'var(--terracotta)', border: 'var(--terracotta)' },
+  MILESTONE_CREATED: { label: 'HITO AGREGADO', bg: 'rgba(36, 26, 18, 0.08)', text: 'var(--ink)', border: 'var(--border)' },
+  MILESTONE_STATUS_UPDATED: { label: 'HITO ACTUALIZADO', bg: 'rgba(198, 138, 61, 0.15)', text: 'var(--ochre)', border: 'var(--ochre)' },
+  DELIVERABLE_PUBLISHED: { label: 'ENTREGABLE PUBLICADO', bg: 'rgba(46, 117, 89, 0.15)', text: '#2E7559', border: '#2E7559' },
+  STAFF_REGISTERED: { label: 'STAFF REGISTRADO', bg: 'rgba(74, 114, 186, 0.12)', text: '#345995', border: '#345995' },
+};
+
 export default function Equipo() {
   useDocumentHead({ title: 'Panel de Equipo & Consultores — Inmerge', path: '/equipo', noIndex: true });
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('leads'); // 'leads' | 'projects' | 'new_project' | 'team'
+  const [activeTab, setActiveTab] = useState('leads'); // 'leads' | 'projects' | 'new_project' | 'activity' | 'team'
+  const [activityFilter, setActivityFilter] = useState('ALL'); // 'ALL' | 'LEADS' | 'PROJECTS' | 'DELIVERABLES' | 'STAFF'
   const [leads, setLeads] = useState([]);
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const [staffList, setStaffList] = useState([]);
+  const [activityLogs, setActivityLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusMsg, setStatusMsg] = useState(null);
@@ -104,14 +116,16 @@ export default function Equipo() {
     setLoading(true);
     setError(null);
     try {
-      const [leadsData, projsData, clientsData] = await Promise.all([
+      const [leadsData, projsData, clientsData, logsData] = await Promise.all([
         fetchTeamLeads().catch(() => []),
         fetchTeamProjects().catch(() => []),
         fetchRegisteredClients().catch(() => []),
+        fetchTeamActivityLogs({ limit: 50 }).catch(() => []),
       ]);
       setLeads(leadsData);
       setProjects(projsData);
       setClients(clientsData);
+      setActivityLogs(logsData);
 
       if (user?.role === 'admin') {
         const staffData = await fetchStaffMembers().catch(() => []);
@@ -130,7 +144,8 @@ export default function Equipo() {
       setLeads((prev) =>
         prev.map((l) => (l.id === leadId ? { ...l, status: newStatus } : l))
       );
-      showTemporaryMsg('Estado del lead actualizado con éxito.');
+      showTemporaryMsg('Estado del lead actualizado y registrado en auditoría.');
+      fetchTeamActivityLogs({ limit: 50 }).then(setActivityLogs).catch(() => {});
     } catch (err) {
       alert(`Error al actualizar lead: ${err.message}`);
     }
@@ -232,6 +247,8 @@ export default function Equipo() {
         filePath = await uploadDeliverableFile(delivFile, safeName);
       }
 
+      const targetProject = projects.find((p) => p.id === newDeliv.projectId);
+
       await createDeliverableRecord({
         projectId: newDeliv.projectId,
         milestoneId: newDeliv.milestoneId || null,
@@ -241,9 +258,12 @@ export default function Equipo() {
         externalUrl: newDeliv.externalUrl || null,
         version: newDeliv.version || 'v1.0',
         notes: newDeliv.notes || '',
+        project: targetProject,
+        clientEmail: targetProject?.client?.email,
+        clientName: targetProject?.client?.full_name,
       });
 
-      showTemporaryMsg('Entregable publicado y disponible para el cliente.');
+      showTemporaryMsg('Entregable publicado, notificado al cliente y registrado en auditoría.');
       setNewDeliv({
         projectId: '',
         milestoneId: '',
@@ -302,6 +322,16 @@ export default function Equipo() {
     await logout();
     navigate('/');
   }
+
+  // Filter activity logs by active filter category
+  const filteredActivityLogs = activityLogs.filter((log) => {
+    if (activityFilter === 'ALL') return true;
+    if (activityFilter === 'LEADS') return log.action.includes('LEAD');
+    if (activityFilter === 'PROJECTS') return log.action.includes('PROJECT') || log.action.includes('MILESTONE');
+    if (activityFilter === 'DELIVERABLES') return log.action.includes('DELIVERABLE');
+    if (activityFilter === 'STAFF') return log.action.includes('STAFF');
+    return true;
+  });
 
   return (
     <>
@@ -489,6 +519,39 @@ export default function Equipo() {
             }}
           >
             + Crear Proyecto / Entregable
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('activity')}
+            style={{
+              background: 'none',
+              border: 'none',
+              borderBottom: activeTab === 'activity' ? '3px solid var(--terracotta)' : '3px solid transparent',
+              padding: '12px 20px',
+              fontSize: 15,
+              fontWeight: activeTab === 'activity' ? 700 : 500,
+              color: activeTab === 'activity' ? 'var(--terracotta)' : 'var(--muted)',
+              cursor: 'pointer',
+              fontFamily: "'IBM Plex Sans', sans-serif",
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span>Bitácora & Auditoría</span>
+            <span
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 11,
+                padding: '2px 6px',
+                borderRadius: 10,
+                background: activeTab === 'activity' ? 'var(--terracotta)' : 'var(--border)',
+                color: activeTab === 'activity' ? '#fff' : 'var(--ink)',
+              }}
+            >
+              {activityLogs.length}
+            </span>
           </button>
 
           {user?.role === 'admin' && (
@@ -1318,7 +1381,153 @@ export default function Equipo() {
               </div>
             )}
 
-            {/* TAB 4: TEAM MANAGEMENT (ADMINS ONLY) */}
+            {/* TAB 4: AUDIT LOGS & ACTIVITY TIMELINE */}
+            {activeTab === 'activity' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+                  <div>
+                    <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: 0 }}>
+                      Bitácora de Auditoría Técnica & Actividad ({filteredActivityLogs.length})
+                    </h2>
+                    <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                      Registro inmutable de trazabilidad de proyectos, hitos, entregables y leads.
+                    </div>
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {[
+                      { key: 'ALL', label: 'Todos' },
+                      { key: 'LEADS', label: 'Leads TDR' },
+                      { key: 'PROJECTS', label: 'Proyectos & Hitos' },
+                      { key: 'DELIVERABLES', label: 'Entregables' },
+                      { key: 'STAFF', label: 'Equipo' },
+                    ].map((btn) => (
+                      <button
+                        key={btn.key}
+                        type="button"
+                        onClick={() => setActivityFilter(btn.key)}
+                        style={{
+                          background: activityFilter === btn.key ? 'var(--terracotta)' : 'var(--cream2)',
+                          color: activityFilter === btn.key ? '#fff' : 'var(--ink)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 16,
+                          padding: '5px 12px',
+                          fontSize: 12,
+                          fontFamily: "'IBM Plex Sans', sans-serif",
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {btn.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {filteredActivityLogs.length === 0 ? (
+                  <div
+                    style={{
+                      padding: 40,
+                      textAlign: 'center',
+                      background: 'var(--cream2)',
+                      borderRadius: 8,
+                      border: '1px dashed var(--border)',
+                    }}
+                  >
+                    <p style={{ color: 'var(--muted)', margin: 0 }}>No hay eventos registrados en esta categoría.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {filteredActivityLogs.map((log) => {
+                      const badge = ACTIVITY_ACTION_BADGES[log.action] || {
+                        label: log.action,
+                        bg: 'rgba(0,0,0,0.05)',
+                        text: 'var(--ink)',
+                        border: 'var(--border)',
+                      };
+
+                      return (
+                        <div
+                          key={log.id}
+                          style={{
+                            background: 'var(--cream2)',
+                            borderRadius: 8,
+                            padding: '16px 20px',
+                            border: '1px solid var(--border)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            flexWrap: 'wrap',
+                            gap: 12,
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                              <span
+                                style={{
+                                  fontFamily: "'IBM Plex Mono', monospace",
+                                  fontSize: 10,
+                                  padding: '2px 8px',
+                                  borderRadius: 4,
+                                  background: badge.bg,
+                                  color: badge.text,
+                                  border: `1px solid ${badge.border}`,
+                                  fontWeight: 700,
+                                }}
+                              >
+                                {badge.label}
+                              </span>
+                              <span style={{ fontSize: 12, color: 'var(--muted)', fontFamily: "'IBM Plex Mono', monospace" }}>
+                                Entidad: <strong>{log.entity_type}</strong>
+                              </span>
+                            </div>
+
+                            <div style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 6 }}>
+                              {log.action === 'PROJECT_CREATED' && (
+                                <span>Proyecto creado: <strong>{log.details?.title}</strong> (Pilar: {log.details?.pillar})</span>
+                              )}
+                              {log.action === 'LEAD_STATUS_UPDATED' && (
+                                <span>Lead actualizado a <strong>{log.details?.new_status}</strong> {log.details?.full_name ? `(${log.details.full_name})` : ''}</span>
+                              )}
+                              {log.action === 'MILESTONE_CREATED' && (
+                                <span>Nuevo hito creado: <strong>{log.details?.title}</strong></span>
+                              )}
+                              {log.action === 'MILESTONE_STATUS_UPDATED' && (
+                                <span>Hito cambiado a <strong>{log.details?.new_status}</strong> {log.details?.title ? `(${log.details.title})` : ''}</span>
+                              )}
+                              {log.action === 'DELIVERABLE_PUBLISHED' && (
+                                <span>Entregable publicado: <strong>{log.details?.title}</strong> ({log.details?.file_type} {log.details?.version})</span>
+                              )}
+                              {log.action === 'STAFF_REGISTERED' && (
+                                <span>Nuevo colaborador dado de alta: <strong>{log.details?.full_name}</strong> ({log.details?.email}, Rol: {log.details?.role})</span>
+                              )}
+                            </div>
+
+                            <div style={{ fontSize: 12, color: 'var(--muted)' }}>
+                              Autor: <strong style={{ color: 'var(--ink)' }}>{log.author?.full_name || log.author?.email || 'Sistema / Staff'}</strong>
+                              {log.author?.role && ` (${log.author.role})`}
+                            </div>
+                          </div>
+
+                          <div style={{ textAlign: 'right', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                            {new Date(log.created_at).toLocaleDateString('es-PE', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 5: TEAM MANAGEMENT (ADMINS ONLY) */}
             {activeTab === 'team' && user?.role === 'admin' && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
                 {/* Form: Register New Staff */}
