@@ -89,7 +89,11 @@
 
   -- Trigger para sincronizar automáticamente nuevos usuarios registrados en auth.users
   CREATE OR REPLACE FUNCTION public.handle_new_user()
-  RETURNS TRIGGER AS $$
+  RETURNS TRIGGER
+  SECURITY DEFINER
+  SET search_path = public
+  LANGUAGE plpgsql
+  AS $$
   BEGIN
     INSERT INTO public.profiles (id, email, full_name, role)
     VALUES (
@@ -101,15 +105,14 @@
     ON CONFLICT (id) DO UPDATE
     SET
       email = EXCLUDED.email,
-      full_name = COALESCE(EXCLUDED.full_name, profiles.full_name),
       updated_at = now();
     RETURN NEW;
   END;
-  $$ LANGUAGE plpgsql SECURITY DEFINER;
+  $$;
 
   DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
   CREATE TRIGGER on_auth_user_created
-    AFTER INSERT OR UPDATE ON auth.users
+    AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 
