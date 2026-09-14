@@ -48,6 +48,23 @@
   CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles (role);
   CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles (email);
 
+  -- Funciones de seguridad (SECURITY DEFINER) para evitar recursión infinita en RLS
+  CREATE OR REPLACE FUNCTION public.is_staff()
+  RETURNS BOOLEAN AS $$
+    SELECT EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role IN ('admin', 'auditor', 'engineer')
+    );
+  $$ LANGUAGE sql STABLE SECURITY DEFINER;
+
+  CREATE OR REPLACE FUNCTION public.is_admin()
+  RETURNS BOOLEAN AS $$
+    SELECT EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    );
+  $$ LANGUAGE sql STABLE SECURITY DEFINER;
+
   ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
   -- Políticas RLS para Profiles
@@ -55,20 +72,20 @@
   CREATE POLICY "profiles_select_own"
     ON public.profiles FOR SELECT
     TO authenticated
-    USING (auth.uid() = id OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin');
+    USING (auth.uid() = id OR public.is_staff());
 
   DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
   CREATE POLICY "profiles_update_own"
     ON public.profiles FOR UPDATE
     TO authenticated
-    USING (auth.uid() = id)
-    WITH CHECK (auth.uid() = id);
+    USING (auth.uid() = id OR public.is_admin())
+    WITH CHECK (auth.uid() = id OR public.is_admin());
 
   DROP POLICY IF EXISTS "profiles_insert_own" ON public.profiles;
   CREATE POLICY "profiles_insert_own"
     ON public.profiles FOR INSERT
     TO authenticated
-    WITH CHECK (auth.uid() = id);
+    WITH CHECK (auth.uid() = id OR public.is_admin());
 
   -- Trigger para sincronizar automáticamente nuevos usuarios registrados en auth.users
   CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -135,26 +152,14 @@
     ON public.leads_tdr
     FOR SELECT
     TO authenticated
-    USING (
-      EXISTS (
-        SELECT 1 FROM public.profiles
-        WHERE profiles.id = auth.uid()
-          AND profiles.role IN ('admin', 'auditor', 'engineer')
-      )
-    );
+    USING (public.is_staff());
 
   DROP POLICY IF EXISTS "Team update leads_tdr" ON public.leads_tdr;
   CREATE POLICY "Team update leads_tdr"
     ON public.leads_tdr
     FOR UPDATE
     TO authenticated
-    USING (
-      EXISTS (
-        SELECT 1 FROM public.profiles
-        WHERE profiles.id = auth.uid()
-          AND profiles.role IN ('admin', 'auditor', 'engineer')
-      )
-    );
+    USING (public.is_staff());
 
 
   -- ------------------------------------------------------------------------------
@@ -181,19 +186,21 @@
 
   ALTER TABLE public.client_projects ENABLE ROW LEVEL SECURITY;
 
-  -- Clientes ven exclusivamente sus propios proyectos
+  -- Clientes ven exclusivamente sus propios proyectos; staff ve todos
   DROP POLICY IF EXISTS "Clients view own projects" ON public.client_projects;
   CREATE POLICY "Clients view own projects"
     ON public.client_projects
     FOR SELECT
     TO authenticated
-    USING (
-      client_id = auth.uid() OR
-      EXISTS (
-        SELECT 1 FROM public.profiles
-        WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'auditor', 'engineer')
-      )
-    );
+    USING (client_id = auth.uid() OR public.is_staff());
+
+  DROP POLICY IF EXISTS "Staff manage client projects" ON public.client_projects;
+  CREATE POLICY "Staff manage client projects"
+    ON public.client_projects
+    FOR ALL
+    TO authenticated
+    USING (public.is_staff())
+    WITH CHECK (public.is_staff());
 
 
   -- ------------------------------------------------------------------------------
@@ -220,15 +227,20 @@
     FOR SELECT
     TO authenticated
     USING (
+      public.is_staff() OR
       EXISTS (
-        SELECT 1 FROM public.client_projects
-        WHERE client_projects.id = project_milestones.project_id
-          AND (
-            client_projects.client_id = auth.uid() OR
-            EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'auditor', 'engineer'))
-          )
+        SELECT 1 FROM public.client_projects cp
+        WHERE cp.id = project_milestones.project_id AND cp.client_id = auth.uid()
       )
     );
+
+  DROP POLICY IF EXISTS "Staff manage project milestones" ON public.project_milestones;
+  CREATE POLICY "Staff manage project milestones"
+    ON public.project_milestones
+    FOR ALL
+    TO authenticated
+    USING (public.is_staff())
+    WITH CHECK (public.is_staff());
 
 
   -- ------------------------------------------------------------------------------
@@ -257,15 +269,20 @@
     FOR SELECT
     TO authenticated
     USING (
+      public.is_staff() OR
       EXISTS (
-        SELECT 1 FROM public.client_projects
-        WHERE client_projects.id = project_deliverables.project_id
-          AND (
-            client_projects.client_id = auth.uid() OR
-            EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role IN ('admin', 'auditor', 'engineer'))
-          )
+        SELECT 1 FROM public.client_projects cp
+        WHERE cp.id = project_deliverables.project_id AND cp.client_id = auth.uid()
       )
     );
+
+  DROP POLICY IF EXISTS "Staff manage project deliverables" ON public.project_deliverables;
+  CREATE POLICY "Staff manage project deliverables"
+    ON public.project_deliverables
+    FOR ALL
+    TO authenticated
+    USING (public.is_staff())
+    WITH CHECK (public.is_staff());
 
 
   -- ------------------------------------------------------------------------------
@@ -283,13 +300,22 @@
     TO authenticated
     USING (
       bucket_id = 'project-deliverables' AND (
+        public.is_staff() OR
         EXISTS (
           SELECT 1 FROM public.project_deliverables pd
           JOIN public.client_projects cp ON cp.id = pd.project_id
-          WHERE pd.file_path = storage.objects.name
-            AND (cp.client_id = auth.uid() OR EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role IN ('admin', 'auditor', 'engineer')))
+          WHERE pd.file_path = storage.objects.name AND cp.client_id = auth.uid()
         )
       )
+    );
+
+  DROP POLICY IF EXISTS "Staff Upload Deliverables" ON storage.objects;
+  CREATE POLICY "Staff Upload Deliverables"
+    ON storage.objects
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (
+      bucket_id = 'project-deliverables' AND public.is_staff()
     );
 
 
