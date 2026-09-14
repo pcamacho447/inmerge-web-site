@@ -91,8 +91,28 @@ export default function Cuenta() {
           </button>
         </div>
 
-        <div style={{ fontSize: 15, color: 'var(--muted)', marginBottom: 40 }}>
-          Sesión activa: <strong style={{ color: 'var(--ink)' }}>{user.email}</strong>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 40, flexWrap: 'wrap' }}>
+          <div style={{ fontSize: 15, color: 'var(--muted)' }}>
+            Sesión activa: <strong style={{ color: 'var(--ink)' }}>{user.email}</strong>
+          </div>
+          {user.isStaff && (
+            <Link
+              to="/equipo"
+              style={{
+                fontSize: 13,
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontWeight: 600,
+                color: 'var(--terracotta)',
+                textDecoration: 'none',
+                background: 'var(--cream2)',
+                padding: '6px 14px',
+                borderRadius: 4,
+                border: '1px solid var(--terracotta)',
+              }}
+            >
+              Ir al Panel de Equipo (/equipo) →
+            </Link>
+          )}
         </div>
 
         {/* Loading and Error States */}
