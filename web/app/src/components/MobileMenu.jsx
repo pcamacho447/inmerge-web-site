@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
 import useOverlay from '../hooks/useOverlay.js';
 import { useAuth } from '../lib/auth.jsx';
-import { NAV_LINKS, waLink } from '../data/content.js';
+import { NAV_LINKS } from '../data/content.js';
 
 export default function MobileMenu({ onClose }) {
   const containerRef = useOverlay(true, onClose);
   const { user } = useAuth();
+
+  const accountPath = user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login';
+  const accountLabel = user ? (user.isStaff ? 'Panel Equipo' : 'Mi cuenta') : 'Iniciar sesión';
 
   return (
     <div
@@ -54,6 +57,7 @@ export default function MobileMenu({ onClose }) {
           <div style={{ width: 22, height: 2, background: 'var(--ink)', transform: 'rotate(-45deg)', position: 'absolute' }} />
         </button>
       </div>
+
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {NAV_LINKS.map((link) => (
           <Link
@@ -73,58 +77,44 @@ export default function MobileMenu({ onClose }) {
             {link.label}
           </Link>
         ))}
-        {user?.isStaff && (
-          <Link
-            to="/equipo"
-            onClick={onClose}
-            className="row-hover"
-            style={{
-              fontFamily: "'Spectral',serif",
-              fontWeight: 600,
-              fontSize: 22,
-              color: 'var(--terracotta)',
-              padding: '18px 0',
-              borderTop: '1px solid var(--border)',
-            }}
-          >
-            Panel Equipo [STAFF]
-          </Link>
-        )}
-        <Link
-          to={user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login'}
-          onClick={onClose}
-          className="row-hover"
-          style={{
-            fontFamily: "'Spectral',serif",
-            fontWeight: 600,
-            fontSize: 22,
-            color: 'var(--ink)',
-            padding: '18px 0',
-            borderTop: '1px solid var(--border)',
-            borderBottom: '1px solid var(--border)',
-          }}
-        >
-          {user ? (user.isStaff ? 'Portal de Clientes' : 'Mi cuenta') : 'Iniciar sesión'}
-        </Link>
       </div>
-      <a
-        href={waLink('Hola, quiero conversar sobre datos con Inmerge.')}
-        target="_blank"
-        rel="noreferrer"
+
+      <Link
+        to={accountPath}
+        onClick={onClose}
         className="btn-hover"
         style={{
           marginTop: 'auto',
-          background: 'var(--terracotta)',
+          background: 'var(--ink)',
           color: 'var(--bg)',
           textAlign: 'center',
           borderRadius: 2,
           padding: 18,
           fontSize: 16,
           fontWeight: 700,
+          textDecoration: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
         }}
       >
-        Escríbenos por WhatsApp
-      </a>
+        {user?.isStaff && (
+          <span
+            style={{
+              fontSize: 11,
+              background: 'var(--terracotta)',
+              color: '#fff',
+              padding: '2px 6px',
+              borderRadius: 3,
+              fontFamily: "'IBM Plex Mono', monospace",
+            }}
+          >
+            STAFF
+          </span>
+        )}
+        <span>{accountLabel}</span>
+      </Link>
     </div>
   );
 }

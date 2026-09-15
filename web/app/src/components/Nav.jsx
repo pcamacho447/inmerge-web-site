@@ -1,10 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth.jsx';
-import { NAV_LINKS, waLink } from '../data/content.js';
+import { NAV_LINKS } from '../data/content.js';
 
 export default function Nav({ mobileMenuOpen, onToggleMenu }) {
   const { pathname } = useLocation();
   const { user } = useAuth();
+
+  const accountPath = user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login';
+  const accountLabel = user ? (user.isStaff ? 'Panel Equipo' : 'Mi cuenta') : 'Iniciar sesión';
 
   return (
     <nav
@@ -29,7 +32,7 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
 
       <div
         className="nav-desktop"
-        style={{ gap: 24, fontSize: 14, flex: 1, minWidth: 0, overflowX: 'auto', padding: '2px 0', alignItems: 'center' }}
+        style={{ gap: 28, fontSize: 14, flex: 1, minWidth: 0, overflowX: 'auto', padding: '2px 0', alignItems: 'center' }}
       >
         {NAV_LINKS.map((link) => (
           <Link
@@ -41,52 +44,10 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
             {link.label}
           </Link>
         ))}
-        {user?.isStaff && (
-          <Link
-            to="/equipo"
-            className="link-hover"
-            style={{
-              color: 'var(--terracotta)',
-              fontWeight: pathname === '/equipo' ? 700 : 600,
-              flexShrink: 0,
-              whiteSpace: 'nowrap',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            <span>Panel Equipo</span>
-            <span
-              style={{
-                fontSize: 10,
-                background: 'var(--terracotta)',
-                color: '#fff',
-                padding: '1px 5px',
-                borderRadius: 3,
-                fontFamily: "'IBM Plex Mono', monospace",
-              }}
-            >
-              STAFF
-            </span>
-          </Link>
-        )}
-        <Link
-          to={user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login'}
-          className="link-hover"
-          style={{
-            color: 'var(--ink)',
-            fontWeight: pathname === '/cuenta' || pathname === '/equipo' ? 600 : 400,
-            flexShrink: 0,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {user ? (user.isStaff ? 'Portal Clientes' : 'Mi cuenta') : 'Iniciar sesión'}
-        </Link>
       </div>
-      <a
-        href={waLink('Hola, quiero conversar sobre datos con Inmerge.')}
-        target="_blank"
-        rel="noreferrer"
+
+      <Link
+        to={accountPath}
         className="nav-desktop btn-hover"
         style={{
           background: 'var(--ink)',
@@ -97,11 +58,28 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
           fontWeight: 600,
           flexShrink: 0,
           whiteSpace: 'nowrap',
+          display: 'inline-flex',
           alignItems: 'center',
+          textDecoration: 'none',
+          gap: 6,
         }}
       >
-        WhatsApp
-      </a>
+        {user?.isStaff && (
+          <span
+            style={{
+              fontSize: 10,
+              background: 'var(--terracotta)',
+              color: '#fff',
+              padding: '1px 5px',
+              borderRadius: 3,
+              fontFamily: "'IBM Plex Mono', monospace",
+            }}
+          >
+            STAFF
+          </span>
+        )}
+        <span>{accountLabel}</span>
+      </Link>
 
       <button
         type="button"
