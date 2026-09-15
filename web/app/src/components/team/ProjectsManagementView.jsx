@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ProjectGantt from '../ProjectGantt.jsx';
 import ProjectTaskManager from '../ProjectTaskManager.jsx';
 import ProjectRiskManager from '../ProjectRiskManager.jsx';
+import { METHODOLOGY_PHASE_PRESETS } from './NewProjectModal.jsx';
 import {
   calculateProjectProgress,
   calculateProjectHours,
@@ -25,8 +26,8 @@ export const PROJECT_STATUS_COLORS = {
 };
 
 export const MILESTONE_STATUS_COLORS = {
-  PENDIENTE: { bg: 'rgba(0,0,0,0.04)', text: 'var(--muted)', border: 'var(--border)' },
-  EN_PROGRESO: { bg: 'rgba(198, 138, 61, 0.15)', text: 'var(--ochre)', border: 'var(--ochre)' },
+  PENDIENTE: { bg: 'rgba(122, 107, 88, 0.08)', text: 'var(--muted)', border: 'var(--border)' },
+  EN_PROGRESO: { bg: 'rgba(216, 168, 78, 0.15)', text: '#9B7322', border: 'var(--gold)' },
   EN_PROCESO: { bg: 'rgba(198, 138, 61, 0.15)', text: 'var(--ochre)', border: 'var(--ochre)' },
   COMPLETADO: { bg: 'rgba(46, 117, 89, 0.15)', text: '#2E7559', border: '#2E7559' },
   BLOQUEADO: { bg: 'rgba(168, 71, 43, 0.15)', text: 'var(--terracotta)', border: 'var(--terracotta)' },
@@ -37,6 +38,7 @@ export default function ProjectsManagementView({
   onUpdateProjectStatus,
   onProjectHealthChange,
   onUpdateMilestone,
+  onAddMilestone,
   onTaskCreated,
   onTaskUpdated,
   onTaskDeleted,
@@ -44,6 +46,13 @@ export default function ProjectsManagementView({
   onRiskUpdated,
 }) {
   const [projectSubTabs, setProjectSubTabs] = useState({});
+  const [addingMilestoneProjId, setAddingMilestoneProjId] = useState(null);
+  const [inlineMilestone, setInlineMilestone] = useState({
+    title: 'Fase 01 — Auditoría & Diagnóstico Inicial',
+    orderIndex: 1,
+    phasePreset: '01',
+    dueDate: '',
+  });
 
   const setProjSubTab = (projId, tab) => {
     setProjectSubTabs((prev) => ({
@@ -444,10 +453,196 @@ export default function ProjectsManagementView({
 
                 {currentSubTab === 'PM_MILESTONES' && (
                   <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <span style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                        Fases & Hitos del Proyecto ({proj.milestones?.length || 0})
+                      </span>
+                      {onAddMilestone && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (addingMilestoneProjId === proj.id) {
+                              setAddingMilestoneProjId(null);
+                            } else {
+                              setAddingMilestoneProjId(proj.id);
+                              setInlineMilestone({
+                                title: 'Fase 01 — Auditoría & Diagnóstico Inicial',
+                                orderIndex: (proj.milestones?.length || 0) + 1,
+                                phasePreset: '01',
+                                dueDate: '',
+                              });
+                            }
+                          }}
+                          className="btn-accent"
+                          style={{
+                            background: addingMilestoneProjId === proj.id ? 'var(--muted)' : 'var(--terracotta)',
+                            color: '#fff',
+                            border: 'none',
+                            padding: '6px 14px',
+                            borderRadius: 16,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {addingMilestoneProjId === proj.id ? 'Cancelar' : '+ Agregar Hito a Proyecto'}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Inline Add Milestone Form */}
+                    {addingMilestoneProjId === proj.id && (
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          if (onAddMilestone) {
+                            await onAddMilestone(e, {
+                              projectId: proj.id,
+                              title: inlineMilestone.title,
+                              orderIndex: parseInt(inlineMilestone.orderIndex, 10) || 1,
+                              dueDate: inlineMilestone.dueDate || null,
+                            });
+                            setAddingMilestoneProjId(null);
+                          }
+                        }}
+                        style={{
+                          background: 'var(--cream2)',
+                          padding: '16px',
+                          borderRadius: 6,
+                          border: '1px solid var(--border)',
+                          marginBottom: 16,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 10,
+                        }}
+                      >
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                              Fase del Proyecto (Método Inmerge)
+                            </label>
+                            <select
+                              value={inlineMilestone.phasePreset}
+                              onChange={(e) => {
+                                const presetId = e.target.value;
+                                const found = METHODOLOGY_PHASE_PRESETS.find((p) => p.id === presetId);
+                                if (found) {
+                                  if (presetId === 'custom') {
+                                    setInlineMilestone({ ...inlineMilestone, phasePreset: 'custom' });
+                                  } else {
+                                    setInlineMilestone({
+                                      ...inlineMilestone,
+                                      phasePreset: found.id,
+                                      orderIndex: found.order,
+                                      title: found.template,
+                                    });
+                                  }
+                                }
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: 4,
+                                border: '1px solid var(--border)',
+                                fontSize: 12,
+                                background: '#fff',
+                              }}
+                            >
+                              {METHODOLOGY_PHASE_PRESETS.map((ph) => (
+                                <option key={ph.id} value={ph.id}>
+                                  {ph.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                              Nº de Fase (Orden) *
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="20"
+                              value={inlineMilestone.orderIndex}
+                              onChange={(e) => setInlineMilestone({ ...inlineMilestone, orderIndex: parseInt(e.target.value, 10) || 1 })}
+                              required
+                              style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: 4,
+                                border: '1px solid var(--border)',
+                                fontSize: 12,
+                                fontFamily: "'IBM Plex Mono', monospace",
+                              }}
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                              Fecha Límite
+                            </label>
+                            <input
+                              type="date"
+                              value={inlineMilestone.dueDate}
+                              onChange={(e) => setInlineMilestone({ ...inlineMilestone, dueDate: e.target.value })}
+                              style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: 4,
+                                border: '1px solid var(--border)',
+                                fontSize: 12,
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                            Título del Hito *
+                          </label>
+                          <input
+                            type="text"
+                            value={inlineMilestone.title}
+                            onChange={(e) => setInlineMilestone({ ...inlineMilestone, title: e.target.value })}
+                            required
+                            placeholder="e.g. Fase 02 — Arquitectura Cloud & Especificación Técnica"
+                            style={{
+                              width: '100%',
+                              padding: '6px 10px',
+                              borderRadius: 4,
+                              border: '1px solid var(--border)',
+                              fontSize: 12,
+                              boxSizing: 'border-box',
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <button
+                            type="submit"
+                            style={{
+                              background: 'var(--ink)',
+                              color: '#fff',
+                              border: 'none',
+                              padding: '7px 16px',
+                              borderRadius: 16,
+                              fontSize: 12,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Guardar Hito
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
                     {proj.milestones && proj.milestones.length > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
                         {proj.milestones.map((m) => {
                           const mColor = MILESTONE_STATUS_COLORS[m.status] || MILESTONE_STATUS_COLORS.PENDIENTE;
+                          const phaseNumberStr = String(m.order_index || 1).padStart(2, '0');
                           return (
                             <div
                               key={m.id}
@@ -464,12 +659,26 @@ export default function ProjectsManagementView({
                                 gap: 8,
                               }}
                             >
-                              <div>
-                                <strong>Fase {m.order_index || 1}: {m.title}</strong>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span
+                                  style={{
+                                    fontFamily: "'IBM Plex Mono', monospace",
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    background: 'var(--cream2)',
+                                    color: 'var(--terracotta)',
+                                    padding: '2px 8px',
+                                    borderRadius: 4,
+                                    border: '1px solid var(--border)',
+                                  }}
+                                >
+                                  Fase {phaseNumberStr}
+                                </span>
+                                <strong>{m.title}</strong>
                                 {m.due_date && (
                                   <span
                                     style={{
-                                      marginLeft: 8,
+                                      marginLeft: 4,
                                       color: 'var(--muted)',
                                       fontSize: 11,
                                       fontFamily: "'IBM Plex Mono', monospace",

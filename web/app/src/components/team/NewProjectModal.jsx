@@ -1,3 +1,11 @@
+export const METHODOLOGY_PHASE_PRESETS = [
+  { id: '01', order: 1, label: 'Fase 01 — Auditoría & Diagnóstico Inicial', template: 'Fase 01 — Auditoría & Diagnóstico Inicial' },
+  { id: '02', order: 2, label: 'Fase 02 — Arquitectura & Diseño de Solución', template: 'Fase 02 — Arquitectura & Diseño de Solución' },
+  { id: '03', order: 3, label: 'Fase 03 — Ingeniería, Desarrollo & Modelado', template: 'Fase 03 — Ingeniería, Desarrollo & Modelado' },
+  { id: '04', order: 4, label: 'Fase 04 — Validación, Certificación & Despliegue', template: 'Fase 04 — Validación, Certificación & Despliegue' },
+  { id: 'custom', order: 1, label: 'Personalizada (Fase a Medida)', template: '' },
+];
+
 export default function NewProjectModal({
   clients,
   projects,
@@ -14,6 +22,24 @@ export default function NewProjectModal({
   handleUploadDeliverable,
   uploading,
 }) {
+  const handlePhasePresetChange = (presetId) => {
+    const found = METHODOLOGY_PHASE_PRESETS.find((p) => p.id === presetId);
+    if (!found) return;
+
+    if (presetId === 'custom') {
+      setNewMilestone({
+        ...newMilestone,
+        phasePreset: 'custom',
+      });
+    } else {
+      setNewMilestone({
+        ...newMilestone,
+        phasePreset: found.id,
+        orderIndex: found.order,
+        title: found.template,
+      });
+    }
+  };
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
       {/* Form 1: New Project */}
@@ -204,13 +230,63 @@ export default function NewProjectModal({
               </select>
             </div>
 
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                  Fase del Proyecto (Método Inmerge)
+                </label>
+                <select
+                  value={newMilestone.phasePreset || '01'}
+                  onChange={(e) => handlePhasePresetChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                    fontSize: 13,
+                    boxSizing: 'border-box',
+                    background: '#fff',
+                  }}
+                >
+                  {METHODOLOGY_PHASE_PRESETS.map((ph) => (
+                    <option key={ph.id} value={ph.id}>
+                      {ph.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                  Nº de Fase *
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={newMilestone.orderIndex || 1}
+                  onChange={(e) => setNewMilestone({ ...newMilestone, orderIndex: parseInt(e.target.value, 10) || 1 })}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                    fontSize: 13,
+                    boxSizing: 'border-box',
+                    fontFamily: "'IBM Plex Mono', monospace",
+                  }}
+                />
+              </div>
+            </div>
+
             <div>
               <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
                 Título del Hito *
               </label>
               <input
                 type="text"
-                placeholder="e.g. Fase 01 — Diagnóstico de Queries y Rendimiento"
+                placeholder="e.g. Fase 02 — Arquitectura Cloud & Especificación Técnica"
                 value={newMilestone.title}
                 onChange={(e) => setNewMilestone({ ...newMilestone, title: e.target.value })}
                 required

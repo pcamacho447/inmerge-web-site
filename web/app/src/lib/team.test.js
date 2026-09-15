@@ -144,8 +144,16 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       return {};
     });
 
-    const res = await addProjectMilestone({ projectId: 'proj-1', title: 'Fase 1: Diagnóstico' });
+    const res = await addProjectMilestone({ projectId: 'proj-1', title: 'Fase 02: Arquitectura', orderIndex: 2 });
     expect(supabase.from).toHaveBeenCalledWith('project_milestones');
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        project_id: 'proj-1',
+        title: 'Fase 02: Arquitectura',
+        order_index: 2,
+        status: 'PENDIENTE',
+      }),
+    );
     expect(res).toEqual(mockMilestone);
   });
 

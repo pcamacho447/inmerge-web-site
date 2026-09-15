@@ -66,6 +66,8 @@ export default function Equipo() {
     title: '',
     description: '',
     dueDate: '',
+    orderIndex: 1,
+    phasePreset: '01',
   });
 
   // Deliverable Upload Form State
@@ -207,22 +209,28 @@ export default function Equipo() {
     }
   }
 
-  async function handleAddMilestone(e) {
-    e.preventDefault();
-    if (!newMilestone.projectId || !newMilestone.title) {
+  async function handleAddMilestone(e, overridePayload = null) {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+
+    const payload = overridePayload || newMilestone;
+
+    if (!payload.projectId || !payload.title) {
       alert('Selecciona un proyecto e ingresa el título del hito.');
       return;
     }
 
     try {
       await addProjectMilestone({
-        projectId: newMilestone.projectId,
-        title: newMilestone.title,
-        description: newMilestone.description,
-        dueDate: newMilestone.dueDate || null,
+        projectId: payload.projectId,
+        title: payload.title,
+        description: payload.description || '',
+        dueDate: payload.dueDate || null,
+        orderIndex: parseInt(payload.orderIndex, 10) || 1,
       });
       showTemporaryMsg('Hito agregado correctamente.');
-      setNewMilestone({ projectId: '', title: '', description: '', dueDate: '' });
+      setNewMilestone({ projectId: '', title: '', description: '', dueDate: '', orderIndex: 1, phasePreset: '01' });
       await loadData();
     } catch (err) {
       alert(`Error al agregar hito: ${err.message}`);
@@ -722,6 +730,7 @@ export default function Equipo() {
                 onUpdateProjectStatus={handleUpdateProjectStatus}
                 onProjectHealthChange={handleProjectHealthChange}
                 onUpdateMilestone={handleUpdateMilestone}
+                onAddMilestone={handleAddMilestone}
                 onTaskCreated={handleTaskCreated}
                 onTaskUpdated={handleTaskUpdated}
                 onTaskDeleted={handleTaskDeleted}
