@@ -116,35 +116,22 @@ export default function Inicio() {
             <br />e inteligencia de datos.
           </h1>
 
-          {/* Strategic Editorial Manifesto Quote */}
-          <div
-            style={{
-              marginTop: 12,
-              marginBottom: 36,
-              paddingLeft: 24,
-              borderLeft: '3px solid var(--terracotta)',
-              maxWidth: 880,
-            }}
-          >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 32 }}>
             <p
               style={{
                 fontFamily: "'Spectral', serif",
                 fontStyle: 'italic',
-                fontSize: 'clamp(17px, 2.1vw, 23px)',
-                lineHeight: 1.55,
+                fontSize: 'clamp(17px, 2vw, 22px)',
+                lineHeight: 1.6,
                 color: 'rgba(243, 234, 218, 0.95)',
+                maxWidth: 640,
                 margin: 0,
+                borderLeft: '3px solid var(--terracotta)',
+                paddingLeft: 20,
               }}
             >
               “Las decisiones operativas y estratégicas de alto nivel no pueden depender de hojas de cálculo aisladas ni de sistemas opacos:
               requieren arquitectura sólida, datos auditables y código verificable.”
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 32 }}>
-            <p style={{ fontSize: 17, color: 'var(--tan-text)', maxWidth: 540, lineHeight: 1.7, margin: 0 }}>
-              Construimos plataformas cloud robustas en AWS, auditamos la integridad de datos críticos y desplegamos modelos de IA
-              orientados a resultados reales de negocio sin intermediarios.
             </p>
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
               <Link
