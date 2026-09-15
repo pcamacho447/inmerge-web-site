@@ -4,6 +4,10 @@ Allow: /servicios
 Allow: /metodologia
 Allow: /nosotros
 Allow: /contacto
+Allow: /cookies
+Allow: /politica-cookies
+Allow: /llms.txt
+Allow: /llms-full.txt
 Disallow: /cuenta
 Disallow: /equipo
 Disallow: /login

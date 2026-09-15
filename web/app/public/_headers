@@ -1,8 +1,10 @@
 /*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.plot.ly; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.cloudflareinsights.com; frame-ancestors 'none'; form-action 'self' https://api.whatsapp.com https://wa.me; base-uri 'self'; object-src 'none'; upgrade-insecure-requests;
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable

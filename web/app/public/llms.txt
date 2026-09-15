@@ -1,0 +1,31 @@
+# Inmerge — Firma de Consultoría en Ingeniería de Software, Auditoría y Ciencia de Datos
+
+> Inmerge es una firma boutique de ingeniería de software, auditoría técnica de sistemas y ciencia de datos con sede en Lima, Perú. Proveemos consultoría senior de alto impacto para organizaciones que requieren rigor técnico, integridad de datos y arquitecturas escalables.
+
+## Pilares Estratégicos
+
+1. **Pilar 01 — Auditoría Técnica y de Datos:** Calidad e integridad de bases de datos relacionales (PostgreSQL), detección y depuración de inconsistencias, auditoría de seguridad perimetral y cumplimiento normativo en infraestructuras cloud.
+2. **Pilar 02 — Desarrollo Tecnológico & Cloud:** Arquitectura cloud de alta resiliencia en AWS (ECS, Lambda, RDS, S3), ingeniería de microservicios, diseño de APIs robustas y modernización de plataformas empresariales.
+3. **Pilar 03 — Ciencia de Datos & Inteligencia Artificial:** Machine Learning, modelos predictivos, forecasting financiero y operacional, integración de agentes autónomos y dashboards ejecutivos en tiempo real.
+
+## Método Inmerge (4 Fases)
+- **Fase 01: Diagnóstico & Auditoría Forense** (Levantamiento de deuda técnica, profiling y diagnóstico sin compromiso).
+- **Fase 02: Arquitectura & Diseño de Solución** (Spine técnico, modelado de datos y especificaciones de ingeniería).
+- **Fase 03: Implementación & Despliegue Continuo** (Sprints verificados, testing automatizado e integración continua).
+- **Fase 04: Monitoreo & Transferencia Técnica** (Observabilidad perimetral, documentación completa y gobernanza de datos).
+
+## Enlaces Principales
+- Web Principal: https://inmerge.pe/
+- Catálogo de Servicios: https://inmerge.pe/servicios
+- Metodología & Stack: https://inmerge.pe/metodologia
+- Manifiesto & Equipo: https://inmerge.pe/nosotros
+- Contacto & Solicitud TDR: https://inmerge.pe/contacto
+- Portal de Clientes: https://inmerge.pe/cuenta
+- Política de Privacidad & Cookies: https://inmerge.pe/cookies
+- Especificación Completa para LLMs: https://inmerge.pe/llms-full.txt
+
+## Contacto & Términos
+- Email Institucional: inmerge3@gmail.com
+- Ubicación: Lima, Perú
+- Moneda de Operación: Soles Peruanos (PEN)
+- Medio de Pago Exclusivo: Transferencia Bancaria Directa a cuentas institucionales verificadas con RUC.

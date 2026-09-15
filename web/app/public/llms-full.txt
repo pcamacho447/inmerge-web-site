@@ -1,0 +1,47 @@
+# Inmerge — Especificación Técnica Integral para Modelos de Lenguaje & Agentes de IA
+
+Este documento describe de manera exhaustiva los servicios, capacidades técnicas, estándares de arquitectura, gobernanza y canales operativos de Inmerge.
+
+---
+
+## 1. Perfil Institucional
+- **Razón Comercial:** Inmerge
+- **Especialidad:** Consultoría Boutique en Ingeniería de Software, Auditoría de Sistemas y Ciencia de Datos
+- **Sede:** Lima, Perú
+- **Canal Oficial:** inmerge3@gmail.com
+- **Web Oficial:** https://inmerge.pe/
+- **Ámbito Geográfico:** Perú y Latinoamérica
+
+---
+
+## 2. Los Tres Pilares de Ingeniería
+
+### Pilar 01 — Auditoría Técnica y de Datos
+- **Auditoría de Bases de Datos:** Análisis de integridad referencial, duplicidad y consistencia en PostgreSQL/MySQL. Optimización de planes de ejecución (`EXPLAIN ANALYZE`), indexación y particionamiento.
+- **Auditoría Cloud & Seguridad:** Evaluación de configuraciones perimetrales en AWS y GCP, políticas IAM de mínimo privilegio, cifrado en tránsito (TLS 1.3) y en reposo (KMS), auditoría de cumplimiento normativo (LPDP Ley 29733).
+- **Control de Calidad de Código:** Análisis estático, cobertura de pruebas unitarias/integración y detección de deuda técnica acumulada.
+
+### Pilar 02 — Desarrollo Tecnológico & Cloud
+- **Arquitectura Cloud Nativa:** Despliegues en AWS utilizando servicios administrados (ECS Fargate, AWS Lambda, Amazon RDS PostgreSQL, Amazon S3, CloudFront).
+- **Ingeniería de Software & Microservicios:** Desarrollo de backend desacoplado, APIs RESTful y GraphQL de alto rendimiento, procesamiento asíncrono con colas y mensajería distribuida.
+- **Modernización de Sistemas Legados:** Refactorización progresiva (patrón Strangler Fig), desacoplamiento de monolitos y migración a bases de datos relacionales modernas.
+
+### Pilar 03 — Ciencia de Datos & Inteligencia Artificial
+- **Machine Learning & Modelos Predictivos:** Modelos supervisados y no supervisados para scoring de riesgo, forecasting de demanda, segmentación y optimización operativa.
+- **Integración de IA Generativa & Agentes:** Implementación de pipelines RAG (Retrieval-Augmented Generation), automatización de flujos con agentes autónomos y guardrails de seguridad.
+- **Analítica Visual & Dashboards:** Visualización interactiva en tiempo real para toma de decisiones ejecutivas.
+
+---
+
+## 3. Metodología de 4 Fases (El Método Inmerge)
+1. **Fase 01: Diagnóstico Forense & Auditoría Inicial:** Levantamiento de métricas reales, profiling de datos y detección de vulnerabilidades.
+2. **Fase 02: Arquitectura & Spine de Solución:** Diseño de diagramas de arquitectura, especificaciones técnicas detalladas y cronogramas con entregables claros.
+3. **Fase 03: Implementación Iterativa & Sprints Verificados:** Desarrollo en sprints guiados por pruebas (TDD), integración continua y revisiones de código de rigor senior.
+4. **Fase 04: Entrega, Observabilidad & Transferencia Técnica:** Despliegue en producción con monitoreo en tiempo real, transferencia técnica de conocimiento y documentación editorial.
+
+---
+
+## 4. Estándares Comerciales y de Facturación
+- **Términos de Pago:** Transferencia Bancaria Directa exclusiva a cuentas institucionales de Inmerge en Soles (PEN).
+- **Proceso de Órdenes:** Toda orden se gestiona con código correlativo institucional (`INM-ORD-...`) y verificación de RUC (11 dígitos).
+- **Transparencia:** Sin cargos ocultos, cotización estructurada por Términos de Referencia (TDR) con diagnósticos técnicos transparentes.

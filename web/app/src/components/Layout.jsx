@@ -49,10 +49,15 @@ export default function Layout() {
 
   return (
     <div style={{ fontFamily: "'IBM Plex Sans',sans-serif", background: 'var(--bg)', color: 'var(--ink)', overflowX: 'hidden' }}>
+      <a href="#main-content" className="skip-to-content">
+        Saltar al contenido principal
+      </a>
       <Preloader done={preloaderDone} />
       <Nav mobileMenuOpen={mobileMenuOpen} onToggleMenu={toggleMenu} />
       {mobileMenuOpen && <MobileMenu onClose={closeMenu} />}
-      <Outlet />
+      <main id="main-content" tabIndex="-1" style={{ outline: 'none' }}>
+        <Outlet />
+      </main>
     </div>
   );
 }
