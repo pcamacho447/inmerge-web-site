@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
+Allow: /servicios
+Allow: /metodologia
+Allow: /nosotros
+Allow: /contacto
+Disallow: /cuenta
+Disallow: /equipo
+Disallow: /login
+Disallow: /registro
 
 Sitemap: https://inmerge.pe/sitemap.xml

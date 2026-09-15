@@ -292,12 +292,41 @@ select {
   }
 }
 
+/* Accessibility & Focus Indicators */
+:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 2px;
+}
+
+/* Skeleton Loading Shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-box {
+  background: linear-gradient(
+    90deg,
+    var(--cream2) 25%,
+    rgba(255, 255, 255, 0.4) 37%,
+    var(--cream2) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  border-radius: 4px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-track,
   .breathe-diamond,
   .preloader-mark,
   .preloader-dot,
-  .preloader-bar {
+  .preloader-bar,
+  .skeleton-box {
     animation: none !important;
   }
   .preloader-overlay {
@@ -309,3 +338,4 @@ select {
     transition: none !important;
   }
 }
+
