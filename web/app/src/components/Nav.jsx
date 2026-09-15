@@ -33,7 +33,7 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
   const navBorder = isHome
     ? scrolled
       ? '1px solid rgba(243, 234, 218, 0.15)'
-      : '1px solid rgba(243, 234, 218, 0.12)'
+      : 'none'
     : '1px solid var(--border)';
 
   const textColor = isHome ? '#F3EADA' : 'var(--ink)';
