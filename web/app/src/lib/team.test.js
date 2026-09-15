@@ -249,10 +249,6 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       p_password: 'SecurePassword123!',
       p_full_name: 'Carlos Ingeniero',
       p_role: 'engineer',
-      new_email: 'nuevo@inmerge.pe',
-      new_password: 'SecurePassword123!',
-      new_full_name: 'Carlos Ingeniero',
-      new_role: 'engineer',
     });
     expect(res).toBe('staff-uuid-123');
   });

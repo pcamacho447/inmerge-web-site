@@ -466,16 +466,25 @@ export async function createStaffMember({ email, password, fullName, role = 'eng
     throw new Error('Correo, contraseña y nombre completo son obligatorios.');
   }
 
-  const { data, error } = await supabase.rpc('create_staff_member', {
+  // 1. Invocar con la signatura canónica estándar (p_*)
+  let { data, error } = await supabase.rpc('create_staff_member', {
     p_email: email,
     p_password: password,
     p_full_name: fullName,
     p_role: role,
-    new_email: email,
-    new_password: password,
-    new_full_name: fullName,
-    new_role: role,
   });
+
+  // 2. Fallback defensivo si el esquema de base de datos utiliza la signatura legacy (new_*)
+  if (error && error.message?.includes('Could not find the function')) {
+    const fallback = await supabase.rpc('create_staff_member', {
+      new_email: email,
+      new_password: password,
+      new_full_name: fullName,
+      new_role: role,
+    });
+    data = fallback.data;
+    error = fallback.error;
+  }
 
   if (error) {
     console.error('Error al registrar colaborador:', error);
