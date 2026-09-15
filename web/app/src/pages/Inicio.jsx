@@ -198,41 +198,6 @@ export default function Inicio() {
         </div>
       </div>
 
-      {/* Quote / Manifesto */}
-      <div data-reveal="" style={{ padding: '120px clamp(20px,5vw,40px)' }}>
-        <div style={{ maxWidth: 1050, margin: '0 auto', position: 'relative' }}>
-          <div
-            style={{
-              fontFamily: "'Spectral',serif",
-              fontWeight: 800,
-              fontSize: 180,
-              color: '#EBDFC9',
-              position: 'absolute',
-              top: -100,
-              left: -40,
-              lineHeight: 1,
-              zIndex: 0,
-            }}
-          >
-            &ldquo;
-          </div>
-          <p
-            style={{
-              position: 'relative',
-              zIndex: 1,
-              fontFamily: "'Spectral',serif",
-              fontWeight: 600,
-              fontSize: 'clamp(26px,3.8vw,42px)',
-              lineHeight: 1.4,
-              margin: 0,
-              color: 'var(--ink)',
-            }}
-          >
-            Las decisiones operativas y estratégicas de alto nivel no pueden depender de hojas de cálculo aisladas ni de sistemas opacos:{' '}
-            <span style={{ color: 'var(--terracotta)' }}>requieren arquitectura sólida, datos auditables y código verificable.</span>
-          </p>
-        </div>
-      </div>
 
       <Frieze border="#D8A84E" upColor="#C68A3D" downColor="#A8472B" medallionBg="#D8A84E" medallionBorder="#241A12" />
 
