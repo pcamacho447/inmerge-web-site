@@ -24,7 +24,9 @@ Consulte las especificaciones técnicas del entorno en:
 - **Rutas de Autenticación & Clientes:**
   - `/login`, `/registro`, `/cuenta` (Portal de Clientes): Seguimiento exclusivo de proyectos propios, cronogramas e informes técnicos.
   - `/equipo` (Panel de Colaboradores & Consultores): Gestión técnica de leads TDR, creación de proyectos y publicación de entregables (requiere rol `admin`, `auditor` o `engineer`).
-- **Restricción de Negocio:** No reintroducir catálogos de reportes fiscales ni descargas cerradas de PDFs.
+- **Restricciones de Negocio & Pagos:**
+  - No reintroducir catálogos de reportes fiscales ni descargas cerradas de PDFs.
+  - **Medio de Pago Exclusivo:** Se aceptan única y exclusivamente **Transferencias Bancarias Directas** a cuentas institucionales de Inmerge (BCP, Interbank, BBVA en PEN). Toda orden se gestiona con código correlativo (`INM-ORD-...`) y validación de RUC (11 dígitos).
 
 ---
 
@@ -45,6 +47,6 @@ Consulte las especificaciones técnicas del entorno en:
 ---
 
 ## 4. Estándares de Código y Calidad
-1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 12 suites de pruebas (59+ tests) deben pasar al 100%.
+1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 20 suites de pruebas (104+ tests) deben pasar al 100%.
 2. **Build de Producción:** Verificar que `npm run build` compile limpiamente sin errores de bundling.
 3. **Formato y Linter:** Mantener conformidad con `npm run lint` y `npm run format`.

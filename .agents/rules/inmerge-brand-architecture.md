@@ -66,10 +66,18 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 - **Auditoría de Spam:** Registrar intentos bloqueados bajo la acción `SPAM_LEAD_BLOCKED` en `team_activity_logs`.
 - **Segmentación UX de Errores:** En la UI, capturar el código `RATE_LIMIT_EXCEEDED` para mostrar un banner informativo y suprimir el fallback `mailto:`, canalizando al usuario hacia WhatsApp.
 
-### 4.5 Convenciones de Project Management (PM) y Estados RAG
+### 4.5 Convenciones de Project Management (PM), Progreso Dinámico e Imputación de Horas
 - **Estados de Salud RAG:** Los proyectos deben calcular y admitir únicamente los estados de salud: `'ON_TRACK'`, `'AT_RISK'`, `'DELAYED'`, `'BLOCKED'`.
 - **Estados de Hitos (`project_milestones`):** `'PENDING'`, `'IN_PROGRESS'`, `'COMPLETED'`, `'DELAYED'`.
+- **Progreso Dinámico de Proyecto:** La tabla `client_projects` no contiene columna `progress`. El porcentaje de avance (0-100%) se calcula en cliente mediante `calculateProjectProgress(milestones, tasks)` ponderando hitos completados y tareas finalizadas.
+- **Control e Imputación de Horas Técnicas (`project_tasks`):** Las tareas registran `estimated_hours` y `actual_hours`. El panel `/equipo` (`ProjectTaskManager.jsx`) permite a los consultores y administradores imputar e incrementar horas reales interactivamente mediante `updateProjectTask(taskId, { actual_hours })`.
 - **Paridad de Migraciones:** Toda nueva migración `000X_*.sql` debe mantenerse idéntica tanto en `supabase/migrations/` (raíz) como en `web/app/supabase/migrations/`.
+
+### 4.6 Facturación B2B y Pagos Exclusivos por Transferencia Bancaria
+- **Método de Pago Único:** Inmerge opera bajo modelo de consultoría B2B y acepta exclusivamente pagos mediante **Transferencia Bancaria Directa** (`transferencia_bancaria`) en Soles (PEN) a sus cuentas corrientes institucionales (BCP, Interbank, BBVA). No utilizar pasarelas de tarjeta ni débitos automáticos.
+- **Validación Estricta de RUC:** Toda solicitud de facturación B2B (`createBillingOrder`) exige un RUC peruano válido de exactamente 11 dígitos numéricos que inicie con `10`, `15`, `16`, `17` o `20`.
+- **Validación de Montos:** Los importes a facturar deben ser números positivos estrictos (`amount > 0`).
+- **Suscripción Realtime en Facturación:** El hook `useOrganizationBilling` escucha eventos en tiempo real sobre `billing_orders` para reflejar instantáneamente aprobaciones o rechazos de órdenes de pago.
 
 ---
 
@@ -78,7 +86,7 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 - **Comandos de Verificación:**
   ```bash
   cd web/app
-  npm test          # Ejecuta suite completa (12 suites, 62+ tests)
+  npm test          # Ejecuta suite completa (20 suites, 104+ tests)
   npm run build     # Valida el bundle de producción en Vite
   npm run lint      # Verifica ausencia de warnings de ESLint
   npm run format    # Aplica formato consistente con Prettier
