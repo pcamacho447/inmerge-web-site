@@ -22,48 +22,75 @@ export default function Inicio() {
 
   return (
     <>
-      {/* Hero Section */}
+      {/* Hero Section with Cinematic Video Background */}
       <div
         style={{
           position: 'relative',
-          padding: '120px clamp(20px,5vw,40px) 80px',
-          minHeight: '80vh',
+          padding: '140px clamp(20px,5vw,40px) 100px',
+          minHeight: '85vh',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           overflow: 'hidden',
+          background: 'var(--ink)',
+          color: '#F3EADA',
         }}
       >
-        <div
+        {/* Background Video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
           style={{
             position: 'absolute',
-            right: -120,
-            top: '50%',
-            transform: 'translateY(-50%) rotate(45deg)',
-            width: 440,
-            height: 440,
-            background: 'var(--ink)',
-            opacity: 0.04,
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
+            opacity: 0.45,
+          }}
+        >
+          <source src="/hero_inmerge.mp4" type="video/mp4" />
+        </video>
+
+        {/* Cinematic Gradient Overlay */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(36,26,18,0.72) 0%, rgba(36,26,18,0.85) 60%, rgba(36,26,18,0.96) 100%)',
+            zIndex: 1,
+            pointerEvents: 'none',
           }}
         />
+
+        {/* Decorative Brand Accent */}
         <div
           className="breathe-diamond"
+          aria-hidden="true"
           style={{
             position: 'absolute',
             right: 'clamp(16px,6vw,60px)',
-            top: '14%',
-            width: 'clamp(32px,6vw,64px)',
-            height: 'clamp(32px,6vw,64px)',
+            top: '16%',
+            width: 'clamp(32px,5vw,56px)',
+            height: 'clamp(32px,5vw,56px)',
             background: 'var(--terracotta)',
+            zIndex: 2,
           }}
         />
-        <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', width: '100%' }}>
+
+        <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', width: '100%', zIndex: 2 }}>
           <div
             style={{
               fontFamily: "'IBM Plex Mono', monospace",
               fontSize: 13,
               letterSpacing: 3,
-              color: 'var(--terracotta)',
+              color: 'var(--gold)',
               fontWeight: 600,
               marginBottom: 24,
               textTransform: 'uppercase',
@@ -75,23 +102,49 @@ export default function Inicio() {
             style={{
               fontFamily: "'Spectral',serif",
               fontWeight: 700,
-              fontSize: 'clamp(44px,7.8vw,110px)',
-              lineHeight: 1.02,
+              fontSize: 'clamp(42px,7vw,100px)',
+              lineHeight: 1.04,
               letterSpacing: -1.5,
-              margin: '0 0 clamp(24px,4vw,36px)',
-              color: 'var(--ink)',
+              margin: '0 0 28px',
+              color: '#F3EADA',
               maxWidth: 1050,
             }}
           >
             Ingeniería de software,
             <br />
-            <span style={{ color: 'var(--terracotta)' }}>auditoría de sistemas</span>
+            <span style={{ color: 'var(--gold)' }}>auditoría de sistemas</span>
             <br />e inteligencia de datos.
           </h1>
+
+          {/* Strategic Editorial Manifesto Quote */}
+          <div
+            style={{
+              marginTop: 12,
+              marginBottom: 36,
+              paddingLeft: 24,
+              borderLeft: '3px solid var(--terracotta)',
+              maxWidth: 880,
+            }}
+          >
+            <p
+              style={{
+                fontFamily: "'Spectral', serif",
+                fontStyle: 'italic',
+                fontSize: 'clamp(17px, 2.1vw, 23px)',
+                lineHeight: 1.55,
+                color: 'rgba(243, 234, 218, 0.95)',
+                margin: 0,
+              }}
+            >
+              “Las decisiones operativas y estratégicas de alto nivel no pueden depender de hojas de cálculo aisladas ni de sistemas opacos:
+              requieren arquitectura sólida, datos auditables y código verificable.”
+            </p>
+          </div>
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 32 }}>
-            <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 520, lineHeight: 1.7, margin: 0 }}>
-              Construimos plataformas cloud robustas, auditamos la integridad de datos críticos y desplegamos modelos de IA orientados a
-              resultados reales de negocio.
+            <p style={{ fontSize: 17, color: 'var(--tan-text)', maxWidth: 540, lineHeight: 1.7, margin: 0 }}>
+              Construimos plataformas cloud robustas en AWS, auditamos la integridad de datos críticos y desplegamos modelos de IA
+              orientados a resultados reales de negocio sin intermediarios.
             </p>
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
               <Link
@@ -106,20 +159,19 @@ export default function Inicio() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 8,
+                  borderRadius: 2,
                 }}
                 className="btn-accent"
               >
                 <span>Solicitar Cotización TDR</span>
                 <span aria-hidden="true">→</span>
               </Link>
-              <a
-                href={heroWa}
-                target="_blank"
-                rel="noreferrer"
+              <Link
+                to="/servicios"
                 style={{
                   background: 'transparent',
-                  color: 'var(--ink)',
-                  border: '1px solid var(--ink)',
+                  color: 'var(--bg)',
+                  border: '1px solid var(--bg)',
                   padding: '16px 26px',
                   fontSize: 15,
                   fontWeight: 600,
@@ -127,11 +179,12 @@ export default function Inicio() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 8,
+                  borderRadius: 2,
                 }}
                 className="btn-outline"
               >
-                <span>WhatsApp Directo</span>
-              </a>
+                <span>Explorar Servicios</span>
+              </Link>
             </div>
           </div>
         </div>
