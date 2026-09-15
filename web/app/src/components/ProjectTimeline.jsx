@@ -11,11 +11,30 @@ export default function ProjectTimeline({ milestones = [] }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
       {milestones.map((m, idx) => {
         const isCompleted = m.status === 'COMPLETADO';
-        const isInProgress = m.status === 'EN_PROGRESO';
+        const isInProgress = m.status === 'EN_PROGRESO' || m.status === 'EN_PROCESO';
+        const isBlocked = m.status === 'BLOQUEADO';
 
-        const statusColor = isCompleted ? 'var(--green)' : isInProgress ? 'var(--gold)' : 'var(--muted)';
-        const statusLabel = isCompleted ? '✓ Completado' : isInProgress ? '● En progreso' : '○ Pendiente';
-        const bgBadge = isCompleted ? 'rgba(74, 156, 106, 0.1)' : isInProgress ? 'rgba(216, 168, 78, 0.15)' : 'rgba(122, 107, 88, 0.08)';
+        const statusColor = isCompleted
+          ? 'var(--green)'
+          : isBlocked
+            ? 'var(--terracotta)'
+            : isInProgress
+              ? 'var(--gold)'
+              : 'var(--muted)';
+        const statusLabel = isCompleted
+          ? '✓ Completado'
+          : isBlocked
+            ? '⚠️ Bloqueado'
+            : isInProgress
+              ? '● En progreso'
+              : '○ Pendiente';
+        const bgBadge = isCompleted
+          ? 'rgba(74, 156, 106, 0.1)'
+          : isBlocked
+            ? 'rgba(168, 71, 43, 0.12)'
+            : isInProgress
+              ? 'rgba(216, 168, 78, 0.15)'
+              : 'rgba(122, 107, 88, 0.08)';
 
         return (
           <div

@@ -49,6 +49,7 @@ const PROJECT_STATUS_COLORS = {
 
 const MILESTONE_STATUS_COLORS = {
   PENDIENTE: { bg: 'rgba(0,0,0,0.04)', text: 'var(--muted)', border: 'var(--border)' },
+  EN_PROGRESO: { bg: 'rgba(198, 138, 61, 0.15)', text: 'var(--ochre)', border: 'var(--ochre)' },
   EN_PROCESO: { bg: 'rgba(198, 138, 61, 0.15)', text: 'var(--ochre)', border: 'var(--ochre)' },
   COMPLETADO: { bg: 'rgba(46, 117, 89, 0.15)', text: '#2E7559', border: '#2E7559' },
   BLOQUEADO: { bg: 'rgba(168, 71, 43, 0.15)', text: 'var(--terracotta)', border: 'var(--terracotta)' },
@@ -1107,6 +1108,7 @@ export default function Equipo() {
                                           }}
                                         >
                                           <option value="PENDIENTE">PENDIENTE</option>
+                                          <option value="EN_PROGRESO">EN_PROGRESO</option>
                                           <option value="EN_PROCESO">EN_PROCESO</option>
                                           <option value="COMPLETADO">COMPLETADO</option>
                                           <option value="BLOQUEADO">BLOQUEADO</option>
