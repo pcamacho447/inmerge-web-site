@@ -77,6 +77,28 @@ describe('PM Components - ProjectTaskManager & ProjectRiskManager', () => {
         })
       );
     });
+
+    it('allows editing actual hours dedicated to a task', async () => {
+      const onTaskUpdated = vi.fn();
+      render(
+        <ProjectTaskManager
+          projectId="p-1"
+          milestones={mockMilestones}
+          tasks={mockTasks}
+          onTaskUpdated={onTaskUpdated}
+        />
+      );
+
+      const hoursInput = screen.getByLabelText(/Horas reales para Validación de esquema SQL/i);
+      expect(hoursInput.value).toBe('2');
+
+      fireEvent.change(hoursInput, { target: { value: '5.5' } });
+      fireEvent.blur(hoursInput);
+
+      expect(onTaskUpdated).toHaveBeenCalledWith('t-1', {
+        actual_hours: 5.5,
+      });
+    });
   });
 
   describe('ProjectRiskManager', () => {

@@ -80,6 +80,20 @@ export default function ProjectTaskManager({
     }
   };
 
+  const handleActualHoursChange = async (task, newHoursStr) => {
+    const newHours = Math.max(0, Number(newHoursStr) || 0);
+    if (Number(task.actual_hours) === newHours) return;
+    try {
+      if (onTaskUpdated) {
+        await onTaskUpdated(task.id, {
+          actual_hours: newHours,
+        });
+      }
+    } catch (err) {
+      console.error('Error al actualizar horas reales de tarea:', err);
+    }
+  };
+
   const handleDelete = async (taskId) => {
     if (!window.confirm('¿Seguro que deseas eliminar esta tarea técnica?')) return;
     try {
@@ -245,7 +259,7 @@ export default function ProjectTaskManager({
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 12 }}>
             <div>
               <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
                 Prioridad
@@ -280,6 +294,27 @@ export default function ProjectTaskManager({
                 min="0"
                 value={formData.estimated_hours}
                 onChange={(e) => setFormData({ ...formData, estimated_hours: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px 10px',
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--ink)',
+                  fontSize: 13,
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)', marginBottom: 4, fontWeight: 700 }}>
+                Horas Reales
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                min="0"
+                value={formData.actual_hours}
+                onChange={(e) => setFormData({ ...formData, actual_hours: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px 10px',
@@ -419,9 +454,49 @@ export default function ProjectTaskManager({
                   )}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ textAlign: 'right', fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--muted)' }}>
-                    <span>{task.actual_hours || 0}h / {task.estimated_hours || 0}h</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  {/* Control Interactivo de Horas Reales vs Estimadas */}
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      background: '#fff',
+                      padding: '3px 8px',
+                      border: '1px solid var(--border)',
+                      borderRadius: 4,
+                    }}
+                    title="Horas reales incurridas por el equipo técnico"
+                  >
+                    <span style={{ fontSize: 11 }}>⏱️</span>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      aria-label={`Horas reales para ${task.title}`}
+                      defaultValue={task.actual_hours ?? 0}
+                      onBlur={(e) => handleActualHoursChange(task, e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.target.blur();
+                        }
+                      }}
+                      style={{
+                        width: 48,
+                        padding: '2px 4px',
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textAlign: 'center',
+                        border: '1px solid var(--border)',
+                        borderRadius: 3,
+                        background: 'var(--bg)',
+                        color: 'var(--ink)',
+                      }}
+                    />
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--muted)' }}>
+                      / {task.estimated_hours || 0}h
+                    </span>
                   </div>
 
                   <select
