@@ -11,7 +11,10 @@ export async function fetchClientProjects(userId) {
       title,
       pillar,
       status,
+      health_status,
+      progress,
       start_date,
+      target_end_date,
       target_completion_date,
       actual_completion_date,
       description,
@@ -23,6 +26,8 @@ export async function fetchClientProjects(userId) {
         title,
         description,
         due_date,
+        start_date,
+        weight,
         status,
         order_index
       ),
@@ -34,6 +39,32 @@ export async function fetchClientProjects(userId) {
         file_path,
         external_url,
         version,
+        created_at
+      ),
+      project_tasks (
+        id,
+        milestone_id,
+        title,
+        description,
+        status,
+        priority,
+        assigned_to_name,
+        estimated_hours,
+        actual_hours,
+        weight,
+        due_date,
+        completed_at,
+        created_at
+      ),
+      project_risks (
+        id,
+        milestone_id,
+        title,
+        description,
+        severity,
+        status,
+        impact,
+        mitigation_plan,
         created_at
       )
     `,
@@ -49,8 +80,10 @@ export async function fetchClientProjects(userId) {
   // Sort milestones by order_index
   return (projects || []).map((p) => ({
     ...p,
-    milestones: (p.project_milestones || []).sort((a, b) => a.order_index - b.order_index),
+    milestones: (p.project_milestones || []).sort((a, b) => (a.order_index || 0) - (b.order_index || 0)),
     deliverables: p.project_deliverables || [],
+    tasks: p.project_tasks || [],
+    risks: p.project_risks || [],
   }));
 }
 

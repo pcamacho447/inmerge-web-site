@@ -136,6 +136,8 @@ export async function fetchTeamProjects() {
         title,
         description,
         due_date,
+        start_date,
+        weight,
         status,
         order_index
       ),
@@ -148,6 +150,12 @@ export async function fetchTeamProjects() {
         version,
         notes,
         created_at
+      ),
+      tasks:project_tasks (
+        *
+      ),
+      risks:project_risks (
+        *
       )
     `,
     )
@@ -158,7 +166,13 @@ export async function fetchTeamProjects() {
     throw new Error(error.message || 'No se pudieron cargar los proyectos');
   }
 
-  return data || [];
+  return (data || []).map((p) => ({
+    ...p,
+    milestones: (p.milestones || []).sort((a, b) => (a.order_index || 0) - (b.order_index || 0)),
+    deliverables: p.deliverables || [],
+    tasks: p.tasks || [],
+    risks: p.risks || [],
+  }));
 }
 
 /**
@@ -473,6 +487,202 @@ export async function createStaffMember({ email, password, fullName, role = 'eng
     entityType: 'profile',
     entityId: typeof data === 'string' ? data : null,
     details: { email, full_name: fullName, role },
+  });
+
+  return data;
+}
+
+/**
+ * Consulta las tareas técnicas desglosadas de un proyecto.
+ */
+export async function fetchProjectTasks(projectId) {
+  if (!projectId) return [];
+  const { data, error } = await supabase
+    .from('project_tasks')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error al obtener tareas del proyecto:', error);
+    throw new Error(error.message || 'No se pudieron cargar las tareas.');
+  }
+
+  return data || [];
+}
+
+/**
+ * Crea una nueva tarea técnica asociada a un hito y proyecto.
+ */
+export async function createProjectTask(taskPayload) {
+  const { data, error } = await supabase
+    .from('project_tasks')
+    .insert(taskPayload)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error al crear tarea técnica:', error);
+    throw new Error(error.message || 'No se pudo crear la tarea.');
+  }
+
+  logTeamActivity({
+    action: 'TASK_CREATED',
+    entityType: 'task',
+    entityId: data.id,
+    details: { project_id: data.project_id, title: data.title, status: data.status },
+  });
+
+  return data;
+}
+
+/**
+ * Actualiza el estado o atributos de una tarea técnica.
+ */
+export async function updateProjectTask(taskId, updates) {
+  const { data, error } = await supabase
+    .from('project_tasks')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', taskId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error al actualizar tarea técnica:', error);
+    throw new Error(error.message || 'No se pudo actualizar la tarea.');
+  }
+
+  logTeamActivity({
+    action: 'TASK_UPDATED',
+    entityType: 'task',
+    entityId: data.id,
+    details: { project_id: data.project_id, title: data.title, status: data.status },
+  });
+
+  return data;
+}
+
+/**
+ * Elimina una tarea técnica.
+ */
+export async function deleteProjectTask(taskId, projectId) {
+  const { error } = await supabase
+    .from('project_tasks')
+    .delete()
+    .eq('id', taskId);
+
+  if (error) {
+    console.error('Error al eliminar tarea técnica:', error);
+    throw new Error(error.message || 'No se pudo eliminar la tarea.');
+  }
+
+  logTeamActivity({
+    action: 'TASK_DELETED',
+    entityType: 'task',
+    entityId: taskId,
+    details: { project_id: projectId },
+  });
+
+  return true;
+}
+
+/**
+ * Consulta los riesgos e incidencias de un proyecto.
+ */
+export async function fetchProjectRisks(projectId) {
+  if (!projectId) return [];
+  const { data, error } = await supabase
+    .from('project_risks')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error al obtener riesgos del proyecto:', error);
+    throw new Error(error.message || 'No se pudieron cargar los riesgos.');
+  }
+
+  return data || [];
+}
+
+/**
+ * Registra un nuevo riesgo o bloqueo.
+ */
+export async function createProjectRisk(riskPayload) {
+  const { data, error } = await supabase
+    .from('project_risks')
+    .insert(riskPayload)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error al registrar riesgo/bloqueo:', error);
+    throw new Error(error.message || 'No se pudo registrar el riesgo.');
+  }
+
+  logTeamActivity({
+    action: 'RISK_REPORTED',
+    entityType: 'risk',
+    entityId: data.id,
+    details: { project_id: data.project_id, title: data.title, severity: data.severity },
+  });
+
+  return data;
+}
+
+/**
+ * Actualiza un riesgo o bloqueo (ej. marcar como resuelto).
+ */
+export async function updateProjectRisk(riskId, updates) {
+  const { data, error } = await supabase
+    .from('project_risks')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', riskId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error al actualizar riesgo/bloqueo:', error);
+    throw new Error(error.message || 'No se pudo actualizar el riesgo.');
+  }
+
+  logTeamActivity({
+    action: 'RISK_UPDATED',
+    entityType: 'risk',
+    entityId: data.id,
+    details: { project_id: data.project_id, status: data.status },
+  });
+
+  return data;
+}
+
+/**
+ * Actualiza el estado de salud RAG y fechas de un proyecto.
+ */
+export async function updateProjectHealth(projectId, { healthStatus, startDate, targetEndDate, progress }) {
+  const updates = {};
+  if (healthStatus !== undefined) updates.health_status = healthStatus;
+  if (startDate !== undefined) updates.start_date = startDate;
+  if (targetEndDate !== undefined) updates.target_end_date = targetEndDate;
+  if (progress !== undefined) updates.progress = progress;
+
+  const { data, error } = await supabase
+    .from('client_projects')
+    .update(updates)
+    .eq('id', projectId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error al actualizar salud del proyecto:', error);
+    throw new Error(error.message || 'No se pudo actualizar la salud del proyecto.');
+  }
+
+  logTeamActivity({
+    action: 'PROJECT_HEALTH_UPDATED',
+    entityType: 'project',
+    entityId: projectId,
+    details: updates,
   });
 
   return data;

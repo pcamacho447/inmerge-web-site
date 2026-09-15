@@ -3,10 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
 import ProjectTimeline from '../components/ProjectTimeline.jsx';
+import ProjectGantt from '../components/ProjectGantt.jsx';
 import useClientProjects from '../hooks/useClientProjects.js';
 import { useAuth } from '../lib/auth.jsx';
 import { waLink } from '../data/content.js';
 import { getSignedDeliverableUrl } from '../lib/projects.js';
+import { calculateProjectProgress, HEALTH_STATUS_CONFIG } from '../lib/pm.js';
 import ToastNotification from '../components/ToastNotification.jsx';
 
 const PILLAR_LABELS = {
@@ -209,7 +211,12 @@ export default function Cuenta() {
             {projects.map((project) => {
               const totalMilestones = project.milestones?.length || 0;
               const completedMilestones = project.milestones?.filter((m) => m.status === 'COMPLETADO').length || 0;
-              const progressPct = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
+              const weightedProgress = calculateProjectProgress(project.milestones, project.tasks || []);
+              const progressPct = project.progress !== undefined && project.progress !== null && project.progress > 0
+                ? project.progress
+                : weightedProgress;
+
+              const healthCfg = HEALTH_STATUS_CONFIG[project.health_status || 'ON_TRACK'] || HEALTH_STATUS_CONFIG.ON_TRACK;
 
               const techLeadWaMsg = `Hola Inmerge, soy cliente del proyecto "${project.title}". Deseo consultar sobre el estado y próximos entregables.`;
               const techLeadWaUrl = waLink(techLeadWaMsg);
@@ -266,20 +273,40 @@ export default function Cuenta() {
                       </h2>
                     </div>
 
-                    <span
-                      style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        fontSize: 12,
-                        padding: '4px 12px',
-                        background: 'var(--bg)',
-                        border: '1px solid var(--border)',
-                        color: 'var(--ink)',
-                        fontWeight: 600,
-                        borderRadius: 4,
-                      }}
-                    >
-                      Estado: {project.status}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span
+                        style={{
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          padding: '4px 10px',
+                          background: healthCfg.badgeBg,
+                          border: `1px solid ${healthCfg.color}`,
+                          color: healthCfg.color,
+                          borderRadius: 4,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                      >
+                        {healthCfg.icon} Salud: {healthCfg.label}
+                      </span>
+
+                      <span
+                        style={{
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontSize: 12,
+                          padding: '4px 12px',
+                          background: 'var(--bg)',
+                          border: '1px solid var(--border)',
+                          color: 'var(--ink)',
+                          fontWeight: 600,
+                          borderRadius: 4,
+                        }}
+                      >
+                        Estado: {project.status}
+                      </span>
+                    </div>
                   </div>
 
                   {project.description && (
@@ -378,12 +405,24 @@ export default function Cuenta() {
                     </div>
                   )}
 
-                  {/* Milestones Timeline */}
+                  {/* Milestones Timeline & Gantt Executive View */}
                   <div style={{ marginBottom: 32 }}>
-                    <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, fontWeight: 700, margin: '0 0 12px 0' }}>
-                      Hitos & Fases de Entrega
-                    </h3>
-                    <ProjectTimeline milestones={project.milestones} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, fontWeight: 700, margin: 0 }}>
+                        Cronograma & Hitos de Entrega
+                      </h3>
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      <ProjectGantt
+                        project={project}
+                        milestones={project.milestones}
+                        tasks={project.tasks || []}
+                        showTasks={false}
+                        isExecutive={true}
+                      />
+                      <ProjectTimeline milestones={project.milestones} />
+                    </div>
                   </div>
 
                   {/* Deliverables List */}

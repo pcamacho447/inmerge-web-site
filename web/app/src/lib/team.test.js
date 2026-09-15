@@ -13,6 +13,9 @@ import {
   fetchStaffMembers,
   createStaffMember,
   fetchTeamActivityLogs,
+  fetchProjectTasks,
+  createProjectTask,
+  updateProjectHealth,
 } from './team.js';
 import { supabase } from './supabaseClient.js';
 
@@ -106,7 +109,17 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
   });
 
   it('fetchTeamProjects consulta los proyectos con sus clientes, hitos y entregables', async () => {
-    const mockProjects = [{ id: 'proj-1', title: 'Auditoría PostgreSQL', client: { full_name: 'Cliente Juan' } }];
+    const mockProjects = [
+      {
+        id: 'proj-1',
+        title: 'Auditoría PostgreSQL',
+        client: { full_name: 'Cliente Juan' },
+        milestones: [],
+        deliverables: [],
+        tasks: [],
+        risks: [],
+      },
+    ];
     const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
     const selectMock = vi.fn().mockReturnValue({ order: orderMock });
     supabase.from.mockReturnValue({ select: selectMock });
@@ -288,5 +301,59 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       },
     });
     expect(res).toEqual(mockUpdatedProject);
+  });
+
+  describe('PM Methods (Tasks, Risks, Health)', () => {
+    it('fetchProjectTasks consulta las tareas del proyecto', async () => {
+      const mockTasks = [{ id: 't-1', title: 'Task 1', project_id: 'p-1' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockTasks, error: null });
+      const eqMock = vi.fn().mockReturnValue({ order: orderMock });
+      const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      const res = await fetchProjectTasks('p-1');
+      expect(supabase.from).toHaveBeenCalledWith('project_tasks');
+      expect(eqMock).toHaveBeenCalledWith('project_id', 'p-1');
+      expect(res).toEqual(mockTasks);
+    });
+
+    it('createProjectTask inserta una tarea técnica y registra auditoría', async () => {
+      const mockTask = { id: 't-1', title: 'Crear VPC', project_id: 'p-1', status: 'TODO' };
+      const singleMock = vi.fn().mockResolvedValue({ data: mockTask, error: null });
+      const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+      const insertMock = vi.fn().mockReturnValue({ select: selectMock });
+      const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      supabase.from.mockImplementation((table) => {
+        if (table === 'project_tasks') return { insert: insertMock };
+        if (table === 'team_activity_logs') return { insert: logInsertMock };
+        return {};
+      });
+
+      const res = await createProjectTask(mockTask);
+      expect(supabase.from).toHaveBeenCalledWith('project_tasks');
+      expect(insertMock).toHaveBeenCalledWith(mockTask);
+      expect(res).toEqual(mockTask);
+    });
+
+    it('updateProjectHealth actualiza la salud del proyecto', async () => {
+      const mockUpdated = { id: 'p-1', health_status: 'ON_TRACK' };
+      const singleMock = vi.fn().mockResolvedValue({ data: mockUpdated, error: null });
+      const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+      const eqMock = vi.fn().mockReturnValue({ select: selectMock });
+      const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
+      const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      supabase.from.mockImplementation((table) => {
+        if (table === 'client_projects') return { update: updateMock };
+        if (table === 'team_activity_logs') return { insert: logInsertMock };
+        return {};
+      });
+
+      const res = await updateProjectHealth('p-1', { healthStatus: 'ON_TRACK' });
+      expect(supabase.from).toHaveBeenCalledWith('client_projects');
+      expect(updateMock).toHaveBeenCalledWith({ health_status: 'ON_TRACK' });
+      expect(res).toEqual(mockUpdated);
+    });
   });
 });
