@@ -22,8 +22,8 @@ Consulte las especificaciones técnicas del entorno en:
   - `/nosotros` (Nosotros): Manifiesto de ingeniería, compromisos técnicos y perfiles senior.
   - `/contacto` (Contacto & TDR): Formulario estructurado con selector de pilares y enlace con mensaje pre-rellenado a WhatsApp.
 - **Rutas de Autenticación & Clientes:**
-  - `/login`, `/registro`, `/cuenta` (Portal de Clientes): Seguimiento exclusivo de proyectos propios, cronogramas e informes técnicos.
-  - `/equipo` (Panel de Colaboradores & Consultores): Gestión técnica de leads TDR, creación de proyectos y publicación de entregables (requiere rol `admin`, `auditor` o `engineer`).
+  - `/login`, `/registro`, `/cuenta` (Portal de Clientes): Seguimiento exclusivo de proyectos propios, cronogramas e informes técnicos para usuarios `client` y `admin`. Los ingenieros y auditores (`engineer`, `auditor`) son redirigidos obligatoriamente a `/equipo`.
+  - `/equipo` (Panel de Colaboradores & Consultores): Panel interno de trabajo. Solo `admin` puede modificar estados de proyectos/hitos/leads, crear proyectos y designar ingenieros/auditores. Los roles `engineer` y `auditor` operan en modo lectura/imputación sin permisos de modificación estructural.
 - **Restricciones de Negocio & Pagos:**
   - No reintroducir catálogos de reportes fiscales ni descargas cerradas de PDFs.
   - **Medio de Pago Exclusivo:** Se aceptan única y exclusivamente **Transferencias Bancarias Directas** a cuentas institucionales de Inmerge (BCP, Interbank, BBVA en PEN). Toda orden se gestiona con código correlativo (`INM-ORD-...`) y validación de RUC (11 dígitos).

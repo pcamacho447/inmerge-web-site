@@ -79,6 +79,12 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 - **Validación de Montos:** Los importes a facturar deben ser números positivos estrictos (`amount > 0`).
 - **Suscripción Realtime en Facturación:** El hook `useOrganizationBilling` escucha eventos en tiempo real sobre `billing_orders` para reflejar instantáneamente aprobaciones o rechazos de órdenes de pago.
 
+### 4.7 Matriz de Roles, Seguridad y Control de Acceso (RBAC)
+- **`admin`**: Control administrativo total sobre `/equipo`. Es el único rol facultado para crear y modificar proyectos, alterar estados (`status`) y salud RAG (`health_status`), gestionar hitos (`project_milestones`), convertir solicitudes de leads TDR a proyectos y designar/reasignar ingenieros y auditores como responsables técnicos. Acceso opcional a previsualización del portal de cliente.
+- **`engineer` & `auditor`**: Acceso al panel `/equipo` para consulta técnica, visualización de tareas asignadas e imputación de horas de trabajo en tareas (`project_tasks`). Todos los selectores estructurales de proyectos, hitos y leads se presentan en modo bloqueado (`🔒`) de solo lectura. **Tienen terminantemente prohibido el acceso al portal de clientes (`/cuenta`)**, siendo redirigidos automáticamente a `/equipo` por `ProtectedRoute.jsx` y `Cuenta.jsx`.
+- **`client`**: Acceso exclusivo a `/cuenta` para dar seguimiento a sus proyectos, descargar entregables y gestionar pagos bancarios.
+- **Trazabilidad Inmutable**: Toda reasignación de personal técnico y cambio de estado se registra de forma inmutable en `team_activity_logs`.
+
 ---
 
 ## 5. Estándares de Testing (Vitest + Testing Library)
