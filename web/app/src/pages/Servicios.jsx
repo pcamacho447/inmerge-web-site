@@ -365,7 +365,7 @@ export default function Servicios() {
               Completar Formulario de TDR
             </Link>
             <Link
-              to="/metodologia"
+              to="/nosotros#metodo"
               style={{
                 background: 'transparent',
                 color: 'var(--bg)',

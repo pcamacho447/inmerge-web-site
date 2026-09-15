@@ -13,7 +13,6 @@ export const SITE_URL = 'https://inmerge.pe';
 export const NAV_LINKS = [
   { to: '/', label: 'Inicio' },
   { to: '/servicios', label: 'Servicios' },
-  { to: '/metodologia', label: 'Stack & Metodología' },
   { to: '/nosotros', label: 'Nosotros' },
   { to: '/contacto', label: 'Contacto' },
 ];

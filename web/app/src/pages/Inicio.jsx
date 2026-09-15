@@ -271,7 +271,7 @@ export default function Inicio() {
 
           <div data-reveal="" style={{ textAlign: 'center', marginTop: 40 }}>
             <Link
-              to="/metodologia"
+              to="/nosotros#metodo"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
