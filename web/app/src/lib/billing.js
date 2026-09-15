@@ -65,17 +65,20 @@ export async function fetchClientOrganization(userId) {
       .from('profiles')
       .select('organization_id')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     if (pErr || !profile?.organization_id) return null;
 
     const { data: org, error: oErr } = await supabase
       .from('organizations')
-      .select('*')
+      .select('id, billing_type, legal_name, tax_id, billing_email, billing_address, created_at')
       .eq('id', profile.organization_id)
-      .single();
+      .maybeSingle();
 
-    if (oErr) return null;
+    if (oErr) {
+      console.warn('Error al obtener datos de organización:', oErr);
+      return null;
+    }
     return org;
   } catch (err) {
     console.error('Error al cargar organización:', err);
@@ -101,19 +104,26 @@ export async function updateOrganizationBilling(userId, orgData) {
     throw new Error('Razón Social y Correo de Facturación son obligatorios.');
   }
 
+  // Validación estricta de formato de RUC peruano (11 dígitos numéricos)
+  if (payload.billing_type === 'ruc') {
+    if (!payload.tax_id || !/^[0-9]{11}$/.test(payload.tax_id)) {
+      throw new Error('El RUC debe contener exactamente 11 dígitos numéricos.');
+    }
+  }
+
   // Buscar si el usuario ya tiene organization_id
   const { data: profile } = await supabase
     .from('profiles')
     .select('organization_id')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (profile?.organization_id) {
     const { data, error } = await supabase
       .from('organizations')
       .update(payload)
       .eq('id', profile.organization_id)
-      .select()
+      .select('id, billing_type, legal_name, tax_id, billing_email, billing_address, created_at')
       .single();
 
     if (error) throw error;
@@ -124,15 +134,14 @@ export async function updateOrganizationBilling(userId, orgData) {
   const { data: newOrg, error: insErr } = await supabase
     .from('organizations')
     .insert([payload])
-    .select()
+    .select('id, billing_type, legal_name, tax_id, billing_email, billing_address, created_at')
     .single();
 
   if (insErr) throw insErr;
 
   await supabase
     .from('profiles')
-    .update({ organization_id: newOrg.id })
-    .eq('id', userId);
+    .upsert({ id: userId, organization_id: newOrg.id });
 
   return newOrg;
 }
@@ -146,7 +155,7 @@ export async function fetchClientOrders(userId) {
   try {
     const { data, error } = await supabase
       .from('orders')
-      .select('*')
+      .select('id, code, kind, plan, amount_pen, method, status, notes, approved_at, created_at, expires_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -168,20 +177,25 @@ export async function fetchClientOrders(userId) {
 export async function createBankTransferOrder({ userId, plan, amountPen, notes }) {
   if (!userId) throw new Error('Usuario no autenticado.');
 
+  const parsedAmount = Number(amountPen);
+  if (isNaN(parsedAmount) || !isFinite(parsedAmount) || parsedAmount <= 0) {
+    throw new Error('El monto de la orden debe ser un valor numérico positivo en Soles (PEN).');
+  }
+
   const payload = {
     user_id: userId,
     kind: 'consultoria_servicio',
-    plan: plan || 'Servicio de Consultoría Técnica',
-    amount_pen: Number(amountPen) || 0,
+    plan: plan?.trim() || 'Servicio de Consultoría Técnica',
+    amount_pen: parsedAmount,
     method: 'transferencia_bancaria',
     status: 'pending',
-    notes: notes || 'Pago vía Transferencia Bancaria Directa a Cuentas Inmerge',
+    notes: notes?.trim() || 'Pago vía Transferencia Bancaria Directa a Cuentas Inmerge',
   };
 
   const { data, error } = await supabase
     .from('orders')
     .insert([payload])
-    .select()
+    .select('id, code, kind, plan, amount_pen, method, status, notes, approved_at, created_at, expires_at')
     .single();
 
   if (error) throw error;

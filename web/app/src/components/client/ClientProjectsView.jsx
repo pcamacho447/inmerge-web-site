@@ -91,11 +91,7 @@ export default function ClientProjectsView({
       {projects.map((proj) => {
         const totalMilestones = proj.milestones?.length || 0;
         const completedMilestones = proj.milestones?.filter((m) => m.status === 'COMPLETADO').length || 0;
-        const weightedProgress = calculateProjectProgress(proj.milestones, proj.tasks || []);
-        const progressPct =
-          proj.progress !== undefined && proj.progress !== null && proj.progress > 0
-            ? proj.progress
-            : weightedProgress;
+        const progressPct = calculateProjectProgress(proj.milestones, proj.tasks || []);
         const healthCfg = HEALTH_STATUS_CONFIG[proj.health_status || 'ON_TRACK'] || HEALTH_STATUS_CONFIG.ON_TRACK;
 
         return (

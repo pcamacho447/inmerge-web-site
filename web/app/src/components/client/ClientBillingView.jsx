@@ -18,10 +18,11 @@ export default function ClientBillingView({
     billingAddress: '',
   });
 
+  const [isDirty, setIsDirty] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState(null);
 
   useEffect(() => {
-    if (organization) {
+    if (organization && !isDirty) {
       setForm({
         billingType: organization.billing_type || 'ruc',
         legalName: organization.legal_name || '',
@@ -30,17 +31,26 @@ export default function ClientBillingView({
         billingAddress: organization.billing_address || '',
       });
     }
-  }, [organization, user]);
+  }, [organization, user, isDirty]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     await onSaveOrganization(form);
+    setIsDirty(false);
   };
 
   const handleCopy = (text, idx) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(idx);
-    setTimeout(() => setCopiedIndex(null), 2500);
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          setCopiedIndex(idx);
+          setTimeout(() => setCopiedIndex(null), 2500);
+        })
+        .catch(() => {
+          // Fallback silencioso si el portapapeles está restringido
+        });
+    }
   };
 
   return (
@@ -156,7 +166,10 @@ export default function ClientBillingView({
               </label>
               <select
                 value={form.billingType}
-                onChange={(e) => setForm({ ...form, billingType: e.target.value })}
+                onChange={(e) => {
+                  setIsDirty(true);
+                  setForm({ ...form, billingType: e.target.value });
+                }}
                 style={{
                   width: '100%',
                   padding: '8px 12px',
@@ -178,8 +191,15 @@ export default function ClientBillingView({
               </label>
               <input
                 type="text"
+                inputMode="numeric"
+                maxLength={form.billingType === 'ruc' ? 11 : 12}
                 value={form.taxId}
-                onChange={(e) => setForm({ ...form, taxId: e.target.value })}
+                onChange={(e) => {
+                  setIsDirty(true);
+                  const maxLen = form.billingType === 'ruc' ? 11 : 12;
+                  const sanitized = e.target.value.replace(/\D/g, '').slice(0, maxLen);
+                  setForm({ ...form, taxId: sanitized });
+                }}
                 placeholder={form.billingType === 'ruc' ? '20XXXXXXXXX' : 'XXXXXXXX'}
                 style={{
                   width: '100%',
@@ -202,7 +222,10 @@ export default function ClientBillingView({
                 type="text"
                 required
                 value={form.legalName}
-                onChange={(e) => setForm({ ...form, legalName: e.target.value })}
+                onChange={(e) => {
+                  setIsDirty(true);
+                  setForm({ ...form, legalName: e.target.value });
+                }}
                 placeholder="e.g. Inversiones & Tecnología del Perú S.A.C."
                 style={{
                   width: '100%',
@@ -223,7 +246,10 @@ export default function ClientBillingView({
                 type="email"
                 required
                 value={form.billingEmail}
-                onChange={(e) => setForm({ ...form, billingEmail: e.target.value })}
+                onChange={(e) => {
+                  setIsDirty(true);
+                  setForm({ ...form, billingEmail: e.target.value });
+                }}
                 placeholder="finanzas@empresa.pe"
                 style={{
                   width: '100%',
@@ -244,7 +270,10 @@ export default function ClientBillingView({
             <input
               type="text"
               value={form.billingAddress}
-              onChange={(e) => setForm({ ...form, billingAddress: e.target.value })}
+              onChange={(e) => {
+                setIsDirty(true);
+                setForm({ ...form, billingAddress: e.target.value });
+              }}
               placeholder="Av. Javier Prado Este 1234, San Isidro, Lima"
               style={{
                 width: '100%',

@@ -15,7 +15,6 @@ vi.mock('./supabaseClient.js', () => ({
   },
 }));
 
-
 describe('billing.js module', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -37,7 +36,103 @@ describe('billing.js module', () => {
     expect(res).toBeNull();
   });
 
-  it('createBankTransferOrder inserts with method "transferencia_bancaria" and status "pending"', async () => {
+  it('updateOrganizationBilling validates required fields and 11-digit RUC format', async () => {
+    await expect(
+      updateOrganizationBilling('usr-1', { legalName: '', billingEmail: 'test@empresa.pe' }),
+    ).rejects.toThrow('Razón Social y Correo de Facturación son obligatorios.');
+
+    await expect(
+      updateOrganizationBilling('usr-1', {
+        legalName: 'Tech S.A.C.',
+        billingEmail: 'test@empresa.pe',
+        billingType: 'ruc',
+        taxId: '2012345', // Inválido, menos de 11 dígitos
+      }),
+    ).rejects.toThrow('El RUC debe contener exactamente 11 dígitos numéricos.');
+
+    await expect(
+      updateOrganizationBilling('usr-1', {
+        legalName: 'Tech S.A.C.',
+        billingEmail: 'test@empresa.pe',
+        billingType: 'ruc',
+        taxId: '2012345678A', // Inválido, contiene letras
+      }),
+    ).rejects.toThrow('El RUC debe contener exactamente 11 dígitos numéricos.');
+  });
+
+  it('updateOrganizationBilling successfully creates new organization and links profile', async () => {
+    const mockProfileSelect = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+      }),
+    });
+
+    const mockOrgInsert = vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({
+          data: { id: 'org-99', legal_name: 'Tech SAC', tax_id: '20601234567' },
+          error: null,
+        }),
+      }),
+    });
+
+    const mockProfileUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'profiles') {
+        return { select: mockProfileSelect, upsert: mockProfileUpsert };
+      }
+      if (table === 'organizations') {
+        return { insert: mockOrgInsert };
+      }
+      return {};
+    });
+
+    const result = await updateOrganizationBilling('usr-1', {
+      billingType: 'ruc',
+      legalName: 'Tech SAC',
+      taxId: '20601234567',
+      billingEmail: 'admin@tech.pe',
+    });
+
+    expect(result.id).toBe('org-99');
+    expect(mockOrgInsert).toHaveBeenCalled();
+    expect(mockProfileUpsert).toHaveBeenCalledWith({
+      id: 'usr-1',
+      organization_id: 'org-99',
+    });
+  });
+
+  it('fetchClientOrders retrieves orders sorted by creation date with explicit projection', async () => {
+    const mockOrderSelect = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        order: vi.fn().mockResolvedValue({
+          data: [{ id: 'ord-1', code: 'INM-2026-0001', amount_pen: 5000 }],
+          error: null,
+        }),
+      }),
+    });
+
+    supabase.from.mockReturnValue({ select: mockOrderSelect });
+
+    const orders = await fetchClientOrders('usr-1');
+    expect(orders).toHaveLength(1);
+    expect(orders[0].code).toBe('INM-2026-0001');
+  });
+
+  it('createBankTransferOrder validates positive amount and inserts with method "transferencia_bancaria"', async () => {
+    await expect(
+      createBankTransferOrder({ userId: 'usr-1', amountPen: 0 }),
+    ).rejects.toThrow('El monto de la orden debe ser un valor numérico positivo');
+
+    await expect(
+      createBankTransferOrder({ userId: 'usr-1', amountPen: -150 }),
+    ).rejects.toThrow('El monto de la orden debe ser un valor numérico positivo');
+
+    await expect(
+      createBankTransferOrder({ userId: 'usr-1', amountPen: 'abc' }),
+    ).rejects.toThrow('El monto de la orden debe ser un valor numérico positivo');
+
     const mockInsert = vi.fn().mockReturnValue({
       select: vi.fn().mockReturnValue({
         single: vi.fn().mockResolvedValue({

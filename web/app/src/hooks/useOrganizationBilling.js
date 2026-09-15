@@ -57,14 +57,24 @@ export default function useOrganizationBilling(userId) {
         (payload) => {
           if (payload.eventType === 'UPDATE') {
             const updated = payload.new;
-            setOrders((prev) =>
-              prev.map((o) => (o.id === updated.id ? { ...o, ...updated } : o)),
-            );
+            setOrders((prev) => {
+              const exists = prev.some((o) => o.id === updated.id);
+              return exists
+                ? prev.map((o) => (o.id === updated.id ? { ...o, ...updated } : o))
+                : [updated, ...prev];
+            });
+
             if (updated.status === 'approved') {
               setToast({
                 type: 'deliverable',
                 title: 'Transferencia Bancaria Confirmada',
                 message: `Tu orden ${updated.code} ha sido aprobada y validada por el equipo de finanzas.`,
+              });
+            } else if (updated.status === 'rejected') {
+              setToast({
+                type: 'error',
+                title: 'Orden Anulada / Rechazada',
+                message: `La orden ${updated.code} fue anulada o no se constató la transferencia bancaria.`,
               });
             }
           } else if (payload.eventType === 'INSERT') {
@@ -90,18 +100,39 @@ export default function useOrganizationBilling(userId) {
         message: 'La información de tu organización ha sido actualizada correctamente.',
       });
       return updated;
+    } catch (err) {
+      setToast({
+        type: 'error',
+        title: 'Error al Guardar',
+        message: err.message || 'No se pudieron actualizar los datos fiscales.',
+      });
+      throw err;
     } finally {
       setSaving(false);
     }
   };
 
   const handleCreateOrder = async (orderPayload) => {
-    const created = await createBankTransferOrder({
-      userId,
-      ...orderPayload,
-    });
-    setOrders((prev) => [created, ...prev]);
-    return created;
+    try {
+      const created = await createBankTransferOrder({
+        userId,
+        ...orderPayload,
+      });
+      setOrders((prev) => [created, ...prev]);
+      setToast({
+        type: 'info',
+        title: 'Orden Registrada',
+        message: `Orden ${created.code} generada para transferencia bancaria.`,
+      });
+      return created;
+    } catch (err) {
+      setToast({
+        type: 'error',
+        title: 'Error al Generar Orden',
+        message: err.message || 'No se pudo crear la orden de servicio.',
+      });
+      throw err;
+    }
   };
 
   return {

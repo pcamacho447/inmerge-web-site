@@ -76,12 +76,12 @@ export async function fetchClientProjects(userId) {
     throw new Error(error.message || 'Error al cargar los proyectos.');
   }
 
-  // Sort milestones by order_index
+  // Sort milestones by order_index and tasks by due_date
   return (projects || []).map((p) => ({
     ...p,
     milestones: (p.project_milestones || []).sort((a, b) => (a.order_index || 0) - (b.order_index || 0)),
     deliverables: p.project_deliverables || [],
-    tasks: p.project_tasks || [],
+    tasks: (p.project_tasks || []).sort((a, b) => new Date(a.due_date || a.created_at || 0) - new Date(b.due_date || b.created_at || 0)),
     risks: p.project_risks || [],
   }));
 }
