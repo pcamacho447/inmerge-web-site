@@ -16,11 +16,12 @@ Consulte las especificaciones técnicas del entorno en:
 
 ## 2. Reglas de Navegación y Rutas
 - **Rutas Públicas:**
-  - `/` (Inicio): Hero de alto impacto, pilares interactivos, diagrama de arquitectura y valores.
+  - `/` (Inicio): Hero con video de fondo cinemático, navbar transparente sin bordes sobre el video, pilares interactivos, diagrama de arquitectura y segmentos de mercado directos al CTA. No incluir bloques redundantes del manifiesto ni la cuadrícula de "Principios de Ingeniería" (reservada para `/nosotros`).
   - `/servicios` (Servicios): Catálogo filtrable por pilar, acordeones de diagnóstico/entregables y cotización directa.
-  - `/metodologia` (Stack & Metodología): Las 4 fases del Método Inmerge, diagrama de flujo y explorador de tecnologías.
-  - `/nosotros` (Nosotros): Manifiesto de ingeniería, compromisos técnicos y perfiles senior.
+  - `/nosotros` (Nosotros): Manifiesto de ingeniería, Misión, Visión, Propósito, Compromisos técnicos (Valores), Método Inmerge y explorador de tecnologías (Stack).
   - `/contacto` (Contacto & TDR): Formulario estructurado con selector de pilares y enlace con mensaje pre-rellenado a WhatsApp.
+- **Estructura del Header Público:**
+  - 4 enlaces principales: `Inicio`, `Servicios`, `Nosotros`, `Contacto` más botón lateral `Iniciar sesión` (el acceso a WhatsApp se canaliza en los CTAs de pilares, servicios y contacto).
 - **Rutas de Autenticación & Clientes:**
   - `/login`, `/registro`, `/cuenta` (Portal de Clientes): Seguimiento exclusivo de proyectos propios, cronogramas e informes técnicos para usuarios `client` y `admin`. Los ingenieros y auditores (`engineer`, `auditor`) son redirigidos obligatoriamente a `/equipo`.
   - `/equipo` (Panel de Colaboradores & Consultores): Panel interno de trabajo. Solo `admin` puede modificar estados de proyectos/hitos/leads, crear proyectos y designar ingenieros/auditores. Los roles `engineer` y `auditor` operan en modo lectura/imputación sin permisos de modificación estructural.

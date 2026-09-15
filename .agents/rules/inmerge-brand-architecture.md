@@ -19,6 +19,11 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
    - Tarjeta interactiva con efecto de elevación `.pillar-card-interactive`, que enlaza al catálogo `/servicios` y permite cotización directa vía WhatsApp.
 3. **[`ArchitectureDiagram.jsx`](file:///c:/papx/inmerge-website/inmerge/web/app/src/components/ArchitectureDiagram.jsx):**
    - Representación visual modular del ciclo de ingeniería y aseguramiento técnico en 4 capas (Ingestión/Auditoría, AWS/Pipelines, Modelos/IA, Aplicaciones Vivas).
+4. **[`Nav.jsx`](file:///c:/papx/inmerge-website/inmerge/web/app/src/components/Nav.jsx) y Video Hero Cinemático:**
+   - En `/` (Landing), el Navbar se sobrepone de forma transparente (`background: transparent`) y sin borde divisor inferior (`border-bottom: none`) sobre el video de fondo (`hero_inmerge.mp4`). Al hacer scroll (`scrollY > 40`), transiciona fluidamente a fondo acrílico (`rgba(243, 234, 218, 0.95)`, `backdrop-filter: blur(8px)` y borde sutil).
+   - El header público cuenta estrictamente con 4 enlaces principales (`Inicio`, `Servicios`, `Nosotros`, `Contacto`) y un botón de acción a la derecha (`Iniciar sesión`).
+5. **Concisión del Landing Page (`/`):**
+   - El landing page debe mantenerse ágil y directo al objetivo de conversión. No reintroducir sliders de citas duplicadas ni la cuadrícula de "Principios de Ingeniería" (`VALUES`), cuyos compromisos viven oficialmente en `/nosotros`.
 
 ---
 
@@ -87,15 +92,19 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 
 ---
 
-## 5. Estándares de Testing (Vitest + Testing Library)
+## 5. Estándares de Testing (Vitest + Testing Library) y Despliegue
 - **Defensiva para jsdom:** En componentes que invoquen `useReveal`, asegurarse de que `IntersectionObserver` esté protegido o mockeado en [`src/test-setup.js`](file:///c:/papx/inmerge-website/inmerge/web/app/src/test-setup.js).
 - **Comandos de Verificación:**
   ```bash
   cd web/app
-  npm test          # Ejecuta suite completa (20 suites, 104+ tests)
+  npm test          # Ejecuta suite completa (23 suites, 125+ tests)
   npm run build     # Valida el bundle de producción en Vite
   npm run lint      # Verifica ausencia de warnings de ESLint
   npm run format    # Aplica formato consistente con Prettier
   ```
+- **Despliegue en Cloudflare Pages:**
+  - El archivo `package.json` en la raíz del repositorio incluye un script `"build"` que compila `web/app` y copia automáticamente el resultado a `dist/` en la raíz. Esto garantiza compilaciones exitosas tanto si Cloudflare Pages está configurado en la raíz (`/`) como en el subdirectorio `web/app`.
+- **Entorno PowerShell en Windows:**
+  - En PowerShell, no encadenar comandos con `&&` ya que causa error de sintaxis en versiones estándar de Windows. Utilizar `;` o invocar cada comando de forma individual.
 
 
