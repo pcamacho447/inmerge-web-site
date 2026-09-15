@@ -1,5 +1,19 @@
 import { supabase } from './supabaseClient.js';
 
+/**
+ * submitLeadTdr - Registra una solicitud de cotización/TDR con protección Anti-Spam y Rate Limiting.
+ *
+ * @param {Object} params
+ * @param {string} params.pillar - Pilar estratégico
+ * @param {string} params.fullName - Nombre de contacto
+ * @param {string} params.company - Empresa u organización
+ * @param {string} params.email - Correo electrónico
+ * @param {string} params.phone - Teléfono o WhatsApp
+ * @param {string} params.timeline - Plazo estimado
+ * @param {string} params.message - Detalle del requerimiento
+ * @param {string} params.honeypot - Campo trampa anti-bot (debe estar vacío para humanos)
+ * @returns {Promise<{ success: boolean, isSpamFiltered?: boolean, lead?: Object }>}
+ */
 export async function submitLeadTdr({
   pillar = 'auditoria',
   fullName = '',
@@ -8,7 +22,14 @@ export async function submitLeadTdr({
   phone = '',
   timeline = '1 a 2 meses',
   message = '',
+  honeypot = '',
 }) {
+  // 1. Detección de Bots vía Honeypot (Shadow Ban: Simular éxito inmediato sin tocar la base de datos)
+  if (honeypot && String(honeypot).trim().length > 0) {
+    console.warn('[leads] Bot detectado mediante honeypot. Ejecutando shadow ban silencioso.');
+    return { success: true, isSpamFiltered: true };
+  }
+
   const cleanEmail = (email || '').trim().toLowerCase();
   const cleanMessage = (message || '').trim();
 
@@ -35,6 +56,15 @@ export async function submitLeadTdr({
 
   if (error) {
     console.error('Error al registrar solicitud TDR en Supabase:', error);
+
+    // Detectar si el trigger de PostgreSQL bloqueó la inserción por exceso de tasa
+    if (error.message && error.message.includes('RATE_LIMIT_EXCEEDED')) {
+      const rateLimitErr = new Error('Has superado el límite de 3 solicitudes por hora para este correo. Si necesitas atención inmediata, por favor contáctanos vía WhatsApp.');
+      rateLimitErr.isRateLimited = true;
+      rateLimitErr.code = 'RATE_LIMIT_EXCEEDED';
+      throw rateLimitErr;
+    }
+
     throw new Error(error.message || 'Error al guardar la solicitud en el servidor.');
   }
 

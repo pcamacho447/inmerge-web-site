@@ -28,6 +28,42 @@ describe('leads.js - submitLeadTdr', () => {
     );
   });
 
+  it('activates shadow ban when honeypot is filled without calling supabase', async () => {
+    const result = await submitLeadTdr({
+      email: 'bot@spam.com',
+      message: 'Spam payload',
+      honeypot: 'http://spam-link.com',
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.isSpamFiltered).toBe(true);
+    expect(supabase.from).not.toHaveBeenCalled();
+    expect(supabase.functions.invoke).not.toHaveBeenCalled();
+  });
+
+  it('handles RATE_LIMIT_EXCEEDED errors from PostgreSQL with isRateLimited flag', async () => {
+    const mockInsert = vi.fn().mockResolvedValue({
+      error: {
+        message: 'RATE_LIMIT_EXCEEDED: Se ha alcanzado el límite de 3 solicitudes por hora para este correo.',
+      },
+    });
+
+    supabase.from.mockReturnValue({
+      insert: mockInsert,
+    });
+
+    await expect(
+      submitLeadTdr({
+        email: 'cliente@empresa.com',
+        message: 'Intento 4 de cotización',
+      }),
+    ).rejects.toMatchObject({
+      isRateLimited: true,
+      code: 'RATE_LIMIT_EXCEEDED',
+      message: expect.stringContaining('límite de 3 solicitudes por hora'),
+    });
+  });
+
   it('successfully sanitizes, inserts lead and triggers notify-lead-tdr', async () => {
     const mockInsert = vi.fn().mockResolvedValue({
       error: null,

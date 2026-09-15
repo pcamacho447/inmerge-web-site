@@ -25,9 +25,11 @@ export default function Contacto() {
   const [formPhone, setFormPhone] = useState('');
   const [formTimeline, setFormTimeline] = useState('1 a 2 meses');
   const [formMessage, setFormMessage] = useState(preselectedService ? `Interés en el servicio: ${preselectedService}\n\n` : '');
+  const [formHoneypot, setFormHoneypot] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [isRateLimited, setIsRateLimited] = useState(false);
 
   useEffect(() => {
     if (preselectedService) {
@@ -41,6 +43,7 @@ export default function Contacto() {
 
     setIsSubmitting(true);
     setSubmitError(null);
+    setIsRateLimited(false);
 
     try {
       await submitLeadTdr({
@@ -51,9 +54,16 @@ export default function Contacto() {
         phone: formPhone,
         timeline: formTimeline,
         message: formMessage,
+        honeypot: formHoneypot,
       });
       setFormSubmitted(true);
     } catch (err) {
+      if (err.isRateLimited || err.code === 'RATE_LIMIT_EXCEEDED' || (err.message && err.message.includes('RATE_LIMIT_EXCEEDED'))) {
+        setIsRateLimited(true);
+        setSubmitError(err.message || 'Has superado el límite de 3 solicitudes por hora para este correo.');
+        return;
+      }
+
       console.warn('Fallo al guardar lead en Supabase, activando fallback:', err);
       // Fallback a mailto si la base de datos o conexión falla
       const subject = `Solicitud TDR / Cotización — ${formCompany || formName || 'Inmerge'}`;
@@ -437,7 +447,79 @@ export default function Contacto() {
               />
             </div>
 
-            {submitError && (
+            {/* Campo Honeypot Anti-Bot Invisible */}
+            <div
+              style={{
+                opacity: 0,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                height: 0,
+                width: 0,
+                zIndex: -1,
+                overflow: 'hidden',
+                pointerEvents: 'none',
+              }}
+              aria-hidden="true"
+            >
+              <label htmlFor="website_url_hp">No completar este campo</label>
+              <input
+                id="website_url_hp"
+                type="text"
+                name="website_url_hp"
+                tabIndex={-1}
+                autoComplete="off"
+                value={formHoneypot}
+                onChange={(e) => setFormHoneypot(e.target.value)}
+              />
+            </div>
+
+            {submitError && isRateLimited && (
+              <div
+                style={{
+                  padding: '16px 20px',
+                  background: 'rgba(168, 71, 43, 0.1)',
+                  border: '1px solid var(--terracotta)',
+                  color: 'var(--ink)',
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                }}
+              >
+                <div>
+                  <strong style={{ color: 'var(--terracotta)', display: 'block', marginBottom: 4 }}>
+                    ⚠️ Límite de solicitudes de cotización alcanzado
+                  </strong>
+                  Has enviado 3 solicitudes recientemente desde este correo electrónico. Para prevenir saturación y garantizar atención prioritaria, por favor comunícate directamente con nuestro equipo de ingeniería vía WhatsApp.
+                </div>
+                <div>
+                  <a
+                    href={customWaUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      background: '#25D366',
+                      color: '#fff',
+                      padding: '8px 16px',
+                      borderRadius: 20,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      fontFamily: "'IBM Plex Sans', sans-serif",
+                    }}
+                  >
+                    💬 Contactar por WhatsApp de Inmediato
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {submitError && !isRateLimited && (
               <div
                 style={{
                   padding: '12px 16px',
