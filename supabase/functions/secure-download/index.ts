@@ -68,6 +68,8 @@ Deno.serve(async (req) => {
         file_path,
         external_url,
         version,
+        sha256_checksum,
+        file_size_bytes,
         project_id,
         project:project_id (
           id,
@@ -122,7 +124,7 @@ Deno.serve(async (req) => {
 
     const userAgent = req.headers.get('user-agent') || 'Desconocido';
 
-    // 6. Registrar evento inmutable de descarga en bitácora de auditoría
+    // 6. Registrar evento inmutable de descarga en bitácora de auditoría y verificar anomalías
     try {
       await supabaseAdmin.from('team_activity_logs').insert({
         user_id: user.id,
@@ -133,6 +135,7 @@ Deno.serve(async (req) => {
           deliverable_title: deliverable.title,
           file_type: deliverable.file_type,
           version: deliverable.version,
+          sha256_checksum: deliverable.sha256_checksum,
           project_id: deliverable.project_id,
           project_title: (deliverable.project as { title?: string })?.title || 'N/A',
           file_path: targetFilePath,
@@ -142,6 +145,13 @@ Deno.serve(async (req) => {
           user_email: user.email,
           user_role: profile?.role || 'client',
         },
+      });
+
+      // Verificación de ráfaga anómala de descargas
+      await supabaseAdmin.rpc('detect_download_anomaly', {
+        p_user_id: user.id,
+        p_window_seconds: 60,
+        p_max_downloads: 12,
       });
     } catch (logErr) {
       console.warn('[secure-download] Error al registrar log forense:', logErr);
@@ -174,6 +184,8 @@ Deno.serve(async (req) => {
           title: deliverable.title,
           file_type: deliverable.file_type,
           version: deliverable.version,
+          sha256_checksum: deliverable.sha256_checksum || null,
+          file_size_bytes: deliverable.file_size_bytes || null,
         },
       }),
       {

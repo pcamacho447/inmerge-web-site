@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fetchClientProjects, getSignedDeliverableUrl } from './projects.js';
+import {
+  fetchClientProjects,
+  getSignedDeliverableUrl,
+  calculateFileSha256,
+  verifyDeliverableIntegrity,
+  generateExecutiveReportMarkdown,
+} from './projects.js';
 import { supabase } from './supabaseClient.js';
 
 vi.mock('./supabaseClient.js', () => ({
@@ -112,5 +118,39 @@ describe('projects.js', () => {
         entity_id: 'deliv-123',
       }),
     );
+  });
+
+  it('calculateFileSha256 and verifyDeliverableIntegrity perform cryptographic validation', async () => {
+    const testData = new TextEncoder().encode('Inmerge Technical Audit Deliverable');
+    const blob = new Blob([testData], { type: 'text/plain' });
+
+    const hash = await calculateFileSha256(blob);
+    expect(hash).toBeDefined();
+    expect(hash).toHaveLength(64);
+
+    const verification = await verifyDeliverableIntegrity(blob, hash);
+    expect(verification.valid).toBe(true);
+
+    const badVerification = await verifyDeliverableIntegrity(blob, '0000000000000000000000000000000000000000000000000000000000000000');
+    expect(badVerification.valid).toBe(false);
+  });
+
+  it('generateExecutiveReportMarkdown produces a complete editorial markdown summary', () => {
+    const sampleProj = {
+      title: 'Auditoría Forense de Base de Datos',
+      pillar: '01. Auditoría Técnica & Datos',
+      health_status: 'ON_TRACK',
+      tech_lead_name: 'Carlos Mendoza',
+      tech_lead_contact: 'cmendoza@inmerge.pe',
+      milestones: [{ title: 'Fase 1: Diagnóstico', status: 'COMPLETED', due_date: '2026-09-30' }],
+      tasks: [{ title: 'Análisis de Redundancias', status: 'DONE', estimated_hours: 20, actual_hours: 18 }],
+      deliverables: [{ title: 'Reporte Forense.pdf', version: '1.0', file_type: 'PDF', sha256_checksum: 'a1b2c3d4e5f6' }],
+    };
+
+    const report = generateExecutiveReportMarkdown(sampleProj);
+    expect(report).toContain('INMERGE — Resumen Ejecutivo de Proyecto');
+    expect(report).toContain('Auditoría Forense de Base de Datos');
+    expect(report).toContain('Reporte Forense.pdf');
+    expect(report).toContain('a1b2c3d4e5f6');
   });
 });

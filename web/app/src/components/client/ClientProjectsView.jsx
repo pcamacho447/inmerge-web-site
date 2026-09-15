@@ -1,6 +1,7 @@
 import ProjectGantt from '../ProjectGantt.jsx';
 import ProjectTimeline from '../ProjectTimeline.jsx';
 import { calculateProjectProgress, HEALTH_STATUS_CONFIG } from '../../lib/pm.js';
+import { generateExecutiveReportMarkdown } from '../../lib/projects.js';
 
 export const PILLAR_LABELS = {
   auditoria: '01. Auditoría Técnica & Datos',
@@ -159,36 +160,72 @@ export default function ClientProjectsView({
                   {proj.title}
                 </h2>
 
-                {proj.description && (
-                  <p style={{ margin: 0, fontSize: 14, color: 'var(--ink)', lineHeight: 1.5, maxWidth: 680 }}>
-                    {proj.description}
-                  </p>
-                )}
+                <p style={{ color: 'var(--muted)', fontSize: 13, margin: 0, maxWidth: 650 }}>
+                  {proj.description || 'Sin descripción detallada registrada.'}
+                </p>
               </div>
 
-              {/* Progress Summary Card */}
-              <div
-                style={{
-                  background: 'var(--bg)',
-                  padding: '16px 20px',
-                  borderRadius: 6,
-                  border: '1px solid var(--border)',
-                  minWidth: 180,
-                }}
-              >
-                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginBottom: 4 }}>
-                  PROGRESO PONDERADO
+              {/* Botón de Exportación Ejecutiva */}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const mdContent = generateExecutiveReportMarkdown(proj);
+                    const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `INMERGE_Resumen_Ejecutivo_${proj.title.replace(/\s+/g, '_')}.md`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="btn-outline"
+                  style={{
+                    border: '1px solid var(--border)',
+                    background: '#fff',
+                    color: 'var(--ink)',
+                    padding: '8px 14px',
+                    borderRadius: 20,
+                    fontSize: 12,
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                >
+                  📄 Exportar Resumen
+                </button>
+              </div>
+            </div>
+
+            {/* Metrics Bar */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                gap: 16,
+                marginBottom: 24,
+                background: '#fff',
+                padding: '16px 20px',
+                borderRadius: 6,
+                border: '1px solid var(--border)',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>Avance Calculado</div>
+                <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)' }}>
+                  {progressPct}%
                 </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <strong style={{ fontSize: 28, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)' }}>
-                    {progressPct}%
-                  </strong>
-                  <span style={{ fontSize: 12, color: 'var(--muted)', fontFamily: "'IBM Plex Mono', monospace" }}>
-                    ({completedMilestones}/{totalMilestones} Hitos)
-                  </span>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>Hitos Completados</div>
+                <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)' }}>
+                  {completedMilestones} / {totalMilestones}
                 </div>
-                <div style={{ width: '100%', height: 6, background: 'var(--cream2)', marginTop: 8, borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ width: `${progressPct}%`, height: '100%', background: 'var(--terracotta)', transition: 'width 0.4s ease' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>Tech Lead</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', marginTop: 4 }}>
+                  {proj.tech_lead_name || 'Senior Inmerge'}
                 </div>
               </div>
             </div>
@@ -196,7 +233,7 @@ export default function ClientProjectsView({
             {/* Gantt & Milestones */}
             <div style={{ marginBottom: 28 }}>
               <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 18, margin: '0 0 14px', color: 'var(--ink)' }}>
-                Cronograma de Ejecución
+                Cronograma & Hitos Ejecutivos
               </h3>
               <ProjectGantt
                 project={proj}
@@ -241,7 +278,7 @@ export default function ClientProjectsView({
                         }}
                       >
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
                             <span
                               style={{
                                 fontFamily: "'IBM Plex Mono', monospace",
@@ -259,6 +296,23 @@ export default function ClientProjectsView({
                             <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--muted)' }}>
                               Versión: {deliv.version || 'v1.0'}
                             </span>
+                            {deliv.sha256_checksum && (
+                              <span
+                                title={`Checksum SHA-256: ${deliv.sha256_checksum}`}
+                                style={{
+                                  fontFamily: "'IBM Plex Mono', monospace",
+                                  fontSize: 10,
+                                  background: 'rgba(74, 156, 106, 0.12)',
+                                  color: 'var(--green, #4A9C6A)',
+                                  border: '1px solid rgba(74, 156, 106, 0.3)',
+                                  padding: '2px 6px',
+                                  borderRadius: 4,
+                                  cursor: 'help',
+                                }}
+                              >
+                                🔒 SHA-256: {deliv.sha256_checksum.slice(0, 8)}...
+                              </span>
+                            )}
                           </div>
                           <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{deliv.title}</div>
                           {deliv.notes && <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{deliv.notes}</div>}

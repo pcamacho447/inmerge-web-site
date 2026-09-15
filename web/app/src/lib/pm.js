@@ -248,3 +248,62 @@ export function sanitizeRiskPayload(payload) {
     resolved_at: payload.status === 'RESUELTO' ? (payload.resolved_at || new Date().toISOString()) : null,
   };
 }
+
+/**
+ * Consulta las métricas analíticas del proyecto mediante el RPC PostgreSQL get_project_analytics
+ * con fallback local resiliente.
+ */
+export async function fetchProjectAnalytics(projectId, localProjectData = null) {
+  if (!projectId) return null;
+
+  try {
+    const { supabase } = await import('./supabaseClient.js');
+    if (supabase && typeof supabase.rpc === 'function') {
+      const { data, error } = await supabase.rpc('get_project_analytics', {
+        p_project_id: projectId,
+      });
+      if (!error && data) {
+        return data;
+      }
+    }
+  } catch (rpcErr) {
+    console.warn('[pm] RPC get_project_analytics no disponible, calculando en cliente:', rpcErr);
+  }
+
+  // Fallback analítico local si se pasan los datos del proyecto
+  if (localProjectData) {
+    const tasks = localProjectData.tasks || [];
+    const milestones = localProjectData.milestones || [];
+    const risks = localProjectData.risks || [];
+
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter((t) => t.status === 'DONE').length;
+    const inProgressTasks = tasks.filter((t) => t.status === 'IN_PROGRESS').length;
+    const blockedTasks = tasks.filter((t) => t.status === 'BLOCKED').length;
+    const overdueTasks = tasks.filter((t) => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'DONE').length;
+
+    const estHours = tasks.reduce((sum, t) => sum + (Number(t.estimated_hours) || 0), 0);
+    const actHours = tasks.reduce((sum, t) => sum + (Number(t.actual_hours) || 0), 0);
+    const variance = estHours > 0 ? Number((((actHours - estHours) / estHours) * 100).toFixed(2)) : 0;
+    const completionPct = totalTasks > 0 ? Number(((completedTasks / totalTasks) * 100).toFixed(1)) : 0;
+
+    return {
+      project_id: projectId,
+      total_tasks: totalTasks,
+      completed_tasks: completedTasks,
+      in_progress_tasks: inProgressTasks,
+      blocked_tasks: blockedTasks,
+      overdue_tasks: overdueTasks,
+      total_estimated_hours: estHours,
+      total_actual_hours: actHours,
+      effort_variance_pct: variance,
+      completion_pct: completionPct,
+      total_milestones: milestones.length,
+      completed_milestones: milestones.filter((m) => m.status === 'COMPLETED').length,
+      open_risks_count: risks.filter((r) => r.status !== 'RESUELTO').length,
+    };
+  }
+
+  return null;
+}
+

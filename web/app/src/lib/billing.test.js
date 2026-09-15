@@ -6,12 +6,18 @@ import {
   updateOrganizationBilling,
   fetchClientOrders,
   createBankTransferOrder,
+  uploadOrderVoucher,
+  verifyBillingOrderAdmin,
 } from './billing.js';
 import { supabase } from './supabaseClient.js';
 
 vi.mock('./supabaseClient.js', () => ({
   supabase: {
     from: vi.fn(),
+    storage: {
+      from: vi.fn(),
+    },
+    rpc: vi.fn(),
   },
 }));
 
@@ -165,5 +171,52 @@ describe('billing.js module', () => {
         amount_pen: 4500,
       }),
     ]);
+  });
+
+  it('uploadOrderVoucher uploads binary to storage and updates order status', async () => {
+    const mockUpload = vi.fn().mockResolvedValue({ error: null });
+    supabase.storage.from.mockReturnValue({ upload: mockUpload });
+
+    const mockUpdate = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
+            data: { id: 'ord-1', voucher_status: 'uploaded' },
+            error: null,
+          }),
+        }),
+      }),
+    });
+    supabase.from.mockReturnValue({ update: mockUpdate });
+
+    const fakeFile = new File(['voucher_content'], 'voucher.pdf', { type: 'application/pdf' });
+    const res = await uploadOrderVoucher({ orderId: 'ord-1', file: fakeFile, userId: 'usr-1' });
+
+    expect(res.voucher_status).toBe('uploaded');
+    expect(supabase.storage.from).toHaveBeenCalledWith('billing-vouchers');
+  });
+
+  it('verifyBillingOrderAdmin calls RPC verify_billing_order and handles errors', async () => {
+    supabase.rpc.mockResolvedValue({
+      data: { success: true, status: 'approved' },
+      error: null,
+    });
+
+    const res = await verifyBillingOrderAdmin({
+      orderId: 'ord-1',
+      status: 'approved',
+      adminNotes: 'Transferencia BCP confirmada',
+    });
+
+    expect(res.status).toBe('approved');
+    expect(supabase.rpc).toHaveBeenCalledWith('verify_billing_order', {
+      p_order_id: 'ord-1',
+      p_status: 'approved',
+      p_admin_notes: 'Transferencia BCP confirmada',
+    });
+
+    await expect(
+      verifyBillingOrderAdmin({ orderId: 'ord-1', status: 'invalid_status' }),
+    ).rejects.toThrow('orderId y status (approved | rejected) son obligatorios.');
   });
 });

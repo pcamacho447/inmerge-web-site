@@ -122,4 +122,37 @@ describe('pm.js - Project Management Engine', () => {
       expect(clean.status).toBe('ABIERTO');
     });
   });
+
+  describe('fetchProjectAnalytics', () => {
+    it('calculates project analytics metrics correctly with local project fallback', async () => {
+      const { fetchProjectAnalytics } = await import('./pm.js');
+
+      const localData = {
+        tasks: [
+          { status: 'DONE', estimated_hours: 10, actual_hours: 8 },
+          { status: 'IN_PROGRESS', estimated_hours: 15, actual_hours: 12 },
+          { status: 'TODO', estimated_hours: 5, actual_hours: 0, due_date: '2020-01-01' }, // Overdue
+        ],
+        milestones: [
+          { status: 'COMPLETED' },
+          { status: 'PENDING' },
+        ],
+        risks: [
+          { status: 'ABIERTO' },
+        ],
+      };
+
+      const metrics = await fetchProjectAnalytics('proj-123', localData);
+      expect(metrics.total_tasks).toBe(3);
+      expect(metrics.completed_tasks).toBe(1);
+      expect(metrics.in_progress_tasks).toBe(1);
+      expect(metrics.overdue_tasks).toBe(1);
+      expect(metrics.total_estimated_hours).toBe(30);
+      expect(metrics.total_actual_hours).toBe(20);
+      expect(metrics.effort_variance_pct).toBe(-33.33);
+      expect(metrics.total_milestones).toBe(2);
+      expect(metrics.completed_milestones).toBe(1);
+      expect(metrics.open_risks_count).toBe(1);
+    });
+  });
 });

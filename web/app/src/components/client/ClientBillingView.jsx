@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { INMERGE_BANK_ACCOUNTS, ORDER_STATUS_CONFIG } from '../../lib/billing.js';
+import { INMERGE_BANK_ACCOUNTS, ORDER_STATUS_CONFIG, uploadOrderVoucher } from '../../lib/billing.js';
 import { formatPEN } from '../../lib/formatPEN.js';
 
 export default function ClientBillingView({
@@ -378,16 +378,72 @@ export default function ClientBillingView({
                     </div>
                   </div>
 
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 18, fontWeight: 700, color: 'var(--terracotta)' }}>
-                      S/ {formatPEN(ord.amount_pen)}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 18, fontWeight: 700, color: 'var(--terracotta)' }}>
+                        S/ {formatPEN(ord.amount_pen)}
+                      </div>
+                      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>
+                        {new Date(ord.created_at).toLocaleDateString('es-PE', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          localeMatcher: 'best fit',
+                        })}
+                      </div>
                     </div>
-                    <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>
-                      {new Date(ord.created_at).toLocaleDateString('es-PE', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
+
+                    {/* Gestión de Comprobante / Voucher Bancario */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      {ord.voucher_status === 'uploaded' ? (
+                        <span style={{ fontSize: 11, background: 'rgba(216, 168, 78, 0.15)', color: 'var(--gold, #C68A3D)', padding: '3px 8px', borderRadius: 4, fontWeight: 600, border: '1px solid rgba(216, 168, 78, 0.3)' }}>
+                          ⏳ Voucher en Revisión
+                        </span>
+                      ) : ord.voucher_status === 'verified' ? (
+                        <span style={{ fontSize: 11, background: 'rgba(74, 156, 106, 0.12)', color: 'var(--green, #4A9C6A)', padding: '3px 8px', borderRadius: 4, fontWeight: 600, border: '1px solid rgba(74, 156, 106, 0.3)' }}>
+                          ✓ Voucher Conciliado
+                        </span>
+                      ) : ord.voucher_status === 'rejected' ? (
+                        <span style={{ fontSize: 11, background: 'rgba(168, 71, 43, 0.15)', color: 'var(--terracotta)', padding: '3px 8px', borderRadius: 4, fontWeight: 600, border: '1px solid rgba(168, 71, 43, 0.3)' }}>
+                          ⚠️ Voucher Rechazado
+                        </span>
+                      ) : (
+                        <label
+                          style={{
+                            fontSize: 11,
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            padding: '4px 10px',
+                            background: 'var(--terracotta)',
+                            color: '#fff',
+                            borderRadius: 4,
+                            cursor: 'pointer',
+                            fontWeight: 600,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          📎 Subir Voucher
+                          <input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            style={{ display: 'none' }}
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file && user?.id) {
+                                try {
+                                  await uploadOrderVoucher({ orderId: ord.id, file, userId: user.id });
+                                  if (typeof onSaveOrganization === 'function') {
+                                    // Trigger reload if available
+                                  }
+                                } catch (upErr) {
+                                  console.error('Error al subir voucher:', upErr);
+                                }
+                              }
+                            }}
+                          />
+                        </label>
+                      )}
                     </div>
                   </div>
                 </div>

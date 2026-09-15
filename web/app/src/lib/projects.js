@@ -38,6 +38,8 @@ export async function fetchClientProjects(userId) {
         file_path,
         external_url,
         version,
+        sha256_checksum,
+        file_size_bytes,
         created_at
       ),
       project_tasks (
@@ -84,6 +86,97 @@ export async function fetchClientProjects(userId) {
     tasks: (p.project_tasks || []).sort((a, b) => new Date(a.due_date || a.created_at || 0) - new Date(b.due_date || b.created_at || 0)),
     risks: p.project_risks || [],
   }));
+}
+
+/**
+ * Calcula el hash criptográfico SHA-256 de un Blob o ArrayBuffer (Web Crypto API)
+ */
+export async function calculateFileSha256(fileBlobOrBuffer) {
+  if (!fileBlobOrBuffer) return null;
+  const buffer = fileBlobOrBuffer instanceof ArrayBuffer
+    ? fileBlobOrBuffer
+    : await fileBlobOrBuffer.arrayBuffer();
+
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Valida la integridad criptográfica de un archivo descargado contra el hash esperado
+ */
+export async function verifyDeliverableIntegrity(fileBlob, expectedSha256) {
+  if (!fileBlob || !expectedSha256) {
+    return { valid: false, reason: 'Parámetros insuficientes para la validación.' };
+  }
+  const calculatedHash = await calculateFileSha256(fileBlob);
+  const match = calculatedHash.toLowerCase() === expectedSha256.trim().toLowerCase();
+  return {
+    valid: match,
+    calculatedHash,
+    expectedSha256,
+  };
+}
+
+/**
+ * Genera un reporte ejecutivo en formato Markdown estructurado con la identidad Inmerge
+ */
+export function generateExecutiveReportMarkdown(project) {
+  if (!project) return '';
+
+  const totalTasks = project.tasks?.length || 0;
+  const doneTasks = project.tasks?.filter((t) => t.status === 'DONE').length || 0;
+  const estHours = project.tasks?.reduce((sum, t) => sum + (Number(t.estimated_hours) || 0), 0) || 0;
+  const actHours = project.tasks?.reduce((sum, t) => sum + (Number(t.actual_hours) || 0), 0) || 0;
+  const variance = estHours > 0 ? (((actHours - estHours) / estHours) * 100).toFixed(1) : 0;
+
+  return `# INMERGE — Resumen Ejecutivo de Proyecto
+
+**Proyecto:** ${project.title}
+**Pilar Estratégico:** ${project.pillar || 'Consultoría de Ingeniería'}
+**Estado de Salud (RAG):** ${project.health_status || 'ON_TRACK'}
+**Tech Lead Asignado:** ${project.tech_lead_name || 'Equipo Senior Inmerge'} (${project.tech_lead_contact || 'inmerge3@gmail.com'})
+**Fecha de Emisión:** ${new Date().toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+---
+
+## 1. Métrica de Ejecución y Consumo de Horas Técnicas
+- **Tareas Totales:** ${totalTasks} (${doneTasks} finalizadas)
+- **Horas Estimadas:** ${estHours}h
+- **Horas Imputadas (Reales):** ${actHours}h
+- **Desviación de Esfuerzo:** ${variance}% ${variance > 20 ? '⚠️ (Desviación presupuestal)' : '✅ (Dentro de margen)'}
+
+---
+
+## 2. Cronograma de Hitos
+${
+  (project.milestones || []).length > 0
+    ? project.milestones
+        .map(
+          (m, idx) =>
+            `${idx + 1}. **${m.title}** [${m.status}] — Vencimiento: ${m.due_date || 'Sin fecha'}\n   _${m.description || ''}_`
+        )
+        .join('\n')
+    : '_No se han registrado hitos en este proyecto._'
+}
+
+---
+
+## 3. Entregables e Integridad Criptográfica (SHA-256)
+${
+  (project.deliverables || []).length > 0
+    ? project.deliverables
+        .map(
+          (d) =>
+            `- **${d.title}** (v${d.version || '1.0'})\n  - Tipo: \`${d.file_type}\`\n  - Checksum SHA-256: \`${d.sha256_checksum || 'Sellado pendiente'}\``
+        )
+        .join('\n')
+    : '_Sin entregables emitidos aún._'
+}
+
+---
+_Inmerge Consulting — Auditoría de Sistemas, Cloud & Data Science (Lima, Perú)_
+`;
 }
 
 /**

@@ -155,7 +155,7 @@ export async function fetchClientOrders(userId) {
   try {
     const { data, error } = await supabase
       .from('orders')
-      .select('id, code, kind, plan, amount_pen, method, status, notes, approved_at, created_at, expires_at')
+      .select('id, code, kind, plan, amount_pen, method, status, notes, voucher_file_path, voucher_uploaded_at, voucher_status, admin_notes, verified_at, approved_at, created_at, expires_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -189,15 +189,82 @@ export async function createBankTransferOrder({ userId, plan, amountPen, notes }
     amount_pen: parsedAmount,
     method: 'transferencia_bancaria',
     status: 'pending',
+    voucher_status: 'pending_upload',
     notes: notes?.trim() || 'Pago vía Transferencia Bancaria Directa a Cuentas Inmerge',
   };
 
   const { data, error } = await supabase
     .from('orders')
     .insert([payload])
-    .select('id, code, kind, plan, amount_pen, method, status, notes, approved_at, created_at, expires_at')
+    .select('id, code, kind, plan, amount_pen, method, status, notes, voucher_file_path, voucher_uploaded_at, voucher_status, admin_notes, approved_at, created_at, expires_at')
     .single();
 
   if (error) throw error;
+  return data;
+}
+
+/**
+ * Sube el comprobante de transferencia bancaria al bucket seguro 'billing-vouchers'
+ */
+export async function uploadOrderVoucher({ orderId, file, userId }) {
+  if (!orderId || !file || !userId) {
+    throw new Error('Parámetros insuficientes para subir el comprobante de pago.');
+  }
+
+  const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
+  const filePath = `${userId}/${orderId}_voucher_${Date.now()}.${fileExt}`;
+
+  // 1. Subir archivo binario a Storage
+  const { error: uploadError } = await supabase.storage
+    .from('billing-vouchers')
+    .upload(filePath, file, {
+      upsert: true,
+      contentType: file.type || 'application/octet-stream',
+    });
+
+  if (uploadError) {
+    console.error('[billing] Error subiendo voucher a Storage:', uploadError);
+    throw uploadError;
+  }
+
+  // 2. Actualizar estado de la orden
+  const { data, error: updateError } = await supabase
+    .from('orders')
+    .update({
+      voucher_file_path: filePath,
+      voucher_uploaded_at: new Date().toISOString(),
+      voucher_status: 'uploaded',
+    })
+    .eq('id', orderId)
+    .select()
+    .single();
+
+  if (updateError) {
+    console.error('[billing] Error actualizando orden con voucher:', updateError);
+    throw updateError;
+  }
+
+  return data;
+}
+
+/**
+ * Invoca el RPC administrativo para verificar y conciliar una orden
+ */
+export async function verifyBillingOrderAdmin({ orderId, status, adminNotes = '' }) {
+  if (!orderId || !['approved', 'rejected'].includes(status)) {
+    throw new Error('orderId y status (approved | rejected) son obligatorios.');
+  }
+
+  const { data, error } = await supabase.rpc('verify_billing_order', {
+    p_order_id: orderId,
+    p_status: status,
+    p_admin_notes: adminNotes,
+  });
+
+  if (error) {
+    console.error('[billing] Error en RPC verify_billing_order:', error);
+    throw error;
+  }
+
   return data;
 }
