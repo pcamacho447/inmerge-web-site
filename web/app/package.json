@@ -14,7 +14,9 @@
     "format:check": "prettier --check .",
     "build:pdfs": "node scripts/build-report-pdfs.mjs",
     "build:covers": "node scripts/build-covers.mjs",
-    "build:sankey": "node scripts/extract-sankey.mjs"
+    "build:sankey": "node scripts/extract-sankey.mjs",
+    "deploy:pages": "npx wrangler pages deploy dist --project-name=inmerge-web",
+    "deploy:worker": "npx wrangler deploy"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
