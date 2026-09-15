@@ -54,17 +54,19 @@ export default function useClientProjects() {
           filter: `client_id=eq.${user.id}`,
         },
         (payload) => {
+          const proj = payload.new || payload.record || {};
+          const title = proj.title || proj.name || 'Proyecto Inmerge';
           if (payload.eventType === 'INSERT') {
             setToast({
               type: 'project',
               title: 'Nuevo Proyecto Registrado',
-              message: `Se ha creado el proyecto "${payload.new.title}".`,
+              message: `Se ha creado el proyecto "${title}".`,
             });
           } else if (payload.eventType === 'UPDATE') {
             setToast({
               type: 'project',
               title: 'Proyecto Actualizado',
-              message: `El proyecto "${payload.new.title}" ahora está en estado "${payload.new.status}".`,
+              message: `El proyecto "${title}" ahora está en estado "${proj.status || 'Actualizado'}".`,
             });
           }
           loadProjects(false);
@@ -79,10 +81,12 @@ export default function useClientProjects() {
         },
         (payload) => {
           if (payload.eventType === 'UPDATE') {
+            const m = payload.new || payload.record || {};
+            const title = m.title || m.name || 'Hito de Proyecto';
             setToast({
               type: 'milestone',
               title: 'Hito de Proyecto Actualizado',
-              message: `El hito "${payload.new.title}" cambió a estado "${payload.new.status}".`,
+              message: `El hito "${title}" cambió a estado "${m.status || 'Actualizado'}".`,
             });
           }
           loadProjects(false);
@@ -97,10 +101,12 @@ export default function useClientProjects() {
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
+            const deliv = payload.new || payload.record || {};
+            const title = deliv.title || deliv.name || (deliv.file_type ? `Documento ${deliv.file_type}` : 'Entregable Técnico');
             setToast({
               type: 'deliverable',
               title: 'Nuevo Entregable Disponible',
-              message: `Se ha publicado el entregable "${payload.new.title}".`,
+              message: `Se ha publicado el entregable "${title}".`,
             });
           }
           loadProjects(false);

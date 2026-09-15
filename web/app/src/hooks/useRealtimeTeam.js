@@ -23,19 +23,20 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            const lead = payload.new;
-            const companyOrName = lead.company || lead.full_name || lead.email;
+            const lead = payload.new || payload.record || {};
+            const companyOrName = lead.company || lead.full_name || lead.email || 'Nuevo Prospecto';
             setToast({
               type: 'lead',
               title: 'Nuevo Lead TDR Recibido',
               message: `${companyOrName} ha enviado una solicitud (${lead.pillar || 'General'}).`,
             });
           } else if (payload.eventType === 'UPDATE') {
-            const lead = payload.new;
+            const lead = payload.new || payload.record || {};
+            const name = lead.company || lead.full_name || 'Prospecto';
             setToast({
               type: 'lead',
               title: 'Estado de Lead Actualizado',
-              message: `El lead de ${lead.company || lead.full_name} cambió a estado "${lead.status}".`,
+              message: `El lead de ${name} cambió a estado "${lead.status || 'Actualizado'}".`,
             });
           }
           onDataRefresh?.();
@@ -50,10 +51,11 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
+            const proj = payload.new || payload.record || {};
             setToast({
               type: 'project',
               title: 'Nuevo Proyecto Activo',
-              message: `Se registró el proyecto "${payload.new.title}".`,
+              message: `Se registró el proyecto "${proj.title || 'Proyecto Inmerge'}".`,
             });
           }
           onDataRefresh?.();
@@ -68,10 +70,12 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
+            const deliv = payload.new || payload.record || {};
+            const title = deliv.title || deliv.name || (deliv.file_type ? `Documento ${deliv.file_type}` : 'Entregable Técnico');
             setToast({
               type: 'deliverable',
               title: 'Entregable Publicado',
-              message: `Nuevo entregable publicado: "${payload.new.title}".`,
+              message: `Nuevo entregable publicado: "${title}".`,
             });
           }
           onDataRefresh?.();
@@ -85,7 +89,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
           table: 'team_activity_logs',
         },
         (payload) => {
-          const log = payload.new;
+          const log = payload.new || payload.record || {};
           if (log?.action === 'DELIVERABLE_DOWNLOADED') {
             setToast({
               type: 'info',

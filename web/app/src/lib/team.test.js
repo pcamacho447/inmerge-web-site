@@ -5,6 +5,7 @@ import {
   updateLeadStatus,
   fetchTeamProjects,
   createTeamProject,
+  updateProjectStatus,
   addProjectMilestone,
   updateMilestoneStatus,
   uploadDeliverableFile,
@@ -245,5 +246,47 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
     const logs = await fetchTeamActivityLogs({ limit: 20 });
     expect(supabase.from).toHaveBeenCalledWith('team_activity_logs');
     expect(logs).toEqual(mockLogs);
+  });
+
+  it('updateProjectStatus actualiza estado, invoca notify-project-status y audita la acción', async () => {
+    await expect(updateProjectStatus('', 'EN_AUDITORIA')).rejects.toThrow('ID de proyecto y el nuevo estado son obligatorios');
+    await expect(updateProjectStatus('p-1', 'ESTADO_INVALIDO')).rejects.toThrow('Estado inválido: ESTADO_INVALIDO');
+
+    const mockUpdatedProject = {
+      id: 'proj-123',
+      title: 'Auditoría Forense AWS',
+      pillar: 'auditoria',
+      status: 'EN_DESARROLLO',
+      client_id: 'cli-1',
+      profiles: { email: 'cliente@empresa.com', full_name: 'Antamina Admin' },
+    };
+
+    const singleMock = vi.fn().mockResolvedValue({ data: mockUpdatedProject, error: null });
+    const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+    const eqMock = vi.fn().mockReturnValue({ select: selectMock });
+    const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
+    const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'client_projects') return { update: updateMock };
+      if (table === 'team_activity_logs') return { insert: logInsertMock };
+      return {};
+    });
+
+    const res = await updateProjectStatus('proj-123', 'EN_DESARROLLO', { notes: 'Comenzando pipelines ETL' });
+
+    expect(supabase.from).toHaveBeenCalledWith('client_projects');
+    expect(updateMock).toHaveBeenCalledWith({ status: 'EN_DESARROLLO' });
+    expect(eqMock).toHaveBeenCalledWith('id', 'proj-123');
+    expect(supabase.functions.invoke).toHaveBeenCalledWith('notify-project-status', {
+      body: {
+        project: mockUpdatedProject,
+        newStatus: 'EN_DESARROLLO',
+        clientEmail: 'cliente@empresa.com',
+        clientName: 'Antamina Admin',
+        notes: 'Comenzando pipelines ETL',
+      },
+    });
+    expect(res).toEqual(mockUpdatedProject);
   });
 });

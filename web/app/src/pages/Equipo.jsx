@@ -10,6 +10,7 @@ import {
   updateLeadStatus,
   fetchTeamProjects,
   createTeamProject,
+  updateProjectStatus,
   addProjectMilestone,
   updateMilestoneStatus,
   uploadDeliverableFile,
@@ -37,6 +38,15 @@ const STATUS_COLORS = {
   DESCARTADO: { bg: 'rgba(0,0,0,0.05)', text: 'var(--muted)', border: 'var(--border)' },
 };
 
+const PROJECT_STATUS_COLORS = {
+  EN_PLANIFICACION: { bg: 'rgba(216, 168, 78, 0.15)', text: '#9B7322', border: 'var(--gold)' },
+  EN_AUDITORIA: { bg: 'rgba(168, 71, 43, 0.1)', text: 'var(--terracotta)', border: 'var(--terracotta)' },
+  EN_DESARROLLO: { bg: 'rgba(52, 89, 149, 0.12)', text: '#345995', border: '#345995' },
+  EN_VALIDACION: { bg: 'rgba(198, 138, 61, 0.15)', text: 'var(--ochre)', border: 'var(--ochre)' },
+  ENTREGADO: { bg: 'rgba(46, 117, 89, 0.15)', text: '#2E7559', border: '#2E7559' },
+  FINALIZADO: { bg: 'rgba(36, 26, 18, 0.08)', text: 'var(--ink)', border: 'var(--border)' },
+};
+
 const MILESTONE_STATUS_COLORS = {
   PENDIENTE: { bg: 'rgba(0,0,0,0.04)', text: 'var(--muted)', border: 'var(--border)' },
   EN_PROCESO: { bg: 'rgba(198, 138, 61, 0.15)', text: 'var(--ochre)', border: 'var(--ochre)' },
@@ -47,6 +57,7 @@ const MILESTONE_STATUS_COLORS = {
 const ACTIVITY_ACTION_BADGES = {
   LEAD_STATUS_UPDATED: { label: 'LEAD ACTUALIZADO', bg: 'rgba(216, 168, 78, 0.15)', text: '#9B7322', border: 'var(--gold)' },
   PROJECT_CREATED: { label: 'PROYECTO CREADO', bg: 'rgba(168, 71, 43, 0.1)', text: 'var(--terracotta)', border: 'var(--terracotta)' },
+  PROJECT_STATUS_UPDATED: { label: 'PROYECTO ACTUALIZADO', bg: 'rgba(52, 89, 149, 0.12)', text: '#345995', border: '#345995' },
   MILESTONE_CREATED: { label: 'HITO AGREGADO', bg: 'rgba(36, 26, 18, 0.08)', text: 'var(--ink)', border: 'var(--border)' },
   MILESTONE_STATUS_UPDATED: { label: 'HITO ACTUALIZADO', bg: 'rgba(198, 138, 61, 0.15)', text: 'var(--ochre)', border: 'var(--ochre)' },
   DELIVERABLE_PUBLISHED: { label: 'ENTREGABLE PUBLICADO', bg: 'rgba(46, 117, 89, 0.15)', text: '#2E7559', border: '#2E7559' },
@@ -160,6 +171,23 @@ export default function Equipo() {
         .catch(() => {});
     } catch (err) {
       alert(`Error al actualizar lead: ${err.message}`);
+    }
+  }
+
+  async function handleUpdateProjectStatus(projectId, newStatus) {
+    try {
+      const proj = projects.find((p) => p.id === projectId);
+      await updateProjectStatus(projectId, newStatus, {
+        clientEmail: proj?.client?.email,
+        clientName: proj?.client?.full_name,
+      });
+      setProjects((prev) => prev.map((p) => (p.id === projectId ? { ...p, status: newStatus } : p)));
+      showTemporaryMsg(`Estado del proyecto actualizado a "${newStatus}" y notificación despachada al cliente.`);
+      fetchTeamActivityLogs({ limit: 50 })
+        .then(setActivityLogs)
+        .catch(() => {});
+    } catch (err) {
+      alert(`Error al actualizar estado del proyecto: ${err.message}`);
     }
   }
 
@@ -915,21 +943,35 @@ export default function Equipo() {
                             }}
                           >
                             <div>
-                              <span
-                                style={{
-                                  fontFamily: "'IBM Plex Mono', monospace",
-                                  fontSize: 11,
-                                  padding: '2px 8px',
-                                  borderRadius: 4,
-                                  background: 'rgba(168,71,43,0.1)',
-                                  color: 'var(--terracotta)',
-                                  border: '1px solid var(--terracotta)',
-                                  fontWeight: 700,
-                                  marginRight: 8,
-                                }}
-                              >
-                                {proj.status}
-                              </span>
+                              {(() => {
+                                const pColor = PROJECT_STATUS_COLORS[proj.status] || PROJECT_STATUS_COLORS.EN_PLANIFICACION;
+                                return (
+                                  <select
+                                    value={proj.status}
+                                    onChange={(e) => handleUpdateProjectStatus(proj.id, e.target.value)}
+                                    title="Cambiar estado del proyecto y notificar al cliente"
+                                    style={{
+                                      fontFamily: "'IBM Plex Mono', monospace",
+                                      fontSize: 11,
+                                      padding: '3px 8px',
+                                      borderRadius: 4,
+                                      background: pColor.bg,
+                                      color: pColor.text,
+                                      border: `1px solid ${pColor.border}`,
+                                      fontWeight: 700,
+                                      marginRight: 8,
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    <option value="EN_PLANIFICACION">EN_PLANIFICACION</option>
+                                    <option value="EN_AUDITORIA">EN_AUDITORIA</option>
+                                    <option value="EN_DESARROLLO">EN_DESARROLLO</option>
+                                    <option value="EN_VALIDACION">EN_VALIDACION</option>
+                                    <option value="ENTREGADO">ENTREGADO</option>
+                                    <option value="FINALIZADO">FINALIZADO</option>
+                                  </select>
+                                );
+                              })()}
                               <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
                                 Pilar: <strong>{PILLAR_LABELS[proj.pillar] || proj.pillar}</strong>
                               </span>

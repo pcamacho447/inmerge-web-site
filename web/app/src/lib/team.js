@@ -209,6 +209,83 @@ export async function createTeamProject({
 }
 
 /**
+ * Actualiza el estado de un proyecto de cliente y dispara la Edge Function notify-project-status.
+ */
+export async function updateProjectStatus(projectId, newStatus, { notes = '', clientEmail = '', clientName = '' } = {}) {
+  if (!projectId || !newStatus) {
+    throw new Error('El ID de proyecto y el nuevo estado son obligatorios.');
+  }
+
+  const validStatuses = ['EN_PLANIFICACION', 'EN_AUDITORIA', 'EN_DESARROLLO', 'EN_VALIDACION', 'ENTREGADO', 'FINALIZADO'];
+  if (!validStatuses.includes(newStatus)) {
+    throw new Error(`Estado inválido: ${newStatus}. Valores permitidos: ${validStatuses.join(', ')}`);
+  }
+
+  const updateFields = { status: newStatus };
+  if (['ENTREGADO', 'FINALIZADO'].includes(newStatus)) {
+    updateFields.actual_completion_date = new Date().toISOString().split('T')[0];
+  }
+
+  const { data, error } = await supabase
+    .from('client_projects')
+    .update(updateFields)
+    .eq('id', projectId)
+    .select(`
+      id,
+      title,
+      pillar,
+      status,
+      start_date,
+      target_completion_date,
+      actual_completion_date,
+      tech_lead_name,
+      tech_lead_contact,
+      client_id,
+      profiles:client_id (
+        id,
+        email,
+        full_name
+      )
+    `)
+    .single();
+
+  if (error) {
+    console.error('Error al actualizar estado del proyecto:', error);
+    throw new Error(error.message || 'No se pudo actualizar el estado del proyecto.');
+  }
+
+  const recipientEmail = clientEmail || data.profiles?.email;
+  const recipientName = clientName || data.profiles?.full_name || 'Cliente';
+
+  // Invocación a Edge Function notify-project-status
+  if (supabase.functions && typeof supabase.functions.invoke === 'function') {
+    try {
+      await supabase.functions.invoke('notify-project-status', {
+        body: {
+          project: data,
+          newStatus,
+          clientEmail: recipientEmail,
+          clientName: recipientName,
+          notes,
+        },
+      });
+    } catch (fnErr) {
+      console.warn('[team] Error al invocar notify-project-status:', fnErr);
+    }
+  }
+
+  // Registrar en bitácora de auditoría
+  logTeamActivity({
+    action: 'PROJECT_STATUS_UPDATED',
+    entityType: 'project',
+    entityId: projectId,
+    details: { new_status: newStatus, title: data.title, notes },
+  });
+
+  return data;
+}
+
+/**
  * Agrega un nuevo hito/fase a un proyecto.
  */
 export async function addProjectMilestone({ projectId, title, description = '', dueDate = null, orderIndex = 1 }) {
