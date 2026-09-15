@@ -12,7 +12,6 @@ export async function fetchClientProjects(userId) {
       pillar,
       status,
       health_status,
-      progress,
       start_date,
       target_end_date,
       target_completion_date,

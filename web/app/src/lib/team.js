@@ -659,12 +659,11 @@ export async function updateProjectRisk(riskId, updates) {
 /**
  * Actualiza el estado de salud RAG y fechas de un proyecto.
  */
-export async function updateProjectHealth(projectId, { healthStatus, startDate, targetEndDate, progress }) {
+export async function updateProjectHealth(projectId, { healthStatus, startDate, targetEndDate }) {
   const updates = {};
   if (healthStatus !== undefined) updates.health_status = healthStatus;
   if (startDate !== undefined) updates.start_date = startDate;
   if (targetEndDate !== undefined) updates.target_end_date = targetEndDate;
-  if (progress !== undefined) updates.progress = progress;
 
   const { data, error } = await supabase
     .from('client_projects')
