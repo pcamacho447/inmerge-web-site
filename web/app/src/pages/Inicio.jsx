@@ -5,7 +5,7 @@ import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
 import ServicePillarCard from '../components/ServicePillarCard.jsx';
 import ArchitectureDiagram from '../components/ArchitectureDiagram.jsx';
-import { waLink, PILLARS, SEGMENTS, VALUES, MARQUEE_ITEMS } from '../data/content.js';
+import { waLink, PILLARS, SEGMENTS, MARQUEE_ITEMS } from '../data/content.js';
 
 export default function Inicio() {
   useReveal();
@@ -336,22 +336,6 @@ export default function Inicio() {
 
       <Frieze border="#A8472B" upColor="#D8A84E" downColor="#C68A3D" medallionBg="#A8472B" medallionBorder="#F3EADA" />
 
-      {/* Values Section */}
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '120px clamp(20px,5vw,40px)' }}>
-        <div data-reveal="" style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,4vw,52px)', marginBottom: 56 }}>
-          Principios de Ingeniería
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 1, background: 'var(--border)' }}>
-          {VALUES.map((v) => (
-            <div key={v.name} data-reveal="" className="row-hover" style={{ background: 'var(--bg)', padding: 44 }}>
-              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, marginBottom: 12, color: 'var(--ink)' }}>
-                {v.name}
-              </div>
-              <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.7, maxWidth: 360 }}>{v.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Final CTA */}
       <div
