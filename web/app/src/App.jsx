@@ -7,11 +7,14 @@ import Layout from './components/Layout.jsx';
 import PageSkeleton from './components/PageSkeleton.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 
+import CookieConsent from './components/CookieConsent.jsx';
+
 const Inicio = lazy(() => import('./pages/Inicio.jsx'));
 const Servicios = lazy(() => import('./pages/Servicios.jsx'));
 const Metodologia = lazy(() => import('./pages/Metodologia.jsx'));
 const Nosotros = lazy(() => import('./pages/Nosotros.jsx'));
 const Contacto = lazy(() => import('./pages/Contacto.jsx'));
+const CookiesPolicy = lazy(() => import('./pages/CookiesPolicy.jsx'));
 const Login = lazy(() => import('./pages/Login.jsx'));
 const Registro = lazy(() => import('./pages/Registro.jsx'));
 const Cuenta = lazy(() => import('./pages/Cuenta.jsx'));
@@ -31,6 +34,8 @@ export default function App() {
               <Route path="/metodologia" element={<Metodologia />} />
               <Route path="/nosotros" element={<Nosotros />} />
               <Route path="/contacto" element={<Contacto />} />
+              <Route path="/cookies" element={<CookiesPolicy />} />
+              <Route path="/politica-cookies" element={<CookiesPolicy />} />
               <Route path="/login" element={<Login />} />
               <Route path="/registro" element={<Registro />} />
               <Route
@@ -52,6 +57,7 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
+          <CookieConsent />
         </Suspense>
       </ErrorBoundary>
     </AuthProvider>

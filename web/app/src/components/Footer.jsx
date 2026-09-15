@@ -1,3 +1,6 @@
+import { Link } from 'react-router-dom';
+import { openCookiePreferences } from '../lib/cookies.js';
+
 export default function Footer({ borderTop = false }) {
   return (
     <footer
@@ -13,7 +16,42 @@ export default function Footer({ borderTop = false }) {
         borderTop: borderTop ? '1px solid var(--border)' : undefined,
       }}
     >
-      <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 14, letterSpacing: 1 }}>INMERGE — 2026</div>
+      <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 14, letterSpacing: 1 }}>
+        INMERGE — 2026
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          fontSize: 13,
+          color: 'var(--muted)',
+          flexWrap: 'wrap',
+        }}
+      >
+        <Link to="/cookies" style={{ color: 'var(--muted)' }} className="hover-underline-link">
+          Política de Cookies
+        </Link>
+        <span>·</span>
+        <button
+          type="button"
+          onClick={openCookiePreferences}
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            color: 'var(--muted)',
+            fontSize: 13,
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+          className="hover-underline-link"
+        >
+          Configurar Cookies
+        </button>
+      </div>
+
       <div style={{ fontSize: 13, color: 'var(--muted)' }}>inmerge3@gmail.com · Lima, Perú</div>
     </footer>
   );
