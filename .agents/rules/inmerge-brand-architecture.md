@@ -47,6 +47,19 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
     - Ejecutar `DROP TRIGGER IF EXISTS` antes de crear triggers y `DROP POLICY IF EXISTS` antes de crear políticas RLS.
     - Inmutabilidad de auditoría: Garantizar `REVOKE UPDATE, DELETE ON public.team_activity_logs`.
 
+### 4.1 Inserciones Anónimas y Políticas RLS en PostgREST
+- **Regla de Inserción sin `.select()`:** Cuando una tabla (`leads_tdr`, etc.) permita inserción pública (`anon`) pero restrinja la lectura (`SELECT`) a usuarios autenticados o miembros del equipo, **nunca encadenar `.select()` ni `.select().single()`** en `supabase.from('...').insert([payload])`.
+- Encadenar `.select()` fuerza a PostgREST a solicitar `RETURNING *`, lo que dispara un error `403 RLS Violation`.
+- Enviar siempre el objeto `payload` del cliente a las Edge Functions de notificación (`notify-lead-tdr`).
+
+### 4.2 Configuración y Hooks de Supabase Realtime
+- **Identidad de Réplica:** Toda tabla suscrita a `supabase_realtime` debe configurarse con `ALTER TABLE public.<tabla> REPLICA IDENTITY FULL;` para garantizar que los eventos `UPDATE` y `DELETE` contengan los estados anteriores y posteriores.
+- **Idempotencia en Publicaciones:** Gestionar la publicación `supabase_realtime` verificando previamente su existencia en `pg_publication_tables`.
+- **Limpieza de Canales en React:** Los hooks reactivos (`useRealtimeTeam`, `useClientProjects`) deben almacenar la referencia retornada por `supabase.channel(...)` y ejecutar `supabase.removeChannel(channel)` en el retorno del `useEffect`.
+
+### 4.3 Buzón y Enrutamiento de Correos
+- La dirección institucional operativa de la firma para cotizaciones, soporte y Tech Leads es **`inmerge3@gmail.com`** (a la espera de la configuración de registros MX para `@inmerge.pe`).
+
 ---
 
 ## 5. Estándares de Testing (Vitest + Testing Library)
@@ -54,9 +67,10 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 - **Comandos de Verificación:**
   ```bash
   cd web/app
-  npm test          # Ejecuta suite completa (12 suites, 59+ tests)
+  npm test          # Ejecuta suite completa (12 suites, 62+ tests)
   npm run build     # Valida el bundle de producción en Vite
   npm run lint      # Verifica ausencia de warnings de ESLint
   npm run format    # Aplica formato consistente con Prettier
   ```
+
 
