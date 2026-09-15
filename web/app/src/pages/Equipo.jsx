@@ -23,6 +23,7 @@ import {
   createProjectRisk,
   updateProjectRisk,
   updateProjectHealth,
+  updateProjectStaff,
 } from '../lib/team.js';
 import useRealtimeTeam from '../hooks/useRealtimeTeam.js';
 import ToastNotification from '../components/ToastNotification.jsx';
@@ -164,6 +165,11 @@ export default function Equipo() {
   }
 
   function handleConvertLeadToProject(lead) {
+    if (!user?.isAdmin) {
+      alert('Solo los Administradores tienen permisos para convertir leads y dar de alta proyectos.');
+      return;
+    }
+
     const matchedClient = clients.find((c) => c.email && c.email.toLowerCase() === lead.email?.toLowerCase());
 
     setNewProj({
@@ -181,6 +187,20 @@ export default function Equipo() {
       showTemporaryMsg(`Lead vinculado automáticamente con el cliente registrado: ${matchedClient.full_name || matchedClient.email}`);
     } else {
       showTemporaryMsg(`Datos del lead pre-cargados. Selecciona el cliente correspondiente o solicita su registro previo.`);
+    }
+  }
+
+  async function handleUpdateProjectStaff(projectId, staffUpdates) {
+    if (!user?.isAdmin) {
+      alert('Permiso denegado: Solo administradores pueden modificar el equipo asignado del proyecto.');
+      return;
+    }
+    try {
+      await updateProjectStaff(projectId, staffUpdates);
+      showTemporaryMsg('Equipo del proyecto actualizado con éxito.');
+      await loadData(false);
+    } catch (err) {
+      alert(`Error al actualizar equipo del proyecto: ${err.message}`);
     }
   }
 
@@ -487,18 +507,20 @@ export default function Equipo() {
           </div>
 
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <Link
-              to="/cuenta"
-              style={{
-                fontSize: 13,
-                fontFamily: "'IBM Plex Mono', monospace",
-                color: 'var(--ink)',
-                textDecoration: 'none',
-                borderBottom: '1px dotted var(--terracotta)',
-              }}
-            >
-              Vista de Cliente →
-            </Link>
+            {user?.isAdmin && (
+              <Link
+                to="/cuenta"
+                style={{
+                  fontSize: 13,
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  color: 'var(--ink)',
+                  textDecoration: 'none',
+                  borderBottom: '1px dotted var(--terracotta)',
+                }}
+              >
+                Vista de Cliente (Admin) →
+              </Link>
+            )}
             <button
               type="button"
               onClick={handleLogout}
@@ -634,23 +656,25 @@ export default function Equipo() {
             </span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('new_project')}
-            style={{
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'new_project' ? '3px solid var(--terracotta)' : '3px solid transparent',
-              padding: '12px 20px',
-              fontSize: 15,
-              fontWeight: activeTab === 'new_project' ? 700 : 500,
-              color: activeTab === 'new_project' ? 'var(--terracotta)' : 'var(--muted)',
-              cursor: 'pointer',
-              fontFamily: "'IBM Plex Sans', sans-serif",
-            }}
-          >
-            + Crear Proyecto / Entregable
-          </button>
+          {user?.isAdmin && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('new_project')}
+              style={{
+                background: 'none',
+                border: 'none',
+                borderBottom: activeTab === 'new_project' ? '3px solid var(--terracotta)' : '3px solid transparent',
+                padding: '12px 20px',
+                fontSize: 15,
+                fontWeight: activeTab === 'new_project' ? 700 : 500,
+                color: activeTab === 'new_project' ? 'var(--terracotta)' : 'var(--muted)',
+                cursor: 'pointer',
+                fontFamily: "'IBM Plex Sans', sans-serif",
+              }}
+            >
+              + Crear Proyecto / Entregable
+            </button>
+          )}
 
           <button
             type="button"
@@ -685,7 +709,7 @@ export default function Equipo() {
             </span>
           </button>
 
-          {user?.role === 'admin' && (
+          {user?.isAdmin && (
             <button
               type="button"
               onClick={() => setActiveTab('team')}
@@ -742,10 +766,12 @@ export default function Equipo() {
               <ProjectsManagementView
                 projects={projects}
                 staffList={staffList}
+                isAdmin={Boolean(user?.isAdmin)}
                 onUpdateProjectStatus={handleUpdateProjectStatus}
                 onProjectHealthChange={handleProjectHealthChange}
                 onUpdateMilestone={handleUpdateMilestone}
                 onAddMilestone={handleAddMilestone}
+                onUpdateProjectStaff={handleUpdateProjectStaff}
                 onTaskCreated={handleTaskCreated}
                 onTaskUpdated={handleTaskUpdated}
                 onTaskDeleted={handleTaskDeleted}
@@ -754,11 +780,12 @@ export default function Equipo() {
               />
             )}
 
-            {activeTab === 'new_project' && (
+            {activeTab === 'new_project' && user?.isAdmin && (
               <NewProjectModal
                 clients={clients}
                 projects={projects}
                 staffList={staffList}
+                isAdmin={Boolean(user?.isAdmin)}
                 newProj={newProj}
                 setNewProj={setNewProj}
                 handleCreateProject={handleCreateProject}

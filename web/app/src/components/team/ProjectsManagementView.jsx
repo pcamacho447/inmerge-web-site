@@ -36,10 +36,12 @@ export const MILESTONE_STATUS_COLORS = {
 export default function ProjectsManagementView({
   projects,
   staffList = [],
+  isAdmin = true,
   onUpdateProjectStatus,
   onProjectHealthChange,
   onUpdateMilestone,
   onAddMilestone,
+  onUpdateProjectStaff,
   onTaskCreated,
   onTaskUpdated,
   onTaskDeleted,
@@ -48,6 +50,11 @@ export default function ProjectsManagementView({
 }) {
   const [projectSubTabs, setProjectSubTabs] = useState({});
   const [addingMilestoneProjId, setAddingMilestoneProjId] = useState(null);
+  const [editingStaffProjId, setEditingStaffProjId] = useState(null);
+  const [staffFormData, setStaffFormData] = useState({
+    techLeadName: '',
+    techLeadContact: '',
+  });
   const [inlineMilestone, setInlineMilestone] = useState({
     title: 'Fase 01 — Auditoría & Diagnóstico Inicial',
     orderIndex: 1,
@@ -127,52 +134,94 @@ export default function ProjectsManagementView({
                 >
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
-                      <select
-                        value={proj.status}
-                        onChange={(e) => onUpdateProjectStatus(proj.id, e.target.value)}
-                        title="Cambiar estado del proyecto y notificar al cliente"
-                        style={{
-                          fontFamily: "'IBM Plex Mono', monospace",
-                          fontSize: 11,
-                          padding: '3px 8px',
-                          borderRadius: 4,
-                          background: pColor.bg,
-                          color: pColor.text,
-                          border: `1px solid ${pColor.border}`,
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <option value="EN_PLANIFICACION">EN_PLANIFICACION</option>
-                        <option value="EN_AUDITORIA">EN_AUDITORIA</option>
-                        <option value="EN_DESARROLLO">EN_DESARROLLO</option>
-                        <option value="EN_VALIDACION">EN_VALIDACION</option>
-                        <option value="ENTREGADO">ENTREGADO</option>
-                        <option value="FINALIZADO">FINALIZADO</option>
-                      </select>
+                      {isAdmin ? (
+                        <select
+                          value={proj.status}
+                          onChange={(e) => onUpdateProjectStatus(proj.id, e.target.value)}
+                          title="Cambiar estado del proyecto y notificar al cliente"
+                          style={{
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontSize: 11,
+                            padding: '3px 8px',
+                            borderRadius: 4,
+                            background: pColor.bg,
+                            color: pColor.text,
+                            border: `1px solid ${pColor.border}`,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <option value="EN_PLANIFICACION">EN_PLANIFICACION</option>
+                          <option value="EN_AUDITORIA">EN_AUDITORIA</option>
+                          <option value="EN_DESARROLLO">EN_DESARROLLO</option>
+                          <option value="EN_VALIDACION">EN_VALIDACION</option>
+                          <option value="ENTREGADO">ENTREGADO</option>
+                          <option value="FINALIZADO">FINALIZADO</option>
+                        </select>
+                      ) : (
+                        <span
+                          title="Solo administradores pueden modificar el estado del proyecto"
+                          style={{
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontSize: 11,
+                            padding: '3px 8px',
+                            borderRadius: 4,
+                            background: pColor.bg,
+                            color: pColor.text,
+                            border: `1px solid ${pColor.border}`,
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          🔒 {proj.status}
+                        </span>
+                      )}
 
-                      <select
-                        value={proj.health_status || 'ON_TRACK'}
-                        onChange={(e) => onProjectHealthChange(proj.id, e.target.value)}
-                        title="Indicador de Salud RAG del Proyecto"
-                        style={{
-                          fontFamily: "'IBM Plex Mono', monospace",
-                          fontSize: 11,
-                          padding: '3px 8px',
-                          borderRadius: 4,
-                          background: healthCfg.badgeBg,
-                          color: healthCfg.color,
-                          border: `1px solid ${healthCfg.color}`,
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {Object.values(HEALTH_STATUS_CONFIG).map((h) => (
-                          <option key={h.key} value={h.key}>
-                            {h.icon} Salud: {h.label}
-                          </option>
-                        ))}
-                      </select>
+                      {isAdmin ? (
+                        <select
+                          value={proj.health_status || 'ON_TRACK'}
+                          onChange={(e) => onProjectHealthChange(proj.id, e.target.value)}
+                          title="Indicador de Salud RAG del Proyecto"
+                          style={{
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontSize: 11,
+                            padding: '3px 8px',
+                            borderRadius: 4,
+                            background: healthCfg.badgeBg,
+                            color: healthCfg.color,
+                            border: `1px solid ${healthCfg.color}`,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {Object.values(HEALTH_STATUS_CONFIG).map((h) => (
+                            <option key={h.key} value={h.key}>
+                              {h.icon} Salud: {h.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span
+                          title="Indicador de Salud RAG (Solo lectura)"
+                          style={{
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontSize: 11,
+                            padding: '3px 8px',
+                            borderRadius: 4,
+                            background: healthCfg.badgeBg,
+                            color: healthCfg.color,
+                            border: `1px solid ${healthCfg.color}`,
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          🔒 {healthCfg.icon} Salud: {healthCfg.label}
+                        </span>
+                      )}
 
                       <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
                         Pilar: <strong>{PILLAR_LABELS[proj.pillar] || proj.pillar}</strong>
@@ -205,6 +254,185 @@ export default function ProjectsManagementView({
                     {proj.target_completion_date && <div>Meta: {proj.target_completion_date}</div>}
                   </div>
                 </div>
+
+                {/* Sección de Equipo Técnico Asignado & Designación */}
+                <div
+                  style={{
+                    background: 'var(--bg)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 4,
+                    padding: '12px 16px',
+                    marginBottom: 16,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: 12,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                    <div>
+                      <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', display: 'block' }}>
+                        LEAD TÉCNICO / AUDITOR RESPONSABLE
+                      </span>
+                      <strong style={{ fontSize: 13, color: 'var(--ink)' }}>
+                        👤 {proj.tech_lead_name || 'Inmerge Technical Lead'}
+                      </strong>{' '}
+                      <span style={{ fontSize: 12, color: 'var(--muted)' }}>
+                        ({proj.tech_lead_contact || 'inmerge3@gmail.com'})
+                      </span>
+                    </div>
+
+                    {/* Miembros del equipo interno participantes */}
+                    {Array.from(
+                      new Set(
+                        (proj.milestones || [])
+                          .filter((m) => m.assigned_to_name)
+                          .map((m) => m.assigned_to_name)
+                      )
+                    ).map((name) => (
+                      <span
+                        key={name}
+                        style={{
+                          fontSize: 11,
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          padding: '2px 8px',
+                          borderRadius: 12,
+                          background: 'var(--cream2)',
+                          border: '1px solid var(--border)',
+                          color: 'var(--ink)',
+                        }}
+                      >
+                        🛠️ {name}
+                      </span>
+                    ))}
+                  </div>
+
+                  {isAdmin && onUpdateProjectStaff && (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (editingStaffProjId === proj.id) {
+                            setEditingStaffProjId(null);
+                          } else {
+                            setEditingStaffProjId(proj.id);
+                            setStaffFormData({
+                              techLeadName: proj.tech_lead_name || '',
+                              techLeadContact: proj.tech_lead_contact || '',
+                            });
+                          }
+                        }}
+                        style={{
+                          background: 'none',
+                          border: '1px dotted var(--terracotta)',
+                          color: 'var(--terracotta)',
+                          padding: '4px 10px',
+                          borderRadius: 4,
+                          fontSize: 12,
+                          cursor: 'pointer',
+                          fontFamily: "'IBM Plex Mono', monospace",
+                        }}
+                      >
+                        {editingStaffProjId === proj.id ? 'Cancelar' : '⚙️ Designar / Cambiar Lead'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Formulario Inline de Designación de Lead (Admin) */}
+                {editingStaffProjId === proj.id && isAdmin && (
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (onUpdateProjectStaff) {
+                        await onUpdateProjectStaff(proj.id, staffFormData);
+                        setEditingStaffProjId(null);
+                      }
+                    }}
+                    style={{
+                      background: 'var(--cream2)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 4,
+                      padding: '14px 16px',
+                      marginBottom: 16,
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr)) auto',
+                      gap: 12,
+                      alignItems: 'flex-end',
+                    }}
+                  >
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                        Seleccionar Consultor / Ingeniero
+                      </label>
+                      <select
+                        onChange={(e) => {
+                          const selected = staffList.find((s) => s.id === e.target.value);
+                          if (selected) {
+                            setStaffFormData({
+                              techLeadName: selected.full_name || selected.email,
+                              techLeadContact: selected.email,
+                            });
+                          }
+                        }}
+                        style={{ width: '100%', padding: '6px 8px', borderRadius: 4, border: '1px solid var(--border)', fontSize: 12, background: '#fff' }}
+                      >
+                        <option value="">-- Seleccionar de la lista de consultores --</option>
+                        {staffList.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.full_name || s.email} ({s.role ? s.role.toUpperCase() : 'STAFF'})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                        Nombre del Lead Técnico *
+                      </label>
+                      <input
+                        type="text"
+                        value={staffFormData.techLeadName}
+                        onChange={(e) => setStaffFormData({ ...staffFormData, techLeadName: e.target.value })}
+                        required
+                        style={{ width: '100%', padding: '6px 8px', borderRadius: 4, border: '1px solid var(--border)', fontSize: 12 }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                        Email de Contacto *
+                      </label>
+                      <input
+                        type="email"
+                        value={staffFormData.techLeadContact}
+                        onChange={(e) => setStaffFormData({ ...staffFormData, techLeadContact: e.target.value })}
+                        required
+                        style={{ width: '100%', padding: '6px 8px', borderRadius: 4, border: '1px solid var(--border)', fontSize: 12 }}
+                      />
+                    </div>
+
+                    <div>
+                      <button
+                        type="submit"
+                        className="btn-accent"
+                        style={{
+                          background: 'var(--terracotta)',
+                          color: '#fff',
+                          border: 'none',
+                          padding: '8px 16px',
+                          borderRadius: 4,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Guardar Designación
+                      </button>
+                    </div>
+                  </form>
+                )}
 
                 {proj.description && (
                   <p style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 16, whiteSpace: 'pre-line' }}>
@@ -461,7 +689,7 @@ export default function ProjectsManagementView({
                       <span style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
                         Fases & Hitos del Proyecto ({proj.milestones?.length || 0})
                       </span>
-                      {onAddMilestone && (
+                      {isAdmin && onAddMilestone ? (
                         <button
                           type="button"
                           onClick={() => {
@@ -494,11 +722,15 @@ export default function ProjectsManagementView({
                         >
                           {addingMilestoneProjId === proj.id ? 'Cancelar' : '+ Agregar Hito a Proyecto'}
                         </button>
+                      ) : (
+                        <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                          🔒 Solo Admin gestiona hitos
+                        </span>
                       )}
                     </div>
 
-                    {/* Inline Add Milestone Form */}
-                    {addingMilestoneProjId === proj.id && (
+                    {/* Inline Add Milestone Form (Admin Only) */}
+                    {isAdmin && addingMilestoneProjId === proj.id && (
                       <form
                         onSubmit={async (e) => {
                           e.preventDefault();
@@ -760,57 +992,80 @@ export default function ProjectsManagementView({
                                 )}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                                {staffList.length > 0 && (
-                                  <select
-                                    value={m.assigned_to_id || ''}
-                                    onChange={(e) => {
-                                      const memberId = e.target.value;
-                                      const member = staffList.find((s) => s.id === memberId);
-                                      onUpdateMilestone(m.id, {
-                                        assignedToId: member?.id || null,
-                                        assignedToName: member?.full_name || member?.email || null,
-                                        assignedToEmail: member?.email || null,
-                                      });
-                                    }}
-                                    style={{
-                                      padding: '4px 8px',
-                                      borderRadius: 4,
-                                      border: '1px solid var(--border)',
-                                      background: '#fff',
-                                      color: 'var(--ink)',
-                                      fontSize: 11,
-                                      fontFamily: "'IBM Plex Mono', monospace",
-                                    }}
-                                    title="Reasignar consultor/encargado del hito"
-                                  >
-                                    <option value="">👤 Sin asignar</option>
-                                    {staffList.map((member) => (
-                                      <option key={member.id} value={member.id}>
-                                        👤 {member.full_name || member.email}
-                                      </option>
-                                    ))}
-                                  </select>
+                                {isAdmin ? (
+                                  <>
+                                    {staffList.length > 0 && (
+                                      <select
+                                        value={m.assigned_to_id || ''}
+                                        onChange={(e) => {
+                                          const memberId = e.target.value;
+                                          const member = staffList.find((s) => s.id === memberId);
+                                          onUpdateMilestone(m.id, {
+                                            assignedToId: member?.id || null,
+                                            assignedToName: member?.full_name || member?.email || null,
+                                            assignedToEmail: member?.email || null,
+                                          });
+                                        }}
+                                        style={{
+                                          padding: '4px 8px',
+                                          borderRadius: 4,
+                                          border: '1px solid var(--border)',
+                                          background: '#fff',
+                                          color: 'var(--ink)',
+                                          fontSize: 11,
+                                          fontFamily: "'IBM Plex Mono', monospace",
+                                        }}
+                                        title="Designar auditor/ingeniero encargado del hito"
+                                      >
+                                        <option value="">👤 Sin asignar</option>
+                                        {staffList.map((member) => (
+                                          <option key={member.id} value={member.id}>
+                                            👤 {member.full_name || member.email} ({member.role ? member.role.toUpperCase() : 'STAFF'})
+                                          </option>
+                                        ))}
+                                      </select>
+                                    )}
+                                    <select
+                                      value={m.status}
+                                      onChange={(e) => onUpdateMilestone(m.id, e.target.value)}
+                                      style={{
+                                        padding: '4px 8px',
+                                        borderRadius: 4,
+                                        border: `1px solid ${mColor.border}`,
+                                        background: mColor.bg,
+                                        color: mColor.text,
+                                        fontSize: 11,
+                                        fontFamily: "'IBM Plex Mono', monospace",
+                                        fontWeight: 700,
+                                      }}
+                                      title="Cambiar estado del hito"
+                                    >
+                                      <option value="PENDIENTE">PENDIENTE</option>
+                                      <option value="EN_PROGRESO">EN_PROGRESO</option>
+                                      <option value="EN_PROCESO">EN_PROCESO</option>
+                                      <option value="COMPLETADO">COMPLETADO</option>
+                                      <option value="BLOQUEADO">BLOQUEADO</option>
+                                    </select>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span
+                                      style={{
+                                        padding: '4px 8px',
+                                        borderRadius: 4,
+                                        border: `1px solid ${mColor.border}`,
+                                        background: mColor.bg,
+                                        color: mColor.text,
+                                        fontSize: 11,
+                                        fontFamily: "'IBM Plex Mono', monospace",
+                                        fontWeight: 700,
+                                      }}
+                                      title="Estado del hito (Solo editable por Admin)"
+                                    >
+                                      🔒 {m.status}
+                                    </span>
+                                  </>
                                 )}
-                                <select
-                                  value={m.status}
-                                  onChange={(e) => onUpdateMilestone(m.id, e.target.value)}
-                                  style={{
-                                    padding: '4px 8px',
-                                    borderRadius: 4,
-                                    border: `1px solid ${mColor.border}`,
-                                    background: mColor.bg,
-                                    color: mColor.text,
-                                    fontSize: 11,
-                                    fontFamily: "'IBM Plex Mono', monospace",
-                                    fontWeight: 700,
-                                  }}
-                                >
-                                  <option value="PENDIENTE">PENDIENTE</option>
-                                  <option value="EN_PROGRESO">EN_PROGRESO</option>
-                                  <option value="EN_PROCESO">EN_PROCESO</option>
-                                  <option value="COMPLETADO">COMPLETADO</option>
-                                  <option value="BLOQUEADO">BLOQUEADO</option>
-                                </select>
                               </div>
                             </div>
                           );

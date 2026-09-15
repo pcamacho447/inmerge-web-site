@@ -152,23 +152,67 @@ export default function NewProjectModal({
             />
           </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-              Fecha Estimada de Entrega
-            </label>
-            <input
-              type="date"
-              value={newProj.targetCompletionDate}
-              onChange={(e) => setNewProj({ ...newProj, targetCompletionDate: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 4,
-                border: '1px solid var(--border)',
-                fontSize: 13,
-                boxSizing: 'border-box',
-              }}
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                Fecha Estimada de Entrega
+              </label>
+              <input
+                type="date"
+                value={newProj.targetCompletionDate}
+                onChange={(e) => setNewProj({ ...newProj, targetCompletionDate: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                  fontSize: 13,
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                Líder / Ingeniero / Auditor Designado
+              </label>
+              <select
+                value={staffList.find((s) => (s.full_name && s.full_name === newProj.techLeadName) || (s.email && s.email === newProj.techLeadContact))?.id || ''}
+                onChange={(e) => {
+                  const memberId = e.target.value;
+                  const member = staffList.find((s) => s.id === memberId);
+                  if (member) {
+                    setNewProj({
+                      ...newProj,
+                      techLeadName: member.full_name || member.email,
+                      techLeadContact: member.email || '',
+                    });
+                  } else {
+                    setNewProj({
+                      ...newProj,
+                      techLeadName: 'Inmerge Tech Lead',
+                      techLeadContact: 'inmerge3@gmail.com',
+                    });
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                  fontSize: 13,
+                  boxSizing: 'border-box',
+                  background: '#fff',
+                }}
+              >
+                <option value="">-- Seleccionar Consultor Asignado --</option>
+                {staffList.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.full_name || s.email} ({s.role ? s.role.toUpperCase() : 'STAFF'})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <button

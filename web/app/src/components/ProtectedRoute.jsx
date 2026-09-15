@@ -15,5 +15,10 @@ export default function ProtectedRoute({ children, requireStaff = false }) {
     return <Navigate to="/cuenta" replace />;
   }
 
+  // Ingenieros y Auditores no tienen acceso al portal de clientes (solo Admin y Clientes)
+  if (!requireStaff && user.isStaff && !user.isAdmin) {
+    return <Navigate to="/equipo" replace />;
+  }
+
   return children;
 }

@@ -38,7 +38,13 @@ export default function Cuenta() {
     saveOrganization,
   } = useOrganizationBilling(user?.id);
 
-  if (!user) return null;
+  useEffect(() => {
+    if (user?.isStaff && !user?.isAdmin) {
+      navigate('/equipo', { replace: true });
+    }
+  }, [user, navigate]);
+
+  if (!user || (user?.isStaff && !user?.isAdmin)) return null;
 
   async function handleLogout() {
     await logout();

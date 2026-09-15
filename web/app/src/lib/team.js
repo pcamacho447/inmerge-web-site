@@ -226,6 +226,47 @@ export async function createTeamProject({
 }
 
 /**
+ * Actualiza la designación de equipo técnico (Lead, Ingenieros, Auditores) o detalles del proyecto (Exclusivo Admin).
+ */
+export async function updateProjectStaff(projectId, {
+  techLeadName,
+  techLeadContact,
+  description,
+  title,
+  targetCompletionDate,
+} = {}) {
+  if (!projectId) throw new Error('El ID de proyecto es obligatorio.');
+
+  const updateFields = {};
+  if (techLeadName !== undefined) updateFields.tech_lead_name = techLeadName;
+  if (techLeadContact !== undefined) updateFields.tech_lead_contact = techLeadContact;
+  if (description !== undefined) updateFields.description = description;
+  if (title !== undefined) updateFields.title = title;
+  if (targetCompletionDate !== undefined) updateFields.target_completion_date = targetCompletionDate;
+
+  const { data, error } = await supabase
+    .from('client_projects')
+    .update(updateFields)
+    .eq('id', projectId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error al actualizar equipo del proyecto:', error);
+    throw new Error(error.message || 'No se pudo actualizar el equipo asignado al proyecto.');
+  }
+
+  logTeamActivity({
+    action: 'PROJECT_STAFF_ASSIGNED',
+    entityType: 'project',
+    entityId: projectId,
+    details: { updateFields, title: data?.title },
+  });
+
+  return data;
+}
+
+/**
  * Actualiza el estado de un proyecto de cliente y dispara la Edge Function notify-project-status.
  */
 export async function updateProjectStatus(projectId, newStatus, { notes = '', clientEmail = '', clientName = '' } = {}) {
