@@ -2,7 +2,7 @@
   "name": "inmerge-monorepo",
   "private": true,
   "scripts": {
-    "build": "cd web/app && npm install && npm run build",
+    "build": "cd web/app && npm install && npm run build && cd ../.. && node -e \"require('fs').cpSync('web/app/dist', 'dist', {recursive:true})\"",
     "test": "cd web/app && npm test"
   }
 }
