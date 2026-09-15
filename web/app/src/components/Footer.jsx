@@ -14,7 +14,7 @@ export default function Footer({ borderTop = false }) {
       }}
     >
       <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 14, letterSpacing: 1 }}>INMERGE — 2026</div>
-      <div style={{ fontSize: 13, color: 'var(--muted)' }}>contacto@inmerge.pe · Lima, Perú</div>
+      <div style={{ fontSize: 13, color: 'var(--muted)' }}>inmerge3@gmail.com · Lima, Perú</div>
     </footer>
   );
 }

@@ -8,11 +8,7 @@ const AuthContext = createContext(null);
  */
 async function ensureProfile(sessionUser) {
   try {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('id, role')
-      .eq('id', sessionUser.id)
-      .maybeSingle();
+    const { data: profile, error } = await supabase.from('profiles').select('id, role').eq('id', sessionUser.id).maybeSingle();
 
     if (error) {
       console.warn('Profiles check error:', error.message);
@@ -20,12 +16,15 @@ async function ensureProfile(sessionUser) {
     }
 
     if (!profile) {
-      await supabase.from('profiles').insert({
-        id: sessionUser.id,
-        email: sessionUser.email,
-        full_name: sessionUser.user_metadata?.full_name || sessionUser.email?.split('@')[0] || '',
-        role: sessionUser.user_metadata?.role || 'client',
-      }).maybeSingle();
+      await supabase
+        .from('profiles')
+        .insert({
+          id: sessionUser.id,
+          email: sessionUser.email,
+          full_name: sessionUser.user_metadata?.full_name || sessionUser.email?.split('@')[0] || '',
+          role: sessionUser.user_metadata?.role || 'client',
+        })
+        .maybeSingle();
     }
     return true;
   } catch (err) {

@@ -5,6 +5,12 @@ import { supabase } from './supabaseClient.js';
 vi.mock('./supabaseClient.js', () => ({
   supabase: {
     from: vi.fn(),
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'client-user-1' } }, error: null }),
+    },
+    functions: {
+      invoke: vi.fn(),
+    },
     storage: {
       from: vi.fn(),
     },
@@ -53,18 +59,58 @@ describe('projects.js', () => {
     expect(projects[0].deliverables).toHaveLength(1);
   });
 
-  it('generates signed deliverable download url', async () => {
+  it('invoca la Edge Function secure-download para obtener la URL firmada con auditoría', async () => {
+    supabase.functions.invoke.mockResolvedValue({
+      data: {
+        success: true,
+        signedUrl: 'https://supabase.co/storage/v1/object/sign/deliverables/secure-doc.pdf?token=xyz',
+        expiresIn: 900,
+      },
+      error: null,
+    });
+
+    const url = await getSignedDeliverableUrl({
+      filePath: 'projects/p1/secure-doc.pdf',
+      deliverableId: 'deliv-999',
+      expiresIn: 900,
+    });
+
+    expect(supabase.functions.invoke).toHaveBeenCalledWith('secure-download', {
+      body: {
+        deliverableId: 'deliv-999',
+        filePath: 'projects/p1/secure-doc.pdf',
+        expiresIn: 900,
+      },
+    });
+    expect(url).toContain('secure-doc.pdf');
+  });
+
+  it('ejecuta fallback a Storage y registra log si la Edge Function falla o no está disponible', async () => {
+    supabase.functions.invoke.mockRejectedValue(new Error('Edge Function Unavailable'));
+
     const mockCreateSignedUrl = vi.fn().mockResolvedValue({
       data: { signedUrl: 'https://supabase.co/storage/v1/object/sign/deliverables/inf.pdf?token=abc' },
       error: null,
     });
 
+    const mockInsert = vi.fn().mockResolvedValue({ data: null, error: null });
+
     supabase.storage.from.mockReturnValue({
       createSignedUrl: mockCreateSignedUrl,
     });
+    supabase.from.mockReturnValue({
+      insert: mockInsert,
+    });
 
-    const url = await getSignedDeliverableUrl('projects/p1/informe.pdf');
+    const url = await getSignedDeliverableUrl('projects/p1/informe.pdf', 'deliv-123', 900);
     expect(url).toContain('https://supabase.co/storage');
-    expect(mockCreateSignedUrl).toHaveBeenCalledWith('projects/p1/informe.pdf', 3600);
+    expect(mockCreateSignedUrl).toHaveBeenCalledWith('projects/p1/informe.pdf', 900);
+    expect(supabase.from).toHaveBeenCalledWith('team_activity_logs');
+    expect(mockInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'DELIVERABLE_DOWNLOADED',
+        entity_id: 'deliv-123',
+      }),
+    );
   });
 });

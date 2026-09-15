@@ -31,19 +31,28 @@ export async function submitLeadTdr({
     status: 'NUEVO',
   };
 
-  const { data, error } = await supabase.from('leads_tdr').insert([payload]).select().single();
+  const { error } = await supabase.from('leads_tdr').insert([payload]);
 
   if (error) {
     console.error('Error al registrar solicitud TDR en Supabase:', error);
     throw new Error(error.message || 'Error al guardar la solicitud en el servidor.');
   }
 
-  // Invocación asíncrona no-bloqueante a la Edge Function de notificación
+  // Invocación a la Edge Function de notificación con registro detallado
   if (supabase.functions && typeof supabase.functions.invoke === 'function') {
-    supabase.functions
-      .invoke('notify-lead-tdr', { body: { record: data } })
-      .catch((fnErr) => console.warn('Notification trigger warning:', fnErr));
+    try {
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('notify-lead-tdr', {
+        body: { record: payload },
+      });
+      if (fnError) {
+        console.warn('[leads] Advertencia de notificación (Edge Function):', fnError);
+      } else {
+        console.log('[leads] Notificación procesada con éxito por notify-lead-tdr:', fnData);
+      }
+    } catch (fnErr) {
+      console.warn('[leads] Error de red al invocar Edge Function notify-lead-tdr:', fnErr);
+    }
   }
 
-  return { success: true, lead: data };
+  return { success: true, lead: payload };
 }

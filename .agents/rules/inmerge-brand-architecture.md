@@ -36,10 +36,16 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 
 ## 4. Arquitectura de Base de Datos y Supabase
 - **Esquema Inicial Maestro:** [`web/app/supabase/migrations/0001_inmerge_initial_schema.sql`](file:///c:/papx/inmerge-website/inmerge/web/app/supabase/migrations/0001_inmerge_initial_schema.sql)
-- **Idempotencia de Esquema:**
+- **Migraciones Incrementales:** Nombrado secuencial `000X_<feature_or_hardening>.sql` (ej. `0002_inmerge_security_and_audit_hardening.sql`).
+- **Idempotencia y Manejo Seguro de Esquema:**
   - Utilizar siempre `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` en `public.profiles` para evitar discrepancias con plantillas predeterminadas de Supabase.
   - Roles soportados: `profiles.role IN ('client', 'auditor', 'engineer', 'admin')`.
   - Bucket privado `project-deliverables` con políticas de lectura restringidas a clientes asignados y equipo técnico.
+  - **Manejo Seguro de Funciones RPC y Triggers:**
+    - Incluir siempre `DROP FUNCTION IF EXISTS public.<funcion>(<tipos>) CASCADE;` antes de `CREATE OR REPLACE FUNCTION` para prevenir el error `42P13` de PostgreSQL por renombrado de parámetros.
+    - No crear funciones sobrecargadas con idénticos tipos de datos para actuar como alias de argumentos; unificar la signatura canónica (`p_*`) y normalizar en el SDK cliente.
+    - Ejecutar `DROP TRIGGER IF EXISTS` antes de crear triggers y `DROP POLICY IF EXISTS` antes de crear políticas RLS.
+    - Inmutabilidad de auditoría: Garantizar `REVOKE UPDATE, DELETE ON public.team_activity_logs`.
 
 ---
 

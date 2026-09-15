@@ -58,7 +58,7 @@ export default function Contacto() {
       // Fallback a mailto si la base de datos o conexión falla
       const subject = `Solicitud TDR / Cotización — ${formCompany || formName || 'Inmerge'}`;
       const body = `Pilar de Interés: ${formPillar}\nNombre: ${formName || 'No indicado'}\nEmpresa/Organización: ${formCompany || 'No indicado'}\nEmail: ${formContact}\nTeléfono/WhatsApp: ${formPhone || 'No indicado'}\nPlazo estimado: ${formTimeline}\n\nRequerimiento:\n${formMessage}`;
-      window.location.href = `mailto:contacto@inmerge.pe?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = `mailto:inmerge3@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       setFormSubmitted(true);
     } finally {
       setIsSubmitting(false);
@@ -197,7 +197,7 @@ export default function Contacto() {
                 <strong>Firma:</strong> Inmerge Consultoría y Tecnología
               </div>
               <div>
-                <strong>Correo:</strong> contacto@inmerge.pe
+                <strong>Correo:</strong> inmerge3@gmail.com
               </div>
               <div>
                 <strong>Ubicación:</strong> Lima, Perú

@@ -18,6 +18,8 @@ import {
   createStaffMember,
   fetchTeamActivityLogs,
 } from '../lib/team.js';
+import useRealtimeTeam from '../hooks/useRealtimeTeam.js';
+import ToastNotification from '../components/ToastNotification.jsx';
 
 const PILLAR_LABELS = {
   auditoria: '01. Auditoría Técnica & Datos',
@@ -75,7 +77,7 @@ export default function Equipo() {
     description: '',
     targetCompletionDate: '',
     techLeadName: user?.fullName || 'Inmerge Tech Lead',
-    techLeadContact: user?.email || 'contacto@inmerge.pe',
+    techLeadContact: user?.email || 'inmerge3@gmail.com',
   });
 
   // Milestone Form State
@@ -109,11 +111,13 @@ export default function Equipo() {
   const [staffSubmitting, setStaffSubmitting] = useState(false);
 
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, []);
 
-  async function loadData() {
-    setLoading(true);
+  async function loadData(showSkeleton = true) {
+    if (showSkeleton) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const [leadsData, projsData, clientsData, logsData] = await Promise.all([
@@ -134,36 +138,42 @@ export default function Equipo() {
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      if (showSkeleton) {
+        setLoading(false);
+      }
     }
   }
+
+  // Escuchar suscripciones en tiempo real para el equipo
+  const { toast, dismissToast } = useRealtimeTeam({
+    onDataRefresh: () => loadData(false),
+    enabled: !!user,
+  });
 
   async function handleUpdateLead(leadId, newStatus) {
     try {
       await updateLeadStatus(leadId, { status: newStatus });
-      setLeads((prev) =>
-        prev.map((l) => (l.id === leadId ? { ...l, status: newStatus } : l))
-      );
+      setLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, status: newStatus } : l)));
       showTemporaryMsg('Estado del lead actualizado y registrado en auditoría.');
-      fetchTeamActivityLogs({ limit: 50 }).then(setActivityLogs).catch(() => {});
+      fetchTeamActivityLogs({ limit: 50 })
+        .then(setActivityLogs)
+        .catch(() => {});
     } catch (err) {
       alert(`Error al actualizar lead: ${err.message}`);
     }
   }
 
   function handleConvertLeadToProject(lead) {
-    const matchedClient = clients.find(
-      (c) => c.email && c.email.toLowerCase() === lead.email?.toLowerCase()
-    );
+    const matchedClient = clients.find((c) => c.email && c.email.toLowerCase() === lead.email?.toLowerCase());
 
     setNewProj({
-      clientId: matchedClient ? matchedClient.id : (clients[0]?.id || ''),
+      clientId: matchedClient ? matchedClient.id : clients[0]?.id || '',
       title: `${PILLAR_LABELS[lead.pillar] || 'Proyecto'} — ${lead.company || lead.full_name || 'Cliente'}`,
       pillar: ['auditoria', 'desarrollo', 'datos', 'integral'].includes(lead.pillar) ? lead.pillar : 'auditoria',
       description: `Requerimiento TDR: ${lead.message || 'Sin descripción'}\n\nContacto: ${lead.full_name || 'N/A'} (${lead.email || 'N/A'}${lead.phone ? `, Tel: ${lead.phone}` : ''})\nPlazo estimado: ${lead.timeline || 'A coordinar'}`,
       targetCompletionDate: '',
       techLeadName: user?.fullName || 'Inmerge Tech Lead',
-      techLeadContact: user?.email || 'contacto@inmerge.pe',
+      techLeadContact: user?.email || 'inmerge3@gmail.com',
     });
 
     setActiveTab('new_project');
@@ -191,7 +201,7 @@ export default function Equipo() {
         description: '',
         targetCompletionDate: '',
         techLeadName: user?.fullName || 'Inmerge Tech Lead',
-        techLeadContact: user?.email || 'contacto@inmerge.pe',
+        techLeadContact: user?.email || 'inmerge3@gmail.com',
       });
       await loadData();
       setActiveTab('projects');
@@ -337,7 +347,9 @@ export default function Equipo() {
     <>
       <div style={{ maxWidth: 1120, margin: '0 auto', padding: '120px clamp(20px,5vw,40px) 80px' }}>
         {/* Header Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 16, marginBottom: 12 }}>
+        <div
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 16, marginBottom: 12 }}
+        >
           <div>
             <div
               style={{
@@ -364,6 +376,23 @@ export default function Equipo() {
                 }}
               >
                 {user?.role || 'STAFF'}
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: 10,
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  color: '#2E7559',
+                  background: 'rgba(46, 117, 89, 0.1)',
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  border: '1px solid rgba(46, 117, 89, 0.25)',
+                }}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#2E7559' }}></span>
+                REALTIME ACTIVO
               </span>
             </div>
             <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,42px)', margin: 0 }}>
@@ -622,9 +651,7 @@ export default function Equipo() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {leads.map((lead) => {
                       const color = STATUS_COLORS[lead.status] || STATUS_COLORS.NUEVO;
-                      const matchedClient = clients.find(
-                        (c) => c.email && c.email.toLowerCase() === lead.email?.toLowerCase()
-                      );
+                      const matchedClient = clients.find((c) => c.email && c.email.toLowerCase() === lead.email?.toLowerCase());
 
                       const leadWaMsg = `Hola ${lead.full_name || 'estimado(a)'}, te saluda ${user?.fullName || 'el equipo técnico'} de Inmerge. Recibimos tu solicitud para "${PILLAR_LABELS[lead.pillar] || lead.pillar}"${lead.company ? ` en ${lead.company}` : ''}. ¿Podemos agendar una breve llamada técnica para revisar los requerimientos?`;
                       const leadWaUrl = waLink(leadWaMsg);
@@ -640,7 +667,16 @@ export default function Equipo() {
                             boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
                           }}
                         >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                              flexWrap: 'wrap',
+                              gap: 12,
+                              marginBottom: 12,
+                            }}
+                          >
                             <div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
                                 <span
@@ -657,7 +693,14 @@ export default function Equipo() {
                                 >
                                   {lead.status}
                                 </span>
-                                <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--terracotta)', fontWeight: 600 }}>
+                                <span
+                                  style={{
+                                    fontFamily: "'IBM Plex Mono', monospace",
+                                    fontSize: 12,
+                                    color: 'var(--terracotta)',
+                                    fontWeight: 600,
+                                  }}
+                                >
                                   {PILLAR_LABELS[lead.pillar] || lead.pillar}
                                 </span>
                                 {matchedClient ? (
@@ -691,31 +734,63 @@ export default function Equipo() {
                                 )}
                               </div>
                               <h3 style={{ margin: '4px 0', fontSize: 18, fontWeight: 700 }}>
-                                {lead.company ? `${lead.company} — ` : ''}{lead.full_name || 'Solicitud Anónima'}
+                                {lead.company ? `${lead.company} — ` : ''}
+                                {lead.full_name || 'Solicitud Anónima'}
                               </h3>
                             </div>
 
                             <div style={{ textAlign: 'right' }}>
                               <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
-                                {new Date(lead.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                {new Date(lead.created_at).toLocaleDateString('es-PE', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
                               </div>
                             </div>
                           </div>
 
-                          <div style={{ background: '#fff', padding: 14, borderRadius: 6, marginBottom: 14, border: '1px solid rgba(0,0,0,0.06)' }}>
+                          <div
+                            style={{
+                              background: '#fff',
+                              padding: 14,
+                              borderRadius: 6,
+                              marginBottom: 14,
+                              border: '1px solid rgba(0,0,0,0.06)',
+                            }}
+                          >
                             <div style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginBottom: 4 }}>
                               DESCRIPCIÓN DEL REQUERIMIENTO / TDR:
                             </div>
-                            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'var(--ink)' }}>
-                              {lead.message}
-                            </p>
+                            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'var(--ink)' }}>{lead.message}</p>
                           </div>
 
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, fontSize: 13 }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              gap: 12,
+                              fontSize: 13,
+                            }}
+                          >
                             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', color: 'var(--muted)' }}>
-                              <span>📧 <strong style={{ color: 'var(--ink)' }}>{lead.email}</strong></span>
-                              {lead.phone && <span>📞 <strong style={{ color: 'var(--ink)' }}>{lead.phone}</strong></span>}
-                              {lead.timeline && <span>⏱️ Plazo: <strong style={{ color: 'var(--ink)' }}>{lead.timeline}</strong></span>}
+                              <span>
+                                📧 <strong style={{ color: 'var(--ink)' }}>{lead.email}</strong>
+                              </span>
+                              {lead.phone && (
+                                <span>
+                                  📞 <strong style={{ color: 'var(--ink)' }}>{lead.phone}</strong>
+                                </span>
+                              )}
+                              {lead.timeline && (
+                                <span>
+                                  ⏱️ Plazo: <strong style={{ color: 'var(--ink)' }}>{lead.timeline}</strong>
+                                </span>
+                              )}
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -829,7 +904,16 @@ export default function Equipo() {
                             border: '1px solid var(--border)',
                           }}
                         >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                              flexWrap: 'wrap',
+                              gap: 12,
+                              marginBottom: 12,
+                            }}
+                          >
                             <div>
                               <span
                                 style={{
@@ -853,12 +937,19 @@ export default function Equipo() {
                                 {proj.title}
                               </h3>
                               <div style={{ fontSize: 13, color: 'var(--muted)' }}>
-                                Cliente: <strong style={{ color: 'var(--ink)' }}>{proj.client?.full_name ? `${proj.client.full_name} (${proj.client.email})` : (proj.client?.email || proj.client_id)}</strong>
+                                Cliente:{' '}
+                                <strong style={{ color: 'var(--ink)' }}>
+                                  {proj.client?.full_name
+                                    ? `${proj.client.full_name} (${proj.client.email})`
+                                    : proj.client?.email || proj.client_id}
+                                </strong>
                                 {proj.client?.company && ` — ${proj.client.company}`}
                               </div>
                             </div>
 
-                            <div style={{ textAlign: 'right', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                            <div
+                              style={{ textAlign: 'right', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}
+                            >
                               <div>Inicio: {proj.start_date || 'N/A'}</div>
                               {proj.target_completion_date && <div>Entrega estimada: {proj.target_completion_date}</div>}
                             </div>
@@ -871,9 +962,31 @@ export default function Equipo() {
                           )}
 
                           {/* Progress Bar */}
-                          <div style={{ margin: '16px 0', background: '#fff', padding: 14, borderRadius: 6, border: '1px solid var(--border)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, fontSize: 12, fontFamily: "'IBM Plex Mono', monospace" }}>
-                              <span>Avance de Hitos: <strong>{completedMilestones} de {totalMilestones} completados</strong></span>
+                          <div
+                            style={{
+                              margin: '16px 0',
+                              background: '#fff',
+                              padding: 14,
+                              borderRadius: 6,
+                              border: '1px solid var(--border)',
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginBottom: 6,
+                                fontSize: 12,
+                                fontFamily: "'IBM Plex Mono', monospace",
+                              }}
+                            >
+                              <span>
+                                Avance de Hitos:{' '}
+                                <strong>
+                                  {completedMilestones} de {totalMilestones} completados
+                                </strong>
+                              </span>
                               <span style={{ fontWeight: 700, color: 'var(--terracotta)' }}>{progressPct}%</span>
                             </div>
                             <div style={{ width: '100%', height: 6, background: 'var(--cream2)', borderRadius: 3, overflow: 'hidden' }}>
@@ -891,7 +1004,15 @@ export default function Equipo() {
                           {/* Milestones Accordion / List */}
                           {proj.milestones && proj.milestones.length > 0 && (
                             <div style={{ marginBottom: 16 }}>
-                              <div style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginBottom: 8, fontWeight: 600 }}>
+                              <div
+                                style={{
+                                  fontSize: 12,
+                                  fontFamily: "'IBM Plex Mono', monospace",
+                                  color: 'var(--muted)',
+                                  marginBottom: 8,
+                                  fontWeight: 600,
+                                }}
+                              >
                                 HITOS DE TRABAJO:
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -916,7 +1037,14 @@ export default function Equipo() {
                                       <div>
                                         <strong>{m.title}</strong>
                                         {m.due_date && (
-                                          <span style={{ marginLeft: 8, color: 'var(--muted)', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace" }}>
+                                          <span
+                                            style={{
+                                              marginLeft: 8,
+                                              color: 'var(--muted)',
+                                              fontSize: 11,
+                                              fontFamily: "'IBM Plex Mono', monospace",
+                                            }}
+                                          >
                                             (Fecha: {m.due_date})
                                           </span>
                                         )}
@@ -950,7 +1078,16 @@ export default function Equipo() {
                           )}
 
                           {/* Deliverables summary */}
-                          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 13 }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              gap: 24,
+                              flexWrap: 'wrap',
+                              paddingTop: 12,
+                              borderTop: '1px solid var(--border)',
+                              fontSize: 13,
+                            }}
+                          >
                             <div>
                               📍 <strong>{totalMilestones} Hitos</strong> registrados
                             </div>
@@ -958,7 +1095,8 @@ export default function Equipo() {
                               📦 <strong>{proj.deliverables?.length || 0} Entregables</strong> publicados
                             </div>
                             <div>
-                              👨‍💻 Tech Lead: <strong>{proj.tech_lead_name || 'Inmerge Lead'}</strong> ({proj.tech_lead_contact || 'contacto@inmerge.pe'})
+                              👨‍💻 Tech Lead: <strong>{proj.tech_lead_name || 'Inmerge Lead'}</strong> (
+                              {proj.tech_lead_contact || 'inmerge3@gmail.com'})
                             </div>
                           </div>
                         </div>
@@ -1153,7 +1291,9 @@ export default function Equipo() {
                         >
                           <option value="">-- Seleccionar Proyecto --</option>
                           {projects.map((p) => (
-                            <option key={p.id} value={p.id}>{p.title}</option>
+                            <option key={p.id} value={p.id}>
+                              {p.title}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -1248,7 +1388,9 @@ export default function Equipo() {
                         >
                           <option value="">-- Seleccionar Proyecto --</option>
                           {projects.map((p) => (
-                            <option key={p.id} value={p.id}>{p.title}</option>
+                            <option key={p.id} value={p.id}>
+                              {p.title}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -1384,7 +1526,16 @@ export default function Equipo() {
             {/* TAB 4: AUDIT LOGS & ACTIVITY TIMELINE */}
             {activeTab === 'activity' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: 20,
+                    flexWrap: 'wrap',
+                    gap: 12,
+                  }}
+                >
                   <div>
                     <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: 0 }}>
                       Bitácora de Auditoría Técnica & Actividad ({filteredActivityLogs.length})
@@ -1485,32 +1636,53 @@ export default function Equipo() {
 
                             <div style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 6 }}>
                               {log.action === 'PROJECT_CREATED' && (
-                                <span>Proyecto creado: <strong>{log.details?.title}</strong> (Pilar: {log.details?.pillar})</span>
+                                <span>
+                                  Proyecto creado: <strong>{log.details?.title}</strong> (Pilar: {log.details?.pillar})
+                                </span>
                               )}
                               {log.action === 'LEAD_STATUS_UPDATED' && (
-                                <span>Lead actualizado a <strong>{log.details?.new_status}</strong> {log.details?.full_name ? `(${log.details.full_name})` : ''}</span>
+                                <span>
+                                  Lead actualizado a <strong>{log.details?.new_status}</strong>{' '}
+                                  {log.details?.full_name ? `(${log.details.full_name})` : ''}
+                                </span>
                               )}
                               {log.action === 'MILESTONE_CREATED' && (
-                                <span>Nuevo hito creado: <strong>{log.details?.title}</strong></span>
+                                <span>
+                                  Nuevo hito creado: <strong>{log.details?.title}</strong>
+                                </span>
                               )}
                               {log.action === 'MILESTONE_STATUS_UPDATED' && (
-                                <span>Hito cambiado a <strong>{log.details?.new_status}</strong> {log.details?.title ? `(${log.details.title})` : ''}</span>
+                                <span>
+                                  Hito cambiado a <strong>{log.details?.new_status}</strong>{' '}
+                                  {log.details?.title ? `(${log.details.title})` : ''}
+                                </span>
                               )}
                               {log.action === 'DELIVERABLE_PUBLISHED' && (
-                                <span>Entregable publicado: <strong>{log.details?.title}</strong> ({log.details?.file_type} {log.details?.version})</span>
+                                <span>
+                                  Entregable publicado: <strong>{log.details?.title}</strong> ({log.details?.file_type}{' '}
+                                  {log.details?.version})
+                                </span>
                               )}
                               {log.action === 'STAFF_REGISTERED' && (
-                                <span>Nuevo colaborador dado de alta: <strong>{log.details?.full_name}</strong> ({log.details?.email}, Rol: {log.details?.role})</span>
+                                <span>
+                                  Nuevo colaborador dado de alta: <strong>{log.details?.full_name}</strong> ({log.details?.email}, Rol:{' '}
+                                  {log.details?.role})
+                                </span>
                               )}
                             </div>
 
                             <div style={{ fontSize: 12, color: 'var(--muted)' }}>
-                              Autor: <strong style={{ color: 'var(--ink)' }}>{log.author?.full_name || log.author?.email || 'Sistema / Staff'}</strong>
+                              Autor:{' '}
+                              <strong style={{ color: 'var(--ink)' }}>
+                                {log.author?.full_name || log.author?.email || 'Sistema / Staff'}
+                              </strong>
                               {log.author?.role && ` (${log.author.role})`}
                             </div>
                           </div>
 
-                          <div style={{ textAlign: 'right', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                          <div
+                            style={{ textAlign: 'right', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}
+                          >
                             {new Date(log.created_at).toLocaleDateString('es-PE', {
                               day: '2-digit',
                               month: 'short',
@@ -1706,6 +1878,7 @@ export default function Equipo() {
         )}
       </div>
 
+      <ToastNotification toast={toast} onDismiss={dismissToast} />
       <Footer />
     </>
   );

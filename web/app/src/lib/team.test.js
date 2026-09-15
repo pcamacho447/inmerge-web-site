@@ -12,7 +12,6 @@ import {
   fetchStaffMembers,
   createStaffMember,
   fetchTeamActivityLogs,
-  logTeamActivity,
 } from './team.js';
 import { supabase } from './supabaseClient.js';
 
@@ -105,6 +104,56 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
     expect(res).toEqual(mockProject);
   });
 
+  it('fetchTeamProjects consulta los proyectos con sus clientes, hitos y entregables', async () => {
+    const mockProjects = [{ id: 'proj-1', title: 'Auditoría PostgreSQL', client: { full_name: 'Cliente Juan' } }];
+    const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+    const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+    supabase.from.mockReturnValue({ select: selectMock });
+
+    const res = await fetchTeamProjects();
+    expect(supabase.from).toHaveBeenCalledWith('client_projects');
+    expect(res).toEqual(mockProjects);
+  });
+
+  it('addProjectMilestone agrega un nuevo hito al proyecto', async () => {
+    await expect(addProjectMilestone({})).rejects.toThrow('El ID de proyecto y título del hito son obligatorios.');
+
+    const mockMilestone = { id: 'm-1', title: 'Fase 1: Diagnóstico', project_id: 'proj-1' };
+    const singleMock = vi.fn().mockResolvedValue({ data: mockMilestone, error: null });
+    const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+    const insertMock = vi.fn().mockReturnValue({ select: selectMock });
+    const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'project_milestones') return { insert: insertMock };
+      if (table === 'team_activity_logs') return { insert: logInsertMock };
+      return {};
+    });
+
+    const res = await addProjectMilestone({ projectId: 'proj-1', title: 'Fase 1: Diagnóstico' });
+    expect(supabase.from).toHaveBeenCalledWith('project_milestones');
+    expect(res).toEqual(mockMilestone);
+  });
+
+  it('updateMilestoneStatus actualiza el estado del hito', async () => {
+    const mockUpdated = { id: 'm-1', title: 'Fase 1: Diagnóstico', project_id: 'proj-1', status: 'COMPLETADO' };
+    const singleMock = vi.fn().mockResolvedValue({ data: mockUpdated, error: null });
+    const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+    const eqMock = vi.fn().mockReturnValue({ select: selectMock });
+    const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
+    const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'project_milestones') return { update: updateMock };
+      if (table === 'team_activity_logs') return { insert: logInsertMock };
+      return {};
+    });
+
+    const res = await updateMilestoneStatus('m-1', 'COMPLETADO');
+    expect(supabase.from).toHaveBeenCalledWith('project_milestones');
+    expect(res).toEqual(mockUpdated);
+  });
+
   it('uploadDeliverableFile sube el archivo al storage de supabase', async () => {
     const mockFile = new Blob(['sample report content'], { type: 'application/pdf' });
     const uploadMock = vi.fn().mockResolvedValue({ data: { path: 'reports/proj1.pdf' }, error: null });
@@ -174,6 +223,10 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
     });
 
     expect(supabase.rpc).toHaveBeenCalledWith('create_staff_member', {
+      p_email: 'nuevo@inmerge.pe',
+      p_password: 'SecurePassword123!',
+      p_full_name: 'Carlos Ingeniero',
+      p_role: 'engineer',
       new_email: 'nuevo@inmerge.pe',
       new_password: 'SecurePassword123!',
       new_full_name: 'Carlos Ingeniero',
@@ -183,9 +236,7 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
   });
 
   it('fetchTeamActivityLogs consulta los registros recientes de auditoría', async () => {
-    const mockLogs = [
-      { id: 'log-1', action: 'PROJECT_CREATED', entity_type: 'project', created_at: '2026-09-14T10:00:00Z' },
-    ];
+    const mockLogs = [{ id: 'log-1', action: 'PROJECT_CREATED', entity_type: 'project', created_at: '2026-09-14T10:00:00Z' }];
     const limitMock = vi.fn().mockResolvedValue({ data: mockLogs, error: null });
     const orderMock = vi.fn().mockReturnValue({ limit: limitMock });
     const selectMock = vi.fn().mockReturnValue({ order: orderMock });

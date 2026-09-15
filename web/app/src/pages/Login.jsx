@@ -31,13 +31,11 @@ export default function Login() {
       }
 
       // Redirección inteligente según el rol del usuario
-      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
       if (authUser) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', authUser.id)
-          .maybeSingle();
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', authUser.id).maybeSingle();
 
         const role = profile?.role || 'client';
         if (['admin', 'auditor', 'engineer'].includes(role)) {
@@ -48,7 +46,11 @@ export default function Login() {
 
       navigate('/cuenta');
     } catch (err) {
-      if (err.message?.toLowerCase().includes('invalid login credentials') || err.message?.toLowerCase().includes('invalid grant') || err.status === 400) {
+      if (
+        err.message?.toLowerCase().includes('invalid login credentials') ||
+        err.message?.toLowerCase().includes('invalid grant') ||
+        err.status === 400
+      ) {
         setError('Tus credenciales son incorrectas.');
       } else {
         setError(err.message || 'Tus credenciales son incorrectas.');
@@ -119,7 +121,7 @@ export default function Login() {
                 border: '1px solid var(--rose)',
               }}
             >
-              {typeof error === 'string' ? error : (error?.message || 'Tus credenciales son incorrectas.')}
+              {typeof error === 'string' ? error : error?.message || 'Tus credenciales son incorrectas.'}
             </div>
           )}
           <button

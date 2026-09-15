@@ -56,7 +56,16 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
             }}
           >
             <span>Panel Equipo</span>
-            <span style={{ fontSize: 10, background: 'var(--terracotta)', color: '#fff', padding: '1px 5px', borderRadius: 3, fontFamily: "'IBM Plex Mono', monospace" }}>
+            <span
+              style={{
+                fontSize: 10,
+                background: 'var(--terracotta)',
+                color: '#fff',
+                padding: '1px 5px',
+                borderRadius: 3,
+                fontFamily: "'IBM Plex Mono', monospace",
+              }}
+            >
               STAFF
             </span>
           </Link>
@@ -64,7 +73,12 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
         <Link
           to={user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login'}
           className="link-hover"
-          style={{ color: 'var(--ink)', fontWeight: (pathname === '/cuenta' || pathname === '/equipo') ? 600 : 400, flexShrink: 0, whiteSpace: 'nowrap' }}
+          style={{
+            color: 'var(--ink)',
+            fontWeight: pathname === '/cuenta' || pathname === '/equipo' ? 600 : 400,
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
+          }}
         >
           {user ? (user.isStaff ? 'Portal Clientes' : 'Mi cuenta') : 'Iniciar sesión'}
         </Link>

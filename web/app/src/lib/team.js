@@ -22,8 +22,10 @@ export async function fetchRegisteredClients() {
  */
 export async function logTeamActivity({ action, entityType, entityId = null, details = {} }) {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     await supabase.from('team_activity_logs').insert({
       user_id: user?.id || null,
       action,
@@ -42,7 +44,8 @@ export async function logTeamActivity({ action, entityType, entityId = null, det
 export async function fetchTeamActivityLogs({ limit = 50 } = {}) {
   const { data, error } = await supabase
     .from('team_activity_logs')
-    .select(`
+    .select(
+      `
       id,
       action,
       entity_type,
@@ -55,7 +58,8 @@ export async function fetchTeamActivityLogs({ limit = 50 } = {}) {
         full_name,
         role
       )
-    `)
+    `,
+    )
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -93,12 +97,7 @@ export async function updateLeadStatus(leadId, { status, notes, assignedTo }) {
   if (notes !== undefined) updates.notes = notes;
   if (assignedTo !== undefined) updates.assigned_to = assignedTo;
 
-  const { data, error } = await supabase
-    .from('leads_tdr')
-    .update(updates)
-    .eq('id', leadId)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('leads_tdr').update(updates).eq('id', leadId).select().single();
 
   if (error) {
     console.error('Error al actualizar lead:', error);
@@ -122,7 +121,8 @@ export async function updateLeadStatus(leadId, { status, notes, assignedTo }) {
 export async function fetchTeamProjects() {
   const { data, error } = await supabase
     .from('client_projects')
-    .select(`
+    .select(
+      `
       *,
       client:client_id (
         id,
@@ -149,7 +149,8 @@ export async function fetchTeamProjects() {
         notes,
         created_at
       )
-    `)
+    `,
+    )
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -170,7 +171,7 @@ export async function createTeamProject({
   description = '',
   targetCompletionDate = null,
   techLeadName = 'Inmerge Technical Lead',
-  techLeadContact = 'contacto@inmerge.pe',
+  techLeadContact = 'inmerge3@gmail.com',
 }) {
   if (!clientId || !title || !pillar) {
     throw new Error('El ID de cliente, título y pilar estratégico son obligatorios.');
@@ -247,12 +248,7 @@ export async function addProjectMilestone({ projectId, title, description = '', 
  * Actualiza el estado de un hito.
  */
 export async function updateMilestoneStatus(milestoneId, status) {
-  const { data, error } = await supabase
-    .from('project_milestones')
-    .update({ status })
-    .eq('id', milestoneId)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('project_milestones').update({ status }).eq('id', milestoneId).select().single();
 
   if (error) {
     console.error('Error al actualizar hito:', error);
@@ -275,12 +271,10 @@ export async function updateMilestoneStatus(milestoneId, status) {
 export async function uploadDeliverableFile(file, destinationPath) {
   if (!file) throw new Error('No se ha seleccionado ningún archivo.');
 
-  const { data, error } = await supabase.storage
-    .from('project-deliverables')
-    .upload(destinationPath, file, {
-      upsert: true,
-      contentType: file.type || 'application/pdf',
-    });
+  const { data, error } = await supabase.storage.from('project-deliverables').upload(destinationPath, file, {
+    upsert: true,
+    contentType: file.type || 'application/pdf',
+  });
 
   if (error) {
     console.error('Error al subir archivo a Storage:', error);
@@ -382,6 +376,10 @@ export async function createStaffMember({ email, password, fullName, role = 'eng
   }
 
   const { data, error } = await supabase.rpc('create_staff_member', {
+    p_email: email,
+    p_password: password,
+    p_full_name: fullName,
+    p_role: role,
     new_email: email,
     new_password: password,
     new_full_name: fullName,

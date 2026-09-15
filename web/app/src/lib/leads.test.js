@@ -29,14 +29,8 @@ describe('leads.js - submitLeadTdr', () => {
   });
 
   it('successfully sanitizes, inserts lead and triggers notify-lead-tdr', async () => {
-    const mockLeadData = { id: 'lead-123', email: 'cliente@empresa.com', status: 'NUEVO' };
-    const mockInsert = vi.fn().mockReturnValue({
-      select: vi.fn().mockReturnValue({
-        single: vi.fn().mockResolvedValue({
-          data: mockLeadData,
-          error: null,
-        }),
-      }),
+    const mockInsert = vi.fn().mockResolvedValue({
+      error: null,
     });
 
     supabase.from.mockReturnValue({
@@ -54,21 +48,20 @@ describe('leads.js - submitLeadTdr', () => {
     });
 
     expect(result.success).toBe(true);
-    expect(result.lead.id).toBe('lead-123');
-    expect(mockInsert).toHaveBeenCalledWith([
-      {
-        pillar: 'auditoria',
-        full_name: 'Juan Perez',
-        company: 'Empresa SAC',
-        email: 'cliente@empresa.com',
-        phone: '987654321',
-        timeline: '1 a 2 meses',
-        message: 'Auditoría de calidad de datos en Postgres',
-        status: 'NUEVO',
-      },
-    ]);
+    expect(result.lead.email).toBe('cliente@empresa.com');
+    const expectedPayload = {
+      pillar: 'auditoria',
+      full_name: 'Juan Perez',
+      company: 'Empresa SAC',
+      email: 'cliente@empresa.com',
+      phone: '987654321',
+      timeline: '1 a 2 meses',
+      message: 'Auditoría de calidad de datos en Postgres',
+      status: 'NUEVO',
+    };
+    expect(mockInsert).toHaveBeenCalledWith([expectedPayload]);
     expect(supabase.functions.invoke).toHaveBeenCalledWith('notify-lead-tdr', {
-      body: { record: mockLeadData },
+      body: { record: expectedPayload },
     });
   });
 });

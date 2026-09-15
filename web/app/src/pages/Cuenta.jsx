@@ -7,6 +7,7 @@ import useClientProjects from '../hooks/useClientProjects.js';
 import { useAuth } from '../lib/auth.jsx';
 import { waLink } from '../data/content.js';
 import { getSignedDeliverableUrl } from '../lib/projects.js';
+import ToastNotification from '../components/ToastNotification.jsx';
 
 const PILLAR_LABELS = {
   auditoria: '01. Auditoría Técnica & Datos',
@@ -27,7 +28,7 @@ export default function Cuenta() {
   useDocumentHead({ title: 'Portal de Clientes — Inmerge', path: '/cuenta', noIndex: true });
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { projects, loading, error, refreshProjects } = useClientProjects();
+  const { projects, loading, error, toast, dismissToast, refreshProjects } = useClientProjects();
   const [downloadingId, setDownloadingId] = useState(null);
 
   if (!user) return null;
@@ -47,7 +48,10 @@ export default function Cuenta() {
 
     setDownloadingId(deliverable.id);
     try {
-      const url = await getSignedDeliverableUrl(deliverable.file_path);
+      const url = await getSignedDeliverableUrl({
+        filePath: deliverable.file_path,
+        deliverableId: deliverable.id,
+      });
       if (url) {
         window.open(url, '_blank');
       }
@@ -70,17 +74,35 @@ export default function Cuenta() {
           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 16, marginBottom: 8 }}
         >
           <div>
-            <div
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 12,
-                color: 'var(--terracotta)',
-                letterSpacing: 2,
-                marginBottom: 6,
-                fontWeight: 600,
-              }}
-            >
-              PORTAL DE CLIENTES
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+              <div
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 12,
+                  color: 'var(--terracotta)',
+                  letterSpacing: 2,
+                  fontWeight: 600,
+                }}
+              >
+                PORTAL DE CLIENTES
+              </div>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: 11,
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  color: '#2E7559',
+                  background: 'rgba(46, 117, 89, 0.1)',
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  border: '1px solid rgba(46, 117, 89, 0.25)',
+                }}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#2E7559' }}></span>
+                REALTIME
+              </span>
             </div>
             <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: 0 }}>
               Panel de Proyectos & Auditoría
@@ -106,7 +128,9 @@ export default function Cuenta() {
           </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 40, flexWrap: 'wrap' }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 40, flexWrap: 'wrap' }}
+        >
           <div style={{ fontSize: 15, color: 'var(--muted)' }}>
             Sesión activa: <strong style={{ color: 'var(--ink)' }}>{user.email}</strong>
           </div>
@@ -285,7 +309,10 @@ export default function Cuenta() {
                       }}
                     >
                       <span>
-                        Progreso del Proyecto: <strong>{completedMilestones} de {totalMilestones} hitos completados</strong>
+                        Progreso del Proyecto:{' '}
+                        <strong>
+                          {completedMilestones} de {totalMilestones} hitos completados
+                        </strong>
                       </span>
                       <span style={{ fontWeight: 700, color: 'var(--terracotta)', fontSize: 14 }}>{progressPct}%</span>
                     </div>
@@ -410,9 +437,7 @@ export default function Cuenta() {
                                   </span>
                                 </div>
                                 <strong style={{ fontSize: 15, color: 'var(--ink)' }}>{del.title}</strong>
-                                {del.notes && (
-                                  <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>{del.notes}</div>
-                                )}
+                                {del.notes && <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>{del.notes}</div>}
                               </div>
 
                               <button
@@ -435,8 +460,8 @@ export default function Cuenta() {
                                 {downloadingId === del.id
                                   ? 'Generando enlace...'
                                   : del.external_url
-                                  ? 'Abrir Enlace ↗'
-                                  : 'Descargar Archivo ↓'}
+                                    ? 'Abrir Enlace ↗'
+                                    : 'Descargar Archivo ↓'}
                               </button>
                             </div>
                           );
@@ -586,6 +611,7 @@ export default function Cuenta() {
         </div>
       </div>
 
+      <ToastNotification toast={toast} onDismiss={dismissToast} />
       <Footer />
     </>
   );
