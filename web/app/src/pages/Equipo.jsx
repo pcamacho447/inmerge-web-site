@@ -134,11 +134,27 @@ export default function Equipo() {
     enabled: !!user,
   });
 
-  async function handleUpdateLead(leadId, newStatus) {
+  async function handleUpdateLead(leadId, updates) {
+    if (!user?.isAdmin) {
+      alert('Permiso denegado: Solo los Administradores pueden modificar leads TDR o designar consultores.');
+      return;
+    }
     try {
-      await updateLeadStatus(leadId, { status: newStatus });
-      setLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, status: newStatus } : l)));
-      showTemporaryMsg('Estado del lead actualizado y registrado en auditoría.');
+      const payload = typeof updates === 'string' ? { status: updates } : updates;
+      await updateLeadStatus(leadId, payload);
+      setLeads((prev) =>
+        prev.map((l) => {
+          if (l.id !== leadId) return l;
+          const updated = { ...l, ...payload };
+          if (payload.assignedTo !== undefined) {
+            updated.assigned_to = payload.assignedTo;
+            const staffMember = staffList.find((s) => s.id === payload.assignedTo);
+            updated.assigned_profile = staffMember ? { full_name: staffMember.full_name, email: staffMember.email } : null;
+          }
+          return updated;
+        })
+      );
+      showTemporaryMsg('Lead actualizado y registrado en la bitácora de auditoría.');
       fetchTeamActivityLogs({ limit: 50 })
         .then(setActivityLogs)
         .catch(() => {});
@@ -756,7 +772,9 @@ export default function Equipo() {
               <LeadsInboxTable
                 leads={leads}
                 clients={clients}
+                staffList={staffList}
                 user={user}
+                isAdmin={Boolean(user?.isAdmin)}
                 onUpdateLeadStatus={handleUpdateLead}
                 onConvertLeadToProject={handleConvertLeadToProject}
               />
