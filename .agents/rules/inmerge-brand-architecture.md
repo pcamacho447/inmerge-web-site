@@ -60,6 +60,17 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 ### 4.3 Buzón y Enrutamiento de Correos
 - La dirección institucional operativa de la firma para cotizaciones, soporte y Tech Leads es **`inmerge3@gmail.com`** (a la espera de la configuración de registros MX para `@inmerge.pe`).
 
+### 4.4 Protección Anti-Spam, Honeypots y Rate Limiting
+- **Honeypot Silencioso (Shadow Ban):** Formularios públicos (como `/contacto`) deben incluir un campo oculto `website_url_hp` (fuera de pantalla y `tabIndex="-1"`). Si un bot lo completa, el SDK cliente debe retornar `{ success: true, isSpamFiltered: true }` sin realizar inserción en base de datos ni invocar Edge Functions.
+- **Rate Limiting en PostgreSQL:** En tablas de prospección (`leads_tdr`), restringir a máx. 3 envíos por email por hora mediante trigger `BEFORE INSERT` apoyado en el índice `idx_leads_tdr_email_created_at (email, created_at DESC)`.
+- **Auditoría de Spam:** Registrar intentos bloqueados bajo la acción `SPAM_LEAD_BLOCKED` en `team_activity_logs`.
+- **Segmentación UX de Errores:** En la UI, capturar el código `RATE_LIMIT_EXCEEDED` para mostrar un banner informativo y suprimir el fallback `mailto:`, canalizando al usuario hacia WhatsApp.
+
+### 4.5 Convenciones de Project Management (PM) y Estados RAG
+- **Estados de Salud RAG:** Los proyectos deben calcular y admitir únicamente los estados de salud: `'ON_TRACK'`, `'AT_RISK'`, `'DELAYED'`, `'BLOCKED'`.
+- **Estados de Hitos (`project_milestones`):** `'PENDING'`, `'IN_PROGRESS'`, `'COMPLETED'`, `'DELAYED'`.
+- **Paridad de Migraciones:** Toda nueva migración `000X_*.sql` debe mantenerse idéntica tanto en `supabase/migrations/` (raíz) como en `web/app/supabase/migrations/`.
+
 ---
 
 ## 5. Estándares de Testing (Vitest + Testing Library)
