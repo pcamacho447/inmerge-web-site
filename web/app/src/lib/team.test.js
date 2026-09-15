@@ -144,7 +144,14 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       return {};
     });
 
-    const res = await addProjectMilestone({ projectId: 'proj-1', title: 'Fase 02: Arquitectura', orderIndex: 2 });
+    const res = await addProjectMilestone({
+      projectId: 'proj-1',
+      title: 'Fase 02: Arquitectura',
+      orderIndex: 2,
+      assignedToName: 'Carlos Dev',
+      assignedToEmail: 'carlos@inmerge.com',
+      assignedToId: 'user-carlos-1',
+    });
     expect(supabase.from).toHaveBeenCalledWith('project_milestones');
     expect(insertMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -152,13 +159,16 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
         title: 'Fase 02: Arquitectura',
         order_index: 2,
         status: 'PENDIENTE',
+        assigned_to_name: 'Carlos Dev',
+        assigned_to_email: 'carlos@inmerge.com',
+        assigned_to_id: 'user-carlos-1',
       }),
     );
     expect(res).toEqual(mockMilestone);
   });
 
-  it('updateMilestoneStatus actualiza el estado del hito', async () => {
-    const mockUpdated = { id: 'm-1', title: 'Fase 1: Diagnóstico', project_id: 'proj-1', status: 'COMPLETADO' };
+  it('updateMilestoneStatus actualiza el estado y encargado del hito', async () => {
+    const mockUpdated = { id: 'm-1', title: 'Fase 1: Diagnóstico', project_id: 'proj-1', status: 'COMPLETADO', assigned_to_name: 'Ana Lead' };
     const singleMock = vi.fn().mockResolvedValue({ data: mockUpdated, error: null });
     const selectMock = vi.fn().mockReturnValue({ single: singleMock });
     const eqMock = vi.fn().mockReturnValue({ select: selectMock });
@@ -171,8 +181,9 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       return {};
     });
 
-    const res = await updateMilestoneStatus('m-1', 'COMPLETADO');
+    const res = await updateMilestoneStatus('m-1', { status: 'COMPLETADO', assignedToName: 'Ana Lead' });
     expect(supabase.from).toHaveBeenCalledWith('project_milestones');
+    expect(updateMock).toHaveBeenCalledWith({ status: 'COMPLETADO', assigned_to_name: 'Ana Lead' });
     expect(res).toEqual(mockUpdated);
   });
 

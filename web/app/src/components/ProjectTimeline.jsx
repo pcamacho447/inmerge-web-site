@@ -83,19 +83,28 @@ export default function ProjectTimeline({ milestones = [] }) {
               {m.description && <p style={{ fontSize: 13, color: 'var(--muted)', margin: 0, lineHeight: 1.5 }}>{m.description}</p>}
             </div>
 
-            {m.due_date && (
-              <div
-                style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 12,
-                  color: 'var(--muted)',
-                  textAlign: 'right',
-                }}
-              >
-                <div>Fecha meta:</div>
-                <strong style={{ color: 'var(--ink)' }}>{m.due_date}</strong>
-              </div>
-            )}
+            <div
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 12,
+                color: 'var(--muted)',
+                textAlign: 'right',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+              }}
+            >
+              {m.assigned_to_name && (
+                <div style={{ fontSize: 11, color: 'var(--ink)' }}>
+                  👤 <span style={{ color: 'var(--muted)' }}>Encargado:</span> <strong>{m.assigned_to_name}</strong>
+                </div>
+              )}
+              {m.due_date && (
+                <div>
+                  Fecha meta: <strong style={{ color: 'var(--ink)' }}>{m.due_date}</strong>
+                </div>
+              )}
+            </div>
           </div>
         );
       })}

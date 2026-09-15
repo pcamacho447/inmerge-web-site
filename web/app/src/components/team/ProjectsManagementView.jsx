@@ -35,6 +35,7 @@ export const MILESTONE_STATUS_COLORS = {
 
 export default function ProjectsManagementView({
   projects,
+  staffList = [],
   onUpdateProjectStatus,
   onProjectHealthChange,
   onUpdateMilestone,
@@ -52,6 +53,9 @@ export default function ProjectsManagementView({
     orderIndex: 1,
     phasePreset: '01',
     dueDate: '',
+    assignedToId: '',
+    assignedToName: '',
+    assignedToEmail: '',
   });
 
   const setProjSubTab = (projId, tab) => {
@@ -470,6 +474,9 @@ export default function ProjectsManagementView({
                                 orderIndex: (proj.milestones?.length || 0) + 1,
                                 phasePreset: '01',
                                 dueDate: '',
+                                assignedToId: '',
+                                assignedToName: '',
+                                assignedToEmail: '',
                               });
                             }
                           }}
@@ -501,6 +508,9 @@ export default function ProjectsManagementView({
                               title: inlineMilestone.title,
                               orderIndex: parseInt(inlineMilestone.orderIndex, 10) || 1,
                               dueDate: inlineMilestone.dueDate || null,
+                              assignedToId: inlineMilestone.assignedToId || null,
+                              assignedToName: inlineMilestone.assignedToName || null,
+                              assignedToEmail: inlineMilestone.assignedToEmail || null,
                             });
                             setAddingMilestoneProjId(null);
                           }
@@ -516,7 +526,7 @@ export default function ProjectsManagementView({
                           gap: 10,
                         }}
                       >
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
                           <div>
                             <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
                               Fase del Proyecto (Método Inmerge)
@@ -594,6 +604,49 @@ export default function ProjectsManagementView({
                                 fontSize: 12,
                               }}
                             />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                              Encargado (Equipo Interno)
+                            </label>
+                            <select
+                              value={inlineMilestone.assignedToId || ''}
+                              onChange={(e) => {
+                                const memberId = e.target.value;
+                                if (!memberId) {
+                                  setInlineMilestone({
+                                    ...inlineMilestone,
+                                    assignedToId: '',
+                                    assignedToName: '',
+                                    assignedToEmail: '',
+                                  });
+                                } else {
+                                  const member = staffList.find((s) => s.id === memberId);
+                                  setInlineMilestone({
+                                    ...inlineMilestone,
+                                    assignedToId: member?.id || memberId,
+                                    assignedToName: member?.full_name || member?.email || '',
+                                    assignedToEmail: member?.email || '',
+                                  });
+                                }
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: 4,
+                                border: '1px solid var(--border)',
+                                fontSize: 12,
+                                background: '#fff',
+                              }}
+                            >
+                              <option value="">-- Sin asignar / General --</option>
+                              {staffList.map((member) => (
+                                <option key={member.id} value={member.id}>
+                                  {member.full_name || member.email} ({member.role ? member.role.toUpperCase() : 'STAFF'})
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         </div>
 
@@ -687,8 +740,57 @@ export default function ProjectsManagementView({
                                     (Fecha: {m.due_date})
                                   </span>
                                 )}
+                                {m.assigned_to_name && (
+                                  <span
+                                    style={{
+                                      fontFamily: "'IBM Plex Mono', monospace",
+                                      fontSize: 11,
+                                      background: 'rgba(36, 26, 18, 0.05)',
+                                      color: 'var(--ink)',
+                                      padding: '2px 8px',
+                                      borderRadius: 4,
+                                      border: '1px solid var(--border)',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 4,
+                                    }}
+                                  >
+                                    👤 {m.assigned_to_name}
+                                  </span>
+                                )}
                               </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                                {staffList.length > 0 && (
+                                  <select
+                                    value={m.assigned_to_id || ''}
+                                    onChange={(e) => {
+                                      const memberId = e.target.value;
+                                      const member = staffList.find((s) => s.id === memberId);
+                                      onUpdateMilestone(m.id, {
+                                        assignedToId: member?.id || null,
+                                        assignedToName: member?.full_name || member?.email || null,
+                                        assignedToEmail: member?.email || null,
+                                      });
+                                    }}
+                                    style={{
+                                      padding: '4px 8px',
+                                      borderRadius: 4,
+                                      border: '1px solid var(--border)',
+                                      background: '#fff',
+                                      color: 'var(--ink)',
+                                      fontSize: 11,
+                                      fontFamily: "'IBM Plex Mono', monospace",
+                                    }}
+                                    title="Reasignar consultor/encargado del hito"
+                                  >
+                                    <option value="">👤 Sin asignar</option>
+                                    {staffList.map((member) => (
+                                      <option key={member.id} value={member.id}>
+                                        👤 {member.full_name || member.email}
+                                      </option>
+                                    ))}
+                                  </select>
+                                )}
                                 <select
                                   value={m.status}
                                   onChange={(e) => onUpdateMilestone(m.id, e.target.value)}

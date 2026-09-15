@@ -28,7 +28,10 @@ export async function fetchClientProjects(userId) {
         start_date,
         weight,
         status,
-        order_index
+        order_index,
+        assigned_to_name,
+        assigned_to_email,
+        assigned_to_id
       ),
       project_deliverables (
         id,

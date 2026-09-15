@@ -139,7 +139,10 @@ export async function fetchTeamProjects() {
         start_date,
         weight,
         status,
-        order_index
+        order_index,
+        assigned_to_name,
+        assigned_to_email,
+        assigned_to_id
       ),
       deliverables:project_deliverables (
         id,
@@ -300,9 +303,18 @@ export async function updateProjectStatus(projectId, newStatus, { notes = '', cl
 }
 
 /**
- * Agrega un nuevo hito/fase a un proyecto.
+ * Agrega un nuevo hito/fase a un proyecto con soporte de asignación a equipo interno.
  */
-export async function addProjectMilestone({ projectId, title, description = '', dueDate = null, orderIndex = 1 }) {
+export async function addProjectMilestone({
+  projectId,
+  title,
+  description = '',
+  dueDate = null,
+  orderIndex = 1,
+  assignedToName = null,
+  assignedToEmail = null,
+  assignedToId = null,
+}) {
   if (!projectId || !title) {
     throw new Error('El ID de proyecto y título del hito son obligatorios.');
   }
@@ -316,6 +328,9 @@ export async function addProjectMilestone({ projectId, title, description = '', 
       due_date: dueDate,
       order_index: orderIndex,
       status: 'PENDIENTE',
+      assigned_to_name: assignedToName || null,
+      assigned_to_email: assignedToEmail || null,
+      assigned_to_id: assignedToId || null,
     })
     .select()
     .single();
@@ -329,17 +344,38 @@ export async function addProjectMilestone({ projectId, title, description = '', 
     action: 'MILESTONE_CREATED',
     entityType: 'milestone',
     entityId: data.id,
-    details: { project_id: projectId, title, due_date: dueDate },
+    details: {
+      project_id: projectId,
+      title,
+      due_date: dueDate,
+      assigned_to_name: assignedToName,
+      assigned_to_email: assignedToEmail,
+    },
   });
 
   return data;
 }
 
 /**
- * Actualiza el estado de un hito.
+ * Actualiza el estado o datos de un hito (incluyendo encargado asignado).
  */
-export async function updateMilestoneStatus(milestoneId, status) {
-  const { data, error } = await supabase.from('project_milestones').update({ status }).eq('id', milestoneId).select().single();
+export async function updateMilestoneStatus(milestoneId, statusOrUpdates) {
+  const updates =
+    typeof statusOrUpdates === 'string'
+      ? { status: statusOrUpdates }
+      : {
+          ...(statusOrUpdates.status && { status: statusOrUpdates.status }),
+          ...(statusOrUpdates.assignedToName !== undefined && { assigned_to_name: statusOrUpdates.assignedToName }),
+          ...(statusOrUpdates.assignedToEmail !== undefined && { assigned_to_email: statusOrUpdates.assignedToEmail }),
+          ...(statusOrUpdates.assignedToId !== undefined && { assigned_to_id: statusOrUpdates.assignedToId }),
+          ...(statusOrUpdates.assigned_to_name !== undefined && { assigned_to_name: statusOrUpdates.assigned_to_name }),
+          ...(statusOrUpdates.assigned_to_email !== undefined && { assigned_to_email: statusOrUpdates.assigned_to_email }),
+          ...(statusOrUpdates.assigned_to_id !== undefined && { assigned_to_id: statusOrUpdates.assigned_to_id }),
+          ...(statusOrUpdates.dueDate !== undefined && { due_date: statusOrUpdates.dueDate }),
+          ...(statusOrUpdates.due_date !== undefined && { due_date: statusOrUpdates.due_date }),
+        };
+
+  const { data, error } = await supabase.from('project_milestones').update(updates).eq('id', milestoneId).select().single();
 
   if (error) {
     console.error('Error al actualizar hito:', error);
@@ -350,7 +386,7 @@ export async function updateMilestoneStatus(milestoneId, status) {
     action: 'MILESTONE_STATUS_UPDATED',
     entityType: 'milestone',
     entityId: milestoneId,
-    details: { new_status: status, title: data.title, project_id: data.project_id },
+    details: { updates, title: data.title, project_id: data.project_id },
   });
 
   return data;

@@ -9,6 +9,7 @@ export const METHODOLOGY_PHASE_PRESETS = [
 export default function NewProjectModal({
   clients,
   projects,
+  staffList = [],
   newProj,
   setNewProj,
   handleCreateProject,
@@ -301,23 +302,69 @@ export default function NewProjectModal({
               />
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-                Fecha Límite
-              </label>
-              <input
-                type="date"
-                value={newMilestone.dueDate}
-                onChange={(e) => setNewMilestone({ ...newMilestone, dueDate: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: 4,
-                  border: '1px solid var(--border)',
-                  fontSize: 13,
-                  boxSizing: 'border-box',
-                }}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                  Fecha Límite
+                </label>
+                <input
+                  type="date"
+                  value={newMilestone.dueDate}
+                  onChange={(e) => setNewMilestone({ ...newMilestone, dueDate: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                    fontSize: 13,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                  Encargado / Responsable (Equipo Interno)
+                </label>
+                <select
+                  value={newMilestone.assignedToId || ''}
+                  onChange={(e) => {
+                    const memberId = e.target.value;
+                    if (!memberId) {
+                      setNewMilestone({
+                        ...newMilestone,
+                        assignedToId: '',
+                        assignedToName: '',
+                        assignedToEmail: '',
+                      });
+                    } else {
+                      const member = staffList.find((s) => s.id === memberId);
+                      setNewMilestone({
+                        ...newMilestone,
+                        assignedToId: member?.id || memberId,
+                        assignedToName: member?.full_name || member?.email || '',
+                        assignedToEmail: member?.email || '',
+                      });
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                    fontSize: 13,
+                    boxSizing: 'border-box',
+                    background: '#fff',
+                  }}
+                >
+                  <option value="">-- Sin asignar / General --</option>
+                  {staffList.map((member) => (
+                    <option key={member.id} value={member.id}>
+                      {member.full_name || member.email} ({member.role ? member.role.toUpperCase() : 'STAFF'})
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <button

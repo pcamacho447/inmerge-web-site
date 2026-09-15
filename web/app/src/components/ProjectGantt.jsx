@@ -86,6 +86,7 @@ export default function ProjectGantt({
         leftPct: mLeftPct,
         widthPct: Math.max(3, mWidthPct),
         tasksCount: mTasks.length,
+        assignedTo: m.assigned_to_name,
       });
 
       if (showTasks && expandedMilestones[m.id]) {

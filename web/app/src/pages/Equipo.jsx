@@ -68,6 +68,9 @@ export default function Equipo() {
     dueDate: '',
     orderIndex: 1,
     phasePreset: '01',
+    assignedToId: '',
+    assignedToName: '',
+    assignedToEmail: '',
   });
 
   // Deliverable Upload Form State
@@ -113,10 +116,8 @@ export default function Equipo() {
       setClients(clientsData);
       setActivityLogs(logsData);
 
-      if (user?.role === 'admin') {
-        const staffData = await fetchStaffMembers().catch(() => []);
-        setStaffList(staffData);
-      }
+      const staffData = await fetchStaffMembers().catch(() => []);
+      setStaffList(staffData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -228,19 +229,32 @@ export default function Equipo() {
         description: payload.description || '',
         dueDate: payload.dueDate || null,
         orderIndex: parseInt(payload.orderIndex, 10) || 1,
+        assignedToName: payload.assignedToName || null,
+        assignedToEmail: payload.assignedToEmail || null,
+        assignedToId: payload.assignedToId || null,
       });
       showTemporaryMsg('Hito agregado correctamente.');
-      setNewMilestone({ projectId: '', title: '', description: '', dueDate: '', orderIndex: 1, phasePreset: '01' });
+      setNewMilestone({
+        projectId: '',
+        title: '',
+        description: '',
+        dueDate: '',
+        orderIndex: 1,
+        phasePreset: '01',
+        assignedToId: '',
+        assignedToName: '',
+        assignedToEmail: '',
+      });
       await loadData();
     } catch (err) {
       alert(`Error al agregar hito: ${err.message}`);
     }
   }
 
-  async function handleUpdateMilestone(milestoneId, newStatus) {
+  async function handleUpdateMilestone(milestoneId, statusOrUpdates) {
     try {
-      await updateMilestoneStatus(milestoneId, newStatus);
-      showTemporaryMsg('Estado de hito actualizado.');
+      await updateMilestoneStatus(milestoneId, statusOrUpdates);
+      showTemporaryMsg('Hito actualizado correctamente.');
       await loadData();
     } catch (err) {
       alert(`Error al actualizar hito: ${err.message}`);
@@ -727,6 +741,7 @@ export default function Equipo() {
             {activeTab === 'projects' && (
               <ProjectsManagementView
                 projects={projects}
+                staffList={staffList}
                 onUpdateProjectStatus={handleUpdateProjectStatus}
                 onProjectHealthChange={handleProjectHealthChange}
                 onUpdateMilestone={handleUpdateMilestone}
@@ -743,6 +758,7 @@ export default function Equipo() {
               <NewProjectModal
                 clients={clients}
                 projects={projects}
+                staffList={staffList}
                 newProj={newProj}
                 setNewProj={setNewProj}
                 handleCreateProject={handleCreateProject}
