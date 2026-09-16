@@ -18,6 +18,9 @@ export const ROUTE_MAP = {
     '/contacto': '/en/contact',
     '/cookies': '/en/cookies',
     '/politica-cookies': '/en/cookies',
+    '/login': '/en/login',
+    '/registro': '/en/register',
+    '/cuenta': '/en/account',
   },
   enToEs: {
     '/en': '/',
@@ -26,6 +29,9 @@ export const ROUTE_MAP = {
     '/en/about': '/nosotros',
     '/en/contact': '/contacto',
     '/en/cookies': '/cookies',
+    '/en/login': '/login',
+    '/en/register': '/registro',
+    '/en/account': '/cuenta',
   },
 };
 

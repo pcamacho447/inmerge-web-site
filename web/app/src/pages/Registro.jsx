@@ -6,9 +6,16 @@ import { useAuth } from '../lib/auth.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Registro() {
-  useDocumentHead({ title: 'Crear cuenta — Inmerge', path: '/registro', noIndex: true });
   const { signup } = useAuth();
-  const { isEn } = useLanguage();
+  const { isEn, content } = useLanguage();
+  const authDict = content?.AUTH_CONTENT || {};
+
+  useDocumentHead({
+    title: isEn ? 'Create account — Inmerge' : 'Crear cuenta — Inmerge',
+    path: isEn ? '/en/register' : '/registro',
+    noIndex: true,
+  });
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -27,9 +34,9 @@ export default function Registro() {
     setError('');
     try {
       await signup({ fullName: fullName.trim(), email: email.trim(), password, billingType, taxId: taxId.trim() });
-      navigate(location.state?.redirectTo || '/cuenta');
+      navigate(location.state?.redirectTo || (isEn ? '/en/account' : '/cuenta'));
     } catch (err) {
-      setError(err.message || 'No se pudo crear la cuenta.');
+      setError(err.message || authDict.genericAuthError || 'No se pudo crear la cuenta.');
     } finally {
       setSubmitting(false);
     }
@@ -49,7 +56,7 @@ export default function Registro() {
             marginBottom: 24,
           }}
         >
-          Portal de seguimiento de proyectos, auditorías e informes técnicos.
+          {authDict.registerSubtitle || 'Portal de seguimiento de proyectos, auditorías e informes técnicos.'}
         </div>
         {isEn && (
           <div
@@ -70,23 +77,27 @@ export default function Registro() {
           >
             <span style={{ color: 'var(--terracotta)', fontWeight: 700, flexShrink: 0 }}>ℹ</span>
             <span>
-              <strong>Peruvian Banking Compliance:</strong> Client and Staff portals operate exclusively in Spanish to satisfy SUNAT RUC validation and bank transfer reconciliation (BCP, Interbank, BBVA in PEN).
+              <strong>International Client Portal:</strong> Sign up with your corporate or individual email. You can specify an international Tax ID (EIN, VAT, Reg No.) or Peruvian RUC for invoicing.
             </span>
           </div>
         )}
-        <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', marginBottom: 12 }}>
-          Crear cuenta
-        </div>
+        <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: '0 0 12px' }}>
+          {authDict.registerTitle || 'Crear cuenta'}
+        </h1>
         <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 32 }}>
-          Registra tu cuenta corporativa para acceder al seguimiento de tus proyectos y entregables.
+          {authDict.registerIntro || 'Registra tu cuenta corporativa para acceder al seguimiento de tus proyectos y entregables.'}
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <input
+            id="name"
+            name="name"
+            type="text"
+            autoComplete="name"
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="Nombre completo"
+            placeholder={authDict.fullNamePlaceholder || 'Nombre completo'}
             style={{
               border: '1px solid var(--border)',
               background: '#FFFFFF',
@@ -97,11 +108,14 @@ export default function Registro() {
             }}
           />
           <input
+            id="email"
+            name="email"
             type="email"
+            autoComplete="username"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="tucorreo@empresa.com"
+            placeholder={authDict.workEmailPlaceholder || 'tucorreo@empresa.com'}
             style={{
               border: '1px solid var(--border)',
               background: '#FFFFFF',
@@ -112,12 +126,15 @@ export default function Registro() {
             }}
           />
           <input
+            id="new-password"
+            name="new-password"
             type="password"
+            autoComplete="new-password"
             required
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Contraseña (mínimo 6 caracteres)"
+            placeholder={isEn ? 'Password (at least 6 characters)' : 'Contraseña (mínimo 6 caracteres)'}
             style={{
               border: '1px solid var(--border)',
               background: '#FFFFFF',
@@ -130,8 +147,8 @@ export default function Registro() {
 
           <div style={{ display: 'flex', gap: 1, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
             {[
-              { value: 'persona_natural', label: 'Persona natural' },
-              { value: 'empresa', label: 'Empresa' },
+              { value: 'persona_natural', label: isEn ? 'Individual' : 'Persona natural' },
+              { value: 'empresa', label: isEn ? 'Corporate Entity' : 'Empresa' },
             ].map((opt) => (
               <button
                 key={opt.value}
@@ -157,10 +174,12 @@ export default function Registro() {
 
           {billingType === 'empresa' && (
             <input
+              id="tax-id"
+              name="tax-id"
               required
               value={taxId}
               onChange={(e) => setTaxId(e.target.value)}
-              placeholder="RUC (para factura)"
+              placeholder={authDict.taxIdPlaceholder || (isEn ? 'e.g. US EIN, VAT ID or 11-digit RUC' : 'RUC (para factura)')}
               style={{
                 border: '1px solid var(--border)',
                 background: '#FFFFFF',
@@ -192,14 +211,14 @@ export default function Registro() {
               opacity: submitting ? 0.7 : 1,
             }}
           >
-            {submitting ? 'Creando cuenta...' : 'Crear cuenta'}
+            {submitting ? authDict.creatingAccountBtn || 'Creando cuenta...' : authDict.createAccountBtn || 'Crear cuenta'}
           </button>
         </form>
 
         <div style={{ fontSize: 14, color: 'var(--muted)', marginTop: 24 }}>
-          ¿Ya tienes cuenta?{' '}
-          <Link to="/login" className="link-hover" style={{ fontWeight: 600 }}>
-            Inicia sesión
+          {authDict.alreadyHaveAccountPrompt || '¿Ya tienes cuenta?'}{' '}
+          <Link to={isEn ? '/en/login' : '/login'} className="link-hover" style={{ fontWeight: 600 }}>
+            {authDict.signInLink || 'Inicia sesión'}
           </Link>
         </div>
       </div>

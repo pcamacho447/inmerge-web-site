@@ -7,12 +7,15 @@ export default function ProtectedRoute({ children, requireStaff = false }) {
 
   // Avoid redirecting to /login before the initial async session check resolves
   if (loading) return null;
+
+  const isEn = location.pathname.startsWith('/en');
+
   if (!user) {
-    return <Navigate to="/login" replace state={{ redirectTo: location.pathname }} />;
+    return <Navigate to={isEn ? '/en/login' : '/login'} replace state={{ redirectTo: location.pathname }} />;
   }
 
   if (requireStaff && !user.isStaff) {
-    return <Navigate to="/cuenta" replace />;
+    return <Navigate to={isEn ? '/en/account' : '/cuenta'} replace />;
   }
 
   // Ingenieros y Auditores no tienen acceso al portal de clientes (solo Admin y Clientes)

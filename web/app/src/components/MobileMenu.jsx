@@ -9,7 +9,7 @@ export default function MobileMenu({ onClose }) {
   const { user } = useAuth();
   const { isEn, content } = useLanguage();
 
-  const accountPath = user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login';
+  const accountPath = user ? (user.isStaff ? '/equipo' : isEn ? '/en/account' : '/cuenta') : isEn ? '/en/login' : '/login';
   const accountLabel = user
     ? user.isStaff
       ? isEn

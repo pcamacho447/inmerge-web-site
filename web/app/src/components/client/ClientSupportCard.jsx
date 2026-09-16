@@ -1,8 +1,12 @@
 import { waLink } from '../../data/content.js';
 
-export default function ClientSupportCard({ user, projectsCount }) {
+export default function ClientSupportCard({ user, projectsCount, isEn, content }) {
+  const supportDict = content?.ACCOUNT_CONTENT?.support || {};
+
   const supportWaUrl = waLink(
-    `Hola equipo de Inmerge, soy cliente con cuenta ${user?.email}. Deseo realizar una consulta técnica sobre mis proyectos.`,
+    isEn
+      ? `Hello Inmerge engineering team, I am a client with account ${user?.email}. I would like to make a technical inquiry regarding my projects.`
+      : `Hola equipo de Inmerge, soy cliente con cuenta ${user?.email}. Deseo realizar una consulta técnica sobre mis proyectos.`,
   );
 
   return (
@@ -20,22 +24,35 @@ export default function ClientSupportCard({ user, projectsCount }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontSize: 20 }}>💬</span>
         <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: 0, fontWeight: 700 }}>
-          Canales de Soporte Técnico & Tech Lead
+          {supportDict.title || 'Canales de Soporte Técnico & Tech Lead'}
         </h3>
       </div>
 
       <p style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6, margin: 0 }}>
-        Tienes <strong>{projectsCount} proyecto(s)</strong> activos en curso. Ante cualquier requerimiento urgente, consulta sobre hitos
-        técnicos o coordinación de entregables, puedes comunicarte directamente con nuestro equipo de ingeniería.
+        {typeof supportDict.desc === 'function' ? (
+          supportDict.desc(projectsCount)
+        ) : isEn ? (
+          <>
+            You have <strong>{projectsCount} active project(s)</strong> in progress. For urgent technical matters or milestone reviews, contact our engineering lead directly.
+          </>
+        ) : (
+          <>
+            Tienes <strong>{projectsCount} proyecto(s)</strong> activos en curso. Ante cualquier requerimiento urgente, consulta sobre hitos técnicos o coordinación de entregables, puedes comunicarte directamente con nuestro equipo de ingeniería.
+          </>
+        )}
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
         <div style={{ background: '#fff', padding: 16, borderRadius: 6, border: '1px solid var(--border)' }}>
           <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)', marginBottom: 4 }}>
-            CANAL DE MENSAJERÍA DIRECTA
+            {supportDict.badge || 'CANAL DE MENSAJERÍA DIRECTA'}
           </div>
-          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>WhatsApp de Guardia Técnica</div>
-          <p style={{ fontSize: 12, color: 'var(--muted)', margin: '0 0 12px' }}>Respuesta promedio menor a 30 minutos en días hábiles.</p>
+          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
+            {supportDict.whatsappTitle || 'WhatsApp de Guardia Técnica'}
+          </div>
+          <p style={{ fontSize: 12, color: 'var(--muted)', margin: '0 0 12px' }}>
+            {supportDict.whatsappSla || 'Respuesta promedio menor a 30 minutos en días hábiles.'}
+          </p>
           <a
             href={supportWaUrl}
             target="_blank"
@@ -54,17 +71,19 @@ export default function ClientSupportCard({ user, projectsCount }) {
               fontFamily: "'IBM Plex Sans', sans-serif",
             }}
           >
-            💬 Abrir WhatsApp Directo
+            {supportDict.whatsappBtn || '💬 Abrir WhatsApp Directo'}
           </a>
         </div>
 
         <div style={{ background: '#fff', padding: 16, borderRadius: 6, border: '1px solid var(--border)' }}>
           <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)', marginBottom: 4 }}>
-            CORREO INSTITUCIONAL
+            {isEn ? 'OFFICIAL EMAIL' : 'CORREO INSTITUCIONAL'}
           </div>
-          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>Mesa de Ayuda de Ingeniería</div>
+          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
+            {supportDict.emailTitle || 'Mesa de Ayuda de Ingeniería'}
+          </div>
           <p style={{ fontSize: 12, color: 'var(--muted)', margin: '0 0 12px' }}>
-            Para envío de requerimientos formales, TDRs y documentación.
+            {supportDict.emailSla || 'Para envío de requerimientos formales, TDRs y documentación.'}
           </p>
           <a
             href="mailto:inmerge3@gmail.com"
@@ -82,7 +101,7 @@ export default function ClientSupportCard({ user, projectsCount }) {
               fontFamily: "'IBM Plex Sans', sans-serif",
             }}
           >
-            ✉️ inmerge3@gmail.com
+            {supportDict.emailBtn || '✉️ inmerge3@gmail.com'}
           </a>
         </div>
       </div>

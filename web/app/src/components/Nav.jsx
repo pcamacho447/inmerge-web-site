@@ -22,7 +22,7 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
   const isHome = pathname === '/' || pathname === '/en';
   const isTransparent = isHome && !scrolled;
 
-  const accountPath = user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login';
+  const accountPath = user ? (user.isStaff ? '/equipo' : isEn ? '/en/account' : '/cuenta') : isEn ? '/en/login' : '/login';
   const accountLabel = user
     ? user.isStaff
       ? isEn

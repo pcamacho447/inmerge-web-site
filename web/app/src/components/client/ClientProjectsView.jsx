@@ -18,11 +18,22 @@ export const DELIVERABLE_TYPE_BADGES = {
   DOCUMENTO: { label: 'DOCUMENTO', bg: 'rgba(0,0,0,0.05)', text: 'var(--muted)', border: 'var(--border)' },
 };
 
-export default function ClientProjectsView({ projects, loading, error, downloadingId, onDownloadDeliverable }) {
+export default function ClientProjectsView({
+  projects,
+  loading,
+  error,
+  downloadingId,
+  onDownloadDeliverable,
+  isEn,
+  content,
+}) {
+  const pDict = content?.ACCOUNT_CONTENT?.projects || {};
+  const pillarLabels = pDict.pillarLabels || PILLAR_LABELS;
+
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
-        <p>Cargando información técnica de tus proyectos...</p>
+        <p>{pDict.loading || 'Cargando información técnica de tus proyectos...'}</p>
       </div>
     );
   }
@@ -39,7 +50,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
           marginBottom: 24,
         }}
       >
-        ⚠️ Error al sincronizar proyectos: {error}
+        ⚠️ {pDict.syncError || 'Error al sincronizar proyectos:'} {error}
       </div>
     );
   }
@@ -55,13 +66,15 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
           border: '1px dashed var(--border)',
         }}
       >
-        <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 22, margin: '0 0 12px' }}>No tienes proyectos activos asignados</h3>
+        <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 22, margin: '0 0 12px' }}>
+          {pDict.noProjectsTitle || 'No tienes proyectos activos asignados'}
+        </h3>
         <p style={{ color: 'var(--muted)', maxWidth: 500, margin: '0 auto 24px', fontSize: 14, lineHeight: 1.6 }}>
-          Si ya enviaste una solicitud de cotización o TDR, nuestro equipo técnico habilitará tu cronograma y entregables una vez validado
-          el requerimiento.
+          {pDict.noProjectsDesc ||
+            'Si ya enviaste una solicitud de cotización o TDR, nuestro equipo técnico habilitará tu cronograma y entregables una vez validado el requerimiento.'}
         </p>
         <a
-          href="/contacto"
+          href={isEn ? '/en/contact' : '/contacto'}
           className="btn-accent"
           style={{
             display: 'inline-block',
@@ -74,7 +87,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
             textDecoration: 'none',
           }}
         >
-          Solicitar Nueva Auditoría o Proyecto →
+          {pDict.requestNewProjectBtn || 'Solicitar Nueva Auditoría o Proyecto →'}
         </a>
       </div>
     );
@@ -136,7 +149,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
                       fontWeight: 600,
                     }}
                   >
-                    {PILLAR_LABELS[proj.pillar] || proj.pillar}
+                    {pillarLabels[proj.pillar] || PILLAR_LABELS[proj.pillar] || proj.pillar}
                   </span>
                   <span
                     style={{
@@ -145,7 +158,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
                       color: 'var(--muted)',
                     }}
                   >
-                    • Estado: {proj.status}
+                    • {isEn ? 'Status:' : 'Estado:'} {proj.status}
                   </span>
                 </div>
 
@@ -154,7 +167,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
                 </h2>
 
                 <p style={{ color: 'var(--muted)', fontSize: 13, margin: 0, maxWidth: 650 }}>
-                  {proj.description || 'Sin descripción detallada registrada.'}
+                  {proj.description || (isEn ? 'No detailed description recorded.' : 'Sin descripción detallada registrada.')}
                 </p>
               </div>
 
@@ -168,7 +181,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `INMERGE_Resumen_Ejecutivo_${proj.title.replace(/\s+/g, '_')}.md`;
+                    a.download = `INMERGE_${isEn ? 'Executive_Summary' : 'Resumen_Ejecutivo'}_${proj.title.replace(/\s+/g, '_')}.md`;
                     a.click();
                     URL.revokeObjectURL(url);
                   }}
@@ -185,7 +198,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
                     fontWeight: 600,
                   }}
                 >
-                  📄 Exportar Resumen
+                  {isEn ? '📄 Export Summary' : '📄 Exportar Resumen'}
                 </button>
               </div>
             </div>
@@ -204,19 +217,25 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
               }}
             >
               <div>
-                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>Avance Calculado</div>
+                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                  {isEn ? 'Calculated Progress' : 'Avance Calculado'}
+                </div>
                 <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)' }}>
                   {progressPct}%
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>Hitos Completados</div>
+                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                  {isEn ? 'Completed Milestones' : 'Hitos Completados'}
+                </div>
                 <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)' }}>
                   {completedMilestones} / {totalMilestones}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>Tech Lead</div>
+                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                  Tech Lead
+                </div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', marginTop: 4 }}>
                   {proj.tech_lead_name || 'Senior Inmerge'}
                 </div>
@@ -226,7 +245,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
             {/* Gantt & Milestones */}
             <div style={{ marginBottom: 28 }}>
               <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 18, margin: '0 0 14px', color: 'var(--ink)' }}>
-                Cronograma & Hitos Ejecutivos
+                {isEn ? 'Schedule & Executive Milestones' : 'Cronograma & Hitos Ejecutivos'}
               </h3>
               <ProjectGantt
                 project={proj}
@@ -247,7 +266,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
             {/* Deliverables List */}
             <div>
               <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 18, margin: '0 0 14px', color: 'var(--ink)' }}>
-                Entregables & Documentos Técnicos ({proj.deliverables?.length || 0})
+                {pDict.deliverablesTitle || 'Entregables & Documentos Técnicos'} ({proj.deliverables?.length || 0})
               </h3>
               {proj.deliverables && proj.deliverables.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -287,7 +306,7 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
                               {badge.label}
                             </span>
                             <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--muted)' }}>
-                              Versión: {deliv.version || 'v1.0'}
+                              {isEn ? 'Version:' : 'Versión:'} {deliv.version || 'v1.0'}
                             </span>
                             {deliv.sha256_checksum && (
                               <span
@@ -328,7 +347,17 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
                             opacity: isDownloading ? 0.7 : 1,
                           }}
                         >
-                          {isDownloading ? 'Generando URL segura...' : deliv.external_url ? 'Abrir Enlace ↗' : 'Descargar Archivo ↓'}
+                          {isDownloading
+                            ? isEn
+                              ? 'Generating secure URL...'
+                              : 'Generando URL segura...'
+                            : deliv.external_url
+                              ? isEn
+                                ? 'Open Link ↗'
+                                : 'Abrir Enlace ↗'
+                              : isEn
+                                ? 'Download File ↓'
+                                : 'Descargar Archivo ↓'}
                         </button>
                       </div>
                     );
@@ -345,7 +374,9 @@ export default function ClientProjectsView({ projects, loading, error, downloadi
                     fontSize: 13,
                   }}
                 >
-                  Los entregables se publicarán a medida que se completen las fases técnicas del cronograma.
+                  {isEn
+                    ? 'Deliverables will be published as technical project phases are completed.'
+                    : 'Los entregables se publicarán a medida que se completen las fases técnicas del cronograma.'}
                 </div>
               )}
             </div>

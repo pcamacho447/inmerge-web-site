@@ -46,6 +46,16 @@ export default function App() {
                 <Route path="/en/about" element={<Nosotros />} />
                 <Route path="/en/contact" element={<Contacto />} />
                 <Route path="/en/cookies" element={<CookiesPolicy />} />
+                <Route path="/en/login" element={<Login />} />
+                <Route path="/en/register" element={<Registro />} />
+                <Route
+                  path="/en/account"
+                  element={
+                    <ProtectedRoute>
+                      <Cuenta />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Autenticación y Portales */}
                 <Route path="/login" element={<Login />} />

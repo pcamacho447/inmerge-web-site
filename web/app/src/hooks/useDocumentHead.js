@@ -58,6 +58,12 @@ const CANONICAL_PAIRS = {
   '/en/contact': { es: '/contacto', en: '/en/contact' },
   '/cookies': { es: '/cookies', en: '/en/cookies' },
   '/en/cookies': { es: '/cookies', en: '/en/cookies' },
+  '/login': { es: '/login', en: '/en/login' },
+  '/en/login': { es: '/login', en: '/en/login' },
+  '/registro': { es: '/registro', en: '/en/register' },
+  '/en/register': { es: '/registro', en: '/en/register' },
+  '/cuenta': { es: '/cuenta', en: '/en/account' },
+  '/en/account': { es: '/cuenta', en: '/en/account' },
 };
 
 // Sets per-page <title>/meta description/OG/Twitter tags/canonical/hreflang/JSON-LD on mount.

@@ -8,12 +8,21 @@ import { useAuth } from '../lib/auth.jsx';
 import { getSignedDeliverableUrl } from '../lib/projects.js';
 import ToastNotification from '../components/ToastNotification.jsx';
 
+import { useLanguage } from '../context/LanguageContext.jsx';
 import ClientProjectsView from '../components/client/ClientProjectsView.jsx';
 import ClientBillingView from '../components/client/ClientBillingView.jsx';
 import ClientSupportCard from '../components/client/ClientSupportCard.jsx';
 
 export default function Cuenta() {
-  useDocumentHead({ title: 'Portal de Clientes — Inmerge', path: '/cuenta', noIndex: true });
+  const { isEn, content } = useLanguage();
+  const accountDict = content?.ACCOUNT_CONTENT || {};
+
+  useDocumentHead({
+    title: isEn ? 'Client Portal — Inmerge' : 'Portal de Clientes — Inmerge',
+    path: isEn ? '/en/account' : '/cuenta',
+    noIndex: true,
+  });
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -48,7 +57,7 @@ export default function Cuenta() {
 
   async function handleLogout() {
     await logout();
-    navigate('/');
+    navigate(isEn ? '/en' : '/');
   }
 
   async function handleDownload(deliverable) {
@@ -69,7 +78,7 @@ export default function Cuenta() {
         window.open(url, '_blank');
       }
     } catch (err) {
-      alert(`No se pudo descargar el archivo: ${err.message}`);
+      alert(isEn ? `Could not download file: ${err.message}` : `No se pudo descargar el archivo: ${err.message}`);
     } finally {
       setDownloadingId(null);
     }
@@ -103,7 +112,7 @@ export default function Cuenta() {
                   fontWeight: 600,
                 }}
               >
-                PORTAL EXCLUSIVO DE CLIENTES
+                {accountDict.portalBadge || 'PORTAL EXCLUSIVO DE CLIENTES'}
               </div>
               {organization?.legal_name && (
                 <span
@@ -123,7 +132,7 @@ export default function Cuenta() {
               )}
             </div>
             <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: 0 }}>
-              Seguimiento Técnico & Facturación
+              {accountDict.portalTitle || 'Seguimiento Técnico & Facturación'}
             </h1>
           </div>
 
@@ -140,7 +149,7 @@ export default function Cuenta() {
                   fontWeight: 600,
                 }}
               >
-                Panel de Consultores →
+                {accountDict.consultantPanelLink || 'Panel de Consultores →'}
               </Link>
             )}
             <button
@@ -159,13 +168,14 @@ export default function Cuenta() {
                 fontFamily: "'IBM Plex Sans',sans-serif",
               }}
             >
-              Cerrar sesión
+              {accountDict.signOut || 'Cerrar sesión'}
             </button>
           </div>
         </div>
 
         <div style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 28 }}>
-          Sesión activa: <strong style={{ color: 'var(--ink)' }}>{user.email}</strong> {user.fullName ? `(${user.fullName})` : ''}
+          {accountDict.activeSession || 'Sesión activa:'}{' '}
+          <strong style={{ color: 'var(--ink)' }}>{user.email}</strong> {user.fullName ? `(${user.fullName})` : ''}
         </div>
 
         {/* Navigation Tabs */}
@@ -196,7 +206,7 @@ export default function Cuenta() {
               gap: 8,
             }}
           >
-            <span>Mis Proyectos & Cronogramas</span>
+            <span>{accountDict.tabs?.projects || 'Mis Proyectos & Cronogramas'}</span>
             <span
               style={{
                 fontFamily: "'IBM Plex Mono', monospace",
@@ -229,7 +239,7 @@ export default function Cuenta() {
               gap: 8,
             }}
           >
-            <span>Organización & Facturación</span>
+            <span>{accountDict.tabs?.billing || 'Organización & Facturación'}</span>
             <span
               style={{
                 fontFamily: "'IBM Plex Mono', monospace",
@@ -259,7 +269,7 @@ export default function Cuenta() {
               fontFamily: "'IBM Plex Sans', sans-serif",
             }}
           >
-            Soporte & Tech Lead
+            {accountDict.tabs?.support || 'Soporte & Tech Lead'}
           </button>
         </div>
 
@@ -271,6 +281,8 @@ export default function Cuenta() {
             error={projectsError}
             downloadingId={downloadingId}
             onDownloadDeliverable={handleDownload}
+            isEn={isEn}
+            content={content}
           />
         )}
 
@@ -282,10 +294,14 @@ export default function Cuenta() {
             saving={billingSaving}
             onSaveOrganization={saveOrganization}
             user={user}
+            isEn={isEn}
+            content={content}
           />
         )}
 
-        {activeTab === 'support' && <ClientSupportCard user={user} projectsCount={projects.length} />}
+        {activeTab === 'support' && (
+          <ClientSupportCard user={user} projectsCount={projects.length} isEn={isEn} content={content} />
+        )}
       </div>
 
       <ToastNotification toast={activeToast} onDismiss={dismissActiveToast} />

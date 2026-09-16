@@ -8,9 +8,16 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 import { supabase } from '../lib/supabaseClient.js';
 
 export default function Login() {
-  useDocumentHead({ title: 'Iniciar sesión — Inmerge', path: '/login', noIndex: true });
   const { login } = useAuth();
-  const { isEn } = useLanguage();
+  const { isEn, content } = useLanguage();
+  const authDict = content?.AUTH_CONTENT || {};
+
+  useDocumentHead({
+    title: isEn ? 'Sign in — Inmerge' : 'Iniciar sesión — Inmerge',
+    path: isEn ? '/en/login' : '/login',
+    noIndex: true,
+  });
+
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -46,16 +53,16 @@ export default function Login() {
         }
       }
 
-      navigate('/cuenta');
+      navigate(isEn ? '/en/account' : '/cuenta');
     } catch (err) {
       if (
         err.message?.toLowerCase().includes('invalid login credentials') ||
         err.message?.toLowerCase().includes('invalid grant') ||
         err.status === 400
       ) {
-        setError('Tus credenciales son incorrectas.');
+        setError(authDict.invalidCredentialsError || 'Tus credenciales son incorrectas.');
       } else {
-        setError(err.message || 'Tus credenciales son incorrectas.');
+        setError(err.message || authDict.invalidCredentialsError || 'Tus credenciales son incorrectas.');
       }
     } finally {
       setSubmitting(false);
@@ -76,7 +83,7 @@ export default function Login() {
             marginBottom: 24,
           }}
         >
-          Portal seguro de seguimiento de proyectos, auditorías y entregables técnicos.
+          {authDict.loginSubtitle || 'Portal seguro de seguimiento de proyectos, auditorías y entregables técnicos.'}
         </div>
         {isEn && (
           <div
@@ -97,20 +104,23 @@ export default function Login() {
           >
             <span style={{ color: 'var(--terracotta)', fontWeight: 700, flexShrink: 0 }}>ℹ</span>
             <span>
-              <strong>Peruvian Banking Compliance:</strong> Client and Staff portals operate exclusively in Spanish to satisfy SUNAT RUC validation and bank transfer reconciliation (BCP, Interbank, BBVA in PEN).
+              <strong>International Client Portal:</strong> Project tracking, architecture milestones, and deliverables are fully available in English. Domestic payments operate in PEN, while international corporate agreements use institutional wire transfer (SWIFT).
             </span>
           </div>
         )}
-        <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', marginBottom: 32 }}>
-          Iniciar sesión
-        </div>
+        <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: '0 0 32px' }}>
+          {authDict.loginTitle || 'Iniciar sesión'}
+        </h1>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <input
+            id="email"
+            name="email"
             type="email"
+            autoComplete="username"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="tucorreo@empresa.com"
+            placeholder={authDict.emailPlaceholder || 'tucorreo@empresa.com'}
             style={{
               border: '1px solid var(--border)',
               background: '#FFFFFF',
@@ -121,11 +131,14 @@ export default function Login() {
             }}
           />
           <input
+            id="password"
+            name="password"
             type="password"
+            autoComplete="current-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Contraseña"
+            placeholder={authDict.passwordPlaceholder || 'Contraseña'}
             style={{
               border: '1px solid var(--border)',
               background: '#FFFFFF',
@@ -146,7 +159,7 @@ export default function Login() {
                 border: '1px solid var(--rose)',
               }}
             >
-              {typeof error === 'string' ? error : error?.message || 'Tus credenciales son incorrectas.'}
+              {typeof error === 'string' ? error : error?.message || authDict.invalidCredentialsError}
             </div>
           )}
           <button
@@ -167,13 +180,13 @@ export default function Login() {
               opacity: submitting ? 0.7 : 1,
             }}
           >
-            {submitting ? 'Entrando...' : 'Entrar'}
+            {submitting ? authDict.signingInBtn || 'Entrando...' : authDict.signInBtn || 'Entrar'}
           </button>
         </form>
         <div style={{ fontSize: 14, color: 'var(--muted)', marginTop: 24 }}>
-          ¿No tienes cuenta?{' '}
-          <Link to="/registro" className="link-hover" style={{ fontWeight: 600 }}>
-            Regístrate
+          {authDict.noAccountPrompt || '¿No tienes cuenta?'}{' '}
+          <Link to={isEn ? '/en/register' : '/registro'} className="link-hover" style={{ fontWeight: 600 }}>
+            {authDict.createAccountLink || 'Regístrate'}
           </Link>
         </div>
       </div>
