@@ -10,28 +10,31 @@ export default function useClientProjects() {
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
-  const loadProjects = useCallback(async (isInitial = true) => {
-    if (!user?.id) {
-      setProjects([]);
-      setLoading(false);
-      return;
-    }
-
-    if (isInitial) {
-      setLoading(true);
-    }
-    setError(null);
-    try {
-      const data = await fetchClientProjects(user.id);
-      setProjects(data);
-    } catch (err) {
-      setError(err.message || 'Error al cargar los proyectos.');
-    } finally {
-      if (isInitial) {
+  const loadProjects = useCallback(
+    async (isInitial = true) => {
+      if (!user?.id) {
+        setProjects([]);
         setLoading(false);
+        return;
       }
-    }
-  }, [user?.id]);
+
+      if (isInitial) {
+        setLoading(true);
+      }
+      setError(null);
+      try {
+        const data = await fetchClientProjects(user.id);
+        setProjects(data);
+      } catch (err) {
+        setError(err.message || 'Error al cargar los proyectos.');
+      } finally {
+        if (isInitial) {
+          setLoading(false);
+        }
+      }
+    },
+    [user?.id],
+  );
 
   useEffect(() => {
     loadProjects(true);

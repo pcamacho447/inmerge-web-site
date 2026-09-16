@@ -152,7 +152,7 @@ export default function Equipo() {
             updated.assigned_profile = staffMember ? { full_name: staffMember.full_name, email: staffMember.email } : null;
           }
           return updated;
-        })
+        }),
       );
       showTemporaryMsg('Lead actualizado y registrado en la bitácora de auditoría.');
       fetchTeamActivityLogs({ limit: 50 })

@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { openCookiePreferences } from '../lib/cookies.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Footer({ borderTop = false }) {
+  const { isEn } = useLanguage();
+
   return (
     <footer
       style={{
@@ -16,9 +19,7 @@ export default function Footer({ borderTop = false }) {
         borderTop: borderTop ? '1px solid var(--border)' : undefined,
       }}
     >
-      <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 14, letterSpacing: 1 }}>
-        INMERGE — 2026
-      </div>
+      <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 14, letterSpacing: 1 }}>INMERGE — 2026</div>
 
       <div
         style={{
@@ -30,8 +31,8 @@ export default function Footer({ borderTop = false }) {
           flexWrap: 'wrap',
         }}
       >
-        <Link to="/cookies" style={{ color: 'var(--muted)' }} className="hover-underline-link">
-          Política de Cookies
+        <Link to={isEn ? '/en/cookies' : '/cookies'} style={{ color: 'var(--muted)' }} className="hover-underline-link">
+          {isEn ? 'Cookie Policy' : 'Política de Cookies'}
         </Link>
         <span>·</span>
         <button
@@ -48,7 +49,7 @@ export default function Footer({ borderTop = false }) {
           }}
           className="hover-underline-link"
         >
-          Configurar Cookies
+          {isEn ? 'Cookie Settings' : 'Configurar Cookies'}
         </button>
       </div>
 

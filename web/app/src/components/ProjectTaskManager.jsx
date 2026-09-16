@@ -5,14 +5,7 @@ import { TASK_STATUS_CONFIG, TASK_PRIORITY_CONFIG, sanitizeTaskPayload } from '.
  * ProjectTaskManager - Gestor Operativo de Tareas Técnicas por Hito
  * Para el Panel de Consultores & Tech Leads (/equipo)
  */
-export default function ProjectTaskManager({
-  projectId,
-  milestones = [],
-  tasks = [],
-  onTaskCreated,
-  onTaskUpdated,
-  onTaskDeleted,
-}) {
+export default function ProjectTaskManager({ projectId, milestones = [], tasks = [], onTaskCreated, onTaskUpdated, onTaskDeleted }) {
   const [selectedMilestoneId, setSelectedMilestoneId] = useState(milestones[0]?.id || '');
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState({
@@ -141,7 +134,9 @@ export default function ProjectTaskManager({
                 gap: 8,
               }}
             >
-              <span>Fase {m.order_index || idx + 1}: {m.title}</span>
+              <span>
+                Fase {m.order_index || idx + 1}: {m.title}
+              </span>
               <span
                 style={{
                   background: isSelected ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
@@ -210,15 +205,13 @@ export default function ProjectTaskManager({
             gap: 12,
           }}
         >
-          {errorMsg && (
-            <div style={{ color: 'var(--terracotta)', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace" }}>
-              {errorMsg}
-            </div>
-          )}
+          {errorMsg && <div style={{ color: 'var(--terracotta)', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace" }}>{errorMsg}</div>}
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Título de la Tarea *
               </label>
               <input
@@ -239,7 +232,9 @@ export default function ProjectTaskManager({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Consultor Responsable
               </label>
               <input
@@ -261,7 +256,9 @@ export default function ProjectTaskManager({
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 12 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Prioridad
               </label>
               <select
@@ -285,7 +282,9 @@ export default function ProjectTaskManager({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Horas Est.
               </label>
               <input
@@ -306,7 +305,16 @@ export default function ProjectTaskManager({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)', marginBottom: 4, fontWeight: 700 }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: 11,
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  color: 'var(--terracotta)',
+                  marginBottom: 4,
+                  fontWeight: 700,
+                }}
+              >
                 Horas Reales
               </label>
               <input
@@ -327,7 +335,9 @@ export default function ProjectTaskManager({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Peso Ponderado
               </label>
               <input
@@ -348,7 +358,9 @@ export default function ProjectTaskManager({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Fecha Límite
               </label>
               <input
@@ -449,9 +461,7 @@ export default function ProjectTaskManager({
                     )}
                   </div>
                   <strong style={{ fontSize: 14, color: 'var(--ink)' }}>{task.title}</strong>
-                  {task.description && (
-                    <p style={{ fontSize: 12, color: 'var(--muted)', margin: '4px 0 0 0' }}>{task.description}</p>
-                  )}
+                  {task.description && <p style={{ fontSize: 12, color: 'var(--muted)', margin: '4px 0 0 0' }}>{task.description}</p>}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>

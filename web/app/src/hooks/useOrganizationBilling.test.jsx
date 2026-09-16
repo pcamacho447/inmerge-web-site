@@ -42,9 +42,7 @@ describe('useOrganizationBilling hook', () => {
       legal_name: 'Tech SAC',
       tax_id: '20123456789',
     });
-    billingLib.fetchClientOrders.mockResolvedValue([
-      { id: 'ord-1', code: 'INM-2026-0001', amount_pen: 5000, status: 'pending' },
-    ]);
+    billingLib.fetchClientOrders.mockResolvedValue([{ id: 'ord-1', code: 'INM-2026-0001', amount_pen: 5000, status: 'pending' }]);
 
     const { result } = renderHook(() => useOrganizationBilling('usr-123'));
 
@@ -60,9 +58,7 @@ describe('useOrganizationBilling hook', () => {
 
   it('updates order list and displays toast when order is approved via Realtime', async () => {
     billingLib.fetchClientOrganization.mockResolvedValue(null);
-    billingLib.fetchClientOrders.mockResolvedValue([
-      { id: 'ord-1', code: 'INM-2026-0001', amount_pen: 5000, status: 'pending' },
-    ]);
+    billingLib.fetchClientOrders.mockResolvedValue([{ id: 'ord-1', code: 'INM-2026-0001', amount_pen: 5000, status: 'pending' }]);
 
     const { result } = renderHook(() => useOrganizationBilling('usr-123'));
 
@@ -89,9 +85,7 @@ describe('useOrganizationBilling hook', () => {
 
   it('displays error toast when order is rejected via Realtime', async () => {
     billingLib.fetchClientOrganization.mockResolvedValue(null);
-    billingLib.fetchClientOrders.mockResolvedValue([
-      { id: 'ord-1', code: 'INM-2026-0001', amount_pen: 5000, status: 'pending' },
-    ]);
+    billingLib.fetchClientOrders.mockResolvedValue([{ id: 'ord-1', code: 'INM-2026-0001', amount_pen: 5000, status: 'pending' }]);
 
     const { result } = renderHook(() => useOrganizationBilling('usr-123'));
 

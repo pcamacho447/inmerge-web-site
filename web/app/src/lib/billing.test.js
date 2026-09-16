@@ -43,9 +43,9 @@ describe('billing.js module', () => {
   });
 
   it('updateOrganizationBilling validates required fields and 11-digit RUC format', async () => {
-    await expect(
-      updateOrganizationBilling('usr-1', { legalName: '', billingEmail: 'test@empresa.pe' }),
-    ).rejects.toThrow('Razón Social y Correo de Facturación son obligatorios.');
+    await expect(updateOrganizationBilling('usr-1', { legalName: '', billingEmail: 'test@empresa.pe' })).rejects.toThrow(
+      'Razón Social y Correo de Facturación son obligatorios.',
+    );
 
     await expect(
       updateOrganizationBilling('usr-1', {
@@ -127,17 +127,17 @@ describe('billing.js module', () => {
   });
 
   it('createBankTransferOrder validates positive amount and inserts with method "transferencia_bancaria"', async () => {
-    await expect(
-      createBankTransferOrder({ userId: 'usr-1', amountPen: 0 }),
-    ).rejects.toThrow('El monto de la orden debe ser un valor numérico positivo');
+    await expect(createBankTransferOrder({ userId: 'usr-1', amountPen: 0 })).rejects.toThrow(
+      'El monto de la orden debe ser un valor numérico positivo',
+    );
 
-    await expect(
-      createBankTransferOrder({ userId: 'usr-1', amountPen: -150 }),
-    ).rejects.toThrow('El monto de la orden debe ser un valor numérico positivo');
+    await expect(createBankTransferOrder({ userId: 'usr-1', amountPen: -150 })).rejects.toThrow(
+      'El monto de la orden debe ser un valor numérico positivo',
+    );
 
-    await expect(
-      createBankTransferOrder({ userId: 'usr-1', amountPen: 'abc' }),
-    ).rejects.toThrow('El monto de la orden debe ser un valor numérico positivo');
+    await expect(createBankTransferOrder({ userId: 'usr-1', amountPen: 'abc' })).rejects.toThrow(
+      'El monto de la orden debe ser un valor numérico positivo',
+    );
 
     const mockInsert = vi.fn().mockReturnValue({
       select: vi.fn().mockReturnValue({
@@ -215,8 +215,8 @@ describe('billing.js module', () => {
       p_admin_notes: 'Transferencia BCP confirmada',
     });
 
-    await expect(
-      verifyBillingOrderAdmin({ orderId: 'ord-1', status: 'invalid_status' }),
-    ).rejects.toThrow('orderId y status (approved | rejected) son obligatorios.');
+    await expect(verifyBillingOrderAdmin({ orderId: 'ord-1', status: 'invalid_status' })).rejects.toThrow(
+      'orderId y status (approved | rejected) son obligatorios.',
+    );
   });
 });

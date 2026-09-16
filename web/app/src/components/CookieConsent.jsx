@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import {
   getCookieConsent,
   setCookieConsent,
@@ -9,7 +10,73 @@ import {
   EVENT_OPEN_COOKIE_PREFERENCES,
 } from '../lib/cookies.js';
 
+const COOKIE_I18N = {
+  es: {
+    bannerAria: 'Aviso de privacidad y cookies',
+    bannerTitle: 'Control de Privacidad y Cookies',
+    bannerDesc:
+      'Inmerge utiliza cookies técnicas esenciales para el funcionamiento de la plataforma y autenticación segura. Opcionalmente, podemos emplear herramientas analíticas y de preferencias de interfaz para optimizar su experiencia.',
+    policyLinkText: 'Leer Política de Cookies',
+    policyUrl: '/cookies',
+    btnAcceptAll: 'Aceptar Todas',
+    btnEssentialOnly: 'Solo Esenciales',
+    btnCustomize: 'Personalizar',
+    dialogAria: 'Preferencias de cookies',
+    dialogTitle: 'Preferencias de Cookies',
+    dialogCloseAria: 'Cerrar modal de preferencias',
+    dialogDesc:
+      'Configure qué tecnologías de almacenamiento permite que Inmerge ejecute en su navegador. Las cookies necesarias garantizan la operatividad técnica de la plataforma.',
+    essentialTitle: 'Cookies Técnicas & Esenciales',
+    essentialBadge: 'Obligatorias',
+    essentialAria: 'Cookies Esenciales (Siempre activas)',
+    essentialDesc:
+      'Imprescindibles para autenticación de usuarios (Supabase JWT), navegación segura por roles, validación perimetral anti-DDoS y persistencia de su estado de sesión.',
+    analyticsTitle: 'Cookies de Rendimiento & Analítica',
+    analyticsAria: 'Permitir Cookies Analíticas',
+    analyticsDesc:
+      'Recopilan telemetría técnica anónima sobre latencia, tiempos de carga y flujos de navegación para ayudarnos a optimizar la infraestructura de Inmerge.',
+    prefsTitle: 'Cookies de Preferencias & Personalización',
+    prefsAria: 'Permitir Cookies de Preferencias',
+    prefsDesc:
+      'Guardan sus ajustes de interfaz como el zoom del cronograma Gantt, filtros preseleccionados en catálogo de servicios y opciones de visualización.',
+    btnRejectOptional: 'Rechazar Opcionales',
+    btnSavePrefs: 'Guardar Preferencias',
+  },
+  en: {
+    bannerAria: 'Privacy and cookie notice',
+    bannerTitle: 'Privacy & Cookie Control',
+    bannerDesc:
+      'Inmerge uses essential technical cookies for core platform operations and secure authentication. Optionally, we use analytics and UI preference tools to enhance your experience.',
+    policyLinkText: 'Read Cookie Policy',
+    policyUrl: '/en/cookies',
+    btnAcceptAll: 'Accept All',
+    btnEssentialOnly: 'Essential Only',
+    btnCustomize: 'Customize',
+    dialogAria: 'Cookie preferences',
+    dialogTitle: 'Cookie Preferences',
+    dialogCloseAria: 'Close cookie preferences modal',
+    dialogDesc:
+      'Configure which storage technologies you permit Inmerge to run in your browser. Essential cookies ensure technical platform operability.',
+    essentialTitle: 'Technical & Essential Cookies',
+    essentialBadge: 'Required',
+    essentialAria: 'Essential cookies (Always active)',
+    essentialDesc:
+      'Mandatory for user authentication (Supabase JWT), secure role-based navigation, perimeter anti-DDoS validation, and session state persistence.',
+    analyticsTitle: 'Performance & Analytics Cookies',
+    analyticsAria: 'Allow Analytics Cookies',
+    analyticsDesc:
+      'Collect anonymous technical telemetry regarding latency, load times, and navigation flows to help us optimize Inmerge infrastructure.',
+    prefsTitle: 'Preferences & Personalization Cookies',
+    prefsAria: 'Allow Preference Cookies',
+    prefsDesc: 'Store UI settings such as Gantt chart zoom, preselected service catalog filters, and display preferences.',
+    btnRejectOptional: 'Reject Optional',
+    btnSavePrefs: 'Save Preferences',
+  },
+};
+
 export default function CookieConsent() {
+  const { isEn } = useLanguage();
+  const t = isEn ? COOKIE_I18N.en : COOKIE_I18N.es;
   const [isVisible, setIsVisible] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [analyticsChecked, setAnalyticsChecked] = useState(false);
@@ -83,7 +150,7 @@ export default function CookieConsent() {
       {!showPreferences && (
         <aside
           role="region"
-          aria-label="Aviso de privacidad y cookies"
+          aria-label={t.bannerAria}
           className="cookie-banner-container"
           style={{
             position: 'fixed',
@@ -122,7 +189,7 @@ export default function CookieConsent() {
                   marginBottom: 8,
                 }}
               >
-                Control de Privacidad y Cookies
+                {t.bannerTitle}
               </div>
               <p
                 style={{
@@ -132,17 +199,16 @@ export default function CookieConsent() {
                   margin: '0 0 16px',
                 }}
               >
-                Inmerge utiliza cookies técnicas esenciales para el funcionamiento de la plataforma y autenticación segura.
-                Opcionalmente, podemos emplear herramientas analíticas y de preferencias de interfaz para optimizar su experiencia.{' '}
+                {t.bannerDesc}{' '}
                 <Link
-                  to="/cookies"
+                  to={t.policyUrl}
                   style={{
                     color: 'var(--terracotta)',
                     fontWeight: 600,
                     textDecoration: 'underline',
                   }}
                 >
-                  Leer Política de Cookies
+                  {t.policyLinkText}
                 </Link>
                 .
               </p>
@@ -170,7 +236,7 @@ export default function CookieConsent() {
                     cursor: 'pointer',
                   }}
                 >
-                  Aceptar Todas
+                  {t.btnAcceptAll}
                 </button>
 
                 <button
@@ -188,7 +254,7 @@ export default function CookieConsent() {
                     cursor: 'pointer',
                   }}
                 >
-                  Solo Esenciales
+                  {t.btnEssentialOnly}
                 </button>
 
                 <button
@@ -205,7 +271,7 @@ export default function CookieConsent() {
                     fontFamily: 'inherit',
                   }}
                 >
-                  Personalizar
+                  {t.btnCustomize}
                 </button>
               </div>
             </div>
@@ -256,7 +322,7 @@ export default function CookieConsent() {
                   color: 'var(--ink)',
                 }}
               >
-                Preferencias de Cookies
+                {t.dialogTitle}
               </h2>
               <button
                 type="button"
@@ -272,15 +338,13 @@ export default function CookieConsent() {
                   color: 'var(--muted)',
                   lineHeight: 1,
                 }}
-                aria-label="Cerrar modal de preferencias"
+                aria-label={t.dialogCloseAria}
               >
                 ✕
               </button>
             </div>
 
-            <p style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--muted)', marginBottom: 24 }}>
-              Configure qué tecnologías de almacenamiento permite que Inmerge ejecute en su navegador. Las cookies necesarias garantizan la operatividad técnica de la plataforma.
-            </p>
+            <p style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--muted)', marginBottom: 24 }}>{t.dialogDesc}</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
               {/* 1. Esenciales */}
@@ -294,7 +358,7 @@ export default function CookieConsent() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>Cookies Técnicas & Esenciales</span>
+                    <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{t.essentialTitle}</span>
                     <span
                       style={{
                         fontFamily: "'IBM Plex Mono', monospace",
@@ -306,20 +370,18 @@ export default function CookieConsent() {
                         textTransform: 'uppercase',
                       }}
                     >
-                      Obligatorias
+                      {t.essentialBadge}
                     </span>
                   </div>
                   <input
                     type="checkbox"
                     checked={true}
                     disabled={true}
-                    aria-label="Cookies Esenciales (Siempre activas)"
+                    aria-label={t.essentialAria}
                     style={{ accentColor: 'var(--terracotta)', width: 16, height: 16, cursor: 'not-allowed' }}
                   />
                 </div>
-                <p style={{ fontSize: 12, lineHeight: 1.5, color: 'var(--muted)', margin: 0 }}>
-                  Imprescindibles para autenticación de usuarios (Supabase JWT), navegación segura por roles, validación perimetral anti-DDoS y persistencia de su estado de sesión.
-                </p>
+                <p style={{ fontSize: 12, lineHeight: 1.5, color: 'var(--muted)', margin: 0 }}>{t.essentialDesc}</p>
               </div>
 
               {/* 2. Analíticas */}
@@ -332,20 +394,18 @@ export default function CookieConsent() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>Cookies de Rendimiento & Analítica</span>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{t.analyticsTitle}</span>
                   <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                     <input
                       type="checkbox"
                       checked={analyticsChecked}
                       onChange={(e) => setAnalyticsChecked(e.target.checked)}
-                      aria-label="Permitir Cookies Analíticas"
+                      aria-label={t.analyticsAria}
                       style={{ accentColor: 'var(--terracotta)', width: 16, height: 16, cursor: 'pointer' }}
                     />
                   </label>
                 </div>
-                <p style={{ fontSize: 12, lineHeight: 1.5, color: 'var(--muted)', margin: 0 }}>
-                  Recopilan telemetría técnica anónima sobre latencia, tiempos de carga y flujos de navegación para ayudarnos a optimizar la infraestructura de Inmerge.
-                </p>
+                <p style={{ fontSize: 12, lineHeight: 1.5, color: 'var(--muted)', margin: 0 }}>{t.analyticsDesc}</p>
               </div>
 
               {/* 3. Preferencias */}
@@ -358,20 +418,18 @@ export default function CookieConsent() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>Cookies de Preferencias & Personalización</span>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{t.prefsTitle}</span>
                   <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                     <input
                       type="checkbox"
                       checked={preferencesChecked}
                       onChange={(e) => setPreferencesChecked(e.target.checked)}
-                      aria-label="Permitir Cookies de Preferencias"
+                      aria-label={t.prefsAria}
                       style={{ accentColor: 'var(--terracotta)', width: 16, height: 16, cursor: 'pointer' }}
                     />
                   </label>
                 </div>
-                <p style={{ fontSize: 12, lineHeight: 1.5, color: 'var(--muted)', margin: 0 }}>
-                  Guardan sus ajustes de interfaz como el zoom del cronograma Gantt, filtros preseleccionados en catálogo de servicios y opciones de visualización.
-                </p>
+                <p style={{ fontSize: 12, lineHeight: 1.5, color: 'var(--muted)', margin: 0 }}>{t.prefsDesc}</p>
               </div>
             </div>
 
@@ -391,7 +449,7 @@ export default function CookieConsent() {
                   cursor: 'pointer',
                 }}
               >
-                Rechazar Opcionales
+                {t.btnRejectOptional}
               </button>
               <button
                 type="button"
@@ -408,7 +466,7 @@ export default function CookieConsent() {
                   cursor: 'pointer',
                 }}
               >
-                Guardar Preferencias
+                {t.btnSavePrefs}
               </button>
             </div>
           </div>

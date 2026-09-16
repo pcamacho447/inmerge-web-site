@@ -74,10 +74,8 @@ export const RISK_STATUS_CONFIG = {
  */
 export function calculateMilestoneProgress(milestone, tasks = []) {
   if (!milestone) return 0;
-  
-  const milestoneTasks = (tasks || []).filter(
-    (t) => String(t.milestone_id) === String(milestone.id)
-  );
+
+  const milestoneTasks = (tasks || []).filter((t) => String(t.milestone_id) === String(milestone.id));
 
   if (milestoneTasks.length === 0) {
     if (milestone.status === 'COMPLETADO') return 100;
@@ -160,9 +158,7 @@ export function deriveProjectHealth(project, milestones = [], risks = []) {
   if (!project) return 'ON_TRACK';
 
   // 1. Si hay riesgos críticos abiertos, está bloqueado
-  const activeCriticalRisks = (risks || []).filter(
-    (r) => r.status !== 'RESUELTO' && (r.severity === 'CRITICA' || r.severity === 'ALTA')
-  );
+  const activeCriticalRisks = (risks || []).filter((r) => r.status !== 'RESUELTO' && (r.severity === 'CRITICA' || r.severity === 'ALTA'));
   if (activeCriticalRisks.length > 0) {
     return 'BLOCKED';
   }
@@ -218,7 +214,7 @@ export function sanitizeTaskPayload(payload) {
     actual_hours: Math.max(0, Number(payload.actual_hours) || 0),
     weight: Math.max(1, parseInt(payload.weight, 10) || 1),
     due_date: payload.due_date || null,
-    completed_at: payload.status === 'DONE' ? (payload.completed_at || new Date().toISOString()) : null,
+    completed_at: payload.status === 'DONE' ? payload.completed_at || new Date().toISOString() : null,
   };
 }
 
@@ -245,7 +241,7 @@ export function sanitizeRiskPayload(payload) {
     status: validStatuses.includes(payload.status) ? payload.status : 'ABIERTO',
     impact: payload.impact ? String(payload.impact).trim() : null,
     mitigation_plan: payload.mitigation_plan ? String(payload.mitigation_plan).trim() : null,
-    resolved_at: payload.status === 'RESUELTO' ? (payload.resolved_at || new Date().toISOString()) : null,
+    resolved_at: payload.status === 'RESUELTO' ? payload.resolved_at || new Date().toISOString() : null,
   };
 }
 
@@ -306,4 +302,3 @@ export async function fetchProjectAnalytics(projectId, localProjectData = null) 
 
   return null;
 }
-

@@ -59,7 +59,9 @@ export async function submitLeadTdr({
 
     // Detectar si el trigger de PostgreSQL bloqueó la inserción por exceso de tasa
     if (error.message && error.message.includes('RATE_LIMIT_EXCEEDED')) {
-      const rateLimitErr = new Error('Has superado el límite de 3 solicitudes por hora para este correo. Si necesitas atención inmediata, por favor contáctanos vía WhatsApp.');
+      const rateLimitErr = new Error(
+        'Has superado el límite de 3 solicitudes por hora para este correo. Si necesitas atención inmediata, por favor contáctanos vía WhatsApp.',
+      );
       rateLimitErr.isRateLimited = true;
       rateLimitErr.code = 'RATE_LIMIT_EXCEEDED';
       throw rateLimitErr;

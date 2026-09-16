@@ -1,10 +1,4 @@
-export default function StaffManagementView({
-  staffList,
-  newStaff,
-  setNewStaff,
-  handleCreateStaff,
-  staffSubmitting,
-}) {
+export default function StaffManagementView({ staffList, newStaff, setNewStaff, handleCreateStaff, staffSubmitting }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
       {/* Form: Register New Staff */}

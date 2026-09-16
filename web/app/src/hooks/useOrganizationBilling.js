@@ -1,12 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient.js';
 
-import {
-  fetchClientOrganization,
-  fetchClientOrders,
-  updateOrganizationBilling,
-  createBankTransferOrder,
-} from '../lib/billing.js';
+import { fetchClientOrganization, fetchClientOrders, updateOrganizationBilling, createBankTransferOrder } from '../lib/billing.js';
 
 export default function useOrganizationBilling(userId) {
   const [organization, setOrganization] = useState(null);
@@ -23,10 +18,7 @@ export default function useOrganizationBilling(userId) {
     }
     setError(null);
     try {
-      const [orgData, ordersData] = await Promise.all([
-        fetchClientOrganization(userId),
-        fetchClientOrders(userId),
-      ]);
+      const [orgData, ordersData] = await Promise.all([fetchClientOrganization(userId), fetchClientOrders(userId)]);
       setOrganization(orgData);
       setOrders(ordersData);
     } catch (err) {
@@ -59,9 +51,7 @@ export default function useOrganizationBilling(userId) {
             const updated = payload.new;
             setOrders((prev) => {
               const exists = prev.some((o) => o.id === updated.id);
-              return exists
-                ? prev.map((o) => (o.id === updated.id ? { ...o, ...updated } : o))
-                : [updated, ...prev];
+              return exists ? prev.map((o) => (o.id === updated.id ? { ...o, ...updated } : o)) : [updated, ...prev];
             });
 
             if (updated.status === 'approved') {

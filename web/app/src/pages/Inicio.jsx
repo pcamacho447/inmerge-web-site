@@ -5,19 +5,26 @@ import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
 import ServicePillarCard from '../components/ServicePillarCard.jsx';
 import ArchitectureDiagram from '../components/ArchitectureDiagram.jsx';
-import { waLink, PILLARS, SEGMENTS, MARQUEE_ITEMS } from '../data/content.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Inicio() {
   useReveal();
+  const { isEn, content } = useLanguage();
+
   useDocumentHead({
-    title: 'Inmerge — Auditoría, Desarrollo Tecnológico & Ciencia de Datos',
-    description:
-      'Consultoría técnica de alto impacto en Lima, Perú: Auditoría de sistemas y datos, desarrollo cloud en AWS, software a medida y modelos de Machine Learning.',
-    path: '/',
+    title: isEn
+      ? 'Inmerge — Software Engineering, Systems Auditing & Data Science'
+      : 'Inmerge — Auditoría, Desarrollo Tecnológico & Ciencia de Datos',
+    description: isEn
+      ? 'High-density engineering consultancy in Lima, Peru: Systems and data auditing, AWS cloud architecture, custom software, and predictive Machine Learning.'
+      : 'Consultoría técnica de alto impacto en Lima, Perú: Auditoría de sistemas y datos, desarrollo cloud en AWS, software a medida y modelos de Machine Learning.',
+    path: isEn ? '/en' : '/',
   });
 
-  const heroWa = waLink(
-    'Hola Inmerge, deseo conversar con un especialista técnico sobre un proyecto de auditoría, desarrollo o ciencia de datos.',
+  const heroWa = content.waLink(
+    isEn
+      ? 'Hello Inmerge team, I would like to speak with a technical specialist regarding an audit, cloud development, or data science project.'
+      : 'Hola Inmerge, deseo conversar con un especialista técnico sobre un proyecto de auditoría, desarrollo o ciencia de datos.',
   );
 
   return (
@@ -96,8 +103,9 @@ export default function Inicio() {
               textTransform: 'uppercase',
             }}
           >
-            AUDITORÍA · DESARROLLO CLOUD · CIENCIA DE DATOS
+            {isEn ? 'AUDITING · CLOUD DEVELOPMENT · DATA SCIENCE' : 'AUDITORÍA · DESARROLLO CLOUD · CIENCIA DE DATOS'}
           </div>
+
           <h1
             style={{
               fontFamily: "'Spectral',serif",
@@ -110,10 +118,21 @@ export default function Inicio() {
               maxWidth: 1050,
             }}
           >
-            Ingeniería de software,
-            <br />
-            <span style={{ color: 'var(--gold)' }}>auditoría de sistemas</span>
-            <br />e inteligencia de datos.
+            {isEn ? (
+              <>
+                Software engineering,
+                <br />
+                <span style={{ color: 'var(--gold)' }}>systems auditing</span>
+                <br />& data intelligence.
+              </>
+            ) : (
+              <>
+                Ingeniería de software,
+                <br />
+                <span style={{ color: 'var(--gold)' }}>auditoría de sistemas</span>
+                <br />e inteligencia de datos.
+              </>
+            )}
           </h1>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 32 }}>
@@ -130,12 +149,13 @@ export default function Inicio() {
                 paddingLeft: 20,
               }}
             >
-              “Las decisiones operativas y estratégicas de alto nivel no pueden depender de hojas de cálculo aisladas ni de sistemas opacos:
-              requieren arquitectura sólida, datos auditables y código verificable.”
+              {isEn
+                ? '“Executive operational and strategic decisions cannot rely on isolated spreadsheets or opaque systems: they require solid architecture, auditable data, and verifiable code.”'
+                : '“Las decisiones operativas y estratégicas de alto nivel no pueden depender de hojas de cálculo aisladas ni de sistemas opacos: requieren arquitectura sólida, datos auditables y código verificable.”'}
             </p>
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
               <Link
-                to="/contacto"
+                to={isEn ? '/en/contact' : '/contacto'}
                 style={{
                   background: 'var(--terracotta)',
                   color: 'var(--bg)',
@@ -150,11 +170,11 @@ export default function Inicio() {
                 }}
                 className="btn-accent"
               >
-                <span>Solicitar Cotización TDR</span>
+                <span>{isEn ? 'Request TDR Scope' : 'Solicitar Cotización TDR'}</span>
                 <span aria-hidden="true">→</span>
               </Link>
               <Link
-                to="/servicios"
+                to={isEn ? '/en/services' : '/servicios'}
                 style={{
                   background: 'transparent',
                   color: 'var(--bg)',
@@ -170,7 +190,7 @@ export default function Inicio() {
                 }}
                 className="btn-outline"
               >
-                <span>Explorar Servicios</span>
+                <span>{isEn ? 'Explore Services' : 'Explorar Servicios'}</span>
               </Link>
             </div>
           </div>
@@ -189,7 +209,7 @@ export default function Inicio() {
         }}
       >
         <div className="marquee-track">
-          {MARQUEE_ITEMS.map((m, i) => (
+          {content.MARQUEE_ITEMS.map((m, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '0 20px', whiteSpace: 'nowrap' }}>
               <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 20, color: 'var(--gold)' }}>{m}</div>
               <div style={{ width: 8, height: 8, background: 'var(--terracotta)', transform: 'rotate(45deg)', flexShrink: 0 }} />
@@ -197,7 +217,6 @@ export default function Inicio() {
           ))}
         </div>
       </div>
-
 
       <Frieze border="#D8A84E" upColor="#C68A3D" downColor="#A8472B" medallionBg="#D8A84E" medallionBorder="#241A12" />
 
@@ -218,14 +237,14 @@ export default function Inicio() {
                 marginBottom: 8,
               }}
             >
-              NUESTRA OFERTA ESTRATÉGICA
+              {isEn ? 'STRATEGIC CAPABILITIES' : 'NUESTRA OFERTA ESTRATÉGICA'}
             </div>
             <h2 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,4.5vw,52px)', margin: 0 }}>
-              Los Tres Pilares de Inmerge
+              {isEn ? 'Three Pillars of Engineering & Assurance' : 'Los Tres Pilares de Inmerge'}
             </h2>
           </div>
-          <Link to="/servicios" className="link-hover" style={{ fontSize: 15, fontWeight: 600 }}>
-            Ver desglose de servicios →
+          <Link to={isEn ? '/en/services' : '/servicios'} className="link-hover" style={{ fontSize: 15, fontWeight: 600 }}>
+            {isEn ? 'View service breakdown →' : 'Ver desglose de servicios →'}
           </Link>
         </div>
 
@@ -236,7 +255,7 @@ export default function Inicio() {
             gap: 24,
           }}
         >
-          {PILLARS.map((pillar) => (
+          {content.PILLARS.map((pillar) => (
             <div key={pillar.id} data-reveal="">
               <ServicePillarCard pillar={pillar} />
             </div>
@@ -251,7 +270,7 @@ export default function Inicio() {
             <div
               style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--gold)', letterSpacing: 2, marginBottom: 12 }}
             >
-              DISEÑO & INGENIERÍA
+              {isEn ? 'DESIGN & ENGINEERING' : 'DISEÑO & INGENIERÍA'}
             </div>
             <h2
               style={{
@@ -262,11 +281,12 @@ export default function Inicio() {
                 margin: '0 0 16px 0',
               }}
             >
-              De la ingestión cruda al producto vivo.
+              {isEn ? 'From raw ingestion to live enterprise product.' : 'De la ingestión cruda al producto vivo.'}
             </h2>
             <p style={{ fontSize: 16, color: 'rgba(243,234,218,0.8)', lineHeight: 1.6, margin: 0 }}>
-              Nuestras soluciones integran auditoría continua en cada capa del flujo técnico, asegurando que cada dato que alimenta tus
-              dashboards o modelos provenga de fuentes sanitizadas.
+              {isEn
+                ? 'Our solutions embed continuous auditing into every layer of the technical lifecycle, ensuring that all data driving your executive dashboards or machine learning models originates from sanitized, verified pipelines.'
+                : 'Nuestras soluciones integran auditoría continua en cada capa del flujo técnico, asegurando que cada dato que alimenta tus dashboards o modelos provenga de fuentes sanitizadas.'}
             </p>
           </div>
 
@@ -276,7 +296,7 @@ export default function Inicio() {
 
           <div data-reveal="" style={{ textAlign: 'center', marginTop: 40 }}>
             <Link
-              to="/nosotros#metodo"
+              to={isEn ? '/en/about#metodo' : '/nosotros#metodo'}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -289,7 +309,11 @@ export default function Inicio() {
                 paddingBottom: 4,
               }}
             >
-              <span>Explorar nuestro stack tecnológico y metodología de 4 fases</span>
+              <span>
+                {isEn
+                  ? 'Explore our technology stack and 4-phase engineering methodology'
+                  : 'Explorar nuestro stack tecnológico y metodología de 4 fases'}
+              </span>
               <span>→</span>
             </Link>
           </div>
@@ -298,7 +322,7 @@ export default function Inicio() {
 
       {/* Segments Section */}
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {SEGMENTS.map((seg) => (
+        {content.SEGMENTS.map((seg) => (
           <div key={seg.name} style={{ padding: '90px clamp(20px,5vw,40px)', background: seg.bg, color: seg.fg }}>
             <div
               data-reveal=""
@@ -336,7 +360,6 @@ export default function Inicio() {
 
       <Frieze border="#A8472B" upColor="#D8A84E" downColor="#C68A3D" medallionBg="#A8472B" medallionBorder="#F3EADA" />
 
-
       {/* Final CTA */}
       <div
         style={{
@@ -370,14 +393,18 @@ export default function Inicio() {
               lineHeight: 1.15,
             }}
           >
-            Iniciemos una evaluación técnica de tus sistemas y datos.
+            {isEn
+              ? 'Initiate a technical assessment of your systems and data.'
+              : 'Iniciemos una evaluación técnica de tus sistemas y datos.'}
           </div>
           <div data-reveal="" style={{ fontSize: 16, color: 'var(--tan-text)', marginBottom: 40, maxWidth: 560, margin: '0 auto 40px' }}>
-            Consultores e ingenieros senior trabajando directamente en tu arquitectura, sin intermediarios ni demoras.
+            {isEn
+              ? 'Senior consultants and engineering leads working directly on your architecture, without intermediaries.'
+              : 'Consultores e ingenieros senior trabajando directamente en tu arquitectura, sin intermediarios ni demoras.'}
           </div>
           <div data-reveal="" style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
             <Link
-              to="/contacto"
+              to={isEn ? '/en/contact' : '/contacto'}
               style={{
                 background: 'var(--gold)',
                 color: 'var(--ink)',
@@ -389,7 +416,7 @@ export default function Inicio() {
               }}
               className="btn-hover"
             >
-              Solicitar Términos de Referencia (TDR)
+              {isEn ? 'Request Scope & Terms (TDR)' : 'Solicitar Términos de Referencia (TDR)'}
             </Link>
             <a
               href={heroWa}
@@ -407,7 +434,7 @@ export default function Inicio() {
               }}
               className="btn-outline"
             >
-              Escribir a WhatsApp
+              {isEn ? 'Contact via WhatsApp' : 'Escribir a WhatsApp'}
             </a>
           </div>
         </div>

@@ -1,14 +1,26 @@
 import { Link } from 'react-router-dom';
 import useOverlay from '../hooks/useOverlay.js';
 import { useAuth } from '../lib/auth.jsx';
-import { NAV_LINKS } from '../data/content.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
+import LanguageSwitcher from './LanguageSwitcher.jsx';
 
 export default function MobileMenu({ onClose }) {
   const containerRef = useOverlay(true, onClose);
   const { user } = useAuth();
+  const { isEn, content } = useLanguage();
 
   const accountPath = user ? (user.isStaff ? '/equipo' : '/cuenta') : '/login';
-  const accountLabel = user ? (user.isStaff ? 'Panel Equipo' : 'Mi cuenta') : 'Iniciar sesión';
+  const accountLabel = user
+    ? user.isStaff
+      ? isEn
+        ? 'Staff Panel'
+        : 'Panel Equipo'
+      : isEn
+        ? 'My Account'
+        : 'Mi cuenta'
+    : isEn
+      ? 'Sign in'
+      : 'Iniciar sesión';
 
   return (
     <div
@@ -16,7 +28,7 @@ export default function MobileMenu({ onClose }) {
       ref={containerRef}
       role="dialog"
       aria-modal="true"
-      aria-label="Menú principal"
+      aria-label={isEn ? 'Main menu' : 'Menú principal'}
       tabIndex={-1}
       style={{
         position: 'fixed',
@@ -34,32 +46,35 @@ export default function MobileMenu({ onClose }) {
           <div style={{ width: 12, height: 12, background: 'var(--terracotta)', transform: 'rotate(45deg)' }} />
           <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 18, letterSpacing: 1.5 }}>INMERGE</div>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Cerrar menú"
-          className="icon-btn-hover"
-          style={{
-            width: 44,
-            height: 44,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            position: 'relative',
-            background: 'none',
-            border: 'none',
-            font: 'inherit',
-            padding: 0,
-          }}
-        >
-          <div style={{ width: 22, height: 2, background: 'var(--ink)', transform: 'rotate(45deg)', position: 'absolute' }} />
-          <div style={{ width: 22, height: 2, background: 'var(--ink)', transform: 'rotate(-45deg)', position: 'absolute' }} />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <LanguageSwitcher isLight={true} />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={isEn ? 'Close menu' : 'Cerrar menú'}
+            className="icon-btn-hover"
+            style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              position: 'relative',
+              background: 'none',
+              border: 'none',
+              font: 'inherit',
+              padding: 0,
+            }}
+          >
+            <div style={{ width: 22, height: 2, background: 'var(--ink)', transform: 'rotate(45deg)', position: 'absolute' }} />
+            <div style={{ width: 22, height: 2, background: 'var(--ink)', transform: 'rotate(-45deg)', position: 'absolute' }} />
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {NAV_LINKS.map((link) => (
+        {content.NAV_LINKS.map((link) => (
           <Link
             key={link.to}
             to={link.to}

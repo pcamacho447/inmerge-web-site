@@ -15,7 +15,7 @@ describe('ErrorBoundary Component', () => {
     render(
       <ErrorBoundary>
         <ProblemChild shouldThrow={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Contenido Seguro')).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe('ErrorBoundary Component', () => {
     render(
       <ErrorBoundary>
         <ProblemChild shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByRole('alert')).toBeInTheDocument();

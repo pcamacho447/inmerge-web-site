@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
-import { waLink } from '../data/content.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function NotFound() {
+  const { isEn, content } = useLanguage();
+
   useDocumentHead({
-    title: 'Página no encontrada — Inmerge',
-    description: 'La página que buscas no existe o cambió de dirección.',
-    path: '/404',
+    title: isEn ? 'Page not found — Inmerge' : 'Página no encontrada — Inmerge',
+    description: isEn
+      ? 'The page you are looking for does not exist or has been moved.'
+      : 'La página que buscas no existe o cambió de dirección.',
+    path: isEn ? '/en/404' : '/404',
     noIndex: true,
   });
 
@@ -35,15 +39,24 @@ export default function NotFound() {
               marginBottom: 28,
             }}
           >
-            Esta página <span style={{ color: 'var(--terracotta)' }}>no existe.</span>
+            {isEn ? (
+              <>
+                This page <span style={{ color: 'var(--terracotta)' }}>does not exist.</span>
+              </>
+            ) : (
+              <>
+                Esta página <span style={{ color: 'var(--terracotta)' }}>no existe.</span>
+              </>
+            )}
           </div>
           <p style={{ fontSize: 17, color: 'var(--muted)', lineHeight: 1.7, marginBottom: 40 }}>
-            El enlace puede estar roto o la página cambió de dirección. Puedes volver al inicio o escribirnos directamente si buscabas algo
-            puntual.
+            {isEn
+              ? 'The link may be broken or the page was moved. You can return to the homepage or reach out directly if you are looking for specific technical assistance.'
+              : 'El enlace puede estar roto o la página cambió de dirección. Puedes volver al inicio o escribirnos directamente si buscabas algo puntual.'}
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
-              to="/"
+              to={isEn ? '/en' : '/'}
               className="btn-hover"
               style={{
                 background: 'var(--terracotta)',
@@ -55,10 +68,14 @@ export default function NotFound() {
                 whiteSpace: 'nowrap',
               }}
             >
-              Volver al inicio
+              {isEn ? 'Return to homepage' : 'Volver al inicio'}
             </Link>
             <a
-              href={waLink('Hola, llegué a una página que no encontré en el sitio de Inmerge y quería escribirles directo.')}
+              href={content.waLink(
+                isEn
+                  ? 'Hello Inmerge team, I reached a page that could not be found on your site and would like to contact you directly.'
+                  : 'Hola, llegué a una página que no encontré en el sitio de Inmerge y quería escribirles directo.',
+              )}
               target="_blank"
               rel="noreferrer"
               className="btn-outline-hover"
@@ -72,7 +89,7 @@ export default function NotFound() {
                 whiteSpace: 'nowrap',
               }}
             >
-              Escríbenos por WhatsApp
+              {isEn ? 'Message on WhatsApp' : 'Escríbenos por WhatsApp'}
             </a>
           </div>
         </div>

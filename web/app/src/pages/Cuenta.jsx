@@ -285,9 +285,7 @@ export default function Cuenta() {
           />
         )}
 
-        {activeTab === 'support' && (
-          <ClientSupportCard user={user} projectsCount={projects.length} />
-        )}
+        {activeTab === 'support' && <ClientSupportCard user={user} projectsCount={projects.length} />}
       </div>
 
       <ToastNotification toast={activeToast} onDismiss={dismissActiveToast} />

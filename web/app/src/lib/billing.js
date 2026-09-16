@@ -61,11 +61,7 @@ export async function fetchClientOrganization(userId) {
   if (!userId) return null;
 
   try {
-    const { data: profile, error: pErr } = await supabase
-      .from('profiles')
-      .select('organization_id')
-      .eq('id', userId)
-      .maybeSingle();
+    const { data: profile, error: pErr } = await supabase.from('profiles').select('organization_id').eq('id', userId).maybeSingle();
 
     if (pErr || !profile?.organization_id) return null;
 
@@ -112,11 +108,7 @@ export async function updateOrganizationBilling(userId, orgData) {
   }
 
   // Buscar si el usuario ya tiene organization_id
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('organization_id')
-    .eq('id', userId)
-    .maybeSingle();
+  const { data: profile } = await supabase.from('profiles').select('organization_id').eq('id', userId).maybeSingle();
 
   if (profile?.organization_id) {
     const { data, error } = await supabase
@@ -139,9 +131,7 @@ export async function updateOrganizationBilling(userId, orgData) {
 
   if (insErr) throw insErr;
 
-  await supabase
-    .from('profiles')
-    .upsert({ id: userId, organization_id: newOrg.id });
+  await supabase.from('profiles').upsert({ id: userId, organization_id: newOrg.id });
 
   return newOrg;
 }
@@ -155,7 +145,9 @@ export async function fetchClientOrders(userId) {
   try {
     const { data, error } = await supabase
       .from('orders')
-      .select('id, code, kind, plan, amount_pen, method, status, notes, voucher_file_path, voucher_uploaded_at, voucher_status, admin_notes, verified_at, approved_at, created_at, expires_at')
+      .select(
+        'id, code, kind, plan, amount_pen, method, status, notes, voucher_file_path, voucher_uploaded_at, voucher_status, admin_notes, verified_at, approved_at, created_at, expires_at',
+      )
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -196,7 +188,9 @@ export async function createBankTransferOrder({ userId, plan, amountPen, notes }
   const { data, error } = await supabase
     .from('orders')
     .insert([payload])
-    .select('id, code, kind, plan, amount_pen, method, status, notes, voucher_file_path, voucher_uploaded_at, voucher_status, admin_notes, approved_at, created_at, expires_at')
+    .select(
+      'id, code, kind, plan, amount_pen, method, status, notes, voucher_file_path, voucher_uploaded_at, voucher_status, admin_notes, approved_at, created_at, expires_at',
+    )
     .single();
 
   if (error) throw error;
@@ -215,12 +209,10 @@ export async function uploadOrderVoucher({ orderId, file, userId }) {
   const filePath = `${userId}/${orderId}_voucher_${Date.now()}.${fileExt}`;
 
   // 1. Subir archivo binario a Storage
-  const { error: uploadError } = await supabase.storage
-    .from('billing-vouchers')
-    .upload(filePath, file, {
-      upsert: true,
-      contentType: file.type || 'application/octet-stream',
-    });
+  const { error: uploadError } = await supabase.storage.from('billing-vouchers').upload(filePath, file, {
+    upsert: true,
+    contentType: file.type || 'application/octet-stream',
+  });
 
   if (uploadError) {
     console.error('[billing] Error subiendo voucher a Storage:', uploadError);

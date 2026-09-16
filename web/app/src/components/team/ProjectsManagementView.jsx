@@ -3,11 +3,7 @@ import ProjectGantt from '../ProjectGantt.jsx';
 import ProjectTaskManager from '../ProjectTaskManager.jsx';
 import ProjectRiskManager from '../ProjectRiskManager.jsx';
 import { METHODOLOGY_PHASE_PRESETS } from './NewProjectModal.jsx';
-import {
-  calculateProjectProgress,
-  calculateProjectHours,
-  HEALTH_STATUS_CONFIG,
-} from '../../lib/pm.js';
+import { calculateProjectProgress, calculateProjectHours, HEALTH_STATUS_CONFIG } from '../../lib/pm.js';
 
 export const PILLAR_LABELS = {
   auditoria: '01. Auditoría Técnica & Datos',
@@ -75,9 +71,7 @@ export default function ProjectsManagementView({
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: 0 }}>
-          Proyectos en Curso & Auditorías ({projects.length})
-        </h2>
+        <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: 0 }}>Proyectos en Curso & Auditorías ({projects.length})</h2>
       </div>
 
       {projects.length === 0 ? (
@@ -99,9 +93,7 @@ export default function ProjectsManagementView({
             const completedMilestones = proj.milestones?.filter((m) => m.status === 'COMPLETADO').length || 0;
             const weightedProgress = calculateProjectProgress(proj.milestones, proj.tasks || []);
             const progressPct =
-              proj.progress !== undefined && proj.progress !== null && proj.progress > 0
-                ? proj.progress
-                : weightedProgress;
+              proj.progress !== undefined && proj.progress !== null && proj.progress > 0 ? proj.progress : weightedProgress;
             const hoursInfo = calculateProjectHours(proj.tasks || []);
             const activeRisksCount = (proj.risks || []).filter((r) => r.status !== 'RESUELTO').length;
             const currentSubTab = projectSubTabs[proj.id] || 'PM_GANTT';
@@ -228,15 +220,11 @@ export default function ProjectsManagementView({
                       </span>
                     </div>
 
-                    <h3 style={{ margin: '4px 0', fontSize: 22, fontFamily: "'Spectral', serif", fontWeight: 700 }}>
-                      {proj.title}
-                    </h3>
+                    <h3 style={{ margin: '4px 0', fontSize: 22, fontFamily: "'Spectral', serif", fontWeight: 700 }}>{proj.title}</h3>
                     <div style={{ fontSize: 13, color: 'var(--muted)' }}>
                       Cliente:{' '}
                       <strong style={{ color: 'var(--ink)' }}>
-                        {proj.client?.full_name
-                          ? `${proj.client.full_name} (${proj.client.email})`
-                          : proj.client?.email || proj.client_id}
+                        {proj.client?.full_name ? `${proj.client.full_name} (${proj.client.email})` : proj.client?.email || proj.client_id}
                       </strong>
                       {proj.client?.company && ` — ${proj.client.company}`}
                     </div>
@@ -275,37 +263,29 @@ export default function ProjectsManagementView({
                       <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', display: 'block' }}>
                         LEAD TÉCNICO / AUDITOR RESPONSABLE
                       </span>
-                      <strong style={{ fontSize: 13, color: 'var(--ink)' }}>
-                        👤 {proj.tech_lead_name || 'Inmerge Technical Lead'}
-                      </strong>{' '}
-                      <span style={{ fontSize: 12, color: 'var(--muted)' }}>
-                        ({proj.tech_lead_contact || 'inmerge3@gmail.com'})
-                      </span>
+                      <strong style={{ fontSize: 13, color: 'var(--ink)' }}>👤 {proj.tech_lead_name || 'Inmerge Technical Lead'}</strong>{' '}
+                      <span style={{ fontSize: 12, color: 'var(--muted)' }}>({proj.tech_lead_contact || 'inmerge3@gmail.com'})</span>
                     </div>
 
                     {/* Miembros del equipo interno participantes */}
-                    {Array.from(
-                      new Set(
-                        (proj.milestones || [])
-                          .filter((m) => m.assigned_to_name)
-                          .map((m) => m.assigned_to_name)
-                      )
-                    ).map((name) => (
-                      <span
-                        key={name}
-                        style={{
-                          fontSize: 11,
-                          fontFamily: "'IBM Plex Mono', monospace",
-                          padding: '2px 8px',
-                          borderRadius: 12,
-                          background: 'var(--cream2)',
-                          border: '1px solid var(--border)',
-                          color: 'var(--ink)',
-                        }}
-                      >
-                        🛠️ {name}
-                      </span>
-                    ))}
+                    {Array.from(new Set((proj.milestones || []).filter((m) => m.assigned_to_name).map((m) => m.assigned_to_name))).map(
+                      (name) => (
+                        <span
+                          key={name}
+                          style={{
+                            fontSize: 11,
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            padding: '2px 8px',
+                            borderRadius: 12,
+                            background: 'var(--cream2)',
+                            border: '1px solid var(--border)',
+                            color: 'var(--ink)',
+                          }}
+                        >
+                          🛠️ {name}
+                        </span>
+                      ),
+                    )}
                   </div>
 
                   {isAdmin && onUpdateProjectStaff && (
@@ -376,7 +356,14 @@ export default function ProjectsManagementView({
                             });
                           }
                         }}
-                        style={{ width: '100%', padding: '6px 8px', borderRadius: 4, border: '1px solid var(--border)', fontSize: 12, background: '#fff' }}
+                        style={{
+                          width: '100%',
+                          padding: '6px 8px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 12,
+                          background: '#fff',
+                        }}
                       >
                         <option value="">-- Seleccionar de la lista de consultores --</option>
                         {staffList.map((s) => (
@@ -435,9 +422,7 @@ export default function ProjectsManagementView({
                 )}
 
                 {proj.description && (
-                  <p style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 16, whiteSpace: 'pre-line' }}>
-                    {proj.description}
-                  </p>
+                  <p style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 16, whiteSpace: 'pre-line' }}>{proj.description}</p>
                 )}
 
                 {/* PM KPI Bar */}
@@ -1072,9 +1057,7 @@ export default function ProjectsManagementView({
                         })}
                       </div>
                     ) : (
-                      <div style={{ padding: 16, color: 'var(--muted)', fontSize: 13 }}>
-                        No hay hitos registrados en este proyecto.
-                      </div>
+                      <div style={{ padding: 16, color: 'var(--muted)', fontSize: 13 }}>No hay hitos registrados en este proyecto.</div>
                     )}
                   </div>
                 )}

@@ -4,11 +4,7 @@ import React, { useEffect } from 'react';
  * Componente ToastNotification con estética Editorial Tech Premium de Inmerge.
  * Permite mostrar notificaciones en vivo no invasivas ante eventos de Supabase Realtime.
  */
-export default function ToastNotification({
-  toast,
-  onDismiss,
-  duration = 5000,
-}) {
+export default function ToastNotification({ toast, onDismiss, duration = 5000 }) {
   useEffect(() => {
     if (!toast) return;
     const timer = setTimeout(() => {
@@ -84,9 +80,7 @@ export default function ToastNotification({
         }
       `}</style>
 
-      <div style={{ fontSize: 20, flexShrink: 0, marginTop: 2 }}>
-        {toast.icon || currentType.icon}
-      </div>
+      <div style={{ fontSize: 20, flexShrink: 0, marginTop: 2 }}>{toast.icon || currentType.icon}</div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>

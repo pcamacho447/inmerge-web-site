@@ -42,9 +42,7 @@ describe('useClientProjects', () => {
 
   it('loads client projects on mount and subscribes to Realtime channel', async () => {
     authLib.useAuth.mockReturnValue({ user: { id: 'user-123', email: 'cliente@inmerge.pe' } });
-    projectsLib.fetchClientProjects.mockResolvedValue([
-      { id: 'proj-1', title: 'Auditoría Cloud AWS', status: 'EN_PROCESO' },
-    ]);
+    projectsLib.fetchClientProjects.mockResolvedValue([{ id: 'proj-1', title: 'Auditoría Cloud AWS', status: 'EN_PROCESO' }]);
 
     const { result } = renderHook(() => useClientProjects());
 

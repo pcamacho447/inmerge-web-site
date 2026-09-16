@@ -2,12 +2,8 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CookieConsent from './CookieConsent.jsx';
-import {
-  getCookieConsent,
-  setCookieConsent,
-  openCookiePreferences,
-  COOKIE_CONSENT_KEY,
-} from '../lib/cookies.js';
+import { LanguageProvider } from '../context/LanguageContext.jsx';
+import { getCookieConsent, setCookieConsent, openCookiePreferences, COOKIE_CONSENT_KEY } from '../lib/cookies.js';
 
 describe('CookieConsent Component', () => {
   beforeEach(() => {
@@ -25,7 +21,7 @@ describe('CookieConsent Component', () => {
     render(
       <MemoryRouter>
         <CookieConsent />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.queryByRole('region', { name: /aviso de privacidad y cookies/i })).not.toBeInTheDocument();
@@ -44,7 +40,7 @@ describe('CookieConsent Component', () => {
     render(
       <MemoryRouter>
         <CookieConsent />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     act(() => {
@@ -58,7 +54,7 @@ describe('CookieConsent Component', () => {
     render(
       <MemoryRouter>
         <CookieConsent />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     act(() => {
@@ -80,7 +76,7 @@ describe('CookieConsent Component', () => {
     render(
       <MemoryRouter>
         <CookieConsent />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     act(() => {
@@ -102,7 +98,7 @@ describe('CookieConsent Component', () => {
     render(
       <MemoryRouter>
         <CookieConsent />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     act(() => {
@@ -117,6 +113,7 @@ describe('CookieConsent Component', () => {
     const analyticsCheckbox = screen.getByLabelText(/permitir cookies analíticas/i);
     const prefsCheckbox = screen.getByLabelText(/permitir cookies de preferencias/i);
 
+    expect(prefsCheckbox).not.toBeChecked();
     fireEvent.click(analyticsCheckbox);
     expect(analyticsCheckbox).toBeChecked();
 
@@ -136,7 +133,7 @@ describe('CookieConsent Component', () => {
     render(
       <MemoryRouter>
         <CookieConsent />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     act(() => {
@@ -150,5 +147,25 @@ describe('CookieConsent Component', () => {
     });
 
     expect(screen.getByRole('dialog', { name: /preferencias de cookies/i })).toBeInTheDocument();
+  });
+
+  it('renders in English when mounted within English route context', () => {
+    render(
+      <MemoryRouter initialEntries={['/en']}>
+        <LanguageProvider>
+          <CookieConsent />
+        </LanguageProvider>
+      </MemoryRouter>,
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
+
+    expect(screen.getByRole('region', { name: /privacy and cookie notice/i })).toBeInTheDocument();
+    expect(screen.getByText('Privacy & Cookie Control')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /accept all/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /essential only/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /customize/i })).toBeInTheDocument();
   });
 });

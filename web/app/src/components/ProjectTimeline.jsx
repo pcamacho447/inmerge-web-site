@@ -14,20 +14,8 @@ export default function ProjectTimeline({ milestones = [] }) {
         const isInProgress = m.status === 'EN_PROGRESO' || m.status === 'EN_PROCESO';
         const isBlocked = m.status === 'BLOQUEADO';
 
-        const statusColor = isCompleted
-          ? 'var(--green)'
-          : isBlocked
-            ? 'var(--terracotta)'
-            : isInProgress
-              ? 'var(--gold)'
-              : 'var(--muted)';
-        const statusLabel = isCompleted
-          ? '✓ Completado'
-          : isBlocked
-            ? '⚠️ Bloqueado'
-            : isInProgress
-              ? '● En progreso'
-              : '○ Pendiente';
+        const statusColor = isCompleted ? 'var(--green)' : isBlocked ? 'var(--terracotta)' : isInProgress ? 'var(--gold)' : 'var(--muted)';
+        const statusLabel = isCompleted ? '✓ Completado' : isBlocked ? '⚠️ Bloqueado' : isInProgress ? '● En progreso' : '○ Pendiente';
         const bgBadge = isCompleted
           ? 'rgba(74, 156, 106, 0.1)'
           : isBlocked

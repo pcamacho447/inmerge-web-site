@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { STACK_CATEGORIES } from '../data/stack.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
+import { STACK_CATEGORIES as fallbackCategories } from '../data/stack.js';
 
 export default function StackTabs() {
-  const [activeTab, setActiveTab] = useState(STACK_CATEGORIES[0].id);
+  const { stack } = useLanguage();
+  const categories = stack?.STACK_CATEGORIES || fallbackCategories;
+  const [activeTab, setActiveTab] = useState(categories[0].id);
 
-  const currentCategory = STACK_CATEGORIES.find((c) => c.id === activeTab) || STACK_CATEGORIES[0];
+  const currentCategory = categories.find((c) => c.id === activeTab) || categories[0];
 
   return (
     <div style={{ margin: '40px 0' }}>
@@ -20,7 +23,7 @@ export default function StackTabs() {
           marginBottom: 32,
         }}
       >
-        {STACK_CATEGORIES.map((cat) => {
+        {categories.map((cat) => {
           const isActive = cat.id === activeTab;
           return (
             <button

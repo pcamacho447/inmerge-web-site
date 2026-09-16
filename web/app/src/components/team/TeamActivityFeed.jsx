@@ -8,11 +8,7 @@ export const ACTIVITY_ACTION_BADGES = {
   STAFF_REGISTERED: { label: 'STAFF REGISTRADO', bg: 'rgba(74, 114, 186, 0.12)', text: '#345995', border: '#345995' },
 };
 
-export default function TeamActivityFeed({
-  filteredActivityLogs,
-  activityFilter,
-  setActivityFilter,
-}) {
+export default function TeamActivityFeed({ filteredActivityLogs, activityFilter, setActivityFilter }) {
   return (
     <div>
       <div
@@ -142,14 +138,12 @@ export default function TeamActivityFeed({
                     )}
                     {log.action === 'MILESTONE_STATUS_UPDATED' && (
                       <span>
-                        Hito cambiado a <strong>{log.details?.new_status}</strong>{' '}
-                        {log.details?.title ? `(${log.details.title})` : ''}
+                        Hito cambiado a <strong>{log.details?.new_status}</strong> {log.details?.title ? `(${log.details.title})` : ''}
                       </span>
                     )}
                     {log.action === 'DELIVERABLE_PUBLISHED' && (
                       <span>
-                        Entregable publicado: <strong>{log.details?.title}</strong> ({log.details?.file_type}{' '}
-                        {log.details?.version})
+                        Entregable publicado: <strong>{log.details?.title}</strong> ({log.details?.file_type} {log.details?.version})
                       </span>
                     )}
                     {log.action === 'STAFF_REGISTERED' && (
@@ -162,9 +156,7 @@ export default function TeamActivityFeed({
 
                   <div style={{ fontSize: 12, color: 'var(--muted)' }}>
                     Autor:{' '}
-                    <strong style={{ color: 'var(--ink)' }}>
-                      {log.author?.full_name || log.author?.email || 'Sistema / Staff'}
-                    </strong>
+                    <strong style={{ color: 'var(--ink)' }}>{log.author?.full_name || log.author?.email || 'Sistema / Staff'}</strong>
                     {log.author?.role && ` (${log.author.role})`}
                   </div>
                 </div>

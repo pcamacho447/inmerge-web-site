@@ -2,7 +2,12 @@ export const METHODOLOGY_PHASE_PRESETS = [
   { id: '01', order: 1, label: 'Fase 01 — Auditoría & Diagnóstico Inicial', template: 'Fase 01 — Auditoría & Diagnóstico Inicial' },
   { id: '02', order: 2, label: 'Fase 02 — Arquitectura & Diseño de Solución', template: 'Fase 02 — Arquitectura & Diseño de Solución' },
   { id: '03', order: 3, label: 'Fase 03 — Ingeniería, Desarrollo & Modelado', template: 'Fase 03 — Ingeniería, Desarrollo & Modelado' },
-  { id: '04', order: 4, label: 'Fase 04 — Validación, Certificación & Despliegue', template: 'Fase 04 — Validación, Certificación & Despliegue' },
+  {
+    id: '04',
+    order: 4,
+    label: 'Fase 04 — Validación, Certificación & Despliegue',
+    template: 'Fase 04 — Validación, Certificación & Despliegue',
+  },
   { id: 'custom', order: 1, label: 'Personalizada (Fase a Medida)', template: '' },
 ];
 
@@ -177,7 +182,11 @@ export default function NewProjectModal({
                 Líder / Ingeniero / Auditor Designado
               </label>
               <select
-                value={staffList.find((s) => (s.full_name && s.full_name === newProj.techLeadName) || (s.email && s.email === newProj.techLeadContact))?.id || ''}
+                value={
+                  staffList.find(
+                    (s) => (s.full_name && s.full_name === newProj.techLeadName) || (s.email && s.email === newProj.techLeadContact),
+                  )?.id || ''
+                }
                 onChange={(e) => {
                   const memberId = e.target.value;
                   const member = staffList.find((s) => s.id === memberId);
@@ -491,9 +500,7 @@ export default function NewProjectModal({
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-                  Tipo
-                </label>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>Tipo</label>
                 <select
                   value={newDeliv.fileType}
                   onChange={(e) => setNewDeliv({ ...newDeliv, fileType: e.target.value })}
@@ -515,9 +522,7 @@ export default function NewProjectModal({
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-                  Versión
-                </label>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>Versión</label>
                 <input
                   type="text"
                   value={newDeliv.version}

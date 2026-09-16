@@ -2,14 +2,7 @@ import { useState, useEffect } from 'react';
 import { INMERGE_BANK_ACCOUNTS, ORDER_STATUS_CONFIG, uploadOrderVoucher } from '../../lib/billing.js';
 import { formatPEN } from '../../lib/formatPEN.js';
 
-export default function ClientBillingView({
-  organization,
-  orders,
-  loading,
-  saving,
-  onSaveOrganization,
-  user,
-}) {
+export default function ClientBillingView({ organization, orders, loading, saving, onSaveOrganization, user }) {
   const [form, setForm] = useState({
     billingType: 'ruc',
     legalName: '',
@@ -71,7 +64,8 @@ export default function ClientBillingView({
           </h3>
         </div>
         <p style={{ fontSize: 13, color: 'var(--muted)', margin: '0 0 20px', lineHeight: 1.5 }}>
-          Inmerge procesa pagos exclusivamente mediante <strong>Transferencia Bancaria Directa</strong> a nuestras cuentas corrientes empresariales en moneda nacional (PEN).
+          Inmerge procesa pagos exclusivamente mediante <strong>Transferencia Bancaria Directa</strong> a nuestras cuentas corrientes
+          empresariales en moneda nacional (PEN).
         </p>
 
         <div
@@ -95,9 +89,7 @@ export default function ClientBillingView({
               }}
             >
               <div>
-                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 2 }}>
-                  {acc.bank}
-                </div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 2 }}>{acc.bank}</div>
                 <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)', marginBottom: 10 }}>
                   {acc.accountType}
                 </div>
@@ -324,8 +316,19 @@ export default function ClientBillingView({
         </div>
 
         {orders.length === 0 ? (
-          <div style={{ padding: 24, background: '#fff', borderRadius: 6, border: '1px dashed var(--border)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
-            No tienes órdenes de servicio registradas. Al acordar una propuesta técnica o hito, se generará tu orden con el código correlativo de pago.
+          <div
+            style={{
+              padding: 24,
+              background: '#fff',
+              borderRadius: 6,
+              border: '1px dashed var(--border)',
+              textAlign: 'center',
+              color: 'var(--muted)',
+              fontSize: 13,
+            }}
+          >
+            No tienes órdenes de servicio registradas. Al acordar una propuesta técnica o hito, se generará tu orden con el código
+            correlativo de pago.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -396,15 +399,45 @@ export default function ClientBillingView({
                     {/* Gestión de Comprobante / Voucher Bancario */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       {ord.voucher_status === 'uploaded' ? (
-                        <span style={{ fontSize: 11, background: 'rgba(216, 168, 78, 0.15)', color: 'var(--gold, #C68A3D)', padding: '3px 8px', borderRadius: 4, fontWeight: 600, border: '1px solid rgba(216, 168, 78, 0.3)' }}>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            background: 'rgba(216, 168, 78, 0.15)',
+                            color: 'var(--gold, #C68A3D)',
+                            padding: '3px 8px',
+                            borderRadius: 4,
+                            fontWeight: 600,
+                            border: '1px solid rgba(216, 168, 78, 0.3)',
+                          }}
+                        >
                           ⏳ Voucher en Revisión
                         </span>
                       ) : ord.voucher_status === 'verified' ? (
-                        <span style={{ fontSize: 11, background: 'rgba(74, 156, 106, 0.12)', color: 'var(--green, #4A9C6A)', padding: '3px 8px', borderRadius: 4, fontWeight: 600, border: '1px solid rgba(74, 156, 106, 0.3)' }}>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            background: 'rgba(74, 156, 106, 0.12)',
+                            color: 'var(--green, #4A9C6A)',
+                            padding: '3px 8px',
+                            borderRadius: 4,
+                            fontWeight: 600,
+                            border: '1px solid rgba(74, 156, 106, 0.3)',
+                          }}
+                        >
                           ✓ Voucher Conciliado
                         </span>
                       ) : ord.voucher_status === 'rejected' ? (
-                        <span style={{ fontSize: 11, background: 'rgba(168, 71, 43, 0.15)', color: 'var(--terracotta)', padding: '3px 8px', borderRadius: 4, fontWeight: 600, border: '1px solid rgba(168, 71, 43, 0.3)' }}>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            background: 'rgba(168, 71, 43, 0.15)',
+                            color: 'var(--terracotta)',
+                            padding: '3px 8px',
+                            borderRadius: 4,
+                            fontWeight: 600,
+                            border: '1px solid rgba(168, 71, 43, 0.3)',
+                          }}
+                        >
                           ⚠️ Voucher Rechazado
                         </span>
                       ) : (

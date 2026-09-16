@@ -96,9 +96,7 @@ export async function fetchClientProjects(userId) {
  */
 export async function calculateFileSha256(fileBlobOrBuffer) {
   if (!fileBlobOrBuffer) return null;
-  const buffer = fileBlobOrBuffer instanceof ArrayBuffer
-    ? fileBlobOrBuffer
-    : await fileBlobOrBuffer.arrayBuffer();
+  const buffer = fileBlobOrBuffer instanceof ArrayBuffer ? fileBlobOrBuffer : await fileBlobOrBuffer.arrayBuffer();
 
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -156,8 +154,7 @@ ${
   (project.milestones || []).length > 0
     ? project.milestones
         .map(
-          (m, idx) =>
-            `${idx + 1}. **${m.title}** [${m.status}] — Vencimiento: ${m.due_date || 'Sin fecha'}\n   _${m.description || ''}_`
+          (m, idx) => `${idx + 1}. **${m.title}** [${m.status}] — Vencimiento: ${m.due_date || 'Sin fecha'}\n   _${m.description || ''}_`,
         )
         .join('\n')
     : '_No se han registrado hitos en este proyecto._'
@@ -171,7 +168,7 @@ ${
     ? project.deliverables
         .map(
           (d) =>
-            `- **${d.title}** (v${d.version || '1.0'})\n  - Tipo: \`${d.file_type}\`\n  - Checksum SHA-256: \`${d.sha256_checksum || 'Sellado pendiente'}\``
+            `- **${d.title}** (v${d.version || '1.0'})\n  - Tipo: \`${d.file_type}\`\n  - Checksum SHA-256: \`${d.sha256_checksum || 'Sellado pendiente'}\``,
         )
         .join('\n')
     : '_Sin entregables emitidos aún._'

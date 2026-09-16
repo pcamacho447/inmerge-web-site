@@ -228,13 +228,7 @@ export async function createTeamProject({
 /**
  * Actualiza la designación de equipo técnico (Lead, Ingenieros, Auditores) o detalles del proyecto (Exclusivo Admin).
  */
-export async function updateProjectStaff(projectId, {
-  techLeadName,
-  techLeadContact,
-  description,
-  title,
-  targetCompletionDate,
-} = {}) {
+export async function updateProjectStaff(projectId, { techLeadName, techLeadContact, description, title, targetCompletionDate } = {}) {
   if (!projectId) throw new Error('El ID de proyecto es obligatorio.');
 
   const updateFields = {};
@@ -244,12 +238,7 @@ export async function updateProjectStaff(projectId, {
   if (title !== undefined) updateFields.title = title;
   if (targetCompletionDate !== undefined) updateFields.target_completion_date = targetCompletionDate;
 
-  const { data, error } = await supabase
-    .from('client_projects')
-    .update(updateFields)
-    .eq('id', projectId)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('client_projects').update(updateFields).eq('id', projectId).select().single();
 
   if (error) {
     console.error('Error al actualizar equipo del proyecto:', error);
@@ -288,7 +277,8 @@ export async function updateProjectStatus(projectId, newStatus, { notes = '', cl
     .from('client_projects')
     .update(updateFields)
     .eq('id', projectId)
-    .select(`
+    .select(
+      `
       id,
       title,
       pillar,
@@ -304,7 +294,8 @@ export async function updateProjectStatus(projectId, newStatus, { notes = '', cl
         email,
         full_name
       )
-    `)
+    `,
+    )
     .single();
 
   if (error) {
@@ -601,11 +592,7 @@ export async function fetchProjectTasks(projectId) {
  * Crea una nueva tarea técnica asociada a un hito y proyecto.
  */
 export async function createProjectTask(taskPayload) {
-  const { data, error } = await supabase
-    .from('project_tasks')
-    .insert(taskPayload)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('project_tasks').insert(taskPayload).select().single();
 
   if (error) {
     console.error('Error al crear tarea técnica:', error);
@@ -652,10 +639,7 @@ export async function updateProjectTask(taskId, updates) {
  * Elimina una tarea técnica.
  */
 export async function deleteProjectTask(taskId, projectId) {
-  const { error } = await supabase
-    .from('project_tasks')
-    .delete()
-    .eq('id', taskId);
+  const { error } = await supabase.from('project_tasks').delete().eq('id', taskId);
 
   if (error) {
     console.error('Error al eliminar tarea técnica:', error);
@@ -695,11 +679,7 @@ export async function fetchProjectRisks(projectId) {
  * Registra un nuevo riesgo o bloqueo.
  */
 export async function createProjectRisk(riskPayload) {
-  const { data, error } = await supabase
-    .from('project_risks')
-    .insert(riskPayload)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('project_risks').insert(riskPayload).select().single();
 
   if (error) {
     console.error('Error al registrar riesgo/bloqueo:', error);
@@ -751,12 +731,7 @@ export async function updateProjectHealth(projectId, { healthStatus, startDate, 
   if (startDate !== undefined) updates.start_date = startDate;
   if (targetEndDate !== undefined) updates.target_end_date = targetEndDate;
 
-  const { data, error } = await supabase
-    .from('client_projects')
-    .update(updates)
-    .eq('id', projectId)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('client_projects').update(updates).eq('id', projectId).select().single();
 
   if (error) {
     console.error('Error al actualizar salud del proyecto:', error);

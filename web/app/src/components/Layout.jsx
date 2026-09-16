@@ -3,10 +3,12 @@ import { Outlet } from 'react-router-dom';
 import Preloader from './Preloader.jsx';
 import Nav from './Nav.jsx';
 import MobileMenu from './MobileMenu.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Layout() {
   const [preloaderDone, setPreloaderDone] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isEn } = useLanguage();
 
   useEffect(() => {
     // Reduced-motion users get no preloader intro at all — it's a branded
@@ -50,7 +52,7 @@ export default function Layout() {
   return (
     <div style={{ fontFamily: "'IBM Plex Sans',sans-serif", background: 'var(--bg)', color: 'var(--ink)', overflowX: 'hidden' }}>
       <a href="#main-content" className="skip-to-content">
-        Saltar al contenido principal
+        {isEn ? 'Skip to main content' : 'Saltar al contenido principal'}
       </a>
       <Preloader done={preloaderDone} />
       <Nav mobileMenuOpen={mobileMenuOpen} onToggleMenu={toggleMenu} />

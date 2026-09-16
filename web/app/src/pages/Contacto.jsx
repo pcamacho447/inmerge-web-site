@@ -4,27 +4,37 @@ import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
-import { waLink } from '../data/content.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { submitLeadTdr } from '../lib/leads.js';
 
 export default function Contacto() {
   useReveal();
+  const { isEn, content } = useLanguage();
+
   useDocumentHead({
-    title: 'Contacto & Cotización TDR — Inmerge',
-    description: 'Solicita cotización o propuesta técnica para proyectos de Auditoría, Desarrollo Cloud y Ciencia de Datos en Lima, Perú.',
-    path: '/contacto',
+    title: isEn ? 'Contact & Technical Proposal (TDR) — Inmerge' : 'Contacto & Cotización TDR — Inmerge',
+    description: isEn
+      ? 'Request a technical proposal or consultation for Systems Auditing, Cloud Engineering (AWS), and Applied Data Science in Lima, Peru.'
+      : 'Solicita cotización o propuesta técnica para proyectos de Auditoría, Desarrollo Cloud y Ciencia de Datos en Lima, Perú.',
+    path: isEn ? '/en/contact' : '/contacto',
   });
 
   const [searchParams] = useSearchParams();
-  const preselectedService = searchParams.get('servicio') || '';
+  const preselectedService = searchParams.get('servicio') || searchParams.get('service') || '';
 
   const [formPillar, setFormPillar] = useState(preselectedService ? 'Especificado' : 'auditoria');
   const [formName, setFormName] = useState('');
   const [formCompany, setFormCompany] = useState('');
   const [formContact, setFormContact] = useState('');
   const [formPhone, setFormPhone] = useState('');
-  const [formTimeline, setFormTimeline] = useState('1 a 2 meses');
-  const [formMessage, setFormMessage] = useState(preselectedService ? `Interés en el servicio: ${preselectedService}\n\n` : '');
+  const [formTimeline, setFormTimeline] = useState(isEn ? '1 to 2 months' : '1 a 2 meses');
+  const [formMessage, setFormMessage] = useState(
+    preselectedService
+      ? isEn
+        ? `Interest in service: ${preselectedService}\n\n`
+        : `Interés en el servicio: ${preselectedService}\n\n`
+      : '',
+  );
   const [formHoneypot, setFormHoneypot] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -33,9 +43,15 @@ export default function Contacto() {
 
   useEffect(() => {
     if (preselectedService) {
-      setFormMessage((prev) => (prev.includes(preselectedService) ? prev : `Interés en el servicio: ${preselectedService}\n\n${prev}`));
+      setFormMessage((prev) =>
+        prev.includes(preselectedService)
+          ? prev
+          : isEn
+            ? `Interest in service: ${preselectedService}\n\n${prev}`
+            : `Interés en el servicio: ${preselectedService}\n\n${prev}`,
+      );
     }
-  }, [preselectedService]);
+  }, [preselectedService, isEn]);
 
   async function handleSubmit(e) {
     if (e) e.preventDefault();
@@ -60,14 +76,22 @@ export default function Contacto() {
     } catch (err) {
       if (err.isRateLimited || err.code === 'RATE_LIMIT_EXCEEDED' || (err.message && err.message.includes('RATE_LIMIT_EXCEEDED'))) {
         setIsRateLimited(true);
-        setSubmitError(err.message || 'Has superado el límite de 3 solicitudes por hora para este correo.');
+        setSubmitError(
+          isEn
+            ? 'You have reached the limit of 3 submissions per hour for this email address.'
+            : err.message || 'Has superado el límite de 3 solicitudes por hora para este correo.',
+        );
         return;
       }
 
       console.warn('Fallo al guardar lead en Supabase, activando fallback:', err);
       // Fallback a mailto si la base de datos o conexión falla
-      const subject = `Solicitud TDR / Cotización — ${formCompany || formName || 'Inmerge'}`;
-      const body = `Pilar de Interés: ${formPillar}\nNombre: ${formName || 'No indicado'}\nEmpresa/Organización: ${formCompany || 'No indicado'}\nEmail: ${formContact}\nTeléfono/WhatsApp: ${formPhone || 'No indicado'}\nPlazo estimado: ${formTimeline}\n\nRequerimiento:\n${formMessage}`;
+      const subject = isEn
+        ? `TDR Project Request — ${formCompany || formName || 'Inmerge'}`
+        : `Solicitud TDR / Cotización — ${formCompany || formName || 'Inmerge'}`;
+      const body = isEn
+        ? `Pillar of Interest: ${formPillar}\nName: ${formName || 'Not specified'}\nCompany: ${formCompany || 'Not specified'}\nEmail: ${formContact}\nPhone/WhatsApp: ${formPhone || 'Not specified'}\nEstimated Timeline: ${formTimeline}\n\nScope Requirement:\n${formMessage}`
+        : `Pilar de Interés: ${formPillar}\nNombre: ${formName || 'No indicado'}\nEmpresa/Organización: ${formCompany || 'No indicado'}\nEmail: ${formContact}\nTeléfono/WhatsApp: ${formPhone || 'No indicado'}\nPlazo estimado: ${formTimeline}\n\nRequerimiento:\n${formMessage}`;
       window.location.href = `mailto:inmerge3@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       setFormSubmitted(true);
     } finally {
@@ -75,14 +99,16 @@ export default function Contacto() {
     }
   }
 
-  const customWaMessage = `Hola Inmerge, deseo cotizar un proyecto.\n*Pilar:* ${formPillar}\n*Empresa:* ${formCompany || 'Particular'}\n*Contacto:* ${formName || 'No especificado'}\n*Detalle:* ${formMessage || 'Coordinar reunión preliminar'}`;
-  const customWaUrl = waLink(customWaMessage);
+  const customWaMessage = isEn
+    ? `Hello Inmerge, I would like to request a technical proposal.\n*Pillar:* ${formPillar}\n*Company:* ${formCompany || 'Not specified'}\n*Contact:* ${formName || 'Not specified'}\n*Scope:* ${formMessage || 'Schedule preliminary technical discussion'}`
+    : `Hola Inmerge, deseo cotizar un proyecto.\n*Pilar:* ${formPillar}\n*Empresa:* ${formCompany || 'Particular'}\n*Contacto:* ${formName || 'No especificado'}\n*Detalle:* ${formMessage || 'Coordinar reunión preliminar'}`;
+  const customWaUrl = content.waLink(customWaMessage);
 
   return (
     <>
       <div style={{ padding: '100px clamp(20px,5vw,40px) 60px', maxWidth: 1240, margin: '0 auto' }}>
         <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 24 }}>
-          COTIZACIÓN & TDR
+          {isEn ? 'PROPOSALS & TECHNICAL SCOPE' : 'COTIZACIÓN & TDR'}
         </div>
         <h1
           style={{
@@ -95,10 +121,12 @@ export default function Contacto() {
             margin: '0 0 24px 0',
           }}
         >
-          Evaluación técnica y propuestas a medida.
+          {isEn ? 'Technical evaluation and bespoke engineering proposals.' : 'Evaluación técnica y propuestas a medida.'}
         </h1>
         <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 640, lineHeight: 1.7, margin: 0 }}>
-          Respondemos directamente con el equipo de ingeniería y consultoría que ejecutará el proyecto — sin capas comerciales ni demoras.
+          {isEn
+            ? 'We communicate directly through the engineering partners and consultants who build and audit your systems — zero commercial bureaucracy.'
+            : 'Respondemos directamente con el equipo de ingeniería y consultoría que ejecutará el proyecto — sin capas comerciales ni demoras.'}
         </p>
       </div>
 
@@ -139,7 +167,7 @@ export default function Contacto() {
                   marginBottom: 16,
                 }}
               >
-                CANAL INMEDIATO
+                {isEn ? 'DIRECT CHANNEL' : 'CANAL INMEDIATO'}
               </div>
               <h2
                 style={{
@@ -151,10 +179,12 @@ export default function Contacto() {
                   color: '#F3EADA',
                 }}
               >
-                Conversación directa por WhatsApp
+                {isEn ? 'Direct Conversation via WhatsApp' : 'Conversación directa por WhatsApp'}
               </h2>
               <p style={{ fontSize: 15, color: 'var(--tan-text)', lineHeight: 1.6, margin: 0 }}>
-                Ideal para coordinar reuniones exploratorias, compartir alcances de TDR o recibir un diagnóstico inicial de factibilidad.
+                {isEn
+                  ? 'Ideal for scheduling exploratory discovery sessions, sharing Terms of Reference (TDR) documents, or receiving an initial feasibility diagnostic.'
+                  : 'Ideal para coordinar reuniones exploratorias, compartir alcances de TDR o recibir un diagnóstico inicial de factibilidad.'}
               </p>
             </div>
 
@@ -176,7 +206,7 @@ export default function Contacto() {
                 }}
                 className="btn-hover"
               >
-                <span>Escribir por WhatsApp</span>
+                <span>{isEn ? 'Message via WhatsApp' : 'Escribir por WhatsApp'}</span>
                 <span aria-hidden="true">→</span>
               </a>
             </div>
@@ -200,20 +230,25 @@ export default function Contacto() {
                 marginBottom: 12,
               }}
             >
-              DATOS INSTITUCIONALES
+              {isEn ? 'INSTITUTIONAL METADATA' : 'DATOS INSTITUCIONALES'}
             </div>
             <div style={{ fontSize: 14, lineHeight: 1.8, color: 'var(--ink)' }}>
               <div>
-                <strong>Firma:</strong> Inmerge Consultoría y Tecnología
+                <strong>{isEn ? 'Firm:' : 'Firma:'}</strong> Inmerge Consultoría y Tecnología
               </div>
               <div>
-                <strong>Correo:</strong> inmerge3@gmail.com
+                <strong>{isEn ? 'Email:' : 'Correo:'}</strong> inmerge3@gmail.com
               </div>
               <div>
-                <strong>Ubicación:</strong> Lima, Perú
+                <strong>{isEn ? 'Location:' : 'Ubicación:'}</strong> Lima, Perú
               </div>
               <div>
-                <strong>Régimen:</strong> Facturación electrónica con RUC activo y habido
+                <strong>{isEn ? 'Timezone:' : 'Huso horario:'}</strong>{' '}
+                {isEn ? 'GMT-5 / UTC-5 (EST equivalent · Lima Time)' : 'GMT-5 (UTC-5 · Hora estándar de Lima)'}
+              </div>
+              <div>
+                <strong>{isEn ? 'Fiscal Status:' : 'Régimen:'}</strong>{' '}
+                {isEn ? 'Electronic Invoicing (RUC Active & Verified)' : 'Facturación electrónica con RUC activo y habido'}
               </div>
             </div>
           </div>
@@ -238,7 +273,7 @@ export default function Contacto() {
               marginBottom: 12,
             }}
           >
-            FORMULARIO DE REQUERIMIENTO
+            {isEn ? 'TECHNICAL SCOPE FORM' : 'FORMULARIO DE REQUERIMIENTO'}
           </div>
           <h2
             style={{
@@ -249,7 +284,7 @@ export default function Contacto() {
               color: 'var(--ink)',
             }}
           >
-            Detalles de la Solicitud
+            {isEn ? 'Project & Mandate Details' : 'Detalles de la Solicitud'}
           </h2>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -259,7 +294,7 @@ export default function Contacto() {
                 htmlFor="pillar-select"
                 style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
               >
-                Pilar o Especialidad Principal *
+                {isEn ? 'Pillar or Primary Focus *' : 'Pilar o Especialidad Principal *'}
               </label>
               <select
                 id="pillar-select"
@@ -275,11 +310,19 @@ export default function Contacto() {
                   fontFamily: "'IBM Plex Sans', sans-serif",
                 }}
               >
-                <option value="auditoria">Pilar 01: Auditoría Técnica y de Datos</option>
-                <option value="desarrollo">Pilar 02: Desarrollo Tecnológico & Cloud (AWS)</option>
-                <option value="datos">Pilar 03: Ciencia de Datos & Inteligencia Artificial</option>
-                <option value="integral">Proyecto Integral / Múltiples Pilares</option>
-                <option value="otro">Otro Requerimiento Específico</option>
+                <option value="auditoria">
+                  {isEn ? 'Pillar 01: Technical & Data Auditing' : 'Pilar 01: Auditoría Técnica y de Datos'}
+                </option>
+                <option value="desarrollo">
+                  {isEn ? 'Pillar 02: Cloud Development & Architecture (AWS)' : 'Pilar 02: Desarrollo Tecnológico & Cloud (AWS)'}
+                </option>
+                <option value="datos">
+                  {isEn ? 'Pillar 03: Applied Data Science & AI' : 'Pilar 03: Ciencia de Datos & Inteligencia Artificial'}
+                </option>
+                <option value="integral">
+                  {isEn ? 'Comprehensive Project / Multiple Pillars' : 'Proyecto Integral / Múltiples Pilares'}
+                </option>
+                <option value="otro">{isEn ? 'Other Specific Requirement' : 'Otro Requerimiento Específico'}</option>
               </select>
             </div>
 
@@ -290,12 +333,12 @@ export default function Contacto() {
                   htmlFor="contact-name"
                   style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
                 >
-                  Nombre y Cargo
+                  {isEn ? 'Full Name & Role' : 'Nombre y Cargo'}
                 </label>
                 <input
                   id="contact-name"
                   type="text"
-                  placeholder="Ej. Carlos Mendoza, Gerente de TI"
+                  placeholder={isEn ? 'e.g. Alex Morgan, VP of Engineering' : 'Ej. Carlos Mendoza, Gerente de TI'}
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   style={{
@@ -315,12 +358,12 @@ export default function Contacto() {
                   htmlFor="contact-company"
                   style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
                 >
-                  Empresa u Organización
+                  {isEn ? 'Company or Entity' : 'Empresa u Organización'}
                 </label>
                 <input
                   id="contact-company"
                   type="text"
-                  placeholder="Ej. Corporación Andina S.A."
+                  placeholder={isEn ? 'e.g. Acme Corp' : 'Ej. Corporación Andina S.A.'}
                   value={formCompany}
                   onChange={(e) => setFormCompany(e.target.value)}
                   style={{
@@ -343,13 +386,13 @@ export default function Contacto() {
                   htmlFor="contact-email"
                   style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
                 >
-                  Correo Electrónico *
+                  {isEn ? 'Corporate Email *' : 'Correo Electrónico *'}
                 </label>
                 <input
                   id="contact-email"
                   type="email"
                   required
-                  placeholder="correo@empresa.com"
+                  placeholder="contact@company.com"
                   value={formContact}
                   onChange={(e) => setFormContact(e.target.value)}
                   style={{
@@ -369,12 +412,12 @@ export default function Contacto() {
                   htmlFor="contact-phone"
                   style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
                 >
-                  Teléfono / WhatsApp
+                  {isEn ? 'Phone / WhatsApp' : 'Teléfono / WhatsApp'}
                 </label>
                 <input
                   id="contact-phone"
                   type="tel"
-                  placeholder="+51 987 654 321"
+                  placeholder="+1 415 555 0199"
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   style={{
@@ -396,7 +439,7 @@ export default function Contacto() {
                 htmlFor="contact-timeline"
                 style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
               >
-                Plazo Estimado de Ejecución
+                {isEn ? 'Estimated Project Timeline' : 'Plazo Estimado de Ejecución'}
               </label>
               <select
                 id="contact-timeline"
@@ -411,10 +454,12 @@ export default function Contacto() {
                   fontSize: 14,
                 }}
               >
-                <option value="Urgente (< 1 mes)">Inmediato / Urgente (&lt; 1 mes)</option>
-                <option value="1 a 2 meses">1 a 2 meses</option>
-                <option value="3 a 6 meses">3 a 6 meses</option>
-                <option value="Planificación anual">Planificación anual / Sin fecha fija</option>
+                <option value="Urgente (< 1 mes)">{isEn ? 'Immediate / Urgent (< 1 month)' : 'Inmediato / Urgente (< 1 mes)'}</option>
+                <option value="1 a 2 meses">{isEn ? '1 to 2 months' : '1 a 2 meses'}</option>
+                <option value="3 a 6 meses">{isEn ? '3 to 6 months' : '3 a 6 meses'}</option>
+                <option value="Planificación anual">
+                  {isEn ? 'Strategic planning / Open timeline' : 'Planificación anual / Sin fecha fija'}
+                </option>
               </select>
             </div>
 
@@ -424,13 +469,17 @@ export default function Contacto() {
                 htmlFor="contact-message"
                 style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--ink)' }}
               >
-                Descripción del Requerimiento / Alcance *
+                {isEn ? 'Scope Description / Core Requirements *' : 'Descripción del Requerimiento / Alcance *'}
               </label>
               <textarea
                 id="contact-message"
                 rows={5}
                 required
-                placeholder="Describe el estado de tus sistemas, fuentes de datos o el problema que buscas resolver..."
+                placeholder={
+                  isEn
+                    ? 'Outline your current system architecture, data sources, or specific technical challenge you are solving...'
+                    : 'Describe el estado de tus sistemas, fuentes de datos o el problema que buscas resolver...'
+                }
                 value={formMessage}
                 onChange={(e) => setFormMessage(e.target.value)}
                 style={{
@@ -490,9 +539,11 @@ export default function Contacto() {
               >
                 <div>
                   <strong style={{ color: 'var(--terracotta)', display: 'block', marginBottom: 4 }}>
-                    ⚠️ Límite de solicitudes de cotización alcanzado
+                    {isEn ? '⚠️ Request submission limit reached' : '⚠️ Límite de solicitudes de cotización alcanzado'}
                   </strong>
-                  Has enviado 3 solicitudes recientemente desde este correo electrónico. Para prevenir saturación y garantizar atención prioritaria, por favor comunícate directamente con nuestro equipo de ingeniería vía WhatsApp.
+                  {isEn
+                    ? 'You have sent multiple requests recently. To ensure priority attention without delay, please reach out directly to our engineering team on WhatsApp.'
+                    : 'Has enviado 3 solicitudes recientemente desde este correo electrónico. Para prevenir saturación y garantizar atención prioritaria, por favor comunícate directamente con nuestro equipo de ingeniería vía WhatsApp.'}
                 </div>
                 <div>
                   <a
@@ -513,7 +564,7 @@ export default function Contacto() {
                       fontFamily: "'IBM Plex Sans', sans-serif",
                     }}
                   >
-                    💬 Contactar por WhatsApp de Inmediato
+                    {isEn ? '💬 Message via WhatsApp Directly' : '💬 Contactar por WhatsApp de Inmediato'}
                   </a>
                 </div>
               </div>
@@ -545,10 +596,11 @@ export default function Contacto() {
                 }}
               >
                 <strong style={{ color: 'var(--green)', display: 'block', marginBottom: 4 }}>
-                  ✓ ¡Solicitud registrada exitosamente en Inmerge!
+                  {isEn ? '✓ Project scope successfully submitted to Inmerge!' : '✓ ¡Solicitud registrada exitosamente en Inmerge!'}
                 </strong>
-                Nuestro equipo técnico revisará los detalles y te responderá en menos de 24 horas laborables. También puedes adelantar la
-                coordinación escribiéndonos directamente al WhatsApp.
+                {isEn
+                  ? 'Our senior engineering partners will review your technical requirements and respond within 24 business hours. You may also expedite discussion by messaging our WhatsApp channel.'
+                  : 'Nuestro equipo técnico revisará los detalles y te responderá en menos de 24 horas laborables. También puedes adelantar la coordinación escribiéndonos directamente al WhatsApp.'}
               </div>
             )}
 
@@ -569,7 +621,13 @@ export default function Contacto() {
               }}
               className="btn-accent"
             >
-              {isSubmitting ? 'Guardando solicitud...' : 'Enviar Solicitud de Cotización (TDR)'}
+              {isSubmitting
+                ? isEn
+                  ? 'Submitting scope...'
+                  : 'Guardando solicitud...'
+                : isEn
+                  ? 'Submit Project Scope (TDR)'
+                  : 'Enviar Solicitud de Cotización (TDR)'}
             </button>
           </form>
         </div>

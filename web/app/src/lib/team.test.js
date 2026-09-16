@@ -168,7 +168,13 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
   });
 
   it('updateMilestoneStatus actualiza el estado y encargado del hito', async () => {
-    const mockUpdated = { id: 'm-1', title: 'Fase 1: Diagnóstico', project_id: 'proj-1', status: 'COMPLETADO', assigned_to_name: 'Ana Lead' };
+    const mockUpdated = {
+      id: 'm-1',
+      title: 'Fase 1: Diagnóstico',
+      project_id: 'proj-1',
+      status: 'COMPLETADO',
+      assigned_to_name: 'Ana Lead',
+    };
     const singleMock = vi.fn().mockResolvedValue({ data: mockUpdated, error: null });
     const selectMock = vi.fn().mockReturnValue({ single: singleMock });
     const eqMock = vi.fn().mockReturnValue({ select: selectMock });

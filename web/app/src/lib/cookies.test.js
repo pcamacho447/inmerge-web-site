@@ -40,7 +40,7 @@ describe('cookies.js - Módulo de consentimiento de cookies', () => {
       expect.objectContaining({
         type: EVENT_COOKIE_CONSENT_CHANGED,
         detail: result,
-      })
+      }),
     );
   });
 
@@ -80,7 +80,7 @@ describe('cookies.js - Módulo de consentimiento de cookies', () => {
       expect.objectContaining({
         type: EVENT_COOKIE_CONSENT_CHANGED,
         detail: null,
-      })
+      }),
     );
   });
 
@@ -91,7 +91,7 @@ describe('cookies.js - Módulo de consentimiento de cookies', () => {
     expect(dispatchSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         type: EVENT_OPEN_COOKIE_PREFERENCES,
-      })
+      }),
     );
   });
 });

@@ -18,13 +18,7 @@ export const DELIVERABLE_TYPE_BADGES = {
   DOCUMENTO: { label: 'DOCUMENTO', bg: 'rgba(0,0,0,0.05)', text: 'var(--muted)', border: 'var(--border)' },
 };
 
-export default function ClientProjectsView({
-  projects,
-  loading,
-  error,
-  downloadingId,
-  onDownloadDeliverable,
-}) {
+export default function ClientProjectsView({ projects, loading, error, downloadingId, onDownloadDeliverable }) {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
@@ -61,11 +55,10 @@ export default function ClientProjectsView({
           border: '1px dashed var(--border)',
         }}
       >
-        <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 22, margin: '0 0 12px' }}>
-          No tienes proyectos activos asignados
-        </h3>
+        <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 22, margin: '0 0 12px' }}>No tienes proyectos activos asignados</h3>
         <p style={{ color: 'var(--muted)', maxWidth: 500, margin: '0 auto 24px', fontSize: 14, lineHeight: 1.6 }}>
-          Si ya enviaste una solicitud de cotización o TDR, nuestro equipo técnico habilitará tu cronograma y entregables una vez validado el requerimiento.
+          Si ya enviaste una solicitud de cotización o TDR, nuestro equipo técnico habilitará tu cronograma y entregables una vez validado
+          el requerimiento.
         </p>
         <a
           href="/contacto"
@@ -342,7 +335,16 @@ export default function ClientProjectsView({
                   })}
                 </div>
               ) : (
-                <div style={{ padding: 16, background: '#fff', borderRadius: 6, border: '1px dashed var(--border)', color: 'var(--muted)', fontSize: 13 }}>
+                <div
+                  style={{
+                    padding: 16,
+                    background: '#fff',
+                    borderRadius: 6,
+                    border: '1px dashed var(--border)',
+                    color: 'var(--muted)',
+                    fontSize: 13,
+                  }}
+                >
                   Los entregables se publicarán a medida que se completen las fases técnicas del cronograma.
                 </div>
               )}

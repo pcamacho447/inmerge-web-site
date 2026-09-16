@@ -36,13 +36,7 @@ describe('PM Components - ProjectTaskManager & ProjectRiskManager', () => {
 
   describe('ProjectTaskManager', () => {
     it('renders phase tabs and registered tasks', () => {
-      render(
-        <ProjectTaskManager
-          projectId="p-1"
-          milestones={mockMilestones}
-          tasks={mockTasks}
-        />
-      );
+      render(<ProjectTaskManager projectId="p-1" milestones={mockMilestones} tasks={mockTasks} />);
 
       expect(screen.getByText(/Fase 1: Diagnóstico e Ingesta/i)).toBeInTheDocument();
       expect(screen.getByText('Validación de esquema SQL')).toBeInTheDocument();
@@ -51,14 +45,7 @@ describe('PM Components - ProjectTaskManager & ProjectRiskManager', () => {
 
     it('toggles new task form and submits', async () => {
       const onTaskCreated = vi.fn();
-      render(
-        <ProjectTaskManager
-          projectId="p-1"
-          milestones={mockMilestones}
-          tasks={mockTasks}
-          onTaskCreated={onTaskCreated}
-        />
-      );
+      render(<ProjectTaskManager projectId="p-1" milestones={mockMilestones} tasks={mockTasks} onTaskCreated={onTaskCreated} />);
 
       const addBtn = screen.getByRole('button', { name: /\+ Nueva Tarea Técnica/i });
       fireEvent.click(addBtn);
@@ -74,20 +61,13 @@ describe('PM Components - ProjectTaskManager & ProjectRiskManager', () => {
           title: 'Nueva Tarea de Test',
           project_id: 'p-1',
           milestone_id: 'm-1',
-        })
+        }),
       );
     });
 
     it('allows editing actual hours dedicated to a task', async () => {
       const onTaskUpdated = vi.fn();
-      render(
-        <ProjectTaskManager
-          projectId="p-1"
-          milestones={mockMilestones}
-          tasks={mockTasks}
-          onTaskUpdated={onTaskUpdated}
-        />
-      );
+      render(<ProjectTaskManager projectId="p-1" milestones={mockMilestones} tasks={mockTasks} onTaskUpdated={onTaskUpdated} />);
 
       const hoursInput = screen.getByLabelText(/Horas reales para Validación de esquema SQL/i);
       expect(hoursInput.value).toBe('2');
@@ -103,13 +83,7 @@ describe('PM Components - ProjectTaskManager & ProjectRiskManager', () => {
 
   describe('ProjectRiskManager', () => {
     it('renders risks and displays severity', () => {
-      render(
-        <ProjectRiskManager
-          projectId="p-1"
-          milestones={mockMilestones}
-          risks={mockRisks}
-        />
-      );
+      render(<ProjectRiskManager projectId="p-1" milestones={mockMilestones} risks={mockRisks} />);
 
       expect(screen.getByText('Matriz de Riesgos & Bloqueos Técnicos')).toBeInTheDocument();
       expect(screen.getByText('Falta acceso a GCP BigQuery')).toBeInTheDocument();

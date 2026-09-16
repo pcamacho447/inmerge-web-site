@@ -4,28 +4,34 @@ import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
-import { waLink, SERVICES, PILLARS } from '../data/content.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Servicios() {
   useReveal();
+  const { isEn, content } = useLanguage();
+
   useDocumentHead({
-    title: 'Servicios — Inmerge · Auditoría, Desarrollo & Datos',
-    description:
-      'Soluciones especializadas en Auditoría Técnica, Desarrollo de Software en la Nube (AWS) y Ciencia de Datos con Machine Learning.',
-    path: '/servicios',
+    title: isEn ? 'Services — Inmerge · Auditing, Cloud Development & Data Science' : 'Servicios — Inmerge · Auditoría, Desarrollo & Datos',
+    description: isEn
+      ? 'Specialized engineering solutions in Technical Auditing, Cloud Systems Architecture (AWS), and Applied Data Science with Machine Learning.'
+      : 'Soluciones especializadas en Auditoría Técnica, Desarrollo de Software en la Nube (AWS) y Ciencia de Datos con Machine Learning.',
+    path: isEn ? '/en/services' : '/servicios',
   });
 
   const [openIndex, setOpenIndex] = useState(0);
   const [selectedPillar, setSelectedPillar] = useState('all');
 
-  const filteredServices = selectedPillar === 'all' ? SERVICES : SERVICES.filter((s) => s.pillarId === selectedPillar);
+  const servicesList = content.SERVICES;
+  const pillarsList = content.PILLARS;
+
+  const filteredServices = selectedPillar === 'all' ? servicesList : servicesList.filter((s) => s.pillarId === selectedPillar);
 
   return (
     <>
       {/* Header */}
       <div style={{ padding: '100px clamp(20px,5vw,40px) 60px', maxWidth: 1240, margin: '0 auto' }}>
         <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 24 }}>
-          CATÁLOGO DE SERVICIOS
+          {isEn ? 'SERVICES CATALOG' : 'CATÁLOGO DE SERVICIOS'}
         </div>
         <h1
           style={{
@@ -38,11 +44,12 @@ export default function Servicios() {
             margin: '0 0 24px 0',
           }}
         >
-          Tres pilares, máxima exigencia técnica.
+          {isEn ? 'Three strategic pillars, zero technical compromise.' : 'Tres pilares, máxima exigencia técnica.'}
         </h1>
         <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 640, lineHeight: 1.7, margin: 0 }}>
-          Desde la auditoría de integridad de datos y sistemas, pasando por la arquitectura cloud a medida, hasta modelos predictivos de
-          Machine Learning listos para producción.
+          {isEn
+            ? 'From independent data and cloud systems audits, to bespoke AWS infrastructure and production-grade machine learning models.'
+            : 'Desde la auditoría de integridad de datos y sistemas, pasando por la arquitectura cloud a medida, hasta modelos predictivos de Machine Learning listos para producción.'}
         </p>
       </div>
 
@@ -76,10 +83,10 @@ export default function Servicios() {
               transition: 'all 0.2s ease',
             }}
           >
-            Todos los servicios ({SERVICES.length})
+            {isEn ? `All services (${servicesList.length})` : `Todos los servicios (${servicesList.length})`}
           </button>
 
-          {PILLARS.map((pillar) => {
+          {pillarsList.map((pillar) => {
             const isSelected = selectedPillar === pillar.id;
             return (
               <button
@@ -98,7 +105,7 @@ export default function Servicios() {
                   transition: 'all 0.2s ease',
                 }}
               >
-                Pilar {pillar.number}: {pillar.title}
+                {isEn ? `Pillar ${pillar.number}: ${pillar.title}` : `Pilar ${pillar.number}: ${pillar.title}`}
               </button>
             );
           })}
@@ -108,9 +115,10 @@ export default function Servicios() {
         <div>
           {filteredServices.map((s, i) => {
             const isOpen = openIndex === i;
-            const quoteWaUrl = waLink(
-              `Hola Inmerge, deseo cotizar el servicio "${s.name}" (${s.pillarName}). ¿Podemos coordinar una llamada?`,
-            );
+            const waQuoteText = isEn
+              ? `Hello Inmerge team, I would like to request a proposal for "${s.name}" (${s.pillarName}). Can we schedule a preliminary call?`
+              : `Hola Inmerge, deseo cotizar el servicio "${s.name}" (${s.pillarName}). ¿Podemos coordinar una llamada?`;
+            const quoteWaUrl = content.waLink(waQuoteText);
 
             return (
               <div key={s.number} data-reveal="" style={{ borderTop: '1px solid var(--border)' }}>
@@ -199,7 +207,7 @@ export default function Servicios() {
                           marginBottom: 8,
                         }}
                       >
-                        DIAGNÓSTICO / PROBLEMA
+                        {isEn ? 'DIAGNOSTIC / PROBLEM' : 'DIAGNÓSTICO / PROBLEMA'}
                       </div>
                       <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--ink)' }}>{s.problem}</div>
                     </div>
@@ -216,7 +224,7 @@ export default function Servicios() {
                           marginBottom: 8,
                         }}
                       >
-                        PROPUESTA DE VALOR
+                        {isEn ? 'VALUE PROPOSITION' : 'PROPUESTA DE VALOR'}
                       </div>
                       <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--tan-text)' }}>{s.value}</div>
                     </div>
@@ -246,7 +254,7 @@ export default function Servicios() {
                             marginBottom: 10,
                           }}
                         >
-                          ENTREGABLES TANGIBLES
+                          {isEn ? 'TANGIBLE DELIVERABLES' : 'ENTREGABLES TANGIBLES'}
                         </div>
                         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                           {s.deliverables.map((d) => (
@@ -268,7 +276,9 @@ export default function Servicios() {
 
                       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                         <Link
-                          to={`/contacto?servicio=${encodeURIComponent(s.name)}`}
+                          to={
+                            isEn ? `/en/contact?service=${encodeURIComponent(s.name)}` : `/contacto?servicio=${encodeURIComponent(s.name)}`
+                          }
                           style={{
                             background: 'var(--terracotta)',
                             color: '#F3EADA',
@@ -279,7 +289,7 @@ export default function Servicios() {
                           }}
                           className="btn-accent"
                         >
-                          Solicitar TDR
+                          {isEn ? 'Request Scope (TDR)' : 'Solicitar TDR'}
                         </Link>
                         <a
                           href={quoteWaUrl}
@@ -342,15 +352,16 @@ export default function Servicios() {
               lineHeight: 1.15,
             }}
           >
-            ¿Necesitas una combinación de servicios?
+            {isEn ? 'Need a tailored combination of services?' : '¿Necesitas una combinación de servicios?'}
           </h2>
           <p style={{ fontSize: 16, color: 'var(--tan-text)', marginBottom: 36, maxWidth: 600, margin: '0 auto 36px' }}>
-            Muchos proyectos inician con una Auditoría Técnica de 3 semanas y continúan con el Desarrollo Cloud o la Ciencia de Datos.
-            Estructuramos propuestas modulares adaptadas a tus metas.
+            {isEn
+              ? 'Many enterprise mandates start with a 3-week Technical Audit and transition directly into Cloud Architecture or Predictive AI. We engineer modular proposals aligned with your milestones.'
+              : 'Muchos proyectos inician con una Auditoría Técnica de 3 semanas y continúan con el Desarrollo Cloud o la Ciencia de Datos. Estructuramos propuestas modulares adaptadas a tus metas.'}
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
             <Link
-              to="/contacto"
+              to={isEn ? '/en/contact' : '/contacto'}
               style={{
                 background: 'var(--gold)',
                 color: 'var(--ink)',
@@ -362,10 +373,10 @@ export default function Servicios() {
               }}
               className="btn-hover"
             >
-              Completar Formulario de TDR
+              {isEn ? 'Complete Technical Scope Form' : 'Completar Formulario de TDR'}
             </Link>
             <Link
-              to="/nosotros#metodo"
+              to={isEn ? '/en/about#metodo' : '/nosotros#metodo'}
               style={{
                 background: 'transparent',
                 color: 'var(--bg)',
@@ -378,7 +389,7 @@ export default function Servicios() {
               }}
               className="btn-outline"
             >
-              Ver Metodología & Stack
+              {isEn ? 'View Methodology & Stack' : 'Ver Metodología & Stack'}
             </Link>
           </div>
         </div>

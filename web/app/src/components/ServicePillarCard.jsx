@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom';
-import { waLink } from '../data/content.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function ServicePillarCard({ pillar }) {
-  const whatsappUrl = waLink(
-    `Hola Inmerge, me interesa consultar sobre el pilar de ${pillar.title}. ¿Podemos agendar una reunión preliminar?`,
-  );
+  const { isEn, content } = useLanguage();
+
+  const waText = isEn
+    ? `Hello Inmerge team, I am interested in consulting regarding ${pillar.title}. Can we schedule a technical call?`
+    : `Hola Inmerge, me interesa consultar sobre el pilar de ${pillar.title}. ¿Podemos agendar una reunión preliminar?`;
+
+  const whatsappUrl = content.waLink(waText);
+  const targetServicesPath = isEn ? `/en/services#${pillar.id}` : `/servicios#${pillar.id}`;
 
   return (
     <div
@@ -42,7 +47,7 @@ export default function ServicePillarCard({ pillar }) {
               letterSpacing: 2,
             }}
           >
-            PILAR {pillar.number}
+            {isEn ? 'PILLAR' : 'PILAR'} {pillar.number}
           </span>
           <span
             style={{
@@ -107,7 +112,7 @@ export default function ServicePillarCard({ pillar }) {
         }}
       >
         <Link
-          to={`/servicios#${pillar.id}`}
+          to={targetServicesPath}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -122,7 +127,7 @@ export default function ServicePillarCard({ pillar }) {
           }}
           className="hover-underline-link"
         >
-          <span>Ver servicios detallados</span>
+          <span>{isEn ? 'View detailed services' : 'Ver servicios detallados'}</span>
           <span aria-hidden="true">→</span>
         </Link>
 
@@ -145,7 +150,7 @@ export default function ServicePillarCard({ pillar }) {
           }}
           className="btn-accent"
         >
-          <span>Consultar</span>
+          <span>{isEn ? 'Inquire' : 'Consultar'}</span>
         </a>
       </div>
     </div>

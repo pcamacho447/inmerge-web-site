@@ -120,7 +120,9 @@ export default function LeadsInboxTable({
           {filteredLeads.map((lead) => {
             const color = STATUS_COLORS[lead.status] || STATUS_COLORS.NUEVO;
             const matchedClient = clients.find((c) => c.email && c.email.toLowerCase() === lead.email?.toLowerCase());
-            const assignedStaff = staffList.find((s) => s.id === lead.assigned_to) || (lead.assigned_profile ? { ...lead.assigned_profile, id: lead.assigned_to } : null);
+            const assignedStaff =
+              staffList.find((s) => s.id === lead.assigned_to) ||
+              (lead.assigned_profile ? { ...lead.assigned_profile, id: lead.assigned_to } : null);
 
             const leadWaMsg = `Hola ${lead.full_name || 'estimado(a)'}, te saluda ${user?.fullName || 'el equipo técnico'} de Inmerge. Recibimos tu solicitud para "${PILLAR_LABELS[lead.pillar] || lead.pillar}"${lead.company ? ` en ${lead.company}` : ''}. ¿Podemos agendar una breve llamada técnica para revisar los requerimientos?`;
             const leadWaUrl = waLink(leadWaMsg);
@@ -274,7 +276,10 @@ export default function LeadsInboxTable({
                             border: '1px solid var(--border)',
                           }}
                         >
-                          👤 {assignedStaff ? `${assignedStaff.full_name || assignedStaff.email} (${assignedStaff.role ? assignedStaff.role.toUpperCase() : 'STAFF'})` : 'Sin asignar'}
+                          👤{' '}
+                          {assignedStaff
+                            ? `${assignedStaff.full_name || assignedStaff.email} (${assignedStaff.role ? assignedStaff.role.toUpperCase() : 'STAFF'})`
+                            : 'Sin asignar'}
                         </span>
                       )}
                     </div>
@@ -310,9 +315,7 @@ export default function LeadsInboxTable({
                   <div style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginBottom: 4 }}>
                     DESCRIPCIÓN DEL REQUERIMIENTO / TDR:
                   </div>
-                  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'var(--ink)', whiteSpace: 'pre-line' }}>
-                    {lead.message}
-                  </p>
+                  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'var(--ink)', whiteSpace: 'pre-line' }}>{lead.message}</p>
                 </div>
 
                 <div

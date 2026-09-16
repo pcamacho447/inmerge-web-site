@@ -110,7 +110,7 @@ export function setCookieConsent({ analytics = false, preferences = false }) {
     window.dispatchEvent(
       new CustomEvent(EVENT_COOKIE_CONSENT_CHANGED, {
         detail: consentData,
-      })
+      }),
     );
   } catch (err) {
     console.error('[cookies] Error al guardar consentimiento:', err);
@@ -153,7 +153,7 @@ export function resetCookieConsent() {
     window.dispatchEvent(
       new CustomEvent(EVENT_COOKIE_CONSENT_CHANGED, {
         detail: null,
-      })
+      }),
     );
   } catch (err) {
     console.warn('[cookies] Error al restablecer consentimiento:', err);

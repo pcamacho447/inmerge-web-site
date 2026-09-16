@@ -5,13 +5,7 @@ import { TASK_STATUS_CONFIG, HEALTH_STATUS_CONFIG } from '../lib/pm.js';
  * ProjectGantt - Diagrama de Cronograma Gantt Interactivo Nativo
  * Sistema de Diseño: Editorial Tech Premium (Inmerge)
  */
-export default function ProjectGantt({
-  project = {},
-  milestones = [],
-  tasks = [],
-  showTasks = true,
-  isExecutive = false,
-}) {
+export default function ProjectGantt({ project = {}, milestones = [], tasks = [], showTasks = true, isExecutive = false }) {
   const [zoomMode, setZoomMode] = useState('WEEK'); // 'WEEK' | 'MONTH'
   const [hoveredItem, setHoveredItem] = useState(null);
   const [expandedMilestones, setExpandedMilestones] = useState(() => {

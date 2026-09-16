@@ -25,7 +25,8 @@ export default function ClientSupportCard({ user, projectsCount }) {
       </div>
 
       <p style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.6, margin: 0 }}>
-        Tienes <strong>{projectsCount} proyecto(s)</strong> activos en curso. Ante cualquier requerimiento urgente, consulta sobre hitos técnicos o coordinación de entregables, puedes comunicarte directamente con nuestro equipo de ingeniería.
+        Tienes <strong>{projectsCount} proyecto(s)</strong> activos en curso. Ante cualquier requerimiento urgente, consulta sobre hitos
+        técnicos o coordinación de entregables, puedes comunicarte directamente con nuestro equipo de ingeniería.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
@@ -34,9 +35,7 @@ export default function ClientSupportCard({ user, projectsCount }) {
             CANAL DE MENSAJERÍA DIRECTA
           </div>
           <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>WhatsApp de Guardia Técnica</div>
-          <p style={{ fontSize: 12, color: 'var(--muted)', margin: '0 0 12px' }}>
-            Respuesta promedio menor a 30 minutos en días hábiles.
-          </p>
+          <p style={{ fontSize: 12, color: 'var(--muted)', margin: '0 0 12px' }}>Respuesta promedio menor a 30 minutos en días hábiles.</p>
           <a
             href={supportWaUrl}
             target="_blank"

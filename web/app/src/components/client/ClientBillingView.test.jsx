@@ -42,7 +42,7 @@ describe('ClientBillingView Component', () => {
         saving={false}
         onSaveOrganization={vi.fn()}
         user={{ email: 'cliente@empresa.pe' }}
-      />
+      />,
     );
 
     expect(screen.getByText(/Cuentas Bancarias Oficiales para Transferencias/i)).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe('ClientBillingView Component', () => {
         saving={false}
         onSaveOrganization={vi.fn()}
         user={{ email: 'cliente@empresa.pe' }}
-      />
+      />,
     );
 
     expect(screen.getByDisplayValue('Minera Los Andes S.A.C.')).toBeInTheDocument();
@@ -83,7 +83,7 @@ describe('ClientBillingView Component', () => {
         saving={false}
         onSaveOrganization={handleSave}
         user={{ email: 'gerencia@tech.pe' }}
-      />
+      />,
     );
 
     const rucInput = screen.getByPlaceholderText('20XXXXXXXXX');
@@ -104,7 +104,7 @@ describe('ClientBillingView Component', () => {
         legalName: 'Data Core SAC',
         taxId: '20601234567',
         billingEmail: 'finanzas@datacore.pe',
-      })
+      }),
     );
   });
 });

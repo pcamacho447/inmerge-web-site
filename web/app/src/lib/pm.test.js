@@ -133,13 +133,8 @@ describe('pm.js - Project Management Engine', () => {
           { status: 'IN_PROGRESS', estimated_hours: 15, actual_hours: 12 },
           { status: 'TODO', estimated_hours: 5, actual_hours: 0, due_date: '2020-01-01' }, // Overdue
         ],
-        milestones: [
-          { status: 'COMPLETED' },
-          { status: 'PENDING' },
-        ],
-        risks: [
-          { status: 'ABIERTO' },
-        ],
+        milestones: [{ status: 'COMPLETED' }, { status: 'PENDING' }],
+        risks: [{ status: 'ABIERTO' }],
       };
 
       const metrics = await fetchProjectAnalytics('proj-123', localData);

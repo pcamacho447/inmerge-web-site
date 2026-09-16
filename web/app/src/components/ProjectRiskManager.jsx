@@ -5,13 +5,7 @@ import { RISK_SEVERITY_CONFIG, RISK_STATUS_CONFIG, sanitizeRiskPayload } from '.
  * ProjectRiskManager - Gestión de Riesgos, Bloqueos e Impedimentos Técnicos
  * Para el Panel de Consultores & Tech Leads (/equipo)
  */
-export default function ProjectRiskManager({
-  projectId,
-  milestones = [],
-  risks = [],
-  onRiskCreated,
-  onRiskUpdated,
-}) {
+export default function ProjectRiskManager({ projectId, milestones = [], risks = [], onRiskCreated, onRiskUpdated }) {
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -125,15 +119,13 @@ export default function ProjectRiskManager({
             gap: 12,
           }}
         >
-          {errorMsg && (
-            <div style={{ color: 'var(--terracotta)', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace" }}>
-              {errorMsg}
-            </div>
-          )}
+          {errorMsg && <div style={{ color: 'var(--terracotta)', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace" }}>{errorMsg}</div>}
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Título del Bloqueo / Riesgo *
               </label>
               <input
@@ -154,7 +146,9 @@ export default function ProjectRiskManager({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Severidad
               </label>
               <select
@@ -178,7 +172,9 @@ export default function ProjectRiskManager({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Hito Afectado
               </label>
               <select
@@ -205,7 +201,9 @@ export default function ProjectRiskManager({
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Impacto Estimado
               </label>
               <input
@@ -225,7 +223,9 @@ export default function ProjectRiskManager({
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}>
+              <label
+                style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--ink)', marginBottom: 4 }}
+              >
                 Plan de Mitigación / Acción
               </label>
               <input
@@ -328,9 +328,7 @@ export default function ProjectRiskManager({
                   </div>
 
                   <strong style={{ fontSize: 14, color: 'var(--ink)' }}>{risk.title}</strong>
-                  {risk.description && (
-                    <p style={{ fontSize: 12, color: 'var(--muted)', margin: '4px 0' }}>{risk.description}</p>
-                  )}
+                  {risk.description && <p style={{ fontSize: 12, color: 'var(--muted)', margin: '4px 0' }}>{risk.description}</p>}
                   {risk.impact && (
                     <div style={{ fontSize: 12, color: 'var(--terracotta)', marginTop: 4 }}>
                       <strong>Impacto:</strong> {risk.impact}
