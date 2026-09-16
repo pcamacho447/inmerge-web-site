@@ -1,11 +1,17 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { PROJECTS_DATA } from '../data/projectsData';
 
 export default function ProjectCarousel({ onQuoteProject }) {
   const { lang } = useLanguage();
   const [selectedPillar, setSelectedPillar] = useState('all');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isAutoplay, setIsAutoplay] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   const carouselRef = useRef(null);
+  const cardRefs = useRef([]);
 
   const filteredProjects =
     selectedPillar === 'all'
@@ -21,13 +27,85 @@ export default function ProjectCarousel({ onQuoteProject }) {
     { id: 'datos', label: isEn ? 'Pillar 03: Data & AI' : 'Pilar 03: Datos & IA' },
   ];
 
-  const scroll = (direction) => {
+  // Reset activeIndex when filter changes
+  useEffect(() => {
+    setActiveIndex(0);
+    setProgress(0);
     if (carouselRef.current) {
-      const scrollAmount = carouselRef.current.clientWidth * 0.85;
-      carouselRef.current.scrollBy({
-        left: direction === 'next' ? scrollAmount : -scrollAmount,
-        behavior: 'smooth',
+      if (typeof carouselRef.current.scrollTo === 'function') {
+        carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        carouselRef.current.scrollLeft = 0;
+      }
+    }
+  }, [selectedPillar]);
+
+  // Scroll to specific card by index
+  const scrollToIndex = useCallback((index) => {
+    if (index < 0 || index >= filteredProjects.length) return;
+    setActiveIndex(index);
+    setProgress(0);
+
+    const targetCard = cardRefs.current[index];
+    if (targetCard && carouselRef.current) {
+      const container = carouselRef.current;
+      const cardLeft = targetCard.offsetLeft || 0;
+      const cardWidth = targetCard.offsetWidth || 0;
+      const containerWidth = container.offsetWidth || 0;
+      const targetScroll = cardLeft - (containerWidth / 2) + (cardWidth / 2);
+
+      if (typeof container.scrollTo === 'function') {
+        container.scrollTo({
+          left: Math.max(0, targetScroll),
+          behavior: 'smooth',
+        });
+      } else {
+        container.scrollLeft = Math.max(0, targetScroll);
+      }
+    }
+  }, [filteredProjects.length]);
+
+  const handlePrev = () => {
+    const nextIdx = activeIndex > 0 ? activeIndex - 1 : filteredProjects.length - 1;
+    scrollToIndex(nextIdx);
+  };
+
+  const handleNext = useCallback(() => {
+    const nextIdx = activeIndex < filteredProjects.length - 1 ? activeIndex + 1 : 0;
+    scrollToIndex(nextIdx);
+  }, [activeIndex, filteredProjects.length, scrollToIndex]);
+
+  // Autoplay timer with progressive bar
+  useEffect(() => {
+    if (!isAutoplay || isPaused || filteredProjects.length <= 1) {
+      return;
+    }
+
+    const intervalTime = 5000; // 5 seconds per slide
+    const stepTime = 100;
+    const progressStep = (stepTime / intervalTime) * 100;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          handleNext();
+          return 0;
+        }
+        return prev + progressStep;
       });
+    }, stepTime);
+
+    return () => clearInterval(timer);
+  }, [isAutoplay, isPaused, handleNext, filteredProjects.length]);
+
+  // Handle keyboard navigation on the carousel
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      handlePrev();
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      handleNext();
     }
   };
 
@@ -50,6 +128,10 @@ export default function ProjectCarousel({ onQuoteProject }) {
       role="region"
       aria-roledescription="carousel"
       aria-label={isEn ? 'Featured Case Studies' : 'Casos de Éxito y Proyectos Reales'}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onFocus={() => setIsPaused(true)}
+      onBlur={() => setIsPaused(false)}
     >
       <div className="carousel-header">
         <div className="carousel-titles">
@@ -68,25 +150,54 @@ export default function ProjectCarousel({ onQuoteProject }) {
           </p>
         </div>
 
-        <div className="carousel-controls" aria-label={isEn ? 'Carousel navigation' : 'Navegación del carrusel'}>
-          <button
-            type="button"
-            className="carousel-arrow-btn"
-            onClick={() => scroll('prev')}
-            aria-label={isEn ? 'Previous projects' : 'Ver proyectos anteriores'}
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            className="carousel-arrow-btn"
-            onClick={() => scroll('next')}
-            aria-label={isEn ? 'Next projects' : 'Ver proyectos siguientes'}
-          >
-            →
-          </button>
+        {/* Carousel Deck Navigation & Counters */}
+        <div className="carousel-top-controls">
+          <div className="carousel-deck-meta">
+            <span className="deck-counter" aria-live="polite">
+              {String(activeIndex + 1).padStart(2, '0')} / {String(filteredProjects.length).padStart(2, '0')}
+            </span>
+            <button
+              type="button"
+              className={`carousel-autoplay-toggle ${isAutoplay ? 'is-playing' : 'is-paused'}`}
+              onClick={() => setIsAutoplay(!isAutoplay)}
+              aria-label={
+                isAutoplay
+                  ? (isEn ? 'Pause automatic slide progression' : 'Pausar avance automático')
+                  : (isEn ? 'Play automatic slide progression' : 'Iniciar avance automático')
+              }
+              title={isAutoplay ? (isEn ? 'Pause Auto-slide' : 'Pausar Auto-slide') : (isEn ? 'Play Auto-slide' : 'Activar Auto-slide')}
+            >
+              {isAutoplay ? '⏸' : '▶'}
+            </button>
+          </div>
+
+          <div className="carousel-arrow-group" aria-label={isEn ? 'Carousel navigation' : 'Navegación del carrusel'}>
+            <button
+              type="button"
+              className="carousel-arrow-btn"
+              onClick={handlePrev}
+              aria-label={isEn ? 'Previous project card' : 'Ver proyecto anterior'}
+            >
+              ←
+            </button>
+            <button
+              type="button"
+              className="carousel-arrow-btn"
+              onClick={handleNext}
+              aria-label={isEn ? 'Next project card' : 'Ver proyecto siguiente'}
+            >
+              →
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Progress Bar for Current Slide */}
+      {isAutoplay && !isPaused && (
+        <div className="carousel-progress-wrapper" aria-hidden="true">
+          <div className="carousel-progress-bar" style={{ width: `${progress}%` }} />
+        </div>
+      )}
 
       {/* Filter Tabs */}
       <div className="carousel-filter-bar" role="tablist" aria-label={isEn ? 'Filter by pillar' : 'Filtrar por pilar'}>
@@ -104,12 +215,28 @@ export default function ProjectCarousel({ onQuoteProject }) {
         ))}
       </div>
 
-      {/* Snap Scroll Container */}
-      <div className="carousel-track" ref={carouselRef} tabIndex={0} aria-live="polite">
-        {filteredProjects.map((project) => {
+      {/* Interactive Snap Scroll Deck Container */}
+      <div
+        className="carousel-track"
+        ref={carouselRef}
+        tabIndex={0}
+        aria-live="polite"
+        onKeyDown={handleKeyDown}
+      >
+        {filteredProjects.map((project, idx) => {
           const badge = getPillarBadge(project.pillarId);
+          const isActive = idx === activeIndex;
+
           return (
-            <article key={project.id} className="carousel-card">
+            <article
+              key={project.id}
+              ref={(el) => (cardRefs.current[idx] = el)}
+              className={`carousel-card ${isActive ? 'is-active-card' : ''}`}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${isEn ? 'Slide' : 'Caso'} ${idx + 1} ${isEn ? 'of' : 'de'} ${filteredProjects.length}: ${isEn ? project.title.en : project.title.es}`}
+              onClick={() => scrollToIndex(idx)}
+            >
               <div className="card-top-meta">
                 <span className="card-pillar-tag" style={{ borderColor: badge.color, color: badge.color }}>
                   {badge.label}
@@ -141,8 +268,8 @@ export default function ProjectCarousel({ onQuoteProject }) {
 
               {/* Metrics Grid */}
               <div className="card-metrics-grid">
-                {project.metrics.map((m, idx) => (
-                  <div key={idx} className="metric-box">
+                {project.metrics.map((m, mIdx) => (
+                  <div key={mIdx} className="metric-box">
                     <span className="metric-number">{m.value}</span>
                     <span className="metric-text">{isEn ? m.label.en : m.label.es}</span>
                   </div>
@@ -151,8 +278,8 @@ export default function ProjectCarousel({ onQuoteProject }) {
 
               {/* Tech Stack Badges */}
               <div className="card-stack-row" aria-label={isEn ? 'Technologies used' : 'Tecnologías empleadas'}>
-                {project.stack.map((tech, idx) => (
-                  <span key={idx} className="stack-pill">
+                {project.stack.map((tech, sIdx) => (
+                  <span key={sIdx} className="stack-pill">
                     {tech}
                   </span>
                 ))}
@@ -163,7 +290,10 @@ export default function ProjectCarousel({ onQuoteProject }) {
                 <button
                   type="button"
                   className="btn-quote-similar"
-                  onClick={() => onQuoteProject && onQuoteProject(project)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onQuoteProject) onQuoteProject(project);
+                  }}
                 >
                   {isEn ? 'Estimate Similar Project →' : 'Cotizar Proyecto Similar →'}
                 </button>
@@ -171,6 +301,22 @@ export default function ProjectCarousel({ onQuoteProject }) {
             </article>
           );
         })}
+      </div>
+
+      {/* Slide Pagination Dots / Quick Selector */}
+      <div className="carousel-dots-pagination" role="group" aria-label={isEn ? 'Slide pagination' : 'Paginación de tarjetas'}>
+        {filteredProjects.map((project, idx) => (
+          <button
+            key={project.id}
+            type="button"
+            className={`carousel-dot-btn ${idx === activeIndex ? 'is-active-dot' : ''}`}
+            onClick={() => scrollToIndex(idx)}
+            aria-label={`${isEn ? 'Go to slide' : 'Ir a tarjeta'} ${idx + 1}: ${isEn ? project.title.en : project.title.es}`}
+            aria-current={idx === activeIndex ? 'true' : 'false'}
+          >
+            <span className="dot-inner" />
+          </button>
+        ))}
       </div>
     </section>
   );
