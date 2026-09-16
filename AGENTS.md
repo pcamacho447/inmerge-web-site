@@ -32,7 +32,9 @@ Consulte las especificaciones técnicas del entorno en:
   - Panel de Consultores & Equipo (`/equipo`): Se mantiene exclusivamente en español para la operación interna del equipo de ingeniería en Lima.
 - **Rutas de Autenticación & Clientes:**
   - `/login`, `/registro`, `/cuenta` (Portal de Clientes): Seguimiento exclusivo de proyectos propios, cronogramas e informes técnicos para usuarios `client` y `admin`. Los ingenieros y auditores (`engineer`, `auditor`) son redirigidos obligatoriamente a `/equipo`.
-  - `/equipo` (Panel de Colaboradores & Consultores): Panel interno de trabajo. Solo `admin` puede modificar estados de proyectos/hitos/leads, crear proyectos y designar ingenieros/auditores. Los roles `engineer` y `auditor` operan en modo lectura/imputación sin permisos de modificación estructural.
+  - `/equipo` (Panel de Colaboradores & Consultores): Panel interno de trabajo. Se mantiene exclusivamente en español para la operación interna del equipo de ingeniería en Lima. Solo `admin` puede modificar estados de proyectos/hitos/leads, crear proyectos y designar ingenieros/auditores. Los roles `engineer` y `auditor` operan en modo lectura/imputación sin permisos de modificación estructural.
+    - **Gestión In-Situ de Entregables:** La publicación y descarga forense de entregables técnicos (`project_deliverables`) se gestiona directamente dentro de cada tarjeta de proyecto (subpestaña `PM_DELIVERABLES`). Toda descarga debe emplear enlaces firmados temporales auditados (`getSignedDeliverableUrl`).
+    - **Navegación Accesible (WCAG 2.1 AA):** Los módulos principales del panel implementan el patrón estándar `role="tablist"` / `role="tab"` / `role="tabpanel"` con navegación fluida por teclado (`ArrowRight`, `ArrowLeft`, `Home`, `End`).
 - **Restricciones de Negocio & Pagos:**
   - No reintroducir catálogos de reportes fiscales ni descargas cerradas de PDFs.
   - **Medio de Pago Exclusivo:** Se aceptan única y exclusivamente **Transferencias Bancarias Directas** a cuentas institucionales de Inmerge (BCP, Interbank, BBVA en PEN). Toda orden se gestiona con código correlativo (`INM-ORD-...`) y validación de RUC (11 dígitos).
@@ -52,6 +54,7 @@ Consulte las especificaciones técnicas del entorno en:
   - `IBM Plex Sans`: Cuerpo de texto, interfaz de usuario y formularios.
   - `IBM Plex Mono`: Cifras tabulares, métricas, badges técnicos y código.
 - **Micro-interacciones:** Usar clases estándar (`.btn-accent`, `.btn-outline`, `.pillar-card-interactive`, `.card-hover`, `.stack-tool-card`).
+- **Política de Notificaciones (Prohibición de `window.alert`):** Queda terminantemente prohibido el uso de `window.alert()` o diálogos nativos bloqueantes. Toda notificación, alerta o feedback de operación debe canalizarse mediante `ToastNotification.jsx` usando `role="alert"` (errores/RBAC denegado) o `role="status"` (éxito y Supabase Realtime).
 
 ---
 

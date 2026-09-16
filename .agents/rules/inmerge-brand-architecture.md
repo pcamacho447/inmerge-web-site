@@ -26,6 +26,16 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
    - El landing page debe mantenerse ágil y directo al objetivo de conversión. No reintroducir sliders de citas duplicadas ni la cuadrícula de "Principios de Ingeniería" (`VALUES`), cuyos compromisos viven oficialmente en `/nosotros`.
 6. **Estándares de Formularios y Accesibilidad (Modern Web Guidance):**
    - Todo formulario de inicio de sesión (`Login.jsx`), registro (`Registro.jsx`) o contacto (`Contacto.jsx`) debe implementar titulares semánticos `<h1>` y atributos nativos de autocompletado para compatibilidad con gestores de contraseñas: `autoComplete="username"` y `autoComplete="current-password"` en login; `autoComplete="name"`, `autoComplete="username"` y `autoComplete="new-password"` en registro. Las etiquetas y placeholders deben consumirse desde diccionarios centralizados tipados (`AUTH_CONTENT`).
+7. **[`ToastNotification.jsx`](file:///c:/papx/inmerge-website/inmerge/web/app/src/components/ToastNotification.jsx) y Feedback No Invasivo:**
+   - Componente flotante editorial para notificaciones en vivo.
+   - Tipos soportados: `error` (`var(--terracotta)`, `role="alert"`, `aria-live="assertive"`), `success` (`#2E7559`, `role="status"`), `warning` (`var(--gold)`), `info` (`var(--ink)`), `lead` (`🔔`), `deliverable` (`📦`), `milestone` (`✨`), `project` (`📂`).
+   - Se prohíbe el uso de `window.alert()`, `window.confirm()` o diálogos bloqueantes nativos en cualquier vista de la plataforma.
+8. **Navegación por Pestañas Accesibles (WCAG 2.1 AA Tablist Pattern):**
+   - Todo contenedor de pestañas (`Equipo.jsx`, `StackTabs.jsx`, etc.) debe implementar la semántica ARIA: `<div role="tablist">`, botones con `role="tab"`, `aria-selected`, `aria-controls` y paneles asociados `<div role="tabpanel">`.
+   - Soporte obligatorio de control por teclado mediante `onKeyDown`: `ArrowRight` y `ArrowLeft` para conmutar tabs cíclicamente, `Home` para el primer tab y `End` para el último tab, enfocando el elemento correspondiente.
+9. **Rendimiento de Renderizado en Listas Extensas & Tablas:**
+   - En feeds de actividad o bitácoras (`TeamActivityFeed.jsx`), aplicar `content-visibility: auto` y `contain-intrinsic-size: 0 80px` en cada fila para optimizar el trabajo del hilo principal y la memoria del navegador.
+   - En tablas con filtrado en tiempo real (`LeadsInboxTable.jsx`), memoizar el procesamiento de datos con `useMemo`.
 
 ---
 
@@ -92,6 +102,9 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 - **`engineer` & `auditor`**: Acceso al panel `/equipo` para consulta técnica, visualización de tareas asignadas e imputación de horas de trabajo en tareas (`project_tasks`). Todos los selectores estructurales de proyectos, hitos y leads se presentan en modo bloqueado (`🔒`) de solo lectura. **Tienen terminantemente prohibido el acceso al portal de clientes (`/cuenta`)**, siendo redirigidos automáticamente a `/equipo` por `ProtectedRoute.jsx` y `Cuenta.jsx`.
 - **`client`**: Acceso exclusivo a `/cuenta` para dar seguimiento a sus proyectos, descargar entregables y gestionar pagos bancarios.
 - **Trazabilidad Inmutable**: Toda reasignación de personal técnico y cambio de estado se registra de forma inmutable en `team_activity_logs`.
+- **Entregables In-Situ & Descargas Firmadas:**
+  - La publicación de entregables técnicos vinculados a hitos se gestiona directamente en `ProjectsManagementView.jsx` bajo la subpestaña `PM_DELIVERABLES`.
+  - Toda descarga de entregables adjuntos debe realizarse mediante `getSignedDeliverableUrl(filePath, deliverableId)` (invocando la Edge Function `secure-download` con fallback seguro a Supabase Storage y registro inmutable en `team_activity_logs`).
 
 ---
 
