@@ -24,6 +24,8 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
    - El header público cuenta estrictamente con 4 enlaces principales (`Inicio`, `Servicios`, `Nosotros`, `Contacto`) y un botón de acción a la derecha (`Iniciar sesión`).
 5. **Concisión del Landing Page (`/`):**
    - El landing page debe mantenerse ágil y directo al objetivo de conversión. No reintroducir sliders de citas duplicadas ni la cuadrícula de "Principios de Ingeniería" (`VALUES`), cuyos compromisos viven oficialmente en `/nosotros`.
+6. **Estándares de Formularios y Accesibilidad (Modern Web Guidance):**
+   - Todo formulario de inicio de sesión (`Login.jsx`), registro (`Registro.jsx`) o contacto (`Contacto.jsx`) debe implementar titulares semánticos `<h1>` y atributos nativos de autocompletado para compatibilidad con gestores de contraseñas: `autoComplete="username"` y `autoComplete="current-password"` en login; `autoComplete="name"`, `autoComplete="username"` y `autoComplete="new-password"` en registro. Las etiquetas y placeholders deben consumirse desde diccionarios centralizados tipados (`AUTH_CONTENT`).
 
 ---
 
@@ -79,8 +81,9 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 - **Paridad de Migraciones:** Toda nueva migración `000X_*.sql` debe mantenerse idéntica tanto en `supabase/migrations/` (raíz) como en `web/app/supabase/migrations/`.
 
 ### 4.6 Facturación B2B y Pagos Exclusivos por Transferencia Bancaria
-- **Método de Pago Único:** Inmerge opera bajo modelo de consultoría B2B y acepta exclusivamente pagos mediante **Transferencia Bancaria Directa** (`transferencia_bancaria`) en Soles (PEN) a sus cuentas corrientes institucionales (BCP, Interbank, BBVA). No utilizar pasarelas de tarjeta ni débitos automáticos.
-- **Validación Estricta de RUC:** Toda solicitud de facturación B2B (`createBillingOrder`) exige un RUC peruano válido de exactamente 11 dígitos numéricos que inicie con `10`, `15`, `16`, `17` o `20`.
+- **Método de Pago Único & Gestión Dual:** Inmerge opera bajo modelo de consultoría B2B y acepta exclusivamente pagos mediante **Transferencia Bancaria Directa** (`transferencia_bancaria`) a cuentas corrientes institucionales. No utilizar pasarelas de tarjeta ni débitos automáticos.
+  - **Clientes Nacionales (Perú):** Operación en Soles (PEN) a cuentas BCP, Interbank y BBVA con validación estricta de RUC peruano (11 dígitos numéricos que inicien con `10`, `15`, `16`, `17` o `20`).
+  - **Clientes Internacionales:** Coordinación mediante transferencia institucional internacional (código SWIFT) o acuerdos de servicio corporativos (MSA) en USD/EUR, con soporte de Tax ID / VAT / EIN flexible en `/en/register` y `/en/account`.
 - **Validación de Montos:** Los importes a facturar deben ser números positivos estrictos (`amount > 0`).
 - **Suscripción Realtime en Facturación:** El hook `useOrganizationBilling` escucha eventos en tiempo real sobre `billing_orders` para reflejar instantáneamente aprobaciones o rechazos de órdenes de pago.
 
@@ -97,7 +100,7 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 - **Comandos de Verificación:**
   ```bash
   cd web/app
-  npm test          # Ejecuta suite completa (23 suites, 125+ tests)
+  npm test          # Ejecuta suite completa (29 suites, 154+ tests al 100%)
   npm run build     # Valida el bundle de producción en Vite
   npm run lint      # Verifica ausencia de warnings de ESLint
   npm run format    # Aplica formato consistente con Prettier

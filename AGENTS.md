@@ -23,12 +23,13 @@ Consulte las especificaciones técnicas del entorno en:
 - **Estructura del Header Público:**
   - 4 enlaces principales: `Inicio`, `Servicios`, `Nosotros`, `Contacto` más botón lateral `Iniciar sesión` (el acceso a WhatsApp se canaliza en los CTAs de pilares, servicios y contacto).
 - **Arquitectura Bilingüe & Rutas en Inglés:**
-  - Rutas públicas espejo: `/en` (Home), `/en/services` (Services), `/en/about` (About Us), `/en/contact` (Contact), `/en/cookies` (Cookie Policy).
+  - Rutas públicas espejo: `/en` (Home), `/en/services` (Services), `/en/about` (About Us), `/en/contact` (Contact), `/en/cookies` (Cookie Policy), `/en/login` (Sign In), `/en/register` (Create Account), `/en/account` (Client Portal).
   - Selector de idioma: Componente minimalista editorial tipo píldora `ES | EN` en el Header público (desktop y móvil) con accesibilidad WCAG 2.1 AA (`role="group"`, `aria-pressed`).
   - Enfoque *zero-bloat*: Gestión mediante React Context nativo (`LanguageContext.jsx`) con diccionarios tipados (`content.en.js`, `stack.en.js`). Prohibido introducir librerías pesadas de i18n como `react-i18next`.
   - Micro-interacciones & View Transitions: Envolver la conmutación de idioma en `document.startViewTransition` con fallback progresivo.
   - SEO Internacional: Inyección dinámica de etiquetas `<link rel="alternate" hreflang="es|en|x-default">`, `og:locale` (`es_PE` / `en_US`), `og:locale:alternate` y atributo `inLanguage` en Schema.org JSON-LD.
-  - Portales de Clientes y Equipo (`/login`, `/registro`, `/cuenta`, `/equipo`): Se mantienen exclusivamente en español por cumplimiento bancario peruano (BCP, Interbank, BBVA) y validaciones de RUC (11 dígitos).
+  - Autenticación y Portal de Clientes Bilingüe (`/login` <-> `/en/login`, `/registro` <-> `/en/register`, `/cuenta` <-> `/en/account`): Experiencia espejo bilingüe completa para clientes. Formularios accesibles con autocompletado nativo (`autoComplete="username"`, `current-password`, `new-password`), titulares semánticos `<h1>` y gestión fiscal dual (RUC 11 dígitos y transferencias en PEN para clientes peruanos; Tax ID flexible y transferencias internacionales SWIFT/MSA para clientes globales).
+  - Panel de Consultores & Equipo (`/equipo`): Se mantiene exclusivamente en español para la operación interna del equipo de ingeniería en Lima.
 - **Rutas de Autenticación & Clientes:**
   - `/login`, `/registro`, `/cuenta` (Portal de Clientes): Seguimiento exclusivo de proyectos propios, cronogramas e informes técnicos para usuarios `client` y `admin`. Los ingenieros y auditores (`engineer`, `auditor`) son redirigidos obligatoriamente a `/equipo`.
   - `/equipo` (Panel de Colaboradores & Consultores): Panel interno de trabajo. Solo `admin` puede modificar estados de proyectos/hitos/leads, crear proyectos y designar ingenieros/auditores. Los roles `engineer` y `auditor` operan en modo lectura/imputación sin permisos de modificación estructural.
@@ -55,6 +56,6 @@ Consulte las especificaciones técnicas del entorno en:
 ---
 
 ## 4. Estándares de Código y Calidad
-1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 24 suites de pruebas (132+ tests) deben pasar al 100%.
+1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 29 suites de pruebas (154+ tests) deben pasar al 100%.
 2. **Build de Producción:** Verificar que `npm run build` compile limpiamente sin errores de bundling.
 3. **Formato y Linter:** Mantener conformidad con `npm run lint` y `npm run format`.
