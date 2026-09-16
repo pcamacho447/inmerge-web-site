@@ -23,7 +23,7 @@ export default function NewProjectModal({
   handleAddMilestone,
   newDeliv,
   setNewDeliv,
-  delivFile,
+  _delivFile,
   setDelivFile,
   handleUploadDeliverable,
   uploading,

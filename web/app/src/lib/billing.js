@@ -199,12 +199,7 @@ export async function createBankTransferOrder({ userId, plan, amountPen, notes }
 
 export const MAX_VOUCHER_SIZE_BYTES = 10 * 1024 * 1024; // 10MB límite del bucket billing-vouchers
 
-export const ALLOWED_VOUCHER_MIME_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'application/pdf',
-];
+export const ALLOWED_VOUCHER_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 
 export const ALLOWED_VOUCHER_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
 

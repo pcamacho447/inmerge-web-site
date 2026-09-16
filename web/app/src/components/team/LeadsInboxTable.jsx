@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { waLink } from '../../data/content.js';
 
 export const PILLAR_LABELS = {
@@ -29,20 +29,22 @@ export default function LeadsInboxTable({
   const [filterStatus, setFilterStatus] = useState('TODOS');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredLeads = leads.filter((lead) => {
-    if (filterStatus !== 'TODOS' && lead.status !== filterStatus) {
-      return false;
-    }
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      (lead.full_name && lead.full_name.toLowerCase().includes(q)) ||
-      (lead.company && lead.company.toLowerCase().includes(q)) ||
-      (lead.email && lead.email.toLowerCase().includes(q)) ||
-      (lead.message && lead.message.toLowerCase().includes(q)) ||
-      (lead.pillar && lead.pillar.toLowerCase().includes(q))
-    );
-  });
+  const filteredLeads = useMemo(() => {
+    return leads.filter((lead) => {
+      if (filterStatus !== 'TODOS' && lead.status !== filterStatus) {
+        return false;
+      }
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        (lead.full_name && lead.full_name.toLowerCase().includes(q)) ||
+        (lead.company && lead.company.toLowerCase().includes(q)) ||
+        (lead.email && lead.email.toLowerCase().includes(q)) ||
+        (lead.message && lead.message.toLowerCase().includes(q)) ||
+        (lead.pillar && lead.pillar.toLowerCase().includes(q))
+      );
+    });
+  }, [leads, filterStatus, searchQuery]);
 
   return (
     <div>

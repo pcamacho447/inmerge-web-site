@@ -23,8 +23,14 @@ describe('Database & Migrations Parity Verification (Root vs web/app)', () => {
   });
 
   it('both directories contain the exact same list of migration files', () => {
-    const rootFiles = fs.readdirSync(rootMigrationsDir).filter((f) => f.endsWith('.sql')).sort();
-    const webAppFiles = fs.readdirSync(webAppMigrationsDir).filter((f) => f.endsWith('.sql')).sort();
+    const rootFiles = fs
+      .readdirSync(rootMigrationsDir)
+      .filter((f) => f.endsWith('.sql'))
+      .sort();
+    const webAppFiles = fs
+      .readdirSync(webAppMigrationsDir)
+      .filter((f) => f.endsWith('.sql'))
+      .sort();
 
     expect(rootFiles).toEqual(webAppFiles);
   });

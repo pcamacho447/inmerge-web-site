@@ -285,9 +285,7 @@ export default function Servicios() {
 
                     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                       <Link
-                        to={
-                          isEn ? `/en/contact?service=${encodeURIComponent(s.name)}` : `/contacto?servicio=${encodeURIComponent(s.name)}`
-                        }
+                        to={isEn ? `/en/contact?service=${encodeURIComponent(s.name)}` : `/contacto?servicio=${encodeURIComponent(s.name)}`}
                         style={{
                           background: 'var(--terracotta)',
                           color: '#F3EADA',

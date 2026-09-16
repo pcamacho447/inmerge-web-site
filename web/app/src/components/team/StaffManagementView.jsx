@@ -24,6 +24,7 @@ export default function StaffManagementView({ staffList, newStaff, setNewStaff, 
               value={newStaff.fullName}
               onChange={(e) => setNewStaff({ ...newStaff, fullName: e.target.value })}
               required
+              autoComplete="name"
               style={{
                 width: '100%',
                 padding: '8px 12px',
@@ -45,6 +46,8 @@ export default function StaffManagementView({ staffList, newStaff, setNewStaff, 
               value={newStaff.email}
               onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
               required
+              inputMode="email"
+              autoComplete="email"
               style={{
                 width: '100%',
                 padding: '8px 12px',
@@ -67,6 +70,7 @@ export default function StaffManagementView({ staffList, newStaff, setNewStaff, 
               onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })}
               required
               minLength={6}
+              autoComplete="new-password"
               style={{
                 width: '100%',
                 padding: '8px 12px',

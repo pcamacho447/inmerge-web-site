@@ -33,11 +33,13 @@ export default function ClientSupportCard({ user, projectsCount, isEn, content }
           supportDict.desc(projectsCount)
         ) : isEn ? (
           <>
-            You have <strong>{projectsCount} active project(s)</strong> in progress. For urgent technical matters or milestone reviews, contact our engineering lead directly.
+            You have <strong>{projectsCount} active project(s)</strong> in progress. For urgent technical matters or milestone reviews,
+            contact our engineering lead directly.
           </>
         ) : (
           <>
-            Tienes <strong>{projectsCount} proyecto(s)</strong> activos en curso. Ante cualquier requerimiento urgente, consulta sobre hitos técnicos o coordinación de entregables, puedes comunicarte directamente con nuestro equipo de ingeniería.
+            Tienes <strong>{projectsCount} proyecto(s)</strong> activos en curso. Ante cualquier requerimiento urgente, consulta sobre hitos
+            técnicos o coordinación de entregables, puedes comunicarte directamente con nuestro equipo de ingeniería.
           </>
         )}
       </p>
@@ -47,9 +49,7 @@ export default function ClientSupportCard({ user, projectsCount, isEn, content }
           <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)', marginBottom: 4 }}>
             {supportDict.badge || 'CANAL DE MENSAJERÍA DIRECTA'}
           </div>
-          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
-            {supportDict.whatsappTitle || 'WhatsApp de Guardia Técnica'}
-          </div>
+          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>{supportDict.whatsappTitle || 'WhatsApp de Guardia Técnica'}</div>
           <p style={{ fontSize: 12, color: 'var(--muted)', margin: '0 0 12px' }}>
             {supportDict.whatsappSla || 'Respuesta promedio menor a 30 minutos en días hábiles.'}
           </p>
@@ -79,9 +79,7 @@ export default function ClientSupportCard({ user, projectsCount, isEn, content }
           <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--terracotta)', marginBottom: 4 }}>
             {isEn ? 'OFFICIAL EMAIL' : 'CORREO INSTITUCIONAL'}
           </div>
-          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
-            {supportDict.emailTitle || 'Mesa de Ayuda de Ingeniería'}
-          </div>
+          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8 }}>{supportDict.emailTitle || 'Mesa de Ayuda de Ingeniería'}</div>
           <p style={{ fontSize: 12, color: 'var(--muted)', margin: '0 0 12px' }}>
             {supportDict.emailSla || 'Para envío de requerimientos formales, TDRs y documentación.'}
           </p>

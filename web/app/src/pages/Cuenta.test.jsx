@@ -52,9 +52,7 @@ describe('Cuenta Component', () => {
           pillar: 'desarrollo',
           status: 'EN_PROGRESO',
           description: 'Enterprise migration to AWS ECS and RDS with zero downtime.',
-          milestones: [
-            { id: 'm-1', title: 'Infraestructura Terraform', status: 'COMPLETADO', progress: 100 },
-          ],
+          milestones: [{ id: 'm-1', title: 'Infraestructura Terraform', status: 'COMPLETADO', progress: 100 }],
           deliverables: [
             {
               id: 'del-1',

@@ -129,14 +129,30 @@ export default function Equipo() {
   }
 
   // Escuchar suscripciones en tiempo real para el equipo
-  const { toast, dismissToast } = useRealtimeTeam({
+  const { toast: realtimeToast, dismissToast: dismissRealtimeToast } = useRealtimeTeam({
     onDataRefresh: () => loadData(false),
     enabled: !!user,
   });
 
+  const [localToast, setLocalToast] = useState(null);
+  const activeToast = localToast || realtimeToast;
+
+  const showToast = (toastObj) => {
+    setLocalToast(toastObj);
+  };
+
+  const dismissToast = () => {
+    setLocalToast(null);
+    dismissRealtimeToast?.();
+  };
+
   async function handleUpdateLead(leadId, updates) {
     if (!user?.isAdmin) {
-      alert('Permiso denegado: Solo los Administradores pueden modificar leads TDR o designar consultores.');
+      showToast({
+        type: 'error',
+        title: 'Permiso Denegado',
+        message: 'Solo los Administradores pueden modificar leads TDR o designar consultores.',
+      });
       return;
     }
     try {
@@ -159,7 +175,11 @@ export default function Equipo() {
         .then(setActivityLogs)
         .catch(() => {});
     } catch (err) {
-      alert(`Error al actualizar lead: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al actualizar lead',
+        message: err.message,
+      });
     }
   }
 
@@ -176,13 +196,21 @@ export default function Equipo() {
         .then(setActivityLogs)
         .catch(() => {});
     } catch (err) {
-      alert(`Error al actualizar estado del proyecto: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al actualizar estado del proyecto',
+        message: err.message,
+      });
     }
   }
 
   function handleConvertLeadToProject(lead) {
     if (!user?.isAdmin) {
-      alert('Solo los Administradores tienen permisos para convertir leads y dar de alta proyectos.');
+      showToast({
+        type: 'error',
+        title: 'Permiso Denegado',
+        message: 'Solo los Administradores tienen permisos para convertir leads y dar de alta proyectos.',
+      });
       return;
     }
 
@@ -208,7 +236,11 @@ export default function Equipo() {
 
   async function handleUpdateProjectStaff(projectId, staffUpdates) {
     if (!user?.isAdmin) {
-      alert('Permiso denegado: Solo administradores pueden modificar el equipo asignado del proyecto.');
+      showToast({
+        type: 'error',
+        title: 'Permiso Denegado',
+        message: 'Solo administradores pueden modificar el equipo asignado del proyecto.',
+      });
       return;
     }
     try {
@@ -216,14 +248,22 @@ export default function Equipo() {
       showTemporaryMsg('Equipo del proyecto actualizado con éxito.');
       await loadData(false);
     } catch (err) {
-      alert(`Error al actualizar equipo del proyecto: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al actualizar equipo del proyecto',
+        message: err.message,
+      });
     }
   }
 
   async function handleCreateProject(e) {
     e.preventDefault();
     if (!newProj.clientId || !newProj.title) {
-      alert('Por favor selecciona un cliente registrado e ingresa el título del proyecto.');
+      showToast({
+        type: 'error',
+        title: 'Datos Incompletos',
+        message: 'Por favor selecciona un cliente registrado e ingresa el título del proyecto.',
+      });
       return;
     }
 
@@ -242,7 +282,11 @@ export default function Equipo() {
       await loadData();
       setActiveTab('projects');
     } catch (err) {
-      alert(`Error al crear proyecto: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al crear proyecto',
+        message: err.message,
+      });
     }
   }
 
@@ -254,7 +298,11 @@ export default function Equipo() {
     const payload = overridePayload || newMilestone;
 
     if (!payload.projectId || !payload.title) {
-      alert('Selecciona un proyecto e ingresa el título del hito.');
+      showToast({
+        type: 'error',
+        title: 'Datos Incompletos',
+        message: 'Selecciona un proyecto e ingresa el título del hito.',
+      });
       return;
     }
 
@@ -283,7 +331,11 @@ export default function Equipo() {
       });
       await loadData();
     } catch (err) {
-      alert(`Error al agregar hito: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al agregar hito',
+        message: err.message,
+      });
     }
   }
 
@@ -293,55 +345,77 @@ export default function Equipo() {
       showTemporaryMsg('Hito actualizado correctamente.');
       await loadData();
     } catch (err) {
-      alert(`Error al actualizar hito: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al actualizar hito',
+        message: err.message,
+      });
     }
   }
 
-  async function handleUploadDeliverable(e) {
-    e.preventDefault();
-    if (!newDeliv.projectId || !newDeliv.title) {
-      alert('Selecciona el proyecto e ingresa el nombre del entregable.');
-      return;
+  async function handleUploadDeliverable(e, customPayload = null, customFile = null) {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+
+    const payload = customPayload || newDeliv;
+    const file = customFile || delivFile;
+
+    if (!payload.projectId || !payload.title) {
+      showToast({
+        type: 'error',
+        title: 'Datos Incompletos',
+        message: 'Selecciona el proyecto e ingresa el nombre del entregable.',
+      });
+      return false;
     }
 
     setUploading(true);
     try {
       let filePath = null;
-      if (delivFile) {
-        const safeName = `${newDeliv.projectId}/${Date.now()}_${delivFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-        filePath = await uploadDeliverableFile(delivFile, safeName);
+      if (file) {
+        const safeName = `${payload.projectId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        filePath = await uploadDeliverableFile(file, safeName);
       }
 
-      const targetProject = projects.find((p) => p.id === newDeliv.projectId);
+      const targetProject = projects.find((p) => p.id === payload.projectId);
 
       await createDeliverableRecord({
-        projectId: newDeliv.projectId,
-        milestoneId: newDeliv.milestoneId || null,
-        title: newDeliv.title,
-        fileType: newDeliv.fileType,
+        projectId: payload.projectId,
+        milestoneId: payload.milestoneId || null,
+        title: payload.title,
+        fileType: payload.fileType,
         filePath,
-        externalUrl: newDeliv.externalUrl || null,
-        version: newDeliv.version || 'v1.0',
-        notes: newDeliv.notes || '',
+        externalUrl: payload.externalUrl || null,
+        version: payload.version || 'v1.0',
+        notes: payload.notes || '',
         project: targetProject,
         clientEmail: targetProject?.client?.email,
         clientName: targetProject?.client?.full_name,
       });
 
       showTemporaryMsg('Entregable publicado, notificado al cliente y registrado en auditoría.');
-      setNewDeliv({
-        projectId: '',
-        milestoneId: '',
-        title: '',
-        fileType: 'PDF',
-        externalUrl: '',
-        version: 'v1.0',
-        notes: '',
-      });
-      setDelivFile(null);
-      await loadData();
+      if (!customPayload) {
+        setNewDeliv({
+          projectId: '',
+          milestoneId: '',
+          title: '',
+          fileType: 'PDF',
+          externalUrl: '',
+          version: 'v1.0',
+          notes: '',
+        });
+        setDelivFile(null);
+      }
+      await loadData(false);
+      return true;
     } catch (err) {
-      alert(`Error al publicar entregable: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al publicar entregable',
+        message: err.message,
+      });
+      return false;
     } finally {
       setUploading(false);
     }
@@ -350,7 +424,11 @@ export default function Equipo() {
   async function handleCreateStaff(e) {
     e.preventDefault();
     if (!newStaff.fullName || !newStaff.email || !newStaff.password) {
-      alert('Por favor completa todos los campos del formulario de colaborador.');
+      showToast({
+        type: 'error',
+        title: 'Campos Requeridos',
+        message: 'Por favor completa todos los campos del formulario de colaborador.',
+      });
       return;
     }
 
@@ -372,7 +450,11 @@ export default function Equipo() {
       });
       await loadData();
     } catch (err) {
-      alert(`Error al registrar colaborador: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al registrar colaborador',
+        message: err.message,
+      });
     } finally {
       setStaffSubmitting(false);
     }
@@ -380,6 +462,11 @@ export default function Equipo() {
 
   function showTemporaryMsg(msg) {
     setStatusMsg(msg);
+    showToast({
+      type: 'success',
+      title: 'Acción Confirmada',
+      message: msg,
+    });
     setTimeout(() => setStatusMsg(null), 4000);
   }
 
@@ -389,7 +476,11 @@ export default function Equipo() {
       showTemporaryMsg('Tarea técnica registrada con éxito.');
       await loadData(false);
     } catch (err) {
-      alert(`Error al registrar tarea: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al registrar tarea',
+        message: err.message,
+      });
     }
   }
 
@@ -399,7 +490,11 @@ export default function Equipo() {
       showTemporaryMsg('Tarea técnica actualizada.');
       await loadData(false);
     } catch (err) {
-      alert(`Error al actualizar tarea: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al actualizar tarea',
+        message: err.message,
+      });
     }
   }
 
@@ -409,7 +504,11 @@ export default function Equipo() {
       showTemporaryMsg('Tarea técnica eliminada.');
       await loadData(false);
     } catch (err) {
-      alert(`Error al eliminar tarea: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al eliminar tarea',
+        message: err.message,
+      });
     }
   }
 
@@ -419,7 +518,11 @@ export default function Equipo() {
       showTemporaryMsg('Bloqueo o riesgo técnico registrado.');
       await loadData(false);
     } catch (err) {
-      alert(`Error al registrar riesgo: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al registrar riesgo',
+        message: err.message,
+      });
     }
   }
 
@@ -429,7 +532,11 @@ export default function Equipo() {
       showTemporaryMsg('Estado de riesgo/bloqueo actualizado.');
       await loadData(false);
     } catch (err) {
-      alert(`Error al actualizar riesgo: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al actualizar riesgo',
+        message: err.message,
+      });
     }
   }
 
@@ -439,7 +546,11 @@ export default function Equipo() {
       showTemporaryMsg(`Salud del proyecto actualizada a: ${newHealth}`);
       await loadData(false);
     } catch (err) {
-      alert(`Error al actualizar salud del proyecto: ${err.message}`);
+      showToast({
+        type: 'error',
+        title: 'Error al actualizar salud del proyecto',
+        message: err.message,
+      });
     }
   }
 
@@ -457,6 +568,38 @@ export default function Equipo() {
     if (activityFilter === 'STAFF') return log.action.includes('STAFF');
     return true;
   });
+
+  const tabs = [
+    { id: 'leads', label: 'Bandeja de Leads & TDR', count: leads.length },
+    { id: 'projects', label: 'Proyectos & Auditorías', count: projects.length },
+    ...(user?.isAdmin ? [{ id: 'new_project', label: '+ Crear Proyecto / Entregable' }] : []),
+    { id: 'activity', label: 'Bitácora & Auditoría', count: activityLogs.length },
+    ...(user?.isAdmin ? [{ id: 'team', label: 'Gestión de Colaboradores', count: staffList.length }] : []),
+  ];
+
+  const handleTabKeyDown = (e, currentTabId) => {
+    const tabIds = tabs.map((t) => t.id);
+    const currentIndex = tabIds.indexOf(currentTabId);
+    if (currentIndex === -1) return;
+
+    let nextIndex = -1;
+    if (e.key === 'ArrowRight') {
+      nextIndex = (currentIndex + 1) % tabIds.length;
+    } else if (e.key === 'ArrowLeft') {
+      nextIndex = (currentIndex - 1 + tabIds.length) % tabIds.length;
+    } else if (e.key === 'Home') {
+      nextIndex = 0;
+    } else if (e.key === 'End') {
+      nextIndex = tabIds.length - 1;
+    }
+
+    if (nextIndex !== -1) {
+      e.preventDefault();
+      const nextTabId = tabIds[nextIndex];
+      setActiveTab(nextTabId);
+      document.getElementById(`tab-${nextTabId}`)?.focus();
+    }
+  };
 
   return (
     <>
@@ -596,8 +739,10 @@ export default function Equipo() {
           </div>
         )}
 
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs - Accessible WCAG Tablist */}
         <div
+          role="tablist"
+          aria-label="Secciones del panel de consultores"
           style={{
             display: 'flex',
             gap: 12,
@@ -606,159 +751,53 @@ export default function Equipo() {
             overflowX: 'auto',
           }}
         >
-          <button
-            type="button"
-            onClick={() => setActiveTab('leads')}
-            style={{
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'leads' ? '3px solid var(--terracotta)' : '3px solid transparent',
-              padding: '12px 20px',
-              fontSize: 15,
-              fontWeight: activeTab === 'leads' ? 700 : 500,
-              color: activeTab === 'leads' ? 'var(--terracotta)' : 'var(--muted)',
-              cursor: 'pointer',
-              fontFamily: "'IBM Plex Sans', sans-serif",
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            <span>Bandeja de Leads & TDR</span>
-            <span
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 11,
-                padding: '2px 6px',
-                borderRadius: 10,
-                background: activeTab === 'leads' ? 'var(--terracotta)' : 'var(--border)',
-                color: activeTab === 'leads' ? '#fff' : 'var(--ink)',
-              }}
-            >
-              {leads.length}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('projects')}
-            style={{
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'projects' ? '3px solid var(--terracotta)' : '3px solid transparent',
-              padding: '12px 20px',
-              fontSize: 15,
-              fontWeight: activeTab === 'projects' ? 700 : 500,
-              color: activeTab === 'projects' ? 'var(--terracotta)' : 'var(--muted)',
-              cursor: 'pointer',
-              fontFamily: "'IBM Plex Sans', sans-serif",
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            <span>Proyectos & Auditorías</span>
-            <span
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 11,
-                padding: '2px 6px',
-                borderRadius: 10,
-                background: activeTab === 'projects' ? 'var(--terracotta)' : 'var(--border)',
-                color: activeTab === 'projects' ? '#fff' : 'var(--ink)',
-              }}
-            >
-              {projects.length}
-            </span>
-          </button>
-
-          {user?.isAdmin && (
-            <button
-              type="button"
-              onClick={() => setActiveTab('new_project')}
-              style={{
-                background: 'none',
-                border: 'none',
-                borderBottom: activeTab === 'new_project' ? '3px solid var(--terracotta)' : '3px solid transparent',
-                padding: '12px 20px',
-                fontSize: 15,
-                fontWeight: activeTab === 'new_project' ? 700 : 500,
-                color: activeTab === 'new_project' ? 'var(--terracotta)' : 'var(--muted)',
-                cursor: 'pointer',
-                fontFamily: "'IBM Plex Sans', sans-serif",
-              }}
-            >
-              + Crear Proyecto / Entregable
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('activity')}
-            style={{
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'activity' ? '3px solid var(--terracotta)' : '3px solid transparent',
-              padding: '12px 20px',
-              fontSize: 15,
-              fontWeight: activeTab === 'activity' ? 700 : 500,
-              color: activeTab === 'activity' ? 'var(--terracotta)' : 'var(--muted)',
-              cursor: 'pointer',
-              fontFamily: "'IBM Plex Sans', sans-serif",
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            <span>Bitácora & Auditoría</span>
-            <span
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 11,
-                padding: '2px 6px',
-                borderRadius: 10,
-                background: activeTab === 'activity' ? 'var(--terracotta)' : 'var(--border)',
-                color: activeTab === 'activity' ? '#fff' : 'var(--ink)',
-              }}
-            >
-              {activityLogs.length}
-            </span>
-          </button>
-
-          {user?.isAdmin && (
-            <button
-              type="button"
-              onClick={() => setActiveTab('team')}
-              style={{
-                background: 'none',
-                border: 'none',
-                borderBottom: activeTab === 'team' ? '3px solid var(--terracotta)' : '3px solid transparent',
-                padding: '12px 20px',
-                fontSize: 15,
-                fontWeight: activeTab === 'team' ? 700 : 500,
-                color: activeTab === 'team' ? 'var(--terracotta)' : 'var(--muted)',
-                cursor: 'pointer',
-                fontFamily: "'IBM Plex Sans', sans-serif",
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-              }}
-            >
-              <span>Gestión de Colaboradores</span>
-              <span
+          {tabs.map((tab) => {
+            const isSelected = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                id={`tab-${tab.id}`}
+                role="tab"
+                aria-selected={isSelected}
+                aria-controls={`panel-${tab.id}`}
+                tabIndex={isSelected ? 0 : -1}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 11,
-                  padding: '2px 6px',
-                  borderRadius: 10,
-                  background: activeTab === 'team' ? 'var(--terracotta)' : 'var(--border)',
-                  color: activeTab === 'team' ? '#fff' : 'var(--ink)',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: isSelected ? '3px solid var(--terracotta)' : '3px solid transparent',
+                  padding: '12px 20px',
+                  fontSize: 15,
+                  fontWeight: isSelected ? 700 : 500,
+                  color: isSelected ? 'var(--terracotta)' : 'var(--muted)',
+                  cursor: 'pointer',
+                  fontFamily: "'IBM Plex Sans', sans-serif",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  whiteSpace: 'nowrap',
                 }}
               >
-                {staffList.length}
-              </span>
-            </button>
-          )}
+                <span>{tab.label}</span>
+                {tab.count !== undefined && (
+                  <span
+                    style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 11,
+                      padding: '2px 6px',
+                      borderRadius: 10,
+                      background: isSelected ? 'var(--terracotta)' : 'var(--border)',
+                      color: isSelected ? '#fff' : 'var(--ink)',
+                    }}
+                  >
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Content Tabs */}
@@ -767,7 +806,7 @@ export default function Equipo() {
             <p>Cargando información del equipo técnico...</p>
           </div>
         ) : (
-          <>
+          <div id={`panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`} tabIndex={0} style={{ outline: 'none' }}>
             {activeTab === 'leads' && (
               <LeadsInboxTable
                 leads={leads}
@@ -795,6 +834,9 @@ export default function Equipo() {
                 onTaskDeleted={handleTaskDeleted}
                 onRiskCreated={handleRiskCreated}
                 onRiskUpdated={handleRiskUpdated}
+                onUploadDeliverable={handleUploadDeliverable}
+                onOpenNewProject={() => setActiveTab('new_project')}
+                showToast={showToast}
               />
             )}
 
@@ -827,7 +869,7 @@ export default function Equipo() {
               />
             )}
 
-            {activeTab === 'team' && user?.role === 'admin' && (
+            {activeTab === 'team' && user?.isAdmin && (
               <StaffManagementView
                 staffList={staffList}
                 newStaff={newStaff}
@@ -836,11 +878,11 @@ export default function Equipo() {
                 staffSubmitting={staffSubmitting}
               />
             )}
-          </>
+          </div>
         )}
       </div>
 
-      <ToastNotification toast={toast} onDismiss={dismissToast} />
+      <ToastNotification toast={activeToast} onDismiss={dismissToast} />
       <Footer />
     </>
   );

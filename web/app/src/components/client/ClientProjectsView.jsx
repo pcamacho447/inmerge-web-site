@@ -18,15 +18,7 @@ export const DELIVERABLE_TYPE_BADGES = {
   DOCUMENTO: { label: 'DOCUMENTO', bg: 'rgba(0,0,0,0.05)', text: 'var(--muted)', border: 'var(--border)' },
 };
 
-export default function ClientProjectsView({
-  projects,
-  loading,
-  error,
-  downloadingId,
-  onDownloadDeliverable,
-  isEn,
-  content,
-}) {
+export default function ClientProjectsView({ projects, loading, error, downloadingId, onDownloadDeliverable, isEn, content }) {
   const pDict = content?.ACCOUNT_CONTENT?.projects || {};
   const pillarLabels = pDict.pillarLabels || PILLAR_LABELS;
 
@@ -233,9 +225,7 @@ export default function ClientProjectsView({
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
-                  Tech Lead
-                </div>
+                <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>Tech Lead</div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', marginTop: 4 }}>
                   {proj.tech_lead_name || 'Senior Inmerge'}
                 </div>

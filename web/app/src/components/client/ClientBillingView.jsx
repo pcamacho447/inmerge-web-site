@@ -2,16 +2,7 @@ import { useState, useEffect } from 'react';
 import { INMERGE_BANK_ACCOUNTS, ORDER_STATUS_CONFIG, uploadOrderVoucher } from '../../lib/billing.js';
 import { formatPEN } from '../../lib/formatPEN.js';
 
-export default function ClientBillingView({
-  organization,
-  orders,
-  _loading,
-  saving,
-  onSaveOrganization,
-  user,
-  isEn,
-  content,
-}) {
+export default function ClientBillingView({ organization, orders, _loading, saving, onSaveOrganization, user, isEn, content }) {
   const bDict = content?.ACCOUNT_CONTENT?.billing || {};
 
   const [form, setForm] = useState({
@@ -73,12 +64,15 @@ export default function ClientBillingView({
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <span style={{ fontSize: 20 }}>🏦</span>
           <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: 0, fontWeight: 700 }}>
-            {isEn ? bDict.officialAccountsTitle || 'Official Bank Accounts for Wire Transfers' : 'Cuentas Bancarias Oficiales para Transferencias'}
+            {isEn
+              ? bDict.officialAccountsTitle || 'Official Bank Accounts for Wire Transfers'
+              : 'Cuentas Bancarias Oficiales para Transferencias'}
           </h3>
         </div>
         <p style={{ fontSize: 13, color: 'var(--muted)', margin: '0 0 20px', lineHeight: 1.5 }}>
           {isEn
-            ? bDict.officialAccountsDesc || 'Inmerge processes domestic payments exclusively via direct bank transfer in PEN. For international corporate contracts, wire transfer (SWIFT) applies.'
+            ? bDict.officialAccountsDesc ||
+              'Inmerge processes domestic payments exclusively via direct bank transfer in PEN. For international corporate contracts, wire transfer (SWIFT) applies.'
             : 'Inmerge procesa pagos exclusivamente mediante Transferencia Bancaria Directa a nuestras cuentas corrientes empresariales en moneda nacional (PEN).'}
         </p>
 

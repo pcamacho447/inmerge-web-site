@@ -4,6 +4,7 @@ import ProjectTaskManager from '../ProjectTaskManager.jsx';
 import ProjectRiskManager from '../ProjectRiskManager.jsx';
 import { METHODOLOGY_PHASE_PRESETS } from './NewProjectModal.jsx';
 import { calculateProjectProgress, calculateProjectHours, HEALTH_STATUS_CONFIG } from '../../lib/pm.js';
+import { getSignedDeliverableUrl } from '../../lib/projects.js';
 
 export const PILLAR_LABELS = {
   auditoria: '01. Auditoría Técnica & Datos',
@@ -43,9 +44,13 @@ export default function ProjectsManagementView({
   onTaskDeleted,
   onRiskCreated,
   onRiskUpdated,
+  onUploadDeliverable,
+  onOpenNewProject,
+  showToast,
 }) {
   const [projectSubTabs, setProjectSubTabs] = useState({});
   const [addingMilestoneProjId, setAddingMilestoneProjId] = useState(null);
+  const [uploadingDeliverableProjId, setUploadingDeliverableProjId] = useState(null);
   const [editingStaffProjId, setEditingStaffProjId] = useState(null);
   const [staffFormData, setStaffFormData] = useState({
     techLeadName: '',
@@ -60,6 +65,17 @@ export default function ProjectsManagementView({
     assignedToName: '',
     assignedToEmail: '',
   });
+  const [inlineDeliverable, setInlineDeliverable] = useState({
+    milestoneId: '',
+    title: '',
+    fileType: 'PDF',
+    externalUrl: '',
+    version: 'v1.0',
+    notes: '',
+  });
+  const [inlineDelivFile, setInlineDelivFile] = useState(null);
+  const [isUploadingDeliv, setIsUploadingDeliv] = useState(false);
+  const [downloadingDelivId, setDownloadingDelivId] = useState(null);
 
   const setProjSubTab = (projId, tab) => {
     setProjectSubTabs((prev) => ({
@@ -70,8 +86,41 @@ export default function ProjectsManagementView({
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: 0 }}>Proyectos en Curso & Auditorías ({projects.length})</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: '0 0 4px', color: 'var(--ink)' }}>
+            Proyectos en Curso & Auditorías ({projects.length})
+          </h2>
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)' }}>
+            {isAdmin
+              ? 'Supervisión técnica, cronograma de hitos, asignación de consultores y entregables firmados.'
+              : 'Seguimiento operativo de cronogramas y tareas técnicas asignadas.'}
+          </p>
+        </div>
+
+        {isAdmin && onOpenNewProject && (
+          <button
+            type="button"
+            onClick={onOpenNewProject}
+            className="btn-hover"
+            style={{
+              background: 'var(--terracotta)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 20,
+              padding: '9px 18px',
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontFamily: "'IBM Plex Sans', sans-serif",
+            }}
+          >
+            <span>+ Registrar Nuevo Proyecto</span>
+          </button>
+        )}
       </div>
 
       {projects.length === 0 ? (
@@ -632,7 +681,24 @@ export default function ProjectsManagementView({
                       cursor: 'pointer',
                     }}
                   >
-                    📌 Hitos & Entregables
+                    📌 Fases & Hitos ({totalMilestones})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProjSubTab(proj.id, 'PM_DELIVERABLES')}
+                    style={{
+                      padding: '8px 14px',
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 12,
+                      fontWeight: currentSubTab === 'PM_DELIVERABLES' ? 700 : 500,
+                      background: currentSubTab === 'PM_DELIVERABLES' ? 'var(--bg)' : 'transparent',
+                      color: currentSubTab === 'PM_DELIVERABLES' ? 'var(--terracotta)' : 'var(--muted)',
+                      border: '1px solid var(--border)',
+                      borderBottom: currentSubTab === 'PM_DELIVERABLES' ? '1px solid var(--bg)' : '1px solid var(--border)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    📦 Entregables ({proj.deliverables?.length || 0})
                   </button>
                 </div>
 
@@ -1058,6 +1124,436 @@ export default function ProjectsManagementView({
                       </div>
                     ) : (
                       <div style={{ padding: 16, color: 'var(--muted)', fontSize: 13 }}>No hay hitos registrados en este proyecto.</div>
+                    )}
+                  </div>
+                )}
+
+                {/* Subtab PM_DELIVERABLES: Gestión in-situ de entregables y descargas firmadas */}
+                {currentSubTab === 'PM_DELIVERABLES' && (
+                  <div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: 16,
+                        flexWrap: 'wrap',
+                        gap: 10,
+                      }}
+                    >
+                      <div>
+                        <span style={{ fontSize: 13, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                          Documentos y Entregables del Proyecto ({proj.deliverables?.length || 0})
+                        </span>
+                        <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>
+                          Entregables confidenciales auditados y accesibles para el cliente mediante enlaces firmados.
+                        </div>
+                      </div>
+
+                      {isAdmin && onUploadDeliverable && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (uploadingDeliverableProjId === proj.id) {
+                              setUploadingDeliverableProjId(null);
+                            } else {
+                              setUploadingDeliverableProjId(proj.id);
+                              setInlineDeliverable({
+                                milestoneId: '',
+                                title: '',
+                                fileType: 'PDF',
+                                externalUrl: '',
+                                version: 'v1.0',
+                                notes: '',
+                              });
+                              setInlineDelivFile(null);
+                            }
+                          }}
+                          className="btn-accent"
+                          style={{
+                            background: uploadingDeliverableProjId === proj.id ? 'var(--muted)' : 'var(--terracotta)',
+                            color: '#fff',
+                            border: 'none',
+                            padding: '6px 14px',
+                            borderRadius: 16,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {uploadingDeliverableProjId === proj.id ? 'Cancelar' : '+ Subir Entregable Técnico'}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Formulario In-Situ para Subir Entregable (Admin Only) */}
+                    {isAdmin && uploadingDeliverableProjId === proj.id && (
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          if (!inlineDeliverable.title.trim()) {
+                            showToast?.({
+                              type: 'error',
+                              title: 'Campo Requerido',
+                              message: 'El título del entregable es obligatorio.',
+                            });
+                            return;
+                          }
+                          setIsUploadingDeliv(true);
+                          try {
+                            const success = await onUploadDeliverable(
+                              e,
+                              {
+                                projectId: proj.id,
+                                milestoneId: inlineDeliverable.milestoneId || null,
+                                title: inlineDeliverable.title,
+                                fileType: inlineDeliverable.fileType,
+                                externalUrl: inlineDeliverable.externalUrl || null,
+                                version: inlineDeliverable.version || 'v1.0',
+                                notes: inlineDeliverable.notes || '',
+                              },
+                              inlineDelivFile,
+                            );
+
+                            if (success !== false) {
+                              setUploadingDeliverableProjId(null);
+                              setInlineDeliverable({
+                                milestoneId: '',
+                                title: '',
+                                fileType: 'PDF',
+                                externalUrl: '',
+                                version: 'v1.0',
+                                notes: '',
+                              });
+                              setInlineDelivFile(null);
+                            }
+                          } finally {
+                            setIsUploadingDeliv(false);
+                          }
+                        }}
+                        style={{
+                          background: 'var(--cream2)',
+                          padding: '16px',
+                          borderRadius: 6,
+                          border: '1px solid var(--border)',
+                          marginBottom: 16,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 12,
+                        }}
+                      >
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                              Vincular a Hito / Fase
+                            </label>
+                            <select
+                              value={inlineDeliverable.milestoneId}
+                              onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, milestoneId: e.target.value })}
+                              style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: 4,
+                                border: '1px solid var(--border)',
+                                fontSize: 12,
+                                background: '#fff',
+                              }}
+                            >
+                              <option value="">-- Entrega General / Sin Hito --</option>
+                              {(proj.milestones || []).map((m) => (
+                                <option key={m.id} value={m.id}>
+                                  Fase {m.order_index}: {m.title}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                              Tipo de Entregable *
+                            </label>
+                            <select
+                              value={inlineDeliverable.fileType}
+                              onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, fileType: e.target.value })}
+                              style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: 4,
+                                border: '1px solid var(--border)',
+                                fontSize: 12,
+                                background: '#fff',
+                              }}
+                            >
+                              <option value="PDF">Informe Técnico (PDF)</option>
+                              <option value="ZIP">Paquete de Código / Artefactos (ZIP)</option>
+                              <option value="DOCX">Documento de Especificación (DOCX)</option>
+                              <option value="XLSX">Matriz de Datos / Auditoría (XLSX)</option>
+                              <option value="URL">Enlace a Repositorio / Dashboard (URL)</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                              Versión de Entrega *
+                            </label>
+                            <input
+                              type="text"
+                              value={inlineDeliverable.version}
+                              onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, version: e.target.value })}
+                              placeholder="e.g. v1.0, v1.2-rev"
+                              required
+                              style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: 4,
+                                border: '1px solid var(--border)',
+                                fontSize: 12,
+                                fontFamily: "'IBM Plex Mono', monospace",
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                            Título del Entregable *
+                          </label>
+                          <input
+                            type="text"
+                            value={inlineDeliverable.title}
+                            onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, title: e.target.value })}
+                            placeholder="e.g. Informe Forense de Rendimiento PostgreSQL & AWS ECS"
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '6px 10px',
+                              borderRadius: 4,
+                              border: '1px solid var(--border)',
+                              fontSize: 12,
+                              boxSizing: 'border-box',
+                            }}
+                          />
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                              Archivo Adjunto (Storage Privado)
+                            </label>
+                            <input
+                              type="file"
+                              onChange={(e) => setInlineDelivFile(e.target.files?.[0] || null)}
+                              accept=".pdf,.zip,.docx,.xlsx,.png,.jpg,.webp"
+                              style={{ width: '100%', fontSize: 12 }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                              O Enlace Externo (Figma, GitHub, S3, etc.)
+                            </label>
+                            <input
+                              type="url"
+                              value={inlineDeliverable.externalUrl}
+                              onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, externalUrl: e.target.value })}
+                              placeholder="https://..."
+                              style={{
+                                width: '100%',
+                                padding: '6px 10px',
+                                borderRadius: 4,
+                                border: '1px solid var(--border)',
+                                fontSize: 12,
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                            Notas Técnicas / Resumen de Cambios
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={inlineDeliverable.notes}
+                            onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, notes: e.target.value })}
+                            placeholder="Alcance cubierto en este entregable..."
+                            style={{
+                              width: '100%',
+                              padding: '6px 10px',
+                              borderRadius: 4,
+                              border: '1px solid var(--border)',
+                              fontSize: 12,
+                              boxSizing: 'border-box',
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <button
+                            type="submit"
+                            disabled={isUploadingDeliv}
+                            style={{
+                              background: 'var(--ink)',
+                              color: '#fff',
+                              border: 'none',
+                              padding: '8px 18px',
+                              borderRadius: 16,
+                              fontSize: 12,
+                              fontWeight: 600,
+                              cursor: isUploadingDeliv ? 'wait' : 'pointer',
+                              opacity: isUploadingDeliv ? 0.7 : 1,
+                            }}
+                          >
+                            {isUploadingDeliv ? 'Subiendo y notificando...' : 'Publicar Entregable'}
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
+                    {/* Deliverables List */}
+                    {proj.deliverables && proj.deliverables.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {proj.deliverables.map((deliv) => {
+                          const isDownloading = downloadingDelivId === deliv.id;
+                          return (
+                            <div
+                              key={deliv.id}
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                background: '#fff',
+                                padding: '12px 16px',
+                                borderRadius: 6,
+                                border: '1px solid var(--border)',
+                                fontSize: 13,
+                                flexWrap: 'wrap',
+                                gap: 10,
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                                <span
+                                  style={{
+                                    fontFamily: "'IBM Plex Mono', monospace",
+                                    fontSize: 10,
+                                    fontWeight: 700,
+                                    background: 'var(--cream2)',
+                                    color: 'var(--terracotta)',
+                                    padding: '4px 8px',
+                                    borderRadius: 4,
+                                    border: '1px solid var(--border)',
+                                    marginTop: 2,
+                                  }}
+                                >
+                                  {deliv.file_type || 'DOC'}
+                                </span>
+                                <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <strong style={{ color: 'var(--ink)' }}>{deliv.title}</strong>
+                                    <span
+                                      style={{
+                                        fontFamily: "'IBM Plex Mono', monospace",
+                                        fontSize: 11,
+                                        color: 'var(--muted)',
+                                        background: 'rgba(36, 26, 18, 0.05)',
+                                        padding: '1px 6px',
+                                        borderRadius: 3,
+                                      }}
+                                    >
+                                      {deliv.version || 'v1.0'}
+                                    </span>
+                                  </div>
+                                  {deliv.notes && <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3 }}>{deliv.notes}</div>}
+                                  <div
+                                    style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginTop: 4 }}
+                                  >
+                                    {deliv.created_at
+                                      ? new Date(deliv.created_at).toLocaleDateString('es-PE', {
+                                          year: 'numeric',
+                                          month: 'short',
+                                          day: 'numeric',
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                        })
+                                      : ''}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div>
+                                <button
+                                  type="button"
+                                  disabled={isDownloading}
+                                  onClick={async () => {
+                                    if (deliv.external_url) {
+                                      window.open(deliv.external_url, '_blank', 'noopener,noreferrer');
+                                      return;
+                                    }
+                                    if (!deliv.file_path) {
+                                      showToast?.({ type: 'warning', title: 'Archivo no disponible', message: 'No hay archivo adjunto.' });
+                                      return;
+                                    }
+                                    setDownloadingDelivId(deliv.id);
+                                    try {
+                                      const signedUrl = await getSignedDeliverableUrl(deliv.file_path, deliv.id);
+                                      if (signedUrl) {
+                                        window.open(signedUrl, '_blank', 'noopener,noreferrer');
+                                        showToast?.({
+                                          type: 'info',
+                                          title: 'Descarga Autorizada',
+                                          message: `Descarga segura de "${deliv.title}" (15 min).`,
+                                        });
+                                      } else {
+                                        showToast?.({
+                                          type: 'error',
+                                          title: 'Error de Descarga',
+                                          message: 'No se pudo generar la URL firmada.',
+                                        });
+                                      }
+                                    } catch (err) {
+                                      showToast?.({ type: 'error', title: 'Error', message: err.message });
+                                    } finally {
+                                      setDownloadingDelivId(null);
+                                    }
+                                  }}
+                                  className="btn-outline-hover"
+                                  style={{
+                                    background: 'none',
+                                    border: '1px solid var(--border)',
+                                    color: 'var(--ink)',
+                                    borderRadius: 16,
+                                    padding: '6px 14px',
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    cursor: isDownloading ? 'wait' : 'pointer',
+                                    fontFamily: "'IBM Plex Sans', sans-serif",
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                  }}
+                                >
+                                  <span>
+                                    {isDownloading ? 'Firmando URL...' : deliv.external_url ? '🔗 Abrir Enlace' : '⬇ Descargar Auditado'}
+                                  </span>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          padding: 20,
+                          textAlign: 'center',
+                          color: 'var(--muted)',
+                          background: 'var(--cream2)',
+                          borderRadius: 6,
+                          border: '1px dashed var(--border)',
+                          fontSize: 13,
+                        }}
+                      >
+                        No se han subido entregables para este proyecto aún.
+                      </div>
                     )}
                   </div>
                 )}

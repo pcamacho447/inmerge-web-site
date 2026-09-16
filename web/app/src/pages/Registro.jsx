@@ -77,7 +77,8 @@ export default function Registro() {
           >
             <span style={{ color: 'var(--terracotta)', fontWeight: 700, flexShrink: 0 }}>ℹ</span>
             <span>
-              <strong>International Client Portal:</strong> Sign up with your corporate or individual email. You can specify an international Tax ID (EIN, VAT, Reg No.) or Peruvian RUC for invoicing.
+              <strong>International Client Portal:</strong> Sign up with your corporate or individual email. You can specify an
+              international Tax ID (EIN, VAT, Reg No.) or Peruvian RUC for invoicing.
             </span>
           </div>
         )}

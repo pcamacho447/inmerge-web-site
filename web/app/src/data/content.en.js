@@ -211,7 +211,8 @@ export const AUTH_CONTENT = {
   signInLink: 'Sign in',
   invalidCredentialsError: 'Invalid email or password.',
   genericAuthError: 'Could not complete authentication. Please try again.',
-  complianceNote: 'Peruvian Banking Compliance: Domestic billing operates via direct bank transfers in PEN (BCP, Interbank, BBVA). For international corporate entities, institutional wire transfers (SWIFT) or MSA arrangements apply.',
+  complianceNote:
+    'Peruvian Banking Compliance: Domestic billing operates via direct bank transfers in PEN (BCP, Interbank, BBVA). For international corporate entities, institutional wire transfers (SWIFT) or MSA arrangements apply.',
 };
 
 export const ACCOUNT_CONTENT = {
@@ -229,7 +230,8 @@ export const ACCOUNT_CONTENT = {
     loading: 'Loading technical project data...',
     syncError: 'Error synchronizing projects:',
     noProjectsTitle: 'No active projects assigned yet',
-    noProjectsDesc: 'If you have already submitted a proposal request or TDR scope, our engineering team will activate your timeline and deliverables once validated.',
+    noProjectsDesc:
+      'If you have already submitted a proposal request or TDR scope, our engineering team will activate your timeline and deliverables once validated.',
     requestNewProjectBtn: 'Request New Project or Audit →',
     pillarLabels: {
       auditoria: '01. Technical & Data Auditing',
@@ -248,7 +250,8 @@ export const ACCOUNT_CONTENT = {
   support: {
     badge: 'DIRECT MESSAGING CHANNEL',
     title: 'Technical Support & Tech Lead Channels',
-    desc: (count) => `You have ${count} active project(s) in progress. For urgent requirements, milestone inquiries, or deliverable coordination, reach out directly to our engineering lead.`,
+    desc: (count) =>
+      `You have ${count} active project(s) in progress. For urgent requirements, milestone inquiries, or deliverable coordination, reach out directly to our engineering lead.`,
     whatsappTitle: 'Technical On-Duty WhatsApp',
     whatsappSla: 'Average response under 30 minutes during business hours.',
     whatsappBtn: '💬 Open Direct WhatsApp',
@@ -258,9 +261,11 @@ export const ACCOUNT_CONTENT = {
   },
   billing: {
     officialAccountsTitle: '1. Official Inmerge Bank Accounts (Direct Bank Transfers)',
-    officialAccountsDesc: 'Exclusive payment method: direct bank transfer to institutional accounts in PEN. Each order requires verification.',
+    officialAccountsDesc:
+      'Exclusive payment method: direct bank transfer to institutional accounts in PEN. Each order requires verification.',
     internationalNoticeTitle: 'INTERNATIONAL CORPORATE CLIENTS',
-    internationalNoticeDesc: 'For international organizations operating outside Peru, payments can be structured via institutional wire transfer (SWIFT) or corporate Master Service Agreements (MSA) in USD/EUR upon coordination.',
+    internationalNoticeDesc:
+      'For international organizations operating outside Peru, payments can be structured via institutional wire transfer (SWIFT) or corporate Master Service Agreements (MSA) in USD/EUR upon coordination.',
     legalEntityTitle: '2. Billing & Fiscal Information',
     legalNameLabel: 'Company / Organization Legal Name',
     taxIdLabel: 'Tax ID / EIN / VAT / RUC',
@@ -272,5 +277,3 @@ export const ACCOUNT_CONTENT = {
     noOrders: 'No orders or invoices registered for this account.',
   },
 };
-
-

@@ -104,7 +104,9 @@ export default function Login() {
           >
             <span style={{ color: 'var(--terracotta)', fontWeight: 700, flexShrink: 0 }}>ℹ</span>
             <span>
-              <strong>International Client Portal:</strong> Project tracking, architecture milestones, and deliverables are fully available in English. Domestic payments operate in PEN, while international corporate agreements use institutional wire transfer (SWIFT).
+              <strong>International Client Portal:</strong> Project tracking, architecture milestones, and deliverables are fully available
+              in English. Domestic payments operate in PEN, while international corporate agreements use institutional wire transfer
+              (SWIFT).
             </span>
           </div>
         )}

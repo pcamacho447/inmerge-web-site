@@ -208,7 +208,8 @@ export const AUTH_CONTENT = {
   signInLink: 'Inicia sesión',
   invalidCredentialsError: 'Tus credenciales son incorrectas.',
   genericAuthError: 'No se pudo completar la autenticación.',
-  complianceNote: 'Cumplimiento Normativo Peruano: Portal seguro con validación fiscal de SUNAT y conciliación de transferencias bancarias (BCP, Interbank, BBVA en PEN).',
+  complianceNote:
+    'Cumplimiento Normativo Peruano: Portal seguro con validación fiscal de SUNAT y conciliación de transferencias bancarias (BCP, Interbank, BBVA en PEN).',
 };
 
 export const ACCOUNT_CONTENT = {
@@ -226,7 +227,8 @@ export const ACCOUNT_CONTENT = {
     loading: 'Cargando información técnica de tus proyectos...',
     syncError: 'Error al sincronizar proyectos:',
     noProjectsTitle: 'No tienes proyectos activos asignados',
-    noProjectsDesc: 'Si ya enviaste una solicitud de cotización o TDR, nuestro equipo técnico habilitará tu cronograma y entregables una vez validado el requerimiento.',
+    noProjectsDesc:
+      'Si ya enviaste una solicitud de cotización o TDR, nuestro equipo técnico habilitará tu cronograma y entregables una vez validado el requerimiento.',
     requestNewProjectBtn: 'Solicitar Nueva Auditoría o Proyecto →',
     pillarLabels: {
       auditoria: '01. Auditoría Técnica & Datos',
@@ -245,7 +247,8 @@ export const ACCOUNT_CONTENT = {
   support: {
     badge: 'CANAL DE MENSAJERÍA DIRECTA',
     title: 'Canales de Soporte Técnico & Tech Lead',
-    desc: (count) => `Tienes ${count} proyecto(s) activos en curso. Ante cualquier requerimiento urgente, consulta sobre hitos técnicos o coordinación de entregables, puedes comunicarte directamente con nuestro equipo de ingeniería.`,
+    desc: (count) =>
+      `Tienes ${count} proyecto(s) activos en curso. Ante cualquier requerimiento urgente, consulta sobre hitos técnicos o coordinación de entregables, puedes comunicarte directamente con nuestro equipo de ingeniería.`,
     whatsappTitle: 'WhatsApp de Guardia Técnica',
     whatsappSla: 'Respuesta promedio menor a 30 minutos en días hábiles.',
     whatsappBtn: '💬 Abrir WhatsApp Directo',
@@ -255,9 +258,11 @@ export const ACCOUNT_CONTENT = {
   },
   billing: {
     officialAccountsTitle: '1. Cuentas Bancarias Oficiales (Transferencias Exclusivas)',
-    officialAccountsDesc: 'Medio de pago exclusivo: transferencia bancaria directa a cuentas institucionales en PEN. Cada orden requiere verificación.',
+    officialAccountsDesc:
+      'Medio de pago exclusivo: transferencia bancaria directa a cuentas institucionales en PEN. Cada orden requiere verificación.',
     internationalNoticeTitle: 'CLIENTES CORPORATIVOS INTERNACIONALES',
-    internationalNoticeDesc: 'Para entidades internacionales que operan fuera del Perú, los pagos se coordinan mediante transferencia institucional internacional (código SWIFT) o acuerdos de servicio (MSA) en USD/EUR previa coordinación.',
+    internationalNoticeDesc:
+      'Para entidades internacionales que operan fuera del Perú, los pagos se coordinan mediante transferencia institucional internacional (código SWIFT) o acuerdos de servicio (MSA) en USD/EUR previa coordinación.',
     legalEntityTitle: '2. Datos de Facturación & Razón Social',
     legalNameLabel: 'Razón Social / Organización',
     taxIdLabel: 'RUC (11 dígitos)',
@@ -269,4 +274,3 @@ export const ACCOUNT_CONTENT = {
     noOrders: 'No hay órdenes registradas para esta cuenta.',
   },
 };
-

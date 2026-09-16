@@ -174,8 +174,8 @@ export default function Cuenta() {
         </div>
 
         <div style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 28 }}>
-          {accountDict.activeSession || 'Sesión activa:'}{' '}
-          <strong style={{ color: 'var(--ink)' }}>{user.email}</strong> {user.fullName ? `(${user.fullName})` : ''}
+          {accountDict.activeSession || 'Sesión activa:'} <strong style={{ color: 'var(--ink)' }}>{user.email}</strong>{' '}
+          {user.fullName ? `(${user.fullName})` : ''}
         </div>
 
         {/* Navigation Tabs */}
@@ -299,9 +299,7 @@ export default function Cuenta() {
           />
         )}
 
-        {activeTab === 'support' && (
-          <ClientSupportCard user={user} projectsCount={projects.length} isEn={isEn} content={content} />
-        )}
+        {activeTab === 'support' && <ClientSupportCard user={user} projectsCount={projects.length} isEn={isEn} content={content} />}
       </div>
 
       <ToastNotification toast={activeToast} onDismiss={dismissActiveToast} />

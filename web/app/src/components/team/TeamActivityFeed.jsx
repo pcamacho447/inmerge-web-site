@@ -96,6 +96,8 @@ export default function TeamActivityFeed({ filteredActivityLogs, activityFilter,
                   alignItems: 'flex-start',
                   flexWrap: 'wrap',
                   gap: 12,
+                  contentVisibility: 'auto',
+                  containIntrinsicSize: '0 80px',
                 }}
               >
                 <div>

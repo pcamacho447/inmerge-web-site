@@ -198,9 +198,7 @@ describe('billing.js module', () => {
 
   it('uploadOrderVoucher rejects invalid files before attempting network upload', async () => {
     const invalidFile = { name: 'video.mp4', size: 500, type: 'video/mp4' };
-    await expect(uploadOrderVoucher({ orderId: 'ord-1', file: invalidFile, userId: 'usr-1' })).rejects.toThrow(
-      'Formato no admitido',
-    );
+    await expect(uploadOrderVoucher({ orderId: 'ord-1', file: invalidFile, userId: 'usr-1' })).rejects.toThrow('Formato no admitido');
     expect(supabase.storage.from).not.toHaveBeenCalled();
   });
 

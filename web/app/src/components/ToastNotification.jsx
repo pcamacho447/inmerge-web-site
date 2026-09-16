@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 /**
  * Componente ToastNotification con estética Editorial Tech Premium de Inmerge.
- * Permite mostrar notificaciones en vivo no invasivas ante eventos de Supabase Realtime.
+ * Permite mostrar notificaciones en vivo no invasivas ante eventos de Supabase Realtime y acciones de usuario.
  */
 export default function ToastNotification({ toast, onDismiss, duration = 5000 }) {
   useEffect(() => {
@@ -36,6 +36,21 @@ export default function ToastNotification({ toast, onDismiss, duration = 5000 })
       badge: 'PROYECTO',
       icon: '📂',
     },
+    error: {
+      accent: 'var(--terracotta)',
+      badge: 'DENEGADO / ERROR',
+      icon: '✕',
+    },
+    success: {
+      accent: '#2E7559',
+      badge: 'CONFIRMADO',
+      icon: '✓',
+    },
+    warning: {
+      accent: 'var(--gold)',
+      badge: 'AVISO TÉCNICO',
+      icon: '⚠️',
+    },
     info: {
       accent: 'var(--ink)',
       badge: 'EN VIVO',
@@ -44,11 +59,12 @@ export default function ToastNotification({ toast, onDismiss, duration = 5000 })
   };
 
   const currentType = typeConfig[toast.type] || typeConfig.info;
+  const isAlert = toast.type === 'error';
 
   return (
     <div
-      role="status"
-      aria-live="polite"
+      role={isAlert ? 'alert' : 'status'}
+      aria-live={isAlert ? 'assertive' : 'polite'}
       style={{
         position: 'fixed',
         bottom: 24,
