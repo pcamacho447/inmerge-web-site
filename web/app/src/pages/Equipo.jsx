@@ -129,7 +129,12 @@ export default function Equipo() {
   }
 
   // Escuchar suscripciones en tiempo real para el equipo
-  const { toast: realtimeToast, dismissToast: dismissRealtimeToast } = useRealtimeTeam({
+  const {
+    toast: realtimeToast,
+    dismissToast: dismissRealtimeToast,
+    connectionStatus: realtimeConnectionStatus,
+    isOnline: realtimeIsOnline,
+  } = useRealtimeTeam({
     onDataRefresh: () => loadData(false),
     enabled: !!user,
   });
@@ -643,12 +648,15 @@ export default function Equipo() {
                 {user?.role || 'STAFF'}
               </span>
               <span
+                role="status"
+                aria-live="polite"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 4,
                   fontSize: 10,
                   fontFamily: "'IBM Plex Mono', monospace",
+                  fontWeight: 600,
                   color: '#2E7559',
                   background: 'rgba(46, 117, 89, 0.1)',
                   padding: '2px 8px',
@@ -656,7 +664,14 @@ export default function Equipo() {
                   border: '1px solid rgba(46, 117, 89, 0.25)',
                 }}
               >
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#2E7559' }}></span>
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: '#2E7559',
+                  }}
+                />
                 REALTIME ACTIVO
               </span>
             </div>

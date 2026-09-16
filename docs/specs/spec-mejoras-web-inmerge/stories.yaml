@@ -1,0 +1,28 @@
+stories:
+  - id: "STORY-1"
+    title: "Crear dataset de proyectos y componente ProjectCarousel"
+    capability_ref: "CAP-1"
+    description: "Crear data/projectsData.js con 6 casos representativos (2 por pilar) y el componente web/app/src/components/ProjectCarousel.jsx con scroll-snap y controles accesibles."
+    spec_checkpoint: "El carrusel muestra proyectos por pilar con badges de stack, métricas de impacto y navegación fluida por teclado."
+    done_checkpoint: "Componente probado con Vitest, renderizado bilingüe y soporte de scroll táctil."
+
+  - id: "STORY-2"
+    title: "Crear componente QuickEstimator (Cotizador Ágil)"
+    capability_ref: "CAP-2"
+    description: "Implementar web/app/src/components/QuickEstimator.jsx que permite seleccionar pilar, nivel de complejidad y volumen para proyectar sprints (1-2 semanas) y rangos en PEN/USD."
+    spec_checkpoint: "Cálculo instantáneo interactivo de estimación sin recargas de página."
+    done_checkpoint: "Componente probado con Vitest y conector para pre-cargar datos en el asistente o contacto."
+
+  - id: "STORY-3"
+    title: "Crear componente LLMAssistantModal con Failover Híbrido"
+    capability_ref: "CAP-3"
+    description: "Implementar web/app/src/components/LLMAssistantModal.jsx con streaming simulado de alta velocidad, respuestas técnicas especializadas por pilar y botón directo de derivación a WhatsApp."
+    spec_checkpoint: "Modal accesible accesible vía botón flotante o botón contextual en cotizador/carrusel."
+    done_checkpoint: "Componente probado con Vitest con cierre accesible (Escape / backdrop click) y fallback a WhatsApp."
+
+  - id: "STORY-4"
+    title: "Integración en páginas clave, LanguageContext y verificación de calidad"
+    capability_ref: "CAP-4"
+    description: "Integrar ProjectCarousel y QuickEstimator en Inicio.jsx y Servicios.jsx, añadir traducciones completas en LanguageContext.jsx, verificar 100% de tests pasando y build de producción."
+    spec_checkpoint: "Páginas públicas Inicio y Servicios muestran las nuevas secciones con coherencia visual."
+    done_checkpoint: "npm test pasa al 100% (todas las suites) y npm run build compila limpiamente."

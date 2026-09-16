@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient.js';
 
 /**
@@ -8,6 +8,11 @@ import { supabase } from '../lib/supabaseClient.js';
 export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) {
   const [toast, setToast] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('CONNECTING');
+  const onDataRefreshRef = useRef(onDataRefresh);
+
+  useEffect(() => {
+    onDataRefreshRef.current = onDataRefresh;
+  }, [onDataRefresh]);
 
   useEffect(() => {
     if (!enabled || !supabase?.channel) return;
@@ -40,7 +45,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
               message: `El lead de ${name} cambió a estado "${lead.status || 'Actualizado'}".`,
             });
           }
-          onDataRefresh?.();
+          onDataRefreshRef.current?.();
         },
       )
       .on(
@@ -59,7 +64,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
               message: `Se registró el proyecto "${proj.title || 'Proyecto Inmerge'}".`,
             });
           }
-          onDataRefresh?.();
+          onDataRefreshRef.current?.();
         },
       )
       .on(
@@ -79,7 +84,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
               message: `Nuevo entregable publicado: "${title}".`,
             });
           }
-          onDataRefresh?.();
+          onDataRefreshRef.current?.();
         },
       )
       .on(
@@ -98,7 +103,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
               message: `Un cliente descargó un entregable confidencial (Trazabilidad registrada).`,
             });
           }
-          onDataRefresh?.();
+          onDataRefreshRef.current?.();
         },
       )
       .subscribe((status, err) => {
@@ -115,7 +120,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
         supabase.removeChannel(channel);
       }
     };
-  }, [enabled, onDataRefresh]);
+  }, [enabled]);
 
   return {
     toast,

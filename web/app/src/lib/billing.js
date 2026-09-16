@@ -100,10 +100,21 @@ export async function updateOrganizationBilling(userId, orgData) {
     throw new Error('Razón Social y Correo de Facturación son obligatorios.');
   }
 
-  // Validación estricta de formato de RUC peruano (11 dígitos numéricos)
+  // Validación fiscal dual:
+  // - RUC peruano: exactamente 11 dígitos numéricos
+  // - DNI peruano: exactamente 8 dígitos numéricos
+  // - Tax ID / EIN / VAT internacional: 4 a 20 caracteres alfanuméricos o guiones
   if (payload.billing_type === 'ruc') {
     if (!payload.tax_id || !/^[0-9]{11}$/.test(payload.tax_id)) {
       throw new Error('El RUC debe contener exactamente 11 dígitos numéricos.');
+    }
+  } else if (payload.billing_type === 'dni') {
+    if (!payload.tax_id || !/^[0-9]{8}$/.test(payload.tax_id)) {
+      throw new Error('El DNI debe contener exactamente 8 dígitos numéricos.');
+    }
+  } else if (payload.billing_type === 'tax_id') {
+    if (!payload.tax_id || !/^[A-Za-z0-9-]{4,20}$/.test(payload.tax_id)) {
+      throw new Error('El Tax ID / EIN / VAT internacional debe contener entre 4 y 20 caracteres alfanuméricos.');
     }
   }
 

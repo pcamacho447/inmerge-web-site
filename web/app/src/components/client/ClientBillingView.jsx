@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { INMERGE_BANK_ACCOUNTS, ORDER_STATUS_CONFIG, uploadOrderVoucher } from '../../lib/billing.js';
 import { formatPEN } from '../../lib/formatPEN.js';
 
-export default function ClientBillingView({ organization, orders, _loading, saving, onSaveOrganization, user, isEn, content }) {
+export default function ClientBillingView({ organization, orders, loading, saving, onSaveOrganization, user, isEn, content }) {
   const bDict = content?.ACCOUNT_CONTENT?.billing || {};
 
   const [form, setForm] = useState({
@@ -49,6 +49,87 @@ export default function ClientBillingView({ organization, orders, _loading, savi
         });
     }
   };
+
+  if (loading) {
+    return (
+      <div
+        data-testid="client-billing-skeleton"
+        role="status"
+        aria-busy="true"
+        aria-label={isEn ? 'Loading billing information...' : 'Cargando información fiscal...'}
+        style={{ display: 'flex', flexDirection: 'column', gap: 36 }}
+      >
+        {/* Skeleton Cuentas Bancarias */}
+        <div
+          style={{
+            background: 'var(--cream2)',
+            borderRadius: 8,
+            padding: '24px clamp(16px, 4vw, 28px)',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <div className="skeleton-box" style={{ width: '45%', height: 24, marginBottom: 12 }} />
+          <div className="skeleton-box" style={{ width: '70%', height: 14, marginBottom: 24 }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                style={{
+                  background: '#fff',
+                  padding: '16px',
+                  borderRadius: 6,
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <div className="skeleton-box" style={{ width: '60%', height: 16, marginBottom: 12 }} />
+                <div className="skeleton-box" style={{ width: '80%', height: 12, marginBottom: 8 }} />
+                <div className="skeleton-box" style={{ width: '90%', height: 12 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Skeleton Formulario de Facturación */}
+        <div
+          style={{
+            background: '#fff',
+            borderRadius: 8,
+            padding: '24px clamp(16px, 4vw, 28px)',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <div className="skeleton-box" style={{ width: '40%', height: 22, marginBottom: 12 }} />
+          <div className="skeleton-box" style={{ width: '60%', height: 14, marginBottom: 24 }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 16 }}>
+            <div className="skeleton-box" style={{ height: 42 }} />
+            <div className="skeleton-box" style={{ height: 42 }} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, marginBottom: 16 }}>
+            <div className="skeleton-box" style={{ height: 42 }} />
+            <div className="skeleton-box" style={{ height: 42 }} />
+          </div>
+          <div className="skeleton-box" style={{ height: 40, width: 180 }} />
+        </div>
+
+        {/* Skeleton Historial de Órdenes */}
+        <div
+          style={{
+            background: '#fff',
+            borderRadius: 8,
+            padding: '24px clamp(16px, 4vw, 28px)',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <div className="skeleton-box" style={{ width: '35%', height: 22, marginBottom: 16 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[1, 2].map((i) => (
+              <div key={i} className="skeleton-box" style={{ width: '100%', height: 60 }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
@@ -222,8 +303,11 @@ export default function ClientBillingView({ organization, orders, _loading, savi
                   fontFamily: "'IBM Plex Sans', sans-serif",
                 }}
               >
-                <option value="ruc">{isEn ? 'Tax Invoice (with RUC / Tax ID)' : 'Factura Electrónica (con RUC)'}</option>
-                <option value="dni">{isEn ? 'Personal Receipt (with DNI / ID)' : 'Boleta de Venta (con DNI)'}</option>
+                <option value="ruc">{isEn ? 'Tax Invoice (with RUC / 11 digits)' : 'Factura Electrónica (con RUC)'}</option>
+                <option value="dni">{isEn ? 'Personal Receipt (with DNI / 8 digits)' : 'Boleta de Venta (con DNI)'}</option>
+                <option value="tax_id">
+                  {isEn ? 'Corporate Invoice (Tax ID / EIN / VAT)' : 'Factura Corporativa Internacional (Tax ID / EIN / VAT)'}
+                </option>
               </select>
             </div>
 
@@ -231,24 +315,42 @@ export default function ClientBillingView({ organization, orders, _loading, savi
               <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 6 }}>
                 {form.billingType === 'ruc'
                   ? isEn
-                    ? 'RUC / Tax ID (11 digits) *'
+                    ? 'RUC (11 digits) *'
                     : 'RUC (11 dígitos) *'
-                  : isEn
-                    ? 'DNI / Personal ID *'
-                    : 'DNI / Documento *'}
+                  : form.billingType === 'tax_id'
+                    ? isEn
+                      ? 'Tax ID / EIN / VAT *'
+                      : 'Tax ID / EIN / VAT (Internacional) *'
+                    : isEn
+                      ? 'DNI / Personal ID (8 digits) *'
+                      : 'DNI / Documento (8 dígitos) *'}
               </label>
               <input
                 type="text"
-                inputMode="numeric"
-                maxLength={form.billingType === 'ruc' ? 11 : 12}
+                inputMode={form.billingType === 'tax_id' ? 'text' : 'numeric'}
+                maxLength={form.billingType === 'ruc' ? 11 : form.billingType === 'dni' ? 8 : 20}
                 value={form.taxId}
                 onChange={(e) => {
                   setIsDirty(true);
-                  const maxLen = form.billingType === 'ruc' ? 11 : 12;
-                  const sanitized = e.target.value.replace(/\D/g, '').slice(0, maxLen);
+                  let sanitized = '';
+                  if (form.billingType === 'ruc') {
+                    sanitized = e.target.value.replace(/\D/g, '').slice(0, 11);
+                  } else if (form.billingType === 'dni') {
+                    sanitized = e.target.value.replace(/\D/g, '').slice(0, 8);
+                  } else {
+                    sanitized = e.target.value.replace(/[^A-Za-z0-9-]/g, '').slice(0, 20);
+                  }
                   setForm({ ...form, taxId: sanitized });
                 }}
-                placeholder={form.billingType === 'ruc' ? '20XXXXXXXXX' : isEn ? 'Personal ID' : 'XXXXXXXX'}
+                placeholder={
+                  form.billingType === 'ruc'
+                    ? '20XXXXXXXXX'
+                    : form.billingType === 'tax_id'
+                      ? isEn
+                        ? 'e.g. US-123456789 or GB999999973'
+                        : 'p. ej. US-123456789 o DE123456789'
+                      : 'XXXXXXXX'
+                }
                 style={{
                   width: '100%',
                   padding: '8px 12px',

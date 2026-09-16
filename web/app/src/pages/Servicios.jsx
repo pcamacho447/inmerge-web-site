@@ -4,11 +4,21 @@ import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
+import ProjectCarousel from '../components/ProjectCarousel.jsx';
+import QuickEstimator from '../components/QuickEstimator.jsx';
+import LLMAssistantModal from '../components/LLMAssistantModal.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Servicios() {
   useReveal();
   const { isEn, content } = useLanguage();
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [assistantContext, setAssistantContext] = useState(null);
+
+  const handleOpenAssistant = (ctx = null) => {
+    setAssistantContext(ctx);
+    setIsAssistantOpen(true);
+  };
 
   useDocumentHead({
     title: isEn ? 'Services — Inmerge · Auditing, Cloud Development & Data Science' : 'Servicios — Inmerge · Auditoría, Desarrollo & Datos',
@@ -327,6 +337,15 @@ export default function Servicios() {
           })}
           <div style={{ borderTop: '1px solid var(--border)' }} />
         </div>
+
+        {/* Quick Estimator Section */}
+        <QuickEstimator
+          initialPillar={selectedPillar !== 'all' ? selectedPillar : 'auditoria'}
+          onOpenLLMAssistant={(ctx) => handleOpenAssistant(ctx)}
+        />
+
+        {/* Real Projects Carousel */}
+        <ProjectCarousel onQuoteProject={(proj) => handleOpenAssistant(proj)} />
       </div>
 
       {/* Bottom CTA Banner */}
@@ -404,6 +423,24 @@ export default function Servicios() {
           </div>
         </div>
       </div>
+
+      {/* Floating AI Assistant Trigger Button */}
+      <button
+        type="button"
+        className="floating-assistant-btn"
+        onClick={() => handleOpenAssistant()}
+        aria-label={isEn ? 'Open AI Engineering Assistant' : 'Abrir Asistente Técnico de IA'}
+      >
+        <span aria-hidden="true">💬</span>
+        <span>{isEn ? 'AI Assistant' : 'Asistente IA'}</span>
+      </button>
+
+      {/* Interactive LLM Assistant Modal */}
+      <LLMAssistantModal
+        isOpen={isAssistantOpen}
+        onClose={() => setIsAssistantOpen(false)}
+        initialContext={assistantContext}
+      />
 
       <Frieze border="#D8A84E" upColor="#C68A3D" downColor="#A8472B" medallionBg="#D8A84E" medallionBorder="#241A12" />
 

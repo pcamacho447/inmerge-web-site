@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
@@ -5,11 +6,21 @@ import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
 import ServicePillarCard from '../components/ServicePillarCard.jsx';
 import ArchitectureDiagram from '../components/ArchitectureDiagram.jsx';
+import ProjectCarousel from '../components/ProjectCarousel.jsx';
+import QuickEstimator from '../components/QuickEstimator.jsx';
+import LLMAssistantModal from '../components/LLMAssistantModal.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Inicio() {
   useReveal();
   const { isEn, content } = useLanguage();
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [assistantContext, setAssistantContext] = useState(null);
+
+  const handleOpenAssistant = (ctx = null) => {
+    setAssistantContext(ctx);
+    setIsAssistantOpen(true);
+  };
 
   useDocumentHead({
     title: isEn
@@ -320,6 +331,12 @@ export default function Inicio() {
         </div>
       </div>
 
+      {/* Case Studies & Estimator Section */}
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 clamp(20px,5vw,40px)' }}>
+        <ProjectCarousel onQuoteProject={(proj) => handleOpenAssistant(proj)} />
+        <QuickEstimator onOpenLLMAssistant={(ctx) => handleOpenAssistant(ctx)} />
+      </div>
+
       {/* Segments Section */}
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {content.SEGMENTS.map((seg) => (
@@ -439,6 +456,24 @@ export default function Inicio() {
           </div>
         </div>
       </div>
+
+      {/* Floating AI Assistant Trigger Button */}
+      <button
+        type="button"
+        className="floating-assistant-btn"
+        onClick={() => handleOpenAssistant()}
+        aria-label={isEn ? 'Open AI Engineering Assistant' : 'Abrir Asistente Técnico de IA'}
+      >
+        <span aria-hidden="true">💬</span>
+        <span>{isEn ? 'AI Assistant' : 'Asistente IA'}</span>
+      </button>
+
+      {/* Interactive LLM Assistant Modal */}
+      <LLMAssistantModal
+        isOpen={isAssistantOpen}
+        onClose={() => setIsAssistantOpen(false)}
+        initialContext={assistantContext}
+      />
 
       <Footer />
     </>

@@ -66,6 +66,35 @@ describe('billing.js module', () => {
         taxId: '2012345678A', // Inválido, contiene letras
       }),
     ).rejects.toThrow('El RUC debe contener exactamente 11 dígitos numéricos.');
+
+    // DNI inválido (no tiene 8 dígitos)
+    await expect(
+      updateOrganizationBilling('usr-1', {
+        legalName: 'Juan Pérez',
+        billingEmail: 'juan@gmail.com',
+        billingType: 'dni',
+        taxId: '12345',
+      }),
+    ).rejects.toThrow('El DNI debe contener exactamente 8 dígitos numéricos.');
+
+    // Tax ID internacional inválido (muy corto o caracteres prohibidos)
+    await expect(
+      updateOrganizationBilling('usr-1', {
+        legalName: 'Global Cloud LLC',
+        billingEmail: 'finance@globalcloud.com',
+        billingType: 'tax_id',
+        taxId: 'US', // Menos de 4 caracteres
+      }),
+    ).rejects.toThrow('El Tax ID / EIN / VAT internacional debe contener entre 4 y 20 caracteres alfanuméricos.');
+
+    await expect(
+      updateOrganizationBilling('usr-1', {
+        legalName: 'Global Cloud LLC',
+        billingEmail: 'finance@globalcloud.com',
+        billingType: 'tax_id',
+        taxId: 'US@123456789!', // Caracteres no permitidos
+      }),
+    ).rejects.toThrow('El Tax ID / EIN / VAT internacional debe contener entre 4 y 20 caracteres alfanuméricos.');
   });
 
   it('updateOrganizationBilling successfully creates new organization and links profile', async () => {

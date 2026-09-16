@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import ClientBillingView from './ClientBillingView.jsx';
 
 describe('ClientBillingView Component', () => {
@@ -104,6 +103,68 @@ describe('ClientBillingView Component', () => {
         legalName: 'Data Core SAC',
         taxId: '20601234567',
         billingEmail: 'finanzas@datacore.pe',
+      }),
+    );
+  });
+
+  it('renders editorial skeleton loader when loading is true', () => {
+    render(
+      <ClientBillingView
+        organization={null}
+        orders={[]}
+        loading={true}
+        saving={false}
+        onSaveOrganization={vi.fn()}
+        user={{ email: 'cliente@empresa.pe' }}
+      />,
+    );
+
+    const skeleton = screen.getByTestId('client-billing-skeleton');
+    expect(skeleton).toBeInTheDocument();
+    expect(skeleton).toHaveAttribute('aria-busy', 'true');
+    // Los campos de formulario reales no deben estar visibles mientras carga
+    expect(screen.queryByPlaceholderText('20XXXXXXXXX')).not.toBeInTheDocument();
+  });
+
+  it('supports international corporate Tax ID / EIN / VAT input and sanitization', async () => {
+    const handleSave = vi.fn().mockResolvedValue({ id: 'org-intl' });
+
+    render(
+      <ClientBillingView
+        organization={null}
+        orders={[]}
+        loading={false}
+        saving={false}
+        onSaveOrganization={handleSave}
+        user={{ email: 'finance@acme-global.com' }}
+        isEn={true}
+      />,
+    );
+
+    // Cambiar tipo de comprobante a Tax ID corporativo internacional
+    const select = screen.getByRole('combobox');
+    fireEvent.change(select, { target: { value: 'tax_id' } });
+
+    // El placeholder cambia para orientar al cliente internacional
+    const taxInput = screen.getByPlaceholderText('e.g. US-123456789 or GB999999973');
+    expect(taxInput).toBeInTheDocument();
+
+    // Permite caracteres alfanuméricos y guiones, pero filtra caracteres especiales
+    fireEvent.change(taxInput, { target: { value: 'US-987654321@#' } });
+    expect(taxInput.value).toBe('US-987654321');
+
+    const legalNameInput = screen.getByPlaceholderText(/e\.g\. Inversiones/i);
+    fireEvent.change(legalNameInput, { target: { value: 'Acme Global LLC' } });
+
+    const submitBtn = screen.getByRole('button', { name: /Guardar Información Fiscal|Save Billing Details/i });
+    fireEvent.click(submitBtn);
+
+    expect(handleSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        billingType: 'tax_id',
+        legalName: 'Acme Global LLC',
+        taxId: 'US-987654321',
+        billingEmail: 'finance@acme-global.com',
       }),
     );
   });

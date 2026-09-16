@@ -83,6 +83,8 @@ describe('Cuenta Component', () => {
       toast: null,
       dismissToast: vi.fn(),
       saveOrganization: vi.fn(),
+      connectionStatus: 'SUBSCRIBED',
+      isOnline: true,
     });
   });
 
@@ -146,5 +148,43 @@ describe('Cuenta Component', () => {
     expect(screen.getByText('DIRECT MESSAGING CHANNEL')).toBeInTheDocument();
     expect(screen.getByText('Technical On-Duty WhatsApp')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Open Direct WhatsApp/i })).toBeInTheDocument();
+  });
+
+  it('displays dynamic realtime sync status pill in header', () => {
+    // Caso 1: Conectado (Online)
+    const { unmount } = render(
+      <MemoryRouter initialEntries={['/cuenta']}>
+        <LanguageProvider>
+          <Cuenta />
+        </LanguageProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('SYNC ACTIVO')).toBeInTheDocument();
+    unmount();
+
+    // Caso 2: Reconectando (Offline o error)
+    billingHook.default.mockReturnValueOnce({
+      organization: null,
+      orders: [],
+      loading: false,
+      saving: false,
+      toast: null,
+      dismissToast: vi.fn(),
+      saveOrganization: vi.fn(),
+      connectionStatus: 'CHANNEL_ERROR',
+      isOnline: false,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/en/account']}>
+        <LanguageProvider>
+          <Cuenta />
+        </LanguageProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByText('RECONNECTING...')).not.toBeInTheDocument();
+    expect(screen.queryByText('LIVE SYNC')).not.toBeInTheDocument();
   });
 });

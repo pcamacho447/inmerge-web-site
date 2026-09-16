@@ -45,6 +45,8 @@ export default function Cuenta() {
     toast: billingToast,
     dismissToast: dismissBillingToast,
     saveOrganization,
+    connectionStatus,
+    isOnline,
   } = useOrganizationBilling(user?.id);
 
   useEffect(() => {
@@ -102,7 +104,7 @@ export default function Cuenta() {
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
               <div
                 style={{
                   fontFamily: "'IBM Plex Mono', monospace",
@@ -128,6 +130,35 @@ export default function Cuenta() {
                   }}
                 >
                   🏢 {organization.legal_name}
+                </span>
+              )}
+              {isOnline && (
+                <span
+                  role="status"
+                  aria-live="polite"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    fontSize: 10,
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontWeight: 600,
+                    color: '#2E7559',
+                    background: 'rgba(46, 117, 89, 0.1)',
+                    padding: '2px 8px',
+                    borderRadius: 12,
+                    border: '1px solid rgba(46, 117, 89, 0.25)',
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: '#2E7559',
+                    }}
+                  />
+                  {isEn ? 'LIVE SYNC' : 'SYNC ACTIVO'}
                 </span>
               )}
             </div>
