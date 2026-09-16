@@ -56,10 +56,10 @@ export default function Servicios() {
         >
           {isEn ? 'Three strategic pillars, zero technical compromise.' : 'Tres pilares, máxima exigencia técnica.'}
         </h1>
-        <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 640, lineHeight: 1.7, margin: 0 }}>
+        <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 680, lineHeight: 1.7, margin: 0 }}>
           {isEn
-            ? 'From independent data and cloud systems audits, to bespoke AWS infrastructure and production-grade machine learning models.'
-            : 'Desde la auditoría de integridad de datos y sistemas, pasando por la arquitectura cloud a medida, hasta modelos predictivos de Machine Learning listos para producción.'}
+            ? 'From independent data and cloud systems audits, to bespoke AWS infrastructure and production-grade machine learning models. Agile sprints, zero bureaucracy.'
+            : 'Desde la auditoría de integridad de datos y sistemas, pasando por la arquitectura cloud a medida, hasta modelos predictivos de Machine Learning listos para producción en sprints ágiles de 1 a 2 semanas.'}
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export default function Servicios() {
           })}
         </div>
 
-        {/* Services Accordion List */}
+        {/* High-Impact Services Accordion List */}
         <div>
           {filteredServices.map((s, i) => {
             const isOpen = openIndex === i;
@@ -152,7 +152,7 @@ export default function Servicios() {
                     flexWrap: 'wrap',
                     alignItems: 'center',
                     gap: '12px 24px',
-                    padding: '32px 8px',
+                    padding: '32px 12px',
                     cursor: 'pointer',
                     width: '100%',
                     background: 'none',
@@ -163,13 +163,13 @@ export default function Servicios() {
                     userSelect: 'none',
                   }}
                 >
-                  <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 14, color: 'var(--terracotta)', flexShrink: 0 }}>
+                  <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 14, color: 'var(--terracotta)', fontWeight: 700, flexShrink: 0 }}>
                     {s.number}
                   </div>
                   <div
                     style={{
                       fontFamily: "'Spectral',serif",
-                      fontWeight: 600,
+                      fontWeight: 700,
                       fontSize: 'clamp(20px,2.4vw,28px)',
                       flex: 1,
                       minWidth: 220,
@@ -181,16 +181,20 @@ export default function Servicios() {
                     style={{
                       fontFamily: "'IBM Plex Mono', monospace",
                       fontSize: 12,
+                      fontWeight: 600,
                       letterSpacing: 0.5,
                       color: 'var(--terracotta)',
                       background: 'rgba(168,71,43,0.08)',
                       padding: '4px 10px',
+                      borderRadius: 4,
                       flexShrink: 0,
                     }}
                   >
                     {s.pillarName}
                   </div>
-                  <div style={{ fontSize: 13, letterSpacing: 0.5, color: 'var(--muted)', flexShrink: 0 }}>{s.timeline}</div>
+                  <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: 'var(--muted)', fontWeight: 600, flexShrink: 0 }}>
+                    {s.timeline}
+                  </div>
                   <div
                     style={{
                       width: 14,
@@ -204,64 +208,89 @@ export default function Servicios() {
                   />
                 </summary>
 
-                <div
-                  id={`service-panel-${s.number}`}
-                  style={{
-                    padding: '0 8px clamp(24px,4vw,40px)',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
-                    gap: 24,
-                    animation: 'fadeIn 0.25s ease',
-                  }}
-                >
-                  {/* Problem Card */}
-                  <div style={{ background: 'var(--cream2)', border: '1px solid var(--border)', padding: 24 }}>
-                    <div
-                      style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        fontSize: 11,
-                        letterSpacing: 1.5,
-                        color: 'var(--muted)',
-                        fontWeight: 600,
-                        marginBottom: 8,
-                      }}
-                    >
-                      {isEn ? 'DIAGNOSTIC / PROBLEM' : 'DIAGNÓSTICO / PROBLEMA'}
+                {/* High-Impact Service Panel Content */}
+                <div id={`service-panel-${s.number}`} className="service-high-impact-layout">
+                  {/* Problem & Value Grid */}
+                  <div className="service-meta-overview-grid">
+                    <div className="service-problem-card">
+                      <div
+                        style={{
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontSize: 11,
+                          letterSpacing: 1.5,
+                          color: 'var(--muted)',
+                          fontWeight: 700,
+                          marginBottom: 8,
+                        }}
+                      >
+                        {isEn ? 'DIAGNOSTIC / PROBLEM' : 'DIAGNÓSTICO / PROBLEMA'}
+                      </div>
+                      <div style={{ fontSize: 14.5, lineHeight: 1.6, color: 'var(--ink)' }}>{s.problem}</div>
                     </div>
-                    <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--ink)' }}>{s.problem}</div>
+
+                    <div className="service-value-card">
+                      <div
+                        style={{
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontSize: 11,
+                          letterSpacing: 1.5,
+                          color: 'var(--gold)',
+                          fontWeight: 700,
+                          marginBottom: 8,
+                        }}
+                      >
+                        {isEn ? 'VALUE PROPOSITION' : 'PROPUESTA DE VALOR'}
+                      </div>
+                      <div style={{ fontSize: 14.5, lineHeight: 1.6, color: 'var(--tan-text)' }}>{s.value}</div>
+                    </div>
                   </div>
 
-                  {/* Value Card */}
-                  <div style={{ background: 'var(--ink)', color: 'var(--bg)', padding: 24 }}>
-                    <div
-                      style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        fontSize: 11,
-                        letterSpacing: 1.5,
-                        color: 'var(--gold)',
-                        fontWeight: 600,
-                        marginBottom: 8,
-                      }}
-                    >
-                      {isEn ? 'VALUE PROPOSITION' : 'PROPUESTA DE VALOR'}
+                  {/* Phased Execution Blueprint */}
+                  <div className="service-blueprint-execution-card">
+                    <div className="blueprint-execution-header">
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, fontWeight: 700, color: 'var(--terracotta)', letterSpacing: '0.05em' }}>
+                        {isEn ? 'RAPID SPRINT BLUEPRINT & EXECUTION PHASES' : 'CRONOGRAMA DE EJECUCIÓN EN SPRINTS ÁGILES'}
+                      </span>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
+                        {s.timeline}
+                      </span>
                     </div>
-                    <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--tan-text)' }}>{s.value}</div>
+
+                    <div className="blueprint-phases-grid">
+                      <div className="phase-step-card">
+                        <span className="phase-num">FASE 01 · DÍAS 1-3</span>
+                        <span className="phase-title">{isEn ? 'Diagnostic & Architecture' : 'Diagnóstico & Arquitectura'}</span>
+                        <p className="phase-desc">
+                          {isEn
+                            ? 'Forensic analysis of data schemas or codebase, non-destructive profiling, and definition of technical acceptance criteria.'
+                            : 'Análisis forense no destructivo de datos o código fuente y definición de criterios de aceptación auditables.'}
+                        </p>
+                      </div>
+
+                      <div className="phase-step-card">
+                        <span className="phase-num">FASE 02 · SEMANA 1-2</span>
+                        <span className="phase-title">{isEn ? 'Active Sprint Engineering' : 'Ingeniería en Sprint Activo'}</span>
+                        <p className="phase-desc">
+                          {isEn
+                            ? 'Direct execution in AWS Cloud, SQL/Python or Machine Learning pipelines with daily staging validation.'
+                            : 'Construcción directa en AWS Cloud, pipelines SQL/Python o modelos de IA con validación continua en staging.'}
+                        </p>
+                      </div>
+
+                      <div className="phase-step-card">
+                        <span className="phase-num">FASE 03 · ENTREGA</span>
+                        <span className="phase-title">{isEn ? 'Forensic Certification & Handoff' : 'Certificación Forense & Traspaso'}</span>
+                        <p className="phase-desc">
+                          {isEn
+                            ? 'Delivery of reproducible scripts, documentation, and audited sign-off directly in the Client Portal.'
+                            : 'Entrega de scripts reproducibles, reportes forenses y certificación técnica auditable en el Portal de Clientes.'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Deliverables & CTA */}
-                  <div
-                    style={{
-                      gridColumn: '1 / -1',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                      gap: 20,
-                      background: 'var(--bg)',
-                      border: '1px solid var(--border)',
-                      padding: '20px 24px',
-                    }}
-                  >
+                  {/* Deliverables & Dual Action CTA */}
+                  <div className="service-deliverables-cta-bar">
                     <div>
                       <div
                         style={{
@@ -269,7 +298,7 @@ export default function Servicios() {
                           fontSize: 11,
                           letterSpacing: 1.5,
                           color: 'var(--muted)',
-                          fontWeight: 600,
+                          fontWeight: 700,
                           marginBottom: 10,
                         }}
                       >
@@ -284,9 +313,12 @@ export default function Servicios() {
                               background: 'var(--cream2)',
                               padding: '6px 14px',
                               fontSize: 13,
+                              fontWeight: 500,
                               color: 'var(--ink)',
+                              borderRadius: 4,
                             }}
                           >
+                            <span style={{ color: 'var(--green)', marginRight: 6 }}>✓</span>
                             {d}
                           </div>
                         ))}
@@ -299,10 +331,11 @@ export default function Servicios() {
                         style={{
                           background: 'var(--terracotta)',
                           color: '#F3EADA',
-                          padding: '10px 20px',
-                          fontSize: 13,
-                          fontWeight: 600,
+                          padding: '12px 22px',
+                          fontSize: 13.5,
+                          fontWeight: 700,
                           textDecoration: 'none',
+                          borderRadius: 4,
                         }}
                         className="btn-accent"
                       >
@@ -316,13 +349,14 @@ export default function Servicios() {
                           background: 'transparent',
                           color: 'var(--ink)',
                           border: '1px solid var(--border)',
-                          padding: '10px 18px',
-                          fontSize: 13,
+                          padding: '12px 20px',
+                          fontSize: 13.5,
                           fontWeight: 600,
                           textDecoration: 'none',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: 6,
+                          borderRadius: 4,
                         }}
                         className="btn-outline-hover"
                       >
@@ -344,7 +378,7 @@ export default function Servicios() {
           onOpenLLMAssistant={(ctx) => handleOpenAssistant(ctx)}
         />
 
-        {/* Real Projects Carousel */}
+        {/* Real Projects Single-Card Focused Carousel */}
         <ProjectCarousel onQuoteProject={(proj) => handleOpenAssistant(proj)} />
       </div>
 
@@ -394,7 +428,7 @@ export default function Servicios() {
               style={{
                 background: 'var(--gold)',
                 color: 'var(--ink)',
-                borderRadius: 2,
+                borderRadius: 4,
                 padding: '18px 36px',
                 fontSize: 16,
                 fontWeight: 700,
@@ -410,7 +444,7 @@ export default function Servicios() {
                 background: 'transparent',
                 color: 'var(--bg)',
                 border: '1px solid var(--bg)',
-                borderRadius: 2,
+                borderRadius: 4,
                 padding: '18px 32px',
                 fontSize: 16,
                 fontWeight: 600,

@@ -1,6 +1,7 @@
 /**
  * Casos de éxito y proyectos representativos de Inmerge por pilar estratégico.
- * Contenido estructurado bilingüe (ES / EN) con métricas de impacto y stack de ingeniería.
+ * Contenido estructurado bilingüe (ES / EN) con esquemas de arquitectura visual,
+ * métricas de impacto verificables y stack de ingeniería senior.
  */
 
 export const PROJECTS_DATA = [
@@ -33,6 +34,19 @@ export const PROJECTS_DATA = [
       es: 'Sprint de 1 semana',
       en: '1-week sprint',
     },
+    diagram: {
+      type: 'database_audit',
+      badge: 'Zero-Loss Forensic Pipeline',
+      steps: [
+        { name: '18M Raw Records', detail: 'Ingestion & Hash Profiling' },
+        { name: 'Forensic Sanitizer', detail: 'Automated Deduplication' },
+        { name: 'Hardened RDS', detail: '99.999% Verified Integrity' },
+      ],
+    },
+    deliverables: {
+      es: ['Scripts SQL de saneamiento reproducibles', 'Reporte forense de inconsistencias', 'Diccionario de datos normalizado'],
+      en: ['Reproducible SQL sanitization scripts', 'Forensic inconsistency audit report', 'Normalized data dictionary'],
+    },
   },
   {
     id: 'audit-aws-security-cost',
@@ -62,6 +76,19 @@ export const PROJECTS_DATA = [
     duration: {
       es: 'Sprint de 10 días',
       en: '10-day sprint',
+    },
+    diagram: {
+      type: 'cloud_topology',
+      badge: 'AWS Well-Architected Security',
+      steps: [
+        { name: 'AWS IAM Audit', detail: 'Least Privilege Enforcement' },
+        { name: 'ECS Right-Sizing', detail: 'Compute Cost Reduction' },
+        { name: 'S3 LifeCycle & KMS', detail: 'Encryption & Archival Tiering' },
+      ],
+    },
+    deliverables: {
+      es: ['Matriz de permisos IAM auditada', 'Módulos Terraform de infraestructura base', 'Plan de ahorro cloud con ROI proyectado'],
+      en: ['Audited IAM permission matrix', 'Baseline Terraform infrastructure modules', 'Cloud cost optimization roadmap with ROI'],
     },
   },
   {
@@ -93,6 +120,19 @@ export const PROJECTS_DATA = [
       es: 'Sprint de 2 semanas',
       en: '2-week sprint',
     },
+    diagram: {
+      type: 'microservices',
+      badge: 'AWS ECS Microservices Topology',
+      steps: [
+        { name: 'API Gateway', detail: 'Rate Limiting & Auth Filter' },
+        { name: 'ECS Task Runners', detail: 'Node.js/Go Parallel Workers' },
+        { name: 'Redis Cache & RDS', detail: 'Sub-100ms Data Fetch' },
+      ],
+    },
+    deliverables: {
+      es: ['Contenedores Docker listos para CI/CD', 'Documentación OpenAPI / Swagger auditada', 'Suite de pruebas de carga k6'],
+      en: ['CI/CD production-ready Docker containers', 'OpenAPI/Swagger specs', 'k6 load testing suite'],
+    },
   },
   {
     id: 'dev-b2b-portal-billing',
@@ -122,6 +162,19 @@ export const PROJECTS_DATA = [
     duration: {
       es: 'Sprint de 2 semanas',
       en: '2-week sprint',
+    },
+    diagram: {
+      type: 'b2b_platform',
+      badge: 'Realtime Portal Architecture',
+      steps: [
+        { name: 'Client UI (Bilingual)', detail: 'Self-serve Order Flow' },
+        { name: 'Reconciliation Engine', detail: 'Unique Code & Receipt Matcher' },
+        { name: 'Admin Dashboard', detail: 'Instant Order Approval' },
+      ],
+    },
+    deliverables: {
+      es: ['Aplicación web SPA React en producción', 'Esquema PostgreSQL con RLS y validaciones', 'Panel administrativo con roles RBAC'],
+      en: ['Production SPA React web application', 'PostgreSQL schema with RLS & validation', 'Admin panel with granular RBAC'],
     },
   },
   {
@@ -153,6 +206,19 @@ export const PROJECTS_DATA = [
       es: 'Sprint de 8 días',
       en: '8-day sprint',
     },
+    diagram: {
+      type: 'rag_engine',
+      badge: 'Audited RAG Vector Pipeline',
+      steps: [
+        { name: 'Document Chunking', detail: 'Text Extraction & Metadata' },
+        { name: 'pgvector Embeddings', detail: 'Dense Semantic Indexing' },
+        { name: 'Gemini LLM Agent', detail: 'Strict Page-Cited Answers' },
+      ],
+    },
+    deliverables: {
+      es: ['Pipeline ETL de vectorización automatizada', 'API REST de consulta semántica', 'Interfaz conversacional con trazabilidad de citas'],
+      en: ['Automated vectorization ETL pipeline', 'Semantic query REST API', 'Chat UI with strict source verification'],
+    },
   },
   {
     id: 'ai-demand-forecasting',
@@ -182,6 +248,19 @@ export const PROJECTS_DATA = [
     duration: {
       es: 'Sprint de 10 días',
       en: '10-day sprint',
+    },
+    diagram: {
+      type: 'forecasting_model',
+      badge: 'Predictive ML Time-Series Engine',
+      steps: [
+        { name: 'Sales History ETL', detail: 'Outlier Removal & Cleansing' },
+        { name: 'LightGBM Regressor', detail: 'Multi-Store Seasonality Model' },
+        { name: 'Executive Dashboard', detail: 'Realtime Stock Recommendations' },
+      ],
+    },
+    deliverables: {
+      es: ['Modelo ML entrenado con métricas de validación', 'Pipeline cron de inferencia diaria', 'Dashboard interactivo de decisiones en tiempo real'],
+      en: ['Trained ML model with cross-validation', 'Daily inference batch cron pipeline', 'Interactive realtime executive dashboard'],
     },
   },
 ];

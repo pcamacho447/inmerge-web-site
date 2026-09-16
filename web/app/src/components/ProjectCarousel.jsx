@@ -40,7 +40,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
     }
   }, [selectedPillar]);
 
-  // Scroll to specific card by index
+  // Scroll to specific card by index with center alignment
   const scrollToIndex = useCallback((index) => {
     if (index < 0 || index >= filteredProjects.length) return;
     setActiveIndex(index);
@@ -75,13 +75,13 @@ export default function ProjectCarousel({ onQuoteProject }) {
     scrollToIndex(nextIdx);
   }, [activeIndex, filteredProjects.length, scrollToIndex]);
 
-  // Autoplay timer with progressive bar
+  // Autoplay progression timer
   useEffect(() => {
     if (!isAutoplay || isPaused || filteredProjects.length <= 1) {
       return;
     }
 
-    const intervalTime = 5000; // 5 seconds per slide
+    const intervalTime = 6000; // 6 seconds per single-card slide
     const stepTime = 100;
     const progressStep = (stepTime / intervalTime) * 100;
 
@@ -98,7 +98,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
     return () => clearInterval(timer);
   }, [isAutoplay, isPaused, handleNext, filteredProjects.length]);
 
-  // Handle keyboard navigation on the carousel
+  // Keyboard navigation
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
@@ -112,22 +112,22 @@ export default function ProjectCarousel({ onQuoteProject }) {
   const getPillarBadge = (pillarId) => {
     switch (pillarId) {
       case 'auditoria':
-        return { label: isEn ? '01 Auditoría' : '01 Auditoría', color: 'var(--terracotta)' };
+        return { label: isEn ? 'Pilar 01 · Auditoría Técnica' : 'Pilar 01 · Auditoría Técnica', color: 'var(--terracotta)' };
       case 'desarrollo':
-        return { label: isEn ? '02 Desarrollo' : '02 Desarrollo', color: 'var(--ochre)' };
+        return { label: isEn ? 'Pilar 02 · Desarrollo Cloud' : 'Pilar 02 · Desarrollo Cloud', color: 'var(--ochre)' };
       case 'datos':
-        return { label: isEn ? '03 Ciencia de Datos' : '03 Ciencia de Datos', color: 'var(--gold)' };
+        return { label: isEn ? 'Pilar 03 · Ciencia de Datos & IA' : 'Pilar 03 · Ciencia de Datos & IA', color: 'var(--gold)' };
       default:
-        return { label: 'Inmerge', color: 'var(--ink)' };
+        return { label: 'Inmerge Engineering', color: 'var(--ink)' };
     }
   };
 
   return (
     <section
-      className="project-carousel-section"
+      className="project-carousel-section single-card-mode"
       role="region"
       aria-roledescription="carousel"
-      aria-label={isEn ? 'Featured Case Studies' : 'Casos de Éxito y Proyectos Reales'}
+      aria-label={isEn ? 'Featured Case Studies & Technical Architecture' : 'Casos de Éxito & Arquitectura Técnica'}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onFocus={() => setIsPaused(true)}
@@ -136,7 +136,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
       <div className="carousel-header">
         <div className="carousel-titles">
           <span className="carousel-eyebrow">
-            {isEn ? 'PROVEN TRACK RECORD' : 'CASOS DE ÉXITO & PROYECTOS REALES'}
+            {isEn ? 'PROVEN TRACK RECORD & SYSTEM ARCHITECTURE' : 'CASOS DE ÉXITO & PROYECTOS REALES'}
           </span>
           <h2 className="carousel-main-title">
             {isEn
@@ -145,12 +145,12 @@ export default function ProjectCarousel({ onQuoteProject }) {
           </h2>
           <p className="carousel-subtitle">
             {isEn
-              ? 'Direct execution by senior engineers with auditable deliverables, fixed sprints, and zero corporate bureaucracy.'
-              : 'Ejecución directa por ingenieros senior con entregables auditables, tiempos ágiles de 1 a 2 semanas y cero sobrecostos.'}
+              ? 'Auditable production-ready systems, scalable cloud architectures, and verifiable business ROI.'
+              : 'Arquitecturas cloud en producción, modelos de datos de alta precisión y entregables forenses con ROI verificable.'}
           </p>
         </div>
 
-        {/* Carousel Deck Navigation & Counters */}
+        {/* Deck Navigation & Top Controls */}
         <div className="carousel-top-controls">
           <div className="carousel-deck-meta">
             <span className="deck-counter" aria-live="polite">
@@ -215,9 +215,9 @@ export default function ProjectCarousel({ onQuoteProject }) {
         ))}
       </div>
 
-      {/* Interactive Snap Scroll Deck Container */}
+      {/* Single-Card Focused Track Container */}
       <div
-        className="carousel-track"
+        className="carousel-track single-card-track"
         ref={carouselRef}
         tabIndex={0}
         aria-live="polite"
@@ -231,12 +231,13 @@ export default function ProjectCarousel({ onQuoteProject }) {
             <article
               key={project.id}
               ref={(el) => (cardRefs.current[idx] = el)}
-              className={`carousel-card ${isActive ? 'is-active-card' : ''}`}
+              className={`carousel-card single-focus-card ${isActive ? 'is-active-card' : 'is-inactive-card'}`}
               role="group"
               aria-roledescription="slide"
-              aria-label={`${isEn ? 'Slide' : 'Caso'} ${idx + 1} ${isEn ? 'of' : 'de'} ${filteredProjects.length}: ${isEn ? project.title.en : project.title.es}`}
+              aria-label={`${isEn ? 'Case' : 'Caso'} ${idx + 1} ${isEn ? 'of' : 'de'} ${filteredProjects.length}: ${isEn ? project.title.en : project.title.es}`}
               onClick={() => scrollToIndex(idx)}
             >
+              {/* Header Meta */}
               <div className="card-top-meta">
                 <span className="card-pillar-tag" style={{ borderColor: badge.color, color: badge.color }}>
                   {badge.label}
@@ -246,27 +247,63 @@ export default function ProjectCarousel({ onQuoteProject }) {
                 </span>
               </div>
 
+              {/* Main Titles */}
               <h3 className="card-project-title">
                 {isEn ? project.title.en : project.title.es}
               </h3>
-
               <div className="card-client-type">
-                <strong>{isEn ? 'Client / Sector:' : 'Cliente / Sector:'}</strong>{' '}
+                <strong>{isEn ? 'Industry / Client:' : 'Industria / Cliente:'}</strong>{' '}
                 {isEn ? project.clientType.en : project.clientType.es}
               </div>
 
-              <div className="card-challenge-solution">
+              {/* Visual Architecture Blueprint Schematics */}
+              {project.diagram && (
+                <div className="card-blueprint-container" aria-label={isEn ? 'System Architecture Blueprint' : 'Blueprint de Arquitectura Técnica'}>
+                  <div className="blueprint-top-bar">
+                    <span className="blueprint-tag">SYSTEM BLUEPRINT</span>
+                    <span className="blueprint-badge-text">{project.diagram.badge}</span>
+                  </div>
+                  <div className="blueprint-nodes-row">
+                    {project.diagram.steps.map((step, sIdx) => (
+                      <div key={sIdx} className="blueprint-node-item">
+                        <span className="node-step-index">0{sIdx + 1}</span>
+                        <span className="node-title">{step.name}</span>
+                        <span className="node-detail">{step.detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Challenge & Solution Grid */}
+              <div className="card-challenge-solution dual-grid">
                 <div className="challenge-block">
-                  <span className="block-label">{isEn ? 'Challenge:' : 'Desafío:'}</span>
+                  <span className="block-label">{isEn ? 'Critical Challenge:' : 'Desafío Crítico:'}</span>
                   <p>{isEn ? project.challenge.en : project.challenge.es}</p>
                 </div>
                 <div className="solution-block">
-                  <span className="block-label">{isEn ? 'Inmerge Solution:' : 'Solución Inmerge:'}</span>
+                  <span className="block-label">{isEn ? 'Engineering Solution:' : 'Solución de Ingeniería:'}</span>
                   <p>{isEn ? project.solution.en : project.solution.es}</p>
                 </div>
               </div>
 
-              {/* Metrics Grid */}
+              {/* Deliverables Checklist */}
+              {project.deliverables && (
+                <div className="card-deliverables-box">
+                  <span className="deliverables-box-title">
+                    {isEn ? 'AUDITED DELIVERABLES:' : 'ENTREGABLES AUDITADOS:'}
+                  </span>
+                  <ul className="deliverables-box-list">
+                    {(isEn ? project.deliverables.en : project.deliverables.es).map((item, dIdx) => (
+                      <li key={dIdx}>
+                        <span className="deliv-check">✓</span> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Impact Metrics */}
               <div className="card-metrics-grid">
                 {project.metrics.map((m, mIdx) => (
                   <div key={mIdx} className="metric-box">
@@ -276,8 +313,8 @@ export default function ProjectCarousel({ onQuoteProject }) {
                 ))}
               </div>
 
-              {/* Tech Stack Badges */}
-              <div className="card-stack-row" aria-label={isEn ? 'Technologies used' : 'Tecnologías empleadas'}>
+              {/* Tech Stack Pills */}
+              <div className="card-stack-row" aria-label={isEn ? 'Tech stack' : 'Stack tecnológico'}>
                 {project.stack.map((tech, sIdx) => (
                   <span key={sIdx} className="stack-pill">
                     {tech}
@@ -285,7 +322,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
                 ))}
               </div>
 
-              {/* CTA Action */}
+              {/* Action Button */}
               <div className="card-footer-cta">
                 <button
                   type="button"
@@ -295,7 +332,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
                     if (onQuoteProject) onQuoteProject(project);
                   }}
                 >
-                  {isEn ? 'Estimate Similar Project →' : 'Cotizar Proyecto Similar →'}
+                  {isEn ? 'Estimate Similar Project in Sprints →' : 'Cotizar Proyecto Similar en Sprints →'}
                 </button>
               </div>
             </article>
@@ -303,7 +340,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
         })}
       </div>
 
-      {/* Slide Pagination Dots / Quick Selector */}
+      {/* Slide Pagination Dots */}
       <div className="carousel-dots-pagination" role="group" aria-label={isEn ? 'Slide pagination' : 'Paginación de tarjetas'}>
         {filteredProjects.map((project, idx) => (
           <button
