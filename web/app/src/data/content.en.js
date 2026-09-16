@@ -170,3 +170,22 @@ export const ROLES = [
   { name: 'Senior Data Scientist', desc: 'Statistical modeling, production machine learning, and AI agent integration.' },
   { name: 'Full-Stack Engineer', desc: 'Engineers high-performance web applications and resilient API platforms.' },
 ];
+
+export const TRUST_BADGES = [
+  {
+    title: 'Response Commitment',
+    detail: '< 24 business hours (UTC-5 / US Eastern)',
+    icon: '⏱',
+  },
+  {
+    title: 'Confidentiality Protocol',
+    detail: 'Mutual NDA executed prior to architecture or data disclosure',
+    icon: '🛡',
+  },
+  {
+    title: 'Direct Senior Review',
+    detail: 'Direct collaboration with Lead Architects & Senior Auditors',
+    icon: '⚖',
+  },
+];
+

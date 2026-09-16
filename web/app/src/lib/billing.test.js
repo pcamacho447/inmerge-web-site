@@ -7,6 +7,8 @@ import {
   fetchClientOrders,
   createBankTransferOrder,
   uploadOrderVoucher,
+  validateVoucherFile,
+  MAX_VOUCHER_SIZE_BYTES,
   verifyBillingOrderAdmin,
 } from './billing.js';
 import { supabase } from './supabaseClient.js';
@@ -171,6 +173,35 @@ describe('billing.js module', () => {
         amount_pen: 4500,
       }),
     ]);
+  });
+
+  it('validateVoucherFile rejects missing files, files > 10MB and unsupported formats', () => {
+    expect(() => validateVoucherFile(null)).toThrow('Debe seleccionar un archivo de comprobante de pago.');
+
+    const oversizedFile = { name: 'recibo.pdf', size: MAX_VOUCHER_SIZE_BYTES + 1, type: 'application/pdf' };
+    expect(() => validateVoucherFile(oversizedFile)).toThrow('El comprobante excede el tamaño máximo permitido de 10 MB.');
+
+    const invalidTypeFile = { name: 'virus.exe', size: 1024, type: 'application/x-msdownload' };
+    expect(() => validateVoucherFile(invalidTypeFile)).toThrow(
+      'Formato no admitido. Se aceptan únicamente imágenes (JPG, PNG, WebP) o documentos PDF.',
+    );
+
+    const validPdf = { name: 'voucher.pdf', size: 1024 * 100, type: 'application/pdf' };
+    expect(validateVoucherFile(validPdf)).toBe(true);
+
+    const validJpg = { name: 'voucher.jpg', size: 1024 * 200, type: 'image/jpeg' };
+    expect(validateVoucherFile(validJpg)).toBe(true);
+
+    const validPng = { name: 'voucher.PNG', size: 1024 * 200, type: 'image/png' };
+    expect(validateVoucherFile(validPng)).toBe(true);
+  });
+
+  it('uploadOrderVoucher rejects invalid files before attempting network upload', async () => {
+    const invalidFile = { name: 'video.mp4', size: 500, type: 'video/mp4' };
+    await expect(uploadOrderVoucher({ orderId: 'ord-1', file: invalidFile, userId: 'usr-1' })).rejects.toThrow(
+      'Formato no admitido',
+    );
+    expect(supabase.storage.from).not.toHaveBeenCalled();
   });
 
   it('uploadOrderVoucher uploads binary to storage and updates order status', async () => {

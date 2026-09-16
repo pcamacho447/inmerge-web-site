@@ -188,7 +188,7 @@ export default function Contacto() {
               </p>
             </div>
 
-            <div style={{ marginTop: 32 }}>
+            <div style={{ marginTop: 32, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <a
                 href={customWaUrl}
                 target="_blank"
@@ -209,6 +209,74 @@ export default function Contacto() {
                 <span>{isEn ? 'Message via WhatsApp' : 'Escribir por WhatsApp'}</span>
                 <span aria-hidden="true">→</span>
               </a>
+              <a
+                href={`mailto:inmerge3@gmail.com?subject=${encodeURIComponent(isEn ? 'Inmerge — Technical Scope Consultation' : 'Inmerge — Consulta Técnica y TDR')}`}
+                style={{
+                  background: 'transparent',
+                  color: '#F3EADA',
+                  border: '1px solid rgba(243, 234, 218, 0.4)',
+                  padding: '16px 22px',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                className="btn-outline"
+              >
+                <span>{isEn ? 'Formal Email' : 'Correo Formal'}</span>
+                <span aria-hidden="true">✉</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Trust & SLA Badges */}
+          <div
+            data-reveal=""
+            style={{
+              background: 'var(--cream2)',
+              border: '1px solid var(--border)',
+              padding: 32,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 11,
+                letterSpacing: 1.5,
+                color: 'var(--terracotta)',
+                fontWeight: 600,
+                marginBottom: 16,
+              }}
+            >
+              {isEn ? 'ASSURANCE & ENGAGEMENT SLA' : 'COMPROMISOS DE SERVICIO'}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {(content.TRUST_BADGES || []).map((badge, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  <div
+                    style={{
+                      fontSize: 16,
+                      background: 'rgba(168,71,43,0.1)',
+                      color: 'var(--terracotta)',
+                      width: 28,
+                      height: 28,
+                      borderRadius: 4,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {badge.icon}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{badge.title}</div>
+                    <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2, lineHeight: 1.4 }}>{badge.detail}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

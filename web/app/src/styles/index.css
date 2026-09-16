@@ -392,3 +392,31 @@ blockquote {
   animation-duration: 0.22s;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Accessibility: Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Native HTML5 <details> styling reset for modern accordions */
+details.service-accordion-item {
+  border-top: 1px solid var(--border);
+}
+details.service-accordion-item > summary {
+  list-style: none;
+}
+details.service-accordion-item > summary::-webkit-details-marker {
+  display: none;
+}
+details.service-accordion-item > summary::marker {
+  display: none;
+}
+

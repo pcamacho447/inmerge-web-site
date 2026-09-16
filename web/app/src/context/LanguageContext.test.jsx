@@ -124,4 +124,25 @@ describe('LanguageContext & Routing', () => {
 
     expect(localStorage.getItem(STORAGE_KEY)).toBe('en');
   });
+
+  it('announces language change via accessible role="status" live region', () => {
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue('es-PE');
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <LanguageProvider>
+          <ConsumerComponent />
+        </LanguageProvider>
+      </MemoryRouter>,
+    );
+
+    const announcer = screen.getByTestId('lang-announcer');
+    expect(announcer).toHaveAttribute('role', 'status');
+    expect(announcer).toHaveAttribute('aria-live', 'polite');
+
+    fireEvent.click(screen.getByText('Set EN'));
+    expect(announcer.textContent).toBe('Language switched to English');
+
+    fireEvent.click(screen.getByText('Set ES'));
+    expect(announcer.textContent).toBe('Página cambiada a Español');
+  });
 });

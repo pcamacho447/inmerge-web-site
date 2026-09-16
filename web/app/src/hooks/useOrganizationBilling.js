@@ -10,6 +10,7 @@ export default function useOrganizationBilling(userId) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('CONNECTING');
 
   const loadBillingData = useCallback(async () => {
     if (!userId) {
@@ -72,7 +73,14 @@ export default function useOrganizationBilling(userId) {
           }
         },
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (status) {
+          setConnectionStatus(status);
+        }
+        if (status === 'CHANNEL_ERROR') {
+          console.warn('[useOrganizationBilling] Advertencia de conectividad Realtime:', err);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -102,26 +110,26 @@ export default function useOrganizationBilling(userId) {
     }
   };
 
-  const handleCreateOrder = async (orderPayload) => {
+  const handleCreateOrder = async ({ plan, amountPen, notes }) => {
+    setSaving(true);
     try {
-      const created = await createBankTransferOrder({
-        userId,
-        ...orderPayload,
-      });
-      setOrders((prev) => [created, ...prev]);
+      const order = await createBankTransferOrder({ userId, plan, amountPen, notes });
+      setOrders((prev) => [order, ...prev]);
       setToast({
-        type: 'info',
-        title: 'Orden Registrada',
-        message: `Orden ${created.code} generada para transferencia bancaria.`,
+        type: 'deliverable',
+        title: 'Orden Registrada con Éxito',
+        message: `Orden ${order.code} generada. Procede con la transferencia bancaria y sube tu voucher.`,
       });
-      return created;
+      return order;
     } catch (err) {
       setToast({
         type: 'error',
         title: 'Error al Generar Orden',
-        message: err.message || 'No se pudo crear la orden de servicio.',
+        message: err.message || 'No se pudo generar la orden de servicio.',
       });
       throw err;
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -136,5 +144,7 @@ export default function useOrganizationBilling(userId) {
     refreshBilling: loadBillingData,
     saveOrganization: handleSaveOrganization,
     createOrder: handleCreateOrder,
+    connectionStatus,
+    isOnline: connectionStatus === 'SUBSCRIBED',
   };
 }

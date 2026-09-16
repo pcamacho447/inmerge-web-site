@@ -1,4 +1,3 @@
-import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
@@ -74,5 +73,14 @@ describe('Contacto.jsx Page - Anti-Spam & Rate Limiting UI', () => {
     const alert = await screen.findByText(/Límite de solicitudes de cotización alcanzado/i);
     expect(alert).toBeInTheDocument();
     expect(screen.getByText(/Contactar por WhatsApp de Inmediato/i)).toBeInTheDocument();
+  });
+
+  it('renders formal email link and assurance SLA badges', () => {
+    renderComponent();
+
+    expect(screen.getByText(/Correo Formal/i)).toBeInTheDocument();
+    expect(screen.getByText(/COMPROMISOS DE SERVICIO/i)).toBeInTheDocument();
+    expect(screen.getByText(/Compromiso de Respuesta/i)).toBeInTheDocument();
+    expect(screen.getByText(/Protocolo de Confidencialidad/i)).toBeInTheDocument();
   });
 });

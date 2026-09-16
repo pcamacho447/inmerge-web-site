@@ -162,8 +162,26 @@ export const MARQUEE_ITEMS = [
 ];
 
 export const ROLES = [
-  { name: 'Lead Auditor & Data Strategist', desc: 'Lidera auditorías técnicas, gobernanza y diagnóstico de datos.' },
-  { name: 'Cloud & DevOps Architect', desc: 'Diseño de infraestructura escalable y pipelines en AWS.' },
-  { name: 'Senior Data Scientist', desc: 'Modelado estadístico, Machine Learning e integración de IA.' },
-  { name: 'Full-Stack Engineer', desc: 'Desarrollo de aplicaciones web de alto rendimiento y APIs.' },
+  { name: 'Lead Auditor & Data Strategist', desc: 'Lidera auditorías técnicas, gobernanza y diagnóstico de calidad de datos.' },
+  { name: 'Cloud & DevOps Architect', desc: 'Diseña arquitecturas cloud tolerantes a fallos y pipelines automatizados en AWS.' },
+  { name: 'Senior Data Scientist', desc: 'Modelado estadístico, Machine Learning en producción e integración de agentes IA.' },
+  { name: 'Full-Stack Engineer', desc: 'Desarrollo de software de alta performance, interfaces reactivas y APIs resilientes.' },
+];
+
+export const TRUST_BADGES = [
+  {
+    title: 'Compromiso de Respuesta',
+    detail: '< 24 horas hábiles (UTC-5 Lima)',
+    icon: '⏱',
+  },
+  {
+    title: 'Protocolo de Confidencialidad',
+    detail: 'Acuerdo de Confidencialidad (NDA) mutuo antes de revisar sistemas o datos',
+    icon: '🛡',
+  },
+  {
+    title: 'Interlocución Senior',
+    detail: 'Trato directo con Líderes de Arquitectura y Auditores Principales',
+    icon: '⚖',
+  },
 ];

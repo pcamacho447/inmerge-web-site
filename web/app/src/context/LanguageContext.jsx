@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as esContent from '../data/content.js';
 import * as enContent from '../data/content.en.js';
@@ -47,6 +47,7 @@ export function LanguageProvider({ children }) {
 
   const isEn = location.pathname.startsWith('/en');
   const lang = isEn ? 'en' : 'es';
+  const [announcement, setAnnouncement] = useState('');
 
   // Synchronize <html> lang attribute with the current route
   useEffect(() => {
@@ -71,6 +72,8 @@ export function LanguageProvider({ children }) {
       } catch {
         // localStorage may be unavailable in private mode
       }
+
+      setAnnouncement(targetLang === 'en' ? 'Language switched to English' : 'Página cambiada a Español');
 
       const nextPath = getEquivalentPath(targetLang, location.pathname);
       if (typeof document !== 'undefined' && typeof document.startViewTransition === 'function') {
@@ -99,7 +102,14 @@ export function LanguageProvider({ children }) {
     [lang, isEn, switchLanguage, content, stack],
   );
 
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
+  return (
+    <LanguageContext.Provider value={value}>
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only" data-testid="lang-announcer">
+        {announcement}
+      </div>
+      {children}
+    </LanguageContext.Provider>
+  );
 }
 
 export function useLanguage() {

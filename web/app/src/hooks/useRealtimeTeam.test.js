@@ -24,7 +24,10 @@ describe('useRealtimeTeam', () => {
         eventCallbacks[table] = callback;
         return mockChannel;
       }),
-      subscribe: vi.fn().mockReturnValue(mockChannel),
+      subscribe: vi.fn().mockImplementation((cb) => {
+        if (cb) cb('SUBSCRIBED');
+        return mockChannel;
+      }),
     };
 
     supabase.channel.mockReturnValue(mockChannel);
@@ -32,10 +35,30 @@ describe('useRealtimeTeam', () => {
 
   it('subscribes to realtime-team-consultancy channel when enabled', () => {
     const onDataRefresh = vi.fn();
-    renderHook(() => useRealtimeTeam({ onDataRefresh, enabled: true }));
+    const { result } = renderHook(() => useRealtimeTeam({ onDataRefresh, enabled: true }));
 
     expect(supabase.channel).toHaveBeenCalledWith('realtime-team-consultancy');
     expect(mockChannel.subscribe).toHaveBeenCalled();
+    expect(result.current.connectionStatus).toBe('SUBSCRIBED');
+    expect(result.current.isOnline).toBe(true);
+  });
+
+  it('tracks connectionStatus and handles CHANNEL_ERROR gracefully', () => {
+    let statusCallback;
+    mockChannel.subscribe = vi.fn().mockImplementation((cb) => {
+      statusCallback = cb;
+      return mockChannel;
+    });
+
+    const { result } = renderHook(() => useRealtimeTeam({ enabled: true }));
+    expect(result.current.connectionStatus).toBe('CONNECTING');
+    expect(result.current.isOnline).toBe(false);
+
+    act(() => {
+      statusCallback?.('CHANNEL_ERROR', new Error('Network timeout'));
+    });
+    expect(result.current.connectionStatus).toBe('CHANNEL_ERROR');
+    expect(result.current.isOnline).toBe(false);
   });
 
   it('handles new lead TDR INSERT event and calls onDataRefresh', () => {

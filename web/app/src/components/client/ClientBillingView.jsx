@@ -13,6 +13,8 @@ export default function ClientBillingView({ organization, orders, loading, savin
 
   const [isDirty, setIsDirty] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState(null);
+  const [uploadingOrderId, setUploadingOrderId] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
 
   useEffect(() => {
     if (organization && !isDirty) {
@@ -441,41 +443,54 @@ export default function ClientBillingView({ organization, orders, loading, savin
                           ⚠️ Voucher Rechazado
                         </span>
                       ) : (
-                        <label
-                          style={{
-                            fontSize: 11,
-                            fontFamily: "'IBM Plex Mono', monospace",
-                            padding: '4px 10px',
-                            background: 'var(--terracotta)',
-                            color: '#fff',
-                            borderRadius: 4,
-                            cursor: 'pointer',
-                            fontWeight: 600,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4,
-                          }}
-                        >
-                          📎 Subir Voucher
-                          <input
-                            type="file"
-                            accept="image/*,application/pdf"
-                            style={{ display: 'none' }}
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (file && user?.id) {
-                                try {
-                                  await uploadOrderVoucher({ orderId: ord.id, file, userId: user.id });
-                                  if (typeof onSaveOrganization === 'function') {
-                                    // Trigger reload if available
-                                  }
-                                } catch (upErr) {
-                                  console.error('Error al subir voucher:', upErr);
-                                }
-                              }
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                          <label
+                            style={{
+                              fontSize: 11,
+                              fontFamily: "'IBM Plex Mono', monospace",
+                              padding: '4px 10px',
+                              background: uploadingOrderId === ord.id ? 'var(--muted)' : 'var(--terracotta)',
+                              color: '#fff',
+                              borderRadius: 4,
+                              cursor: uploadingOrderId === ord.id ? 'wait' : 'pointer',
+                              fontWeight: 600,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
                             }}
-                          />
-                        </label>
+                          >
+                            {uploadingOrderId === ord.id ? '⏳ Subiendo...' : '📎 Subir Voucher'}
+                            <input
+                              type="file"
+                              accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
+                              disabled={uploadingOrderId === ord.id}
+                              style={{ display: 'none' }}
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file && user?.id) {
+                                  setUploadError(null);
+                                  setUploadingOrderId(ord.id);
+                                  try {
+                                    await uploadOrderVoucher({ orderId: ord.id, file, userId: user.id });
+                                    if (typeof onSaveOrganization === 'function') {
+                                      // Trigger reload if available
+                                    }
+                                  } catch (upErr) {
+                                    console.error('Error al subir voucher:', upErr);
+                                    setUploadError({ orderId: ord.id, message: upErr.message || 'Error al subir el comprobante.' });
+                                  } finally {
+                                    setUploadingOrderId(null);
+                                  }
+                                }
+                              }}
+                            />
+                          </label>
+                          {uploadError?.orderId === ord.id && (
+                            <span style={{ fontSize: 11, color: 'var(--terracotta)', maxWidth: 280, textAlign: 'right' }}>
+                              ⚠️ {uploadError.message}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>

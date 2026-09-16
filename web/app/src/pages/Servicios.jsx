@@ -121,12 +121,21 @@ export default function Servicios() {
             const quoteWaUrl = content.waLink(waQuoteText);
 
             return (
-              <div key={s.number} data-reveal="" style={{ borderTop: '1px solid var(--border)' }}>
-                <button
-                  type="button"
-                  onClick={() => setOpenIndex(isOpen ? null : i)}
-                  aria-expanded={isOpen}
-                  aria-controls={`service-panel-${s.number}`}
+              <details
+                key={s.number}
+                name="inmerge-services"
+                open={isOpen}
+                onToggle={(e) => {
+                  if (e.currentTarget.open) {
+                    setOpenIndex(i);
+                  } else if (openIndex === i) {
+                    setOpenIndex(null);
+                  }
+                }}
+                className="service-accordion-item"
+                data-reveal=""
+              >
+                <summary
                   className="row-hover"
                   style={{
                     display: 'flex',
@@ -141,6 +150,7 @@ export default function Servicios() {
                     font: 'inherit',
                     color: 'inherit',
                     textAlign: 'left',
+                    userSelect: 'none',
                   }}
                 >
                   <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 14, color: 'var(--terracotta)', flexShrink: 0 }}>
@@ -182,21 +192,67 @@ export default function Servicios() {
                       marginLeft: 'auto',
                     }}
                   />
-                </button>
+                </summary>
 
-                {isOpen && (
+                <div
+                  id={`service-panel-${s.number}`}
+                  style={{
+                    padding: '0 8px clamp(24px,4vw,40px)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
+                    gap: 24,
+                    animation: 'fadeIn 0.25s ease',
+                  }}
+                >
+                  {/* Problem Card */}
+                  <div style={{ background: 'var(--cream2)', border: '1px solid var(--border)', padding: 24 }}>
+                    <div
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: 11,
+                        letterSpacing: 1.5,
+                        color: 'var(--muted)',
+                        fontWeight: 600,
+                        marginBottom: 8,
+                      }}
+                    >
+                      {isEn ? 'DIAGNOSTIC / PROBLEM' : 'DIAGNÓSTICO / PROBLEMA'}
+                    </div>
+                    <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--ink)' }}>{s.problem}</div>
+                  </div>
+
+                  {/* Value Card */}
+                  <div style={{ background: 'var(--ink)', color: 'var(--bg)', padding: 24 }}>
+                    <div
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: 11,
+                        letterSpacing: 1.5,
+                        color: 'var(--gold)',
+                        fontWeight: 600,
+                        marginBottom: 8,
+                      }}
+                    >
+                      {isEn ? 'VALUE PROPOSITION' : 'PROPUESTA DE VALOR'}
+                    </div>
+                    <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--tan-text)' }}>{s.value}</div>
+                  </div>
+
+                  {/* Deliverables & CTA */}
                   <div
-                    id={`service-panel-${s.number}`}
                     style={{
-                      padding: '0 8px clamp(24px,4vw,40px)',
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
-                      gap: 24,
-                      animation: 'fadeIn 0.25s ease',
+                      gridColumn: '1 / -1',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: 20,
+                      background: 'var(--bg)',
+                      border: '1px solid var(--border)',
+                      padding: '20px 24px',
                     }}
                   >
-                    {/* Problem Card */}
-                    <div style={{ background: 'var(--cream2)', border: '1px solid var(--border)', padding: 24 }}>
+                    <div>
                       <div
                         style={{
                           fontFamily: "'IBM Plex Mono', monospace",
@@ -204,115 +260,71 @@ export default function Servicios() {
                           letterSpacing: 1.5,
                           color: 'var(--muted)',
                           fontWeight: 600,
-                          marginBottom: 8,
+                          marginBottom: 10,
                         }}
                       >
-                        {isEn ? 'DIAGNOSTIC / PROBLEM' : 'DIAGNÓSTICO / PROBLEMA'}
+                        {isEn ? 'TANGIBLE DELIVERABLES' : 'ENTREGABLES TANGIBLES'}
                       </div>
-                      <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--ink)' }}>{s.problem}</div>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        {s.deliverables.map((d) => (
+                          <div
+                            key={d}
+                            style={{
+                              border: '1px solid var(--border)',
+                              background: 'var(--cream2)',
+                              padding: '6px 14px',
+                              fontSize: 13,
+                              color: 'var(--ink)',
+                            }}
+                          >
+                            {d}
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
-                    {/* Value Card */}
-                    <div style={{ background: 'var(--ink)', color: 'var(--bg)', padding: 24 }}>
-                      <div
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                      <Link
+                        to={
+                          isEn ? `/en/contact?service=${encodeURIComponent(s.name)}` : `/contacto?servicio=${encodeURIComponent(s.name)}`
+                        }
                         style={{
-                          fontFamily: "'IBM Plex Mono', monospace",
-                          fontSize: 11,
-                          letterSpacing: 1.5,
-                          color: 'var(--gold)',
+                          background: 'var(--terracotta)',
+                          color: '#F3EADA',
+                          padding: '10px 20px',
+                          fontSize: 13,
                           fontWeight: 600,
-                          marginBottom: 8,
+                          textDecoration: 'none',
                         }}
+                        className="btn-accent"
                       >
-                        {isEn ? 'VALUE PROPOSITION' : 'PROPUESTA DE VALOR'}
-                      </div>
-                      <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--tan-text)' }}>{s.value}</div>
-                    </div>
-
-                    {/* Deliverables & CTA */}
-                    <div
-                      style={{
-                        gridColumn: '1 / -1',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        gap: 20,
-                        background: 'var(--bg)',
-                        border: '1px solid var(--border)',
-                        padding: '20px 24px',
-                      }}
-                    >
-                      <div>
-                        <div
-                          style={{
-                            fontFamily: "'IBM Plex Mono', monospace",
-                            fontSize: 11,
-                            letterSpacing: 1.5,
-                            color: 'var(--muted)',
-                            fontWeight: 600,
-                            marginBottom: 10,
-                          }}
-                        >
-                          {isEn ? 'TANGIBLE DELIVERABLES' : 'ENTREGABLES TANGIBLES'}
-                        </div>
-                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                          {s.deliverables.map((d) => (
-                            <div
-                              key={d}
-                              style={{
-                                border: '1px solid var(--border)',
-                                background: 'var(--cream2)',
-                                padding: '6px 14px',
-                                fontSize: 13,
-                                color: 'var(--ink)',
-                              }}
-                            >
-                              {d}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                        <Link
-                          to={
-                            isEn ? `/en/contact?service=${encodeURIComponent(s.name)}` : `/contacto?servicio=${encodeURIComponent(s.name)}`
-                          }
-                          style={{
-                            background: 'var(--terracotta)',
-                            color: '#F3EADA',
-                            padding: '10px 20px',
-                            fontSize: 13,
-                            fontWeight: 600,
-                            textDecoration: 'none',
-                          }}
-                          className="btn-accent"
-                        >
-                          {isEn ? 'Request Scope (TDR)' : 'Solicitar TDR'}
-                        </Link>
-                        <a
-                          href={quoteWaUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{
-                            background: 'transparent',
-                            color: 'var(--ink)',
-                            border: '1px solid var(--ink)',
-                            padding: '10px 18px',
-                            fontSize: 13,
-                            fontWeight: 600,
-                            textDecoration: 'none',
-                          }}
-                          className="btn-outline"
-                        >
-                          WhatsApp
-                        </a>
-                      </div>
+                        {isEn ? 'Request Scope (TDR)' : 'Solicitar TDR'}
+                      </Link>
+                      <a
+                        href={quoteWaUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          background: 'transparent',
+                          color: 'var(--ink)',
+                          border: '1px solid var(--border)',
+                          padding: '10px 18px',
+                          fontSize: 13,
+                          fontWeight: 600,
+                          textDecoration: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 6,
+                        }}
+                        className="btn-outline-hover"
+                      >
+                        <span>WhatsApp</span>
+                        <span aria-hidden="true">→</span>
+                      </a>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              </details>
             );
           })}
           <div style={{ borderTop: '1px solid var(--border)' }} />

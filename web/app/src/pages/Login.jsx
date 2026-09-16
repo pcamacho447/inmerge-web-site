@@ -3,12 +3,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 import { supabase } from '../lib/supabaseClient.js';
 
 export default function Login() {
   useDocumentHead({ title: 'Iniciar sesión — Inmerge', path: '/login', noIndex: true });
   const { login } = useAuth();
+  const { isEn } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -76,6 +78,29 @@ export default function Login() {
         >
           Portal seguro de seguimiento de proyectos, auditorías y entregables técnicos.
         </div>
+        {isEn && (
+          <div
+            role="note"
+            style={{
+              background: 'rgba(168,71,43,0.08)',
+              border: '1px solid rgba(168,71,43,0.2)',
+              borderRadius: 3,
+              padding: '10px 14px',
+              fontSize: 12,
+              lineHeight: 1.5,
+              color: 'var(--ink)',
+              marginBottom: 20,
+              display: 'flex',
+              gap: 8,
+              alignItems: 'flex-start',
+            }}
+          >
+            <span style={{ color: 'var(--terracotta)', fontWeight: 700, flexShrink: 0 }}>ℹ</span>
+            <span>
+              <strong>Peruvian Banking Compliance:</strong> Client and Staff portals operate exclusively in Spanish to satisfy SUNAT RUC validation and bank transfer reconciliation (BCP, Interbank, BBVA in PEN).
+            </span>
+          </div>
+        )}
         <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', marginBottom: 32 }}>
           Iniciar sesión
         </div>

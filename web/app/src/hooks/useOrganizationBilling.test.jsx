@@ -30,13 +30,16 @@ describe('useOrganizationBilling hook', () => {
         realtimeCallback = callback;
         return mockChannel;
       }),
-      subscribe: vi.fn().mockReturnValue(mockChannel),
+      subscribe: vi.fn().mockImplementation((cb) => {
+        if (cb) cb('SUBSCRIBED');
+        return mockChannel;
+      }),
     };
 
     supabase.channel.mockReturnValue(mockChannel);
   });
 
-  it('loads organization and orders on mount and connects to Realtime channel', async () => {
+  it('loads organization and orders on mount and connects to Realtime channel with SUBSCRIBED status', async () => {
     billingLib.fetchClientOrganization.mockResolvedValue({
       id: 'org-1',
       legal_name: 'Tech SAC',
@@ -52,6 +55,8 @@ describe('useOrganizationBilling hook', () => {
 
     expect(result.current.organization?.legal_name).toBe('Tech SAC');
     expect(result.current.orders).toHaveLength(1);
+    expect(result.current.connectionStatus).toBe('SUBSCRIBED');
+    expect(result.current.isOnline).toBe(true);
     expect(supabase.channel).toHaveBeenCalledWith('user-orders-usr-123');
     expect(mockChannel.subscribe).toHaveBeenCalled();
   });

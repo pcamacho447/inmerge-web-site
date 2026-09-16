@@ -197,6 +197,43 @@ export async function createBankTransferOrder({ userId, plan, amountPen, notes }
   return data;
 }
 
+export const MAX_VOUCHER_SIZE_BYTES = 10 * 1024 * 1024; // 10MB límite del bucket billing-vouchers
+
+export const ALLOWED_VOUCHER_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/pdf',
+];
+
+export const ALLOWED_VOUCHER_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+
+/**
+ * Valida de forma defensiva el archivo de comprobante antes de emitir la petición a Storage
+ */
+export function validateVoucherFile(file) {
+  if (!file) {
+    throw new Error('Debe seleccionar un archivo de comprobante de pago.');
+  }
+
+  if (file.size > MAX_VOUCHER_SIZE_BYTES) {
+    throw new Error('El comprobante excede el tamaño máximo permitido de 10 MB.');
+  }
+
+  const fileName = file.name || '';
+  const ext = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
+  const mime = (file.type || '').toLowerCase();
+
+  const isExtAllowed = ALLOWED_VOUCHER_EXTENSIONS.includes(ext);
+  const isMimeAllowed = !mime || mime === 'application/octet-stream' || ALLOWED_VOUCHER_MIME_TYPES.includes(mime);
+
+  if (!isExtAllowed || !isMimeAllowed) {
+    throw new Error('Formato no admitido. Se aceptan únicamente imágenes (JPG, PNG, WebP) o documentos PDF.');
+  }
+
+  return true;
+}
+
 /**
  * Sube el comprobante de transferencia bancaria al bucket seguro 'billing-vouchers'
  */
@@ -205,7 +242,10 @@ export async function uploadOrderVoucher({ orderId, file, userId }) {
     throw new Error('Parámetros insuficientes para subir el comprobante de pago.');
   }
 
-  const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
+  // Validación defensiva en cliente antes del upload
+  validateVoucherFile(file);
+
+  const fileExt = file.name ? file.name.split('.').pop().toLowerCase() : 'jpg';
   const filePath = `${userId}/${orderId}_voucher_${Date.now()}.${fileExt}`;
 
   // 1. Subir archivo binario a Storage

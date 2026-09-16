@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabaseClient.js';
  */
 export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) {
   const [toast, setToast] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('CONNECTING');
 
   useEffect(() => {
     if (!enabled || !supabase?.channel) return;
@@ -100,7 +101,14 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
           onDataRefresh?.();
         },
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (status) {
+          setConnectionStatus(status);
+        }
+        if (status === 'CHANNEL_ERROR') {
+          console.warn('[useRealtimeTeam] Advertencia de conectividad Realtime:', err);
+        }
+      });
 
     return () => {
       if (supabase && typeof supabase.removeChannel === 'function') {
@@ -113,5 +121,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
     toast,
     dismissToast: () => setToast(null),
     showToast: (customToast) => setToast(customToast),
+    connectionStatus,
+    isOnline: connectionStatus === 'SUBSCRIBED',
   };
 }
