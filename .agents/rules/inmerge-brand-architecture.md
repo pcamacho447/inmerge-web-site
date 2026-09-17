@@ -40,9 +40,15 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
    - Todo componente de carrusel continuo (`ProjectCarousel.jsx`) debe utilizar transformaciones CSS aceleradas por GPU (`transform: translate3d(translateX, 0, 0)`) sobre un buffer virtual triplicado (`3 * N`).
    - Prohibido el uso de `scrollLeft` con `scroll-behavior: smooth` para ciclos continuos (genera rebobinados visuales hacia atrás).
    - Al completar la animación de transición (`onTransitionEnd`), ejecutar un rebase instantáneo a 0ms sin transición (`withTransition = false`) para garantizar un avance continuo siempre en una sola dirección hacia adelante.
-11. **Consola de Operaciones Full-Canvas y Slide-Over Drawer (`/equipo`):**
-   - La vista de equipo opera siempre en modo **Full-Canvas (`100vw` / `100vh`)** para dar amplitud a diagramas de Gantt, matrices de riesgo y tablas de leads TDR.
-   - Estructura obligatoria: Topbar pegajosa con resumen de KPIs y estado Realtime, Sidebar colapsable (`.equipo-sidebar` de 240px a 68px) con patrón accesible `role="tablist"` y **Slide-Over Drawer** (`.equipo-drawer-panel`) para flujos de creación/edición sin desmontar la vista de trabajo.
+11. **Consola de Operaciones Full-Canvas, Command Palette (⌘K) y Vistas Split/Kanban (`/equipo`):**
+    - La vista de equipo opera siempre en modo **Full-Canvas (`100vw` / `100vh`)** con barra superior pegajosa, resumen Bento KPI instantáneo y estado Realtime.
+    - **Paleta de Comandos Omnicanal ([`CommandPaletteModal.jsx`](file:///c:/papx/inmerge-website/inmerge/web/app/src/components/team/CommandPaletteModal.jsx)):** Atajo global `Cmd+K` / `Ctrl+K` con búsqueda difusa de proyectos, leads TDR y acciones rápidas (`+ Registrar Proyecto`, `+ Añadir Hito`, `+ Subir Entregable`, `+ Dar de Alta Staff`), accesible según WCAG 2.1 AA (`role="combobox"`, `role="listbox"`, `role="option"`, `↑`/`↓`/`Enter`/`Esc`).
+    - **Conmutador de 4 Vistas en Gestión de Proyectos ([`ProjectsManagementView.jsx`](file:///c:/papx/inmerge-website/inmerge/web/app/src/components/team/ProjectsManagementView.jsx)):**
+      1. `◫ Split 60/40` (Maestro-Detalle): Selección de proyecto en panel izquierdo y detalle completo (Gantt, tareas, entregables firmados, matriz de riesgos) en inspector lateral sticky.
+      2. `☷ Kanban Fases`: Tablero interactivo organizado por las 4 fases metodológicas oficiales de Inmerge (`01 Diagnóstico`, `02 Arquitectura`, `03 Ingeniería/IA`, `04 Certificación`).
+      3. `▦ Cuadrícula`: Vista responsive en 2 columnas para monitores anchos.
+      4. `☰ Lista`: Vista lineal extendida al 100% de ancho.
+    - **Centro de Opciones & Creación Segmentado ([`NewProjectModal.jsx`](file:///c:/papx/inmerge-website/inmerge/web/app/src/components/team/NewProjectModal.jsx)):** Pestañas independientes (`[🚀 Proyecto]`, `[⚡ Hito]`, `[📦 Entregable]`, `[👥 Staff]`) en el Slide-Over Drawer (`.equipo-drawer-panel`) para flujos in-situ sin perder el contexto de trabajo.
 
 ---
 
@@ -120,7 +126,7 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 - **Comandos de Verificación:**
   ```bash
   cd web/app
-  npm test          # Ejecuta suite completa (29 suites, 154+ tests al 100%)
+  npm test          # Ejecuta suite completa (34 suites, 178+ tests al 100%)
   npm run build     # Valida el bundle de producción en Vite
   npm run lint      # Verifica ausencia de warnings de ESLint
   npm run format    # Aplica formato consistente con Prettier

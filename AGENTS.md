@@ -32,7 +32,7 @@ Consulte las especificaciones técnicas del entorno en:
   - Panel de Consultores & Equipo (`/equipo`): Se mantiene exclusivamente en español para la operación interna del equipo de ingeniería en Lima.
 - **Rutas de Autenticación & Clientes:**
   - `/login`, `/registro`, `/cuenta` (Portal de Clientes): Seguimiento exclusivo de proyectos propios, cronogramas e informes técnicos para usuarios `client` y `admin`. Los ingenieros y auditores (`engineer`, `auditor`) son redirigidos obligatoriamente a `/equipo`.
-  - `/equipo` (Consola Editorial Full-Canvas & Operaciones): Panel de operaciones de pantalla completa (100vw/100vh). Incluye barra lateral colapsable (expanded 240px / compact 68px), barra superior sticky con KPIs e indicador Realtime, y Slide-Over Drawer para creación de proyectos, carga de entregables y gestión de hitos sin perder el contexto de la vista. Se mantiene exclusivamente en español. Solo `admin` puede modificar estados de proyectos/hitos/leads, crear proyectos y designar staff.
+  - `/equipo` (Consola Editorial Full-Canvas & Operaciones): Panel de operaciones de pantalla completa (100vw/100vh) con resumen Bento KPI, Paleta de Comandos global (`⌘K` / `Ctrl+K`) para búsqueda difusa instantánea, espacio de trabajo Maestro-Detalle Split (60/40), Tablero Kanban de Fases Metodológicas Inmerge y Slide-Over Drawer segmentado (`[🚀 Proyecto]`, `[⚡ Hito]`, `[📦 Entregable]`, `[👥 Staff]`). Se mantiene exclusivamente en español. Solo `admin` puede modificar estados de proyectos/hitos/leads, crear proyectos y designar staff.
     - **Gestión In-Situ de Entregables:** La publicación y descarga forense de entregables técnicos (`project_deliverables`) se gestiona directamente dentro de cada tarjeta de proyecto (subpestaña `PM_DELIVERABLES`). Toda descarga debe emplear enlaces firmados temporales auditados (`getSignedDeliverableUrl`).
     - **Navegación Accesible (WCAG 2.1 AA):** Los módulos principales del panel implementan el patrón estándar `role="tablist"` / `role="tab"` / `role="tabpanel"` con navegación fluida por teclado (`ArrowRight`, `ArrowLeft`, `ArrowUp`, `ArrowDown`, `Home`, `End`).
 - **Restricciones de Negocio & Pagos:**
@@ -64,7 +64,7 @@ Consulte las especificaciones técnicas del entorno en:
 ---
 
 ## 5. Estándares de Código y Calidad
-1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 33 suites de pruebas (174+ tests) deben pasar al 100%.
+1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 34 suites de pruebas (178+ tests) deben pasar al 100%.
 2. **Build de Producción:** Verificar que `npm run build` compile limpiamente sin errores de bundling.
 3. **Formato y Linter:** Mantener conformidad con `npm run lint` y `npm run format`.
 
