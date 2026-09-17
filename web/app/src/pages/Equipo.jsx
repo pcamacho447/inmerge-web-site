@@ -928,6 +928,10 @@ export default function Equipo() {
                   setDelivFile={setDelivFile}
                   handleUploadDeliverable={handleUploadDeliverable}
                   uploading={uploading}
+                  newStaff={newStaff}
+                  setNewStaff={setNewStaff}
+                  handleCreateStaff={handleCreateStaff}
+                  staffSubmitting={staffSubmitting}
                 />
               )}
 
@@ -986,7 +990,7 @@ export default function Equipo() {
 
         <div className="equipo-drawer-body">
           <p style={{ fontSize: 13, color: 'var(--muted)', margin: '0 0 20px' }}>
-            Acceso rápido para registrar proyectos, añadir hitos a la metodología Inmerge y subir entregables forenses sin perder tu vista de trabajo.
+            Acceso rápido para registrar proyectos, añadir hitos a la metodología Inmerge, subir entregables forenses y registrar staff sin perder tu vista de trabajo.
           </p>
 
           <NewProjectModal
@@ -1015,6 +1019,13 @@ export default function Equipo() {
               setIsDrawerOpen(false);
             }}
             uploading={uploading}
+            newStaff={newStaff}
+            setNewStaff={setNewStaff}
+            handleCreateStaff={async (e) => {
+              await handleCreateStaff(e);
+              setIsDrawerOpen(false);
+            }}
+            staffSubmitting={staffSubmitting}
           />
         </div>
       </div>

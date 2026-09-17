@@ -76,6 +76,7 @@ export default function ProjectsManagementView({
   const [inlineDelivFile, setInlineDelivFile] = useState(null);
   const [isUploadingDeliv, setIsUploadingDeliv] = useState(false);
   const [downloadingDelivId, setDownloadingDelivId] = useState(null);
+  const [viewLayout, setViewLayout] = useState('LIST'); // 'LIST' | 'GRID'
 
   const setProjSubTab = (projId, tab) => {
     setProjectSubTabs((prev) => ({
@@ -98,29 +99,91 @@ export default function ProjectsManagementView({
           </p>
         </div>
 
-        {isAdmin && onOpenNewProject && (
-          <button
-            type="button"
-            onClick={onOpenNewProject}
-            className="btn-hover"
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          {/* Layout View Mode Switcher */}
+          <div
+            role="group"
+            aria-label="Modo de visualización de proyectos"
             style={{
-              background: 'var(--terracotta)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 20,
-              padding: '9px 18px',
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: 'pointer',
               display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontFamily: "'IBM Plex Sans', sans-serif",
+              background: 'var(--cream2)',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+              padding: 2,
             }}
           >
-            <span>+ Registrar Nuevo Proyecto</span>
-          </button>
-        )}
+            <button
+              type="button"
+              onClick={() => setViewLayout('LIST')}
+              title="Vista Lista Extendida (100% Ancho)"
+              aria-pressed={viewLayout === 'LIST'}
+              style={{
+                background: viewLayout === 'LIST' ? 'var(--ink)' : 'transparent',
+                color: viewLayout === 'LIST' ? 'var(--gold)' : 'var(--muted)',
+                border: 'none',
+                borderRadius: 4,
+                padding: '6px 12px',
+                fontSize: 12,
+                fontWeight: 600,
+                fontFamily: "'IBM Plex Sans', sans-serif",
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <span>☰ Lista 100%</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewLayout('GRID')}
+              title="Vista Cuadrícula 2 Columnas (@container)"
+              aria-pressed={viewLayout === 'GRID'}
+              style={{
+                background: viewLayout === 'GRID' ? 'var(--ink)' : 'transparent',
+                color: viewLayout === 'GRID' ? 'var(--gold)' : 'var(--muted)',
+                border: 'none',
+                borderRadius: 4,
+                padding: '6px 12px',
+                fontSize: 12,
+                fontWeight: 600,
+                fontFamily: "'IBM Plex Sans', sans-serif",
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <span>▦ Cuadrícula 2-Col</span>
+            </button>
+          </div>
+
+          {isAdmin && onOpenNewProject && (
+            <button
+              type="button"
+              onClick={onOpenNewProject}
+              className="btn-hover"
+              style={{
+                background: 'var(--terracotta)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 20,
+                padding: '9px 18px',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontFamily: "'IBM Plex Sans', sans-serif",
+              }}
+            >
+              <span>+ Registrar Nuevo Proyecto</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {projects.length === 0 ? (
@@ -136,7 +199,22 @@ export default function ProjectsManagementView({
           <p style={{ color: 'var(--muted)', margin: 0 }}>No hay proyectos activos registrados.</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div
+          style={
+            viewLayout === 'GRID'
+              ? {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 580px), 1fr))',
+                  gap: 20,
+                  alignItems: 'start',
+                }
+              : {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 20,
+                }
+          }
+        >
           {projects.map((proj) => {
             const totalMilestones = proj.milestones?.length || 0;
             const completedMilestones = proj.milestones?.filter((m) => m.status === 'COMPLETADO').length || 0;

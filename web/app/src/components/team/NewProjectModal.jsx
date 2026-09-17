@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 export const METHODOLOGY_PHASE_PRESETS = [
   { id: '01', order: 1, label: 'Fase 01 — Auditoría & Diagnóstico Inicial', template: 'Fase 01 — Auditoría & Diagnóstico Inicial' },
   { id: '02', order: 2, label: 'Fase 02 — Arquitectura & Diseño de Solución', template: 'Fase 02 — Arquitectura & Diseño de Solución' },
@@ -12,8 +14,8 @@ export const METHODOLOGY_PHASE_PRESETS = [
 ];
 
 export default function NewProjectModal({
-  clients,
-  projects,
+  clients = [],
+  projects = [],
   staffList = [],
   newProj,
   setNewProj,
@@ -27,7 +29,13 @@ export default function NewProjectModal({
   setDelivFile,
   handleUploadDeliverable,
   uploading,
+  newStaff,
+  setNewStaff,
+  handleCreateStaff,
+  staffSubmitting,
 }) {
+  const [activeModalTab, setActiveModalTab] = useState('project'); // 'project' | 'milestone' | 'deliverable' | 'staff'
+
   const handlePhasePresetChange = (presetId) => {
     const found = METHODOLOGY_PHASE_PRESETS.find((p) => p.id === presetId);
     if (!found) return;
@@ -46,126 +54,116 @@ export default function NewProjectModal({
       });
     }
   };
+
+  const modalTabs = [
+    { id: 'project', label: '🚀 Proyecto', title: 'Registrar Nuevo Proyecto' },
+    { id: 'milestone', label: '⚡ Hito Metodológico', title: 'Agregar Hito a Proyecto' },
+    { id: 'deliverable', label: '📦 Entregable', title: 'Publicar Entregable / Informe' },
+    ...(handleCreateStaff && newStaff ? [{ id: 'staff', label: '👥 Alta Staff', title: 'Alta de Consultor / Ingeniero' }] : []),
+  ];
+
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
-      {/* Form 1: New Project */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Segmented Modal Tabs */}
       <div
+        role="tablist"
+        aria-label="Pestañas de opciones y creación"
         style={{
+          display: 'flex',
+          gap: 6,
           background: 'var(--cream2)',
-          padding: 24,
+          padding: 4,
           borderRadius: 8,
           border: '1px solid var(--border)',
+          overflowX: 'auto',
         }}
       >
-        <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: '0 0 16px', color: 'var(--ink)' }}>
-          1. Registrar Nuevo Proyecto
-        </h3>
-        <form onSubmit={handleCreateProject} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-              Cliente Asignado (Seleccionar Usuario Registrado) *
-            </label>
-            <select
-              value={newProj.clientId}
-              onChange={(e) => setNewProj({ ...newProj, clientId: e.target.value })}
-              required
+        {modalTabs.map((t) => {
+          const isSelected = activeModalTab === t.id;
+          return (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={isSelected}
+              type="button"
+              onClick={() => setActiveModalTab(t.id)}
               style={{
-                width: '100%',
+                flex: 1,
                 padding: '8px 12px',
-                borderRadius: 4,
-                border: '1px solid var(--border)',
                 fontSize: 13,
-                boxSizing: 'border-box',
-                background: '#fff',
+                fontWeight: isSelected ? 700 : 500,
+                fontFamily: "'IBM Plex Sans', sans-serif",
+                background: isSelected ? 'var(--ink)' : 'transparent',
+                color: isSelected ? 'var(--gold)' : 'var(--muted)',
+                border: 'none',
+                borderRadius: 6,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.15s ease',
               }}
             >
-              <option value="">-- Seleccionar Cliente ({clients.length} disponibles) --</option>
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.full_name ? `${c.full_name} (${c.email})` : c.email} {c.company ? `— ${c.company}` : ''}
-                </option>
-              ))}
-            </select>
-            {clients.length === 0 && (
-              <div style={{ fontSize: 11, color: 'var(--terracotta)', marginTop: 4 }}>
-                Nota: No hay cuentas de cliente registradas aún. El cliente puede registrarse en /registro.
-              </div>
-            )}
-          </div>
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-              Nombre del Proyecto / Auditoría *
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Auditoría Integral de Base de Datos y AWS"
-              value={newProj.title}
-              onChange={(e) => setNewProj({ ...newProj, title: e.target.value })}
-              required
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 4,
-                border: '1px solid var(--border)',
-                fontSize: 13,
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-              Pilar Estratégico *
-            </label>
-            <select
-              value={newProj.pillar}
-              onChange={(e) => setNewProj({ ...newProj, pillar: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 4,
-                border: '1px solid var(--border)',
-                fontSize: 13,
-                boxSizing: 'border-box',
-              }}
-            >
-              <option value="auditoria">01. Auditoría Técnica & Datos</option>
-              <option value="desarrollo">02. Desarrollo Cloud & AWS</option>
-              <option value="datos">03. Datos & IA</option>
-              <option value="integral">Solución Integral Multi-pilar</option>
-            </select>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-              Descripción del Alcance
-            </label>
-            <textarea
-              rows={4}
-              placeholder="Objetivos técnicos, infraestructura evaluada y entregables acordados..."
-              value={newProj.description}
-              onChange={(e) => setNewProj({ ...newProj, description: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 4,
-                border: '1px solid var(--border)',
-                fontSize: 13,
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
+      {/* Form 1: New Project */}
+      {activeModalTab === 'project' && (
+        <div
+          style={{
+            background: 'var(--cream2)',
+            padding: 24,
+            borderRadius: 8,
+            border: '1px solid var(--border)',
+          }}
+        >
+          <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: '0 0 16px', color: 'var(--ink)' }}>
+            1. Registrar Nuevo Proyecto / Auditoría
+          </h3>
+          <form onSubmit={handleCreateProject} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div>
               <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-                Fecha Estimada de Entrega
+                Cliente Asignado (Seleccionar Usuario Registrado) *
+              </label>
+              <select
+                value={newProj.clientId}
+                onChange={(e) => setNewProj({ ...newProj, clientId: e.target.value })}
+                required
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                  fontSize: 13,
+                  boxSizing: 'border-box',
+                  background: '#fff',
+                }}
+              >
+                <option value="">-- Seleccionar Cliente ({clients.length} disponibles) --</option>
+                {clients.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.full_name ? `${c.full_name} (${c.email})` : c.email} {c.company ? `— ${c.company}` : ''}
+                  </option>
+                ))}
+              </select>
+              {clients.length === 0 && (
+                <div style={{ fontSize: 11, color: 'var(--terracotta)', marginTop: 4 }}>
+                  Nota: No hay cuentas de cliente registradas aún. El cliente puede registrarse en /registro.
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                Nombre del Proyecto / Auditoría *
               </label>
               <input
-                type="date"
-                value={newProj.targetCompletionDate}
-                onChange={(e) => setNewProj({ ...newProj, targetCompletionDate: e.target.value })}
+                type="text"
+                placeholder="e.g. Auditoría Integral de Base de Datos y AWS"
+                value={newProj.title}
+                onChange={(e) => setNewProj({ ...newProj, title: e.target.value })}
+                required
                 style={{
                   width: '100%',
                   padding: '8px 12px',
@@ -179,31 +177,11 @@ export default function NewProjectModal({
 
             <div>
               <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
-                Líder / Ingeniero / Auditor Designado
+                Pilar Estratégico *
               </label>
               <select
-                value={
-                  staffList.find(
-                    (s) => (s.full_name && s.full_name === newProj.techLeadName) || (s.email && s.email === newProj.techLeadContact),
-                  )?.id || ''
-                }
-                onChange={(e) => {
-                  const memberId = e.target.value;
-                  const member = staffList.find((s) => s.id === memberId);
-                  if (member) {
-                    setNewProj({
-                      ...newProj,
-                      techLeadName: member.full_name || member.email,
-                      techLeadContact: member.email || '',
-                    });
-                  } else {
-                    setNewProj({
-                      ...newProj,
-                      techLeadName: 'Inmerge Tech Lead',
-                      techLeadContact: 'inmerge3@gmail.com',
-                    });
-                  }
-                }}
+                value={newProj.pillar}
+                onChange={(e) => setNewProj({ ...newProj, pillar: e.target.value })}
                 style={{
                   width: '100%',
                   padding: '8px 12px',
@@ -211,41 +189,124 @@ export default function NewProjectModal({
                   border: '1px solid var(--border)',
                   fontSize: 13,
                   boxSizing: 'border-box',
-                  background: '#fff',
                 }}
               >
-                <option value="">-- Seleccionar Consultor Asignado --</option>
-                {staffList.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.full_name || s.email} ({s.role ? s.role.toUpperCase() : 'STAFF'})
-                  </option>
-                ))}
+                <option value="auditoria">01. Auditoría Técnica & Datos</option>
+                <option value="desarrollo">02. Desarrollo Cloud & AWS</option>
+                <option value="datos">03. Datos & IA</option>
+                <option value="integral">Solución Integral Multi-pilar</option>
               </select>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            style={{
-              background: 'var(--terracotta)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 20,
-              padding: '10px 20px',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: 'pointer',
-              marginTop: 8,
-            }}
-          >
-            Guardar Proyecto
-          </button>
-        </form>
-      </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                Descripción del Alcance
+              </label>
+              <textarea
+                rows={4}
+                placeholder="Objetivos técnicos, infraestructura evaluada y entregables acordados..."
+                value={newProj.description}
+                onChange={(e) => setNewProj({ ...newProj, description: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                  fontSize: 13,
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
 
-      {/* Form 2: Add Milestone & Upload Deliverable */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        {/* Milestone Form */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                  Fecha Estimada de Entrega
+                </label>
+                <input
+                  type="date"
+                  value={newProj.targetCompletionDate}
+                  onChange={(e) => setNewProj({ ...newProj, targetCompletionDate: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                    fontSize: 13,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                  Líder / Ingeniero / Auditor Designado
+                </label>
+                <select
+                  value={
+                    staffList.find(
+                      (s) => (s.full_name && s.full_name === newProj.techLeadName) || (s.email && s.email === newProj.techLeadContact),
+                    )?.id || ''
+                  }
+                  onChange={(e) => {
+                    const memberId = e.target.value;
+                    const member = staffList.find((s) => s.id === memberId);
+                    if (member) {
+                      setNewProj({
+                        ...newProj,
+                        techLeadName: member.full_name || member.email,
+                        techLeadContact: member.email || '',
+                      });
+                    } else {
+                      setNewProj({
+                        ...newProj,
+                        techLeadName: 'Inmerge Tech Lead',
+                        techLeadContact: 'inmerge3@gmail.com',
+                      });
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                    fontSize: 13,
+                    boxSizing: 'border-box',
+                    background: '#fff',
+                  }}
+                >
+                  <option value="">-- Seleccionar Consultor Asignado --</option>
+                  {staffList.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.full_name || s.email} ({s.role ? s.role.toUpperCase() : 'STAFF'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              style={{
+                background: 'var(--terracotta)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 20,
+                padding: '10px 20px',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+                marginTop: 8,
+              }}
+            >
+              Guardar Proyecto
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Form 2: Add Milestone */}
+      {activeModalTab === 'milestone' && (
         <div
           style={{
             background: 'var(--cream2)',
@@ -255,7 +316,7 @@ export default function NewProjectModal({
           }}
         >
           <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: '0 0 16px', color: 'var(--ink)' }}>
-            2. Agregar Hito a Proyecto
+            2. Agregar Hito a Proyecto Existente
           </h3>
           <form onSubmit={handleAddMilestone} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div>
@@ -275,7 +336,7 @@ export default function NewProjectModal({
                   boxSizing: 'border-box',
                 }}
               >
-                <option value="">-- Seleccionar Proyecto --</option>
+                <option value="">-- Seleccionar Proyecto ({projects.length}) --</option>
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.title}
@@ -437,8 +498,10 @@ export default function NewProjectModal({
             </button>
           </form>
         </div>
+      )}
 
-        {/* Deliverable Form */}
+      {/* Form 3: Upload Deliverable */}
+      {activeModalTab === 'deliverable' && (
         <div
           style={{
             background: 'var(--cream2)',
@@ -468,7 +531,7 @@ export default function NewProjectModal({
                   boxSizing: 'border-box',
                 }}
               >
-                <option value="">-- Seleccionar Proyecto --</option>
+                <option value="">-- Seleccionar Proyecto ({projects.length}) --</option>
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.title}
@@ -597,7 +660,128 @@ export default function NewProjectModal({
             </button>
           </form>
         </div>
-      </div>
+      )}
+
+      {/* Form 4: Create Staff */}
+      {activeModalTab === 'staff' && handleCreateStaff && newStaff && (
+        <div
+          style={{
+            background: 'var(--cream2)',
+            padding: 24,
+            borderRadius: 8,
+            border: '1px solid var(--border)',
+          }}
+        >
+          <h3 style={{ fontFamily: "'Spectral', serif", fontSize: 20, margin: '0 0 16px', color: 'var(--ink)' }}>
+            4. Registrar Nuevo Consultor / Ingeniero
+          </h3>
+          <form onSubmit={handleCreateStaff} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                Nombre Completo *
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Ing. Andrea Valdivia"
+                value={newStaff.fullName}
+                onChange={(e) => setNewStaff({ ...newStaff, fullName: e.target.value })}
+                required
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                  fontSize: 13,
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                Correo Electrónico Corporativo *
+              </label>
+              <input
+                type="email"
+                placeholder="andrea.valdivia@inmerge.pe"
+                value={newStaff.email}
+                onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
+                required
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                  fontSize: 13,
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>Rol *</label>
+                <select
+                  value={newStaff.role}
+                  onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                    fontSize: 13,
+                    boxSizing: 'border-box',
+                    background: '#fff',
+                  }}
+                >
+                  <option value="engineer">Ingeniero de Software / Cloud</option>
+                  <option value="auditor">Auditor Técnico & Datos</option>
+                  <option value="admin">Administrador General</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 4 }}>
+                  Contraseña Inicial *
+                </label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={newStaff.password}
+                  onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                    fontSize: 13,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={staffSubmitting}
+              style={{
+                background: 'var(--terracotta)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 20,
+                padding: '10px 20px',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: staffSubmitting ? 'not-allowed' : 'pointer',
+                marginTop: 8,
+              }}
+            >
+              {staffSubmitting ? 'Registrando...' : 'Dar de Alta Colaborador'}
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
