@@ -12,12 +12,19 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 30);
+      const isHomePage = pathname === '/' || pathname === '/en';
+      // Over the hero video, keep transparent until user scrolls past ~55% of the viewport height
+      const threshold = isHomePage ? Math.max((window.innerHeight || 700) * 0.55, 360) : 20;
+      setScrolled(window.scrollY > threshold);
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    window.addEventListener('resize', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [pathname]);
 
   const isHome = pathname === '/' || pathname === '/en';
   const isTransparent = isHome && !scrolled;
@@ -36,8 +43,8 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
       : 'Iniciar sesión';
 
   // Dynamic theme colors: transparent when over the hero video on Home, acrylic light arena (#F3EADA) when scrolled or on other pages
-  const navBg = isTransparent ? 'transparent' : 'rgba(243, 234, 218, 0.95)';
-  const navBorder = isTransparent ? 'none' : '1px solid var(--border)';
+  const navBg = isTransparent ? 'transparent' : 'rgba(243, 234, 218, 0.92)';
+  const navBorder = isTransparent ? '1px solid transparent' : '1px solid var(--border)';
   const textColor = isTransparent ? '#F3EADA' : 'var(--ink)';
   const activeColor = isTransparent ? 'var(--gold)' : 'var(--terracotta)';
   const buttonBg = isTransparent ? 'var(--terracotta)' : 'var(--ink)';
@@ -54,15 +61,17 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
         width: '100%',
         zIndex: 50,
         background: navBg,
-        backdropFilter: isTransparent ? 'none' : 'blur(10px)',
-        WebkitBackdropFilter: isTransparent ? 'none' : 'blur(10px)',
+        backdropFilter: isTransparent ? 'none' : 'blur(14px)',
+        WebkitBackdropFilter: isTransparent ? 'none' : 'blur(14px)',
         borderBottom: navBorder,
+        boxShadow: isTransparent ? 'none' : '0 4px 20px rgba(36, 26, 18, 0.05)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 20,
-        padding: '18px clamp(20px,5vw,40px)',
-        transition: 'background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease, color 0.3s ease',
+        padding: isTransparent ? '20px clamp(20px,5vw,40px)' : '14px clamp(20px,5vw,40px)',
+        transition:
+          'background 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s ease, backdrop-filter 0.5s ease, -webkit-backdrop-filter 0.5s ease, color 0.4s ease, padding 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease',
       }}
     >
       <Link
