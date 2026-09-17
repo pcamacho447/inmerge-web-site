@@ -8,10 +8,13 @@ export default function ProjectCarousel({ onQuoteProject }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoplay, setIsAutoplay] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const carouselRef = useRef(null);
   const cardRefs = useRef([]);
+  const startXRef = useRef(0);
+  const startScrollLeftRef = useRef(0);
+  const hasMovedRef = useRef(false);
 
   const filteredProjects =
     selectedPillar === 'all'
@@ -30,7 +33,6 @@ export default function ProjectCarousel({ onQuoteProject }) {
   // Reset activeIndex when filter changes
   useEffect(() => {
     setActiveIndex(0);
-    setProgress(0);
     if (carouselRef.current) {
       if (typeof carouselRef.current.scrollTo === 'function') {
         carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
@@ -44,7 +46,6 @@ export default function ProjectCarousel({ onQuoteProject }) {
   const scrollToIndex = useCallback((index) => {
     if (index < 0 || index >= filteredProjects.length) return;
     setActiveIndex(index);
-    setProgress(0);
 
     const targetCard = cardRefs.current[index];
     if (targetCard && carouselRef.current) {
@@ -65,38 +66,120 @@ export default function ProjectCarousel({ onQuoteProject }) {
     }
   }, [filteredProjects.length]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     const nextIdx = activeIndex > 0 ? activeIndex - 1 : filteredProjects.length - 1;
     scrollToIndex(nextIdx);
-  };
+  }, [activeIndex, filteredProjects.length, scrollToIndex]);
 
   const handleNext = useCallback(() => {
     const nextIdx = activeIndex < filteredProjects.length - 1 ? activeIndex + 1 : 0;
     scrollToIndex(nextIdx);
   }, [activeIndex, filteredProjects.length, scrollToIndex]);
 
-  // Autoplay progression timer
+  // Smooth automatic motion progression every 5 seconds
   useEffect(() => {
-    if (!isAutoplay || isPaused || filteredProjects.length <= 1) {
+    if (!isAutoplay || isPaused || isDragging || filteredProjects.length <= 1) {
       return;
     }
 
-    const intervalTime = 6000; // 6 seconds per single-card slide
-    const stepTime = 100;
-    const progressStep = (stepTime / intervalTime) * 100;
-
     const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          handleNext();
-          return 0;
-        }
-        return prev + progressStep;
-      });
-    }, stepTime);
+      handleNext();
+    }, 5000);
 
     return () => clearInterval(timer);
-  }, [isAutoplay, isPaused, handleNext, filteredProjects.length]);
+  }, [isAutoplay, isPaused, isDragging, handleNext, filteredProjects.length]);
+
+  const isDraggingRef = useRef(false);
+
+  const getEventCoord = (e) => {
+    if (e.clientX !== undefined) return e.clientX;
+    if (e.pageX !== undefined) return e.pageX;
+    return 0;
+  };
+
+  // Mouse Drag to Scroll Handlers
+  const handleMouseDown = (e) => {
+    if (!carouselRef.current) return;
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    setIsPaused(true);
+    hasMovedRef.current = false;
+    startXRef.current = getEventCoord(e);
+    startScrollLeftRef.current = carouselRef.current.scrollLeft || 0;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDraggingRef.current || !carouselRef.current) return;
+    if (e.preventDefault) e.preventDefault();
+    const currentX = getEventCoord(e);
+    const walk = currentX - startXRef.current;
+    if (Math.abs(walk) > 5) {
+      hasMovedRef.current = true;
+    }
+    carouselRef.current.scrollLeft = (startScrollLeftRef.current || 0) - walk;
+  };
+
+  const handleMouseUp = (e) => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    setIsDragging(false);
+    setIsPaused(false);
+    if (!carouselRef.current) return;
+    const currentX = getEventCoord(e);
+    const walk = currentX - startXRef.current;
+
+    if (walk < -40) {
+      handleNext();
+    } else if (walk > 40) {
+      handlePrev();
+    } else {
+      scrollToIndex(activeIndex);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (isDraggingRef.current) {
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      setIsPaused(false);
+      scrollToIndex(activeIndex);
+    }
+  };
+
+  // Touch Swipe Handlers for mobile & trackpads
+  const handleTouchStart = (e) => {
+    if (!carouselRef.current || e.touches.length === 0) return;
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    setIsPaused(true);
+    startXRef.current = e.touches[0].pageX ?? e.touches[0].clientX ?? 0;
+    startScrollLeftRef.current = carouselRef.current.scrollLeft || 0;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDraggingRef.current || !carouselRef.current || e.touches.length === 0) return;
+    const pageX = e.touches[0].pageX ?? e.touches[0].clientX ?? 0;
+    const walk = pageX - startXRef.current;
+    carouselRef.current.scrollLeft = (startScrollLeftRef.current || 0) - walk;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    setIsDragging(false);
+    setIsPaused(false);
+    if (!carouselRef.current || e.changedTouches.length === 0) return;
+    const pageX = e.changedTouches[0].pageX ?? e.changedTouches[0].clientX ?? 0;
+    const walk = pageX - startXRef.current;
+
+    if (walk < -40) {
+      handleNext();
+    } else if (walk > 40) {
+      handlePrev();
+    } else {
+      scrollToIndex(activeIndex);
+    }
+  };
 
   // Keyboard navigation
   const handleKeyDown = (e) => {
@@ -129,7 +212,9 @@ export default function ProjectCarousel({ onQuoteProject }) {
       aria-roledescription="carousel"
       aria-label={isEn ? 'Featured Case Studies & Technical Architecture' : 'Casos de Éxito & Arquitectura Técnica'}
       onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      onMouseLeave={() => {
+        if (!isDragging) setIsPaused(false);
+      }}
       onFocus={() => setIsPaused(true)}
       onBlur={() => setIsPaused(false)}
     >
@@ -150,7 +235,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
           </p>
         </div>
 
-        {/* Deck Navigation & Top Controls */}
+        {/* Deck Navigation & Controls */}
         <div className="carousel-top-controls">
           <div className="carousel-deck-meta">
             <span className="deck-counter" aria-live="polite">
@@ -192,13 +277,6 @@ export default function ProjectCarousel({ onQuoteProject }) {
         </div>
       </div>
 
-      {/* Progress Bar for Current Slide */}
-      {isAutoplay && !isPaused && (
-        <div className="carousel-progress-wrapper" aria-hidden="true">
-          <div className="carousel-progress-bar" style={{ width: `${progress}%` }} />
-        </div>
-      )}
-
       {/* Filter Tabs */}
       <div className="carousel-filter-bar" role="tablist" aria-label={isEn ? 'Filter by pillar' : 'Filtrar por pilar'}>
         {filterTabs.map((tab) => (
@@ -215,13 +293,20 @@ export default function ProjectCarousel({ onQuoteProject }) {
         ))}
       </div>
 
-      {/* Single-Card Focused Track Container */}
+      {/* Interactive Single-Card Track with Drag & Auto-motion */}
       <div
-        className="carousel-track single-card-track"
+        className={`carousel-track single-card-track ${isDragging ? 'is-dragging' : ''}`}
         ref={carouselRef}
         tabIndex={0}
         aria-live="polite"
         onKeyDown={handleKeyDown}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {filteredProjects.map((project, idx) => {
           const badge = getPillarBadge(project.pillarId);
@@ -235,7 +320,11 @@ export default function ProjectCarousel({ onQuoteProject }) {
               role="group"
               aria-roledescription="slide"
               aria-label={`${isEn ? 'Case' : 'Caso'} ${idx + 1} ${isEn ? 'of' : 'de'} ${filteredProjects.length}: ${isEn ? project.title.en : project.title.es}`}
-              onClick={() => scrollToIndex(idx)}
+              onClick={() => {
+                if (!hasMovedRef.current) {
+                  scrollToIndex(idx);
+                }
+              }}
             >
               {/* Header Meta */}
               <div className="card-top-meta">

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ProjectCarousel from './ProjectCarousel.jsx';
 import { LanguageProvider, STORAGE_KEY } from '../context/LanguageContext.jsx';
@@ -74,6 +74,20 @@ describe('ProjectCarousel Component', () => {
 
     fireEvent.click(autoplayBtn);
     expect(screen.getByTitle(/activar auto-slide/i)).toBeInTheDocument();
+  });
+
+  it('handles mouse dragging gesture to advance slides', () => {
+    renderWithLang(<ProjectCarousel onQuoteProject={vi.fn()} />);
+
+    const track = screen.getByRole('region', { name: /casos de éxito/i }).querySelector('.carousel-track');
+    expect(track).toBeInTheDocument();
+
+    // Drag left (> 50px) to go next
+    fireEvent.mouseDown(track, { clientX: 200, pageX: 200 });
+    fireEvent.mouseMove(track, { clientX: 100, pageX: 100 });
+    fireEvent.mouseUp(track, { clientX: 100, pageX: 100 });
+
+    expect(screen.getByText(/02 \/ 06/)).toBeInTheDocument();
   });
 
   it('triggers onQuoteProject callback with project data when CTA is clicked', () => {

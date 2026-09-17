@@ -533,21 +533,6 @@ details.service-accordion-item > summary::marker {
   border-color: var(--terracotta);
 }
 
-.carousel-progress-wrapper {
-  width: 100%;
-  height: 3px;
-  background: var(--cream2);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.carousel-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold), var(--terracotta));
-  transition: width 0.1s linear;
-}
-
 .carousel-filter-bar {
   display: flex;
   gap: 8px;
@@ -555,10 +540,11 @@ details.service-accordion-item > summary::marker {
   padding-bottom: 12px;
   margin-bottom: 24px;
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .carousel-filter-bar::-webkit-scrollbar {
-  display: none;
+  display: none !important;
 }
 
 .carousel-filter-btn {
@@ -589,7 +575,26 @@ details.service-accordion-item > summary::marker {
   scroll-behavior: smooth;
   padding: 16px 10px 24px 10px;
   outline: none;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none !important;
+}
+
+.carousel-track.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+.carousel-track.is-dragging * {
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .carousel-track.single-card-track {
