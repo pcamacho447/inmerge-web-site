@@ -41,8 +41,8 @@ export default function Inicio() {
       <div
         style={{
           position: 'relative',
-          padding: '140px clamp(20px,5vw,40px) 100px',
-          minHeight: '85vh',
+          padding: '160px clamp(24px,5vw,64px) 110px',
+          minHeight: '90vh',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -99,7 +99,7 @@ export default function Inicio() {
           }}
         />
 
-        <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', width: '100%', zIndex: 2 }}>
+        <div style={{ position: 'relative', maxWidth: 1440, margin: '0 auto', width: '100%', zIndex: 2 }}>
           <div
             style={{
               fontFamily: "'IBM Plex Mono', monospace",
@@ -118,12 +118,12 @@ export default function Inicio() {
             style={{
               fontFamily: "'Spectral',serif",
               fontWeight: 700,
-              fontSize: 'clamp(42px,7vw,100px)',
+              fontSize: 'clamp(44px,7.5vw,108px)',
               lineHeight: 1.04,
               letterSpacing: -1.5,
-              margin: '0 0 28px',
+              margin: '0 0 32px',
               color: '#F3EADA',
-              maxWidth: 1050,
+              maxWidth: 1180,
             }}
           >
             {isEn ? (
@@ -143,18 +143,18 @@ export default function Inicio() {
             )}
           </h1>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 32 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 36 }}>
             <p
               style={{
                 fontFamily: "'Spectral', serif",
                 fontStyle: 'italic',
-                fontSize: 'clamp(17px, 2vw, 22px)',
+                fontSize: 'clamp(18px, 2.1vw, 24px)',
                 lineHeight: 1.6,
                 color: 'rgba(243, 234, 218, 0.95)',
-                maxWidth: 640,
+                maxWidth: 720,
                 margin: 0,
                 borderLeft: '3px solid var(--terracotta)',
-                paddingLeft: 20,
+                paddingLeft: 24,
               }}
             >
               {isEn
@@ -227,10 +227,10 @@ export default function Inicio() {
       </div>
 
       {/* 3 Pillars Section */}
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '80px clamp(20px,5vw,40px) 120px' }}>
+      <div style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
         <div
           data-reveal=""
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 56, flexWrap: 'wrap', gap: 16 }}
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 64, flexWrap: 'wrap', gap: 20 }}
         >
           <div>
             <div
@@ -240,12 +240,12 @@ export default function Inicio() {
                 color: 'var(--terracotta)',
                 letterSpacing: 2,
                 fontWeight: 600,
-                marginBottom: 8,
+                marginBottom: 10,
               }}
             >
               {isEn ? 'STRATEGIC CAPABILITIES' : 'NUESTRA OFERTA ESTRATÉGICA'}
             </div>
-            <h2 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,4.5vw,52px)', margin: 0 }}>
+            <h2 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(34px,4.8vw,56px)', margin: 0 }}>
               {isEn ? 'Three Pillars of Engineering & Assurance' : 'Los Tres Pilares de Inmerge'}
             </h2>
           </div>
@@ -257,8 +257,8 @@ export default function Inicio() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: 24,
+            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+            gap: 'clamp(36px, 4vw, 64px)',
           }}
         >
           {content.PILLARS.map((pillar) => (
@@ -270,7 +270,7 @@ export default function Inicio() {
       </div>
 
       {/* Case Studies Section */}
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 clamp(20px,5vw,40px) 60px' }}>
+      <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 clamp(24px, 5vw, 64px) clamp(100px, 12vh, 150px)' }}>
         <ProjectCarousel onQuoteProject={(proj) => handleOpenAssistant(proj)} />
       </div>
 
@@ -280,7 +280,7 @@ export default function Inicio() {
           position: 'relative',
           background: 'var(--ink)',
           color: 'var(--bg)',
-          padding: '140px clamp(20px,5vw,40px)',
+          padding: 'clamp(120px, 14vh, 180px) clamp(24px, 5vw, 64px)',
           overflow: 'hidden',
         }}
       >

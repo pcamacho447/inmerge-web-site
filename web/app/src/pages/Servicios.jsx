@@ -38,7 +38,7 @@ export default function Servicios() {
   return (
     <>
       {/* Header */}
-      <div style={{ padding: '100px clamp(20px,5vw,40px) 60px', maxWidth: 1240, margin: '0 auto' }}>
+      <div style={{ padding: '120px clamp(24px, 5vw, 64px) 60px', maxWidth: 1440, margin: '0 auto' }}>
         <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 24 }}>
           {isEn ? 'SERVICES CATALOG' : 'CATÁLOGO DE SERVICIOS'}
         </div>
@@ -46,16 +46,16 @@ export default function Servicios() {
           style={{
             fontFamily: "'Spectral',serif",
             fontWeight: 700,
-            fontSize: 'clamp(40px,7vw,88px)',
+            fontSize: 'clamp(42px,7.5vw,96px)',
             lineHeight: 1.05,
             letterSpacing: -1,
-            maxWidth: 960,
-            margin: '0 0 24px 0',
+            maxWidth: 1100,
+            margin: '0 0 28px 0',
           }}
         >
           {isEn ? 'Three strategic pillars, zero technical compromise.' : 'Tres pilares, máxima exigencia técnica.'}
         </h1>
-        <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 680, lineHeight: 1.7, margin: 0 }}>
+        <p style={{ fontSize: 'clamp(17px, 1.8vw, 20px)', color: 'var(--muted)', maxWidth: 760, lineHeight: 1.7, margin: 0 }}>
           {isEn
             ? 'From independent data and cloud systems audits, to bespoke AWS infrastructure and production-grade machine learning models. Agile sprints, zero bureaucracy.'
             : 'Desde la auditoría de integridad de datos y sistemas, pasando por la arquitectura cloud a medida, hasta modelos predictivos de Machine Learning listos para producción en sprints ágiles de 1 a 2 semanas.'}
@@ -63,7 +63,7 @@ export default function Servicios() {
       </div>
 
       {/* Main Container */}
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '60px clamp(20px,5vw,40px) 140px' }}>
+      <div style={{ maxWidth: 1440, margin: '0 auto', padding: '60px clamp(24px, 5vw, 64px) 140px' }}>
         {/* Pillar Filter Tabs */}
         <div
           style={{

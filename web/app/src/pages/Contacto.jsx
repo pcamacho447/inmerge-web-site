@@ -105,7 +105,7 @@ export default function Contacto() {
 
   return (
     <>
-      <div style={{ padding: '100px clamp(20px,5vw,40px) 60px', maxWidth: 1240, margin: '0 auto' }}>
+      <div style={{ padding: '120px clamp(24px, 5vw, 64px) 60px', maxWidth: 1440, margin: '0 auto' }}>
         <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 24 }}>
           {isEn ? 'PROPOSALS & TECHNICAL SCOPE' : 'COTIZACIÓN & TDR'}
         </div>
@@ -113,16 +113,16 @@ export default function Contacto() {
           style={{
             fontFamily: "'Spectral',serif",
             fontWeight: 700,
-            fontSize: 'clamp(40px,7vw,88px)',
+            fontSize: 'clamp(42px,7.5vw,96px)',
             lineHeight: 1.05,
             letterSpacing: -1,
-            maxWidth: 960,
-            margin: '0 0 24px 0',
+            maxWidth: 1100,
+            margin: '0 0 28px 0',
           }}
         >
           {isEn ? 'Technical evaluation and bespoke engineering proposals.' : 'Evaluación técnica y propuestas a medida.'}
         </h1>
-        <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 640, lineHeight: 1.7, margin: 0 }}>
+        <p style={{ fontSize: 'clamp(17px, 1.8vw, 20px)', color: 'var(--muted)', maxWidth: 760, lineHeight: 1.7, margin: 0 }}>
           {isEn
             ? 'We communicate directly through the engineering partners and consultants who build and audit your systems — zero commercial bureaucracy.'
             : 'Respondemos directamente con el equipo de ingeniería y consultoría que ejecutará el proyecto — sin capas comerciales ni demoras.'}
@@ -131,12 +131,12 @@ export default function Contacto() {
 
       <div
         style={{
-          maxWidth: 1240,
+          maxWidth: 1440,
           margin: '0 auto',
-          padding: '80px clamp(20px,5vw,40px) 140px',
+          padding: '80px clamp(24px, 5vw, 64px) 140px',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: 64,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gap: 'clamp(48px, 5vw, 84px)',
         }}
       >
         {/* Left Column: Direct WhatsApp & Info */}

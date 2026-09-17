@@ -8,13 +8,13 @@ export default function Footer({ borderTop = false }) {
   return (
     <footer
       style={{
-        padding: '48px clamp(20px,5vw,40px)',
+        padding: '56px clamp(24px, 5vw, 64px)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: 16,
-        maxWidth: 1240,
+        gap: 20,
+        maxWidth: 1440,
         margin: '0 auto',
         borderTop: borderTop ? '1px solid var(--border)' : undefined,
       }}

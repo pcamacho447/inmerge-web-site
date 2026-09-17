@@ -542,8 +542,8 @@ details.service-accordion-item > summary::marker {
 }
 
 .carousel-card.single-focus-card {
-  flex: 0 0 clamp(320px, 86vw, 860px);
-  max-width: 860px;
+  flex: 0 0 clamp(320px, 92vw, 1180px);
+  max-width: 1180px;
   margin: 0 auto;
 }
 
@@ -1001,7 +1001,7 @@ details.service-accordion-item > summary::marker {
 
 /* Inner content container */
 .manifesto-slide-inner {
-  max-width: 960px;
+  max-width: 1200px;
   width: 100%;
   position: relative;
   z-index: 1;
@@ -1028,21 +1028,21 @@ details.service-accordion-item > summary::marker {
 .manifesto-slide-title {
   font-family: 'Spectral', Georgia, serif;
   font-weight: 700;
-  font-size: clamp(2.1rem, 4.4vw, 3.5rem);
+  font-size: clamp(2.2rem, 4.6vw, 3.8rem);
   line-height: 1.08;
   margin: 0 0 24px 0;
   letter-spacing: -0.02em;
   color: var(--ink);
-  max-width: 820px;
+  max-width: 960px;
 }
 
 .manifesto-slide-body {
   font-family: 'IBM Plex Sans', sans-serif;
-  font-size: clamp(1rem, 1.35vw, 1.2rem);
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
   line-height: 1.8;
   color: var(--ink);
   opacity: 0.88;
-  max-width: 700px;
+  max-width: 820px;
   margin: 0;
 }
 

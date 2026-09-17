@@ -106,7 +106,7 @@ export default function Nosotros() {
           }}
         />
 
-        <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', width: '100%', zIndex: 2 }}>
+        <div style={{ position: 'relative', maxWidth: 1440, margin: '0 auto', width: '100%', zIndex: 2 }}>
           <div
             style={{
               fontFamily: "'IBM Plex Mono', monospace",
@@ -124,11 +124,11 @@ export default function Nosotros() {
             style={{
               fontFamily: "'Spectral', serif",
               fontWeight: 700,
-              fontSize: 'clamp(42px,7.5vw,96px)',
+              fontSize: 'clamp(44px,7.8vw,104px)',
               lineHeight: 1.04,
               letterSpacing: -1.5,
-              maxWidth: 980,
-              margin: '0 0 28px 0',
+              maxWidth: 1120,
+              margin: '0 0 32px 0',
               color: '#F3EADA',
             }}
           >
@@ -140,13 +140,13 @@ export default function Nosotros() {
             style={{
               fontFamily: "'Spectral', serif",
               fontStyle: 'italic',
-              fontSize: 'clamp(17px, 2vw, 22px)',
+              fontSize: 'clamp(18px, 2.1vw, 24px)',
               color: 'rgba(243,234,218,0.9)',
-              maxWidth: 700,
+              maxWidth: 760,
               lineHeight: 1.65,
-              margin: '0 0 40px 0',
+              margin: '0 0 44px 0',
               borderLeft: '3px solid var(--terracotta)',
-              paddingLeft: 20,
+              paddingLeft: 24,
             }}
           >
             {isEn
@@ -161,8 +161,8 @@ export default function Nosotros() {
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
-              gap: '8px 18px',
-              paddingTop: 8,
+              gap: '10px 24px',
+              paddingTop: 12,
             }}
           >
             {[
@@ -195,17 +195,17 @@ export default function Nosotros() {
       {/* =====================================================================
           2. MANIFIESTO — Propósito, Misión y Visión (Declaraciones de Rigor I, II, III)
           ===================================================================== */}
-      <section id="mision" style={{ maxWidth: 1240, margin: '0 auto', padding: '90px clamp(20px,5vw,40px)' }}>
+      <section id="mision" style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
         <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 16 }}>
           {isEn ? 'STATEMENTS OF RIGOR' : 'DECLARACIONES DE RIGOR'}
         </div>
         <h2
           style={{
             fontFamily: "'Spectral', serif",
-            fontSize: 'clamp(32px, 5vw, 44px)',
+            fontSize: 'clamp(34px, 5.2vw, 52px)',
             fontWeight: 700,
             color: 'var(--ink)',
-            margin: '0 0 40px 0',
+            margin: '0 0 48px 0',
           }}
         >
           {isEn ? 'The Inmerge Standard: Purpose, Mission & Vision' : 'El Estándar Inmerge: Propósito, Misión & Visión'}
@@ -213,8 +213,8 @@ export default function Nosotros() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
-            gap: 'clamp(28px, 4vw, 48px)',
+            gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))',
+            gap: 'clamp(36px, 4.5vw, 64px)',
             paddingTop: 12,
           }}
         >
@@ -331,8 +331,8 @@ export default function Nosotros() {
       {/* =====================================================================
           3. DIRECTORES DE PRÁCTICA & ESPECIALISTAS SENIOR (Flujo A: Segundo/Tercer Bloque)
           ===================================================================== */}
-      <section id="directores" style={{ background: 'var(--bg)', padding: '90px clamp(20px,5vw,40px)' }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+      <section id="directores" style={{ background: 'var(--bg)', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div
             data-reveal=""
             style={{
@@ -352,14 +352,14 @@ export default function Nosotros() {
             style={{
               fontFamily: "'Spectral',serif",
               fontWeight: 700,
-              fontSize: 'clamp(32px,4vw,52px)',
-              marginBottom: 14,
+              fontSize: 'clamp(34px,4.5vw,56px)',
+              marginBottom: 16,
               color: 'var(--ink)',
             }}
           >
             {isEn ? 'Senior Leadership & Technical Directors' : 'Directores de Práctica & Especialistas Senior'}
           </div>
-          <p data-reveal="" style={{ fontSize: 16, color: 'var(--muted)', marginBottom: 36, maxWidth: 720, lineHeight: 1.6 }}>
+          <p data-reveal="" style={{ fontSize: 16.5, color: 'var(--muted)', marginBottom: 40, maxWidth: 780, lineHeight: 1.6 }}>
             {isEn
               ? 'Zero commercial middle layers: every project mandate is led, audited, and built directly by our four practice directors.'
               : 'Sin intermediarios comerciales: cada proyecto es liderado, auditado y construido directamente por nuestros 4 directores de práctica.'}
@@ -379,7 +379,7 @@ export default function Nosotros() {
       {/* =====================================================================
           5. MÉTODO + STACK — Combined tabbed section
           ===================================================================== */}
-      <section id="metodo" style={{ maxWidth: 1240, margin: '0 auto', padding: '80px clamp(20px,5vw,40px) 100px' }}>
+      <section id="metodo" style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
         <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 16 }}>
           {isEn ? 'METHODOLOGY & TECHNOLOGY' : 'METODOLOGÍA & TECNOLOGÍA'}
         </div>
@@ -580,8 +580,8 @@ export default function Nosotros() {
       {/* =====================================================================
           6. COMPROMISOS TÉCNICOS & SLA — Editorial Accordion
           ===================================================================== */}
-      <div id="compromisos" style={{ background: 'var(--bg)', padding: '100px clamp(20px,5vw,40px)' }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+      <div id="compromisos" style={{ background: 'var(--bg)', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div
             data-reveal=""
             style={{
@@ -690,7 +690,7 @@ export default function Nosotros() {
           position: 'relative',
           background: 'var(--ink)',
           color: 'var(--bg)',
-          padding: '120px clamp(20px,5vw,40px)',
+          padding: 'clamp(120px, 14vh, 180px) clamp(24px, 5vw, 64px)',
           overflow: 'hidden',
         }}
       >
@@ -707,7 +707,7 @@ export default function Nosotros() {
             opacity: 0.15,
           }}
         />
-        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ position: 'relative', maxWidth: 960, margin: '0 auto', textAlign: 'center' }}>
           <h2
             style={{
               fontFamily: "'Spectral',serif",
