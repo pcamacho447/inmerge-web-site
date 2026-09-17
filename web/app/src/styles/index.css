@@ -1057,135 +1057,150 @@ details.service-accordion-item > summary::marker {
 }
 
 /* ==========================================================================
-   Quick Estimator Component
+   Quick Estimator Component (Editorial Tech Redesign)
    ========================================================================== */
 .quick-estimator-section {
-  margin: 50px 0;
+  margin: 60px 0;
 }
 
 .estimator-card {
-  background: #fff;
+  background: rgba(235, 223, 201, 0.45);
   border: 1px solid var(--border);
+  border-top: 3px solid var(--terracotta);
   border-radius: 10px;
-  padding: 36px;
-  box-shadow: 0 6px 20px rgba(36, 26, 18, 0.05);
+  padding: clamp(24px, 4vw, 44px);
+  box-shadow: 0 16px 40px rgba(36, 26, 18, 0.06);
 }
 
 .estimator-header {
   text-align: center;
   max-width: 680px;
-  margin: 0 auto 32px auto;
+  margin: 0 auto 36px auto;
 }
 
 .estimator-badge {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--gold);
   background: var(--ink);
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 4px;
   display: inline-block;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .estimator-title {
   font-family: 'Spectral', Georgia, serif;
   font-size: clamp(1.8rem, 3.5vw, 2.4rem);
   color: var(--ink);
-  margin: 0 0 10px 0;
+  font-weight: 700;
+  margin: 0 0 12px 0;
 }
 
 .estimator-subtitle {
   font-size: 1rem;
   color: var(--muted);
+  line-height: 1.6;
 }
 
 .estimator-layout-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px;
+  gap: 36px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 840px) {
   .estimator-layout-grid {
     grid-template-columns: 1fr;
+    gap: 28px;
   }
 }
 
 .estimator-controls-col {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 
 .control-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .control-label {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
   color: var(--ink);
+  letter-spacing: 0.02em;
 }
 
 .estimator-select {
-  padding: 12px 14px;
+  padding: 13px 16px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--bg);
+  background: var(--cream2);
   font-size: 0.92rem;
+  font-family: 'IBM Plex Sans', sans-serif;
   color: var(--ink);
   outline: none;
-  transition: border-color 0.2s ease;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .estimator-select:focus {
   border-color: var(--terracotta);
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--terracotta);
 }
 
 .results-summary-card {
-  background: var(--cream2);
-  border: 1px solid var(--border);
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid rgba(216, 168, 78, 0.35);
   border-radius: 8px;
-  padding: 24px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
   height: 100%;
+  box-shadow: 0 12px 32px rgba(36, 26, 18, 0.3);
 }
 
 .results-badge-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 10px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.75rem;
 }
 
 .res-badge-pillar {
   font-weight: 700;
-  color: var(--terracotta);
+  color: var(--gold);
 }
 
 .res-badge-model {
-  color: var(--muted);
+  color: var(--tan-text);
+  opacity: 0.85;
 }
 
 .results-key-metrics {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .res-metric-item {
-  background: #fff;
-  border: 1px solid var(--border);
-  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px 18px;
   border-radius: 6px;
   display: flex;
   justify-content: space-between;
@@ -1193,20 +1208,20 @@ details.service-accordion-item > summary::marker {
 }
 
 .res-metric-label {
-  font-size: 0.85rem;
-  color: var(--muted);
+  font-size: 0.86rem;
+  color: var(--tan-text);
 }
 
 .res-metric-val {
   font-family: 'IBM Plex Mono', monospace;
   font-weight: 700;
   font-size: 1.05rem;
-  color: var(--ink);
+  color: #fff;
 }
 
 .res-metric-val.highlight-val {
-  color: var(--terracotta);
-  font-size: 1.15rem;
+  color: var(--gold);
+  font-size: 1.2rem;
 }
 
 .results-deliverables {
@@ -1214,22 +1229,37 @@ details.service-accordion-item > summary::marker {
 }
 
 .deliverables-title {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--gold);
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .deliverables-list {
   margin: 0;
-  padding-left: 20px;
-  font-size: 0.85rem;
-  color: var(--ink);
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .deliverables-list li {
-  margin-bottom: 4px;
+  font-size: 0.85rem;
+  color: var(--tan-text);
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.deliverables-list li::before {
+  content: '✓';
+  color: var(--gold);
+  font-weight: 700;
 }
 
 .results-actions {
@@ -1243,9 +1273,9 @@ details.service-accordion-item > summary::marker {
   background: var(--terracotta);
   color: #fff;
   text-align: center;
-  padding: 12px 16px;
-  font-weight: 600;
-  font-size: 0.92rem;
+  padding: 14px 18px;
+  font-weight: 700;
+  font-size: 0.94rem;
   border-radius: 4px;
   text-decoration: none;
   transition: background 0.2s ease;
@@ -1258,15 +1288,20 @@ details.service-accordion-item > summary::marker {
 }
 
 .btn-estimator-llm {
-  background: var(--ink);
+  background: transparent;
   color: var(--gold);
-  border: none;
-  padding: 10px 16px;
-  font-weight: 600;
-  font-size: 0.88rem;
+  border: 1px solid var(--gold);
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 0.9rem;
   border-radius: 4px;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+.btn-estimator-llm:hover {
+  background: var(--gold);
+  color: var(--ink);
 }
 
 .btn-estimator-llm:hover {
