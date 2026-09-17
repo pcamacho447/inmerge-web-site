@@ -101,15 +101,14 @@ export default function ServicePillarCard({ pillar }) {
   return (
     <div
       style={{
-        background: 'var(--cream2)',
-        border: '1px solid var(--border)',
-        borderTop: `3px solid ${pillarColor}`,
-        padding: 'clamp(28px, 4vw, 36px)',
+        background: 'transparent',
+        border: 'none',
+        padding: '0 0 16px 0',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         position: 'relative',
-        transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease',
+        transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
       className="pillar-card-interactive"
     >
