@@ -18,18 +18,21 @@ describe('Metodologia Page', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('El Método Inmerge en 4 etapas')).toBeInTheDocument();
     expect(screen.getByText('Auditoría & Diagnóstico Inicial')).toBeInTheDocument();
     expect(screen.getByText('Validación, Certificación & Despliegue')).toBeInTheDocument();
   });
 
-  it('renders and allows interacting with the StackTabs component', async () => {
+  it('switches to Stack tab and shows StackTabs component', async () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
         <Metodologia />
       </MemoryRouter>,
     );
+
+    // Switch to Stack tab
+    const stackTab = screen.getByRole('tab', { name: /Stack Tecnológico/i });
+    await user.click(stackTab);
 
     // Initial tab is Cloud & DevOps
     expect(screen.getByText('Amazon Web Services (AWS)')).toBeInTheDocument();
@@ -41,14 +44,15 @@ describe('Metodologia Page', () => {
     expect(screen.getByText('Apache Airflow / Orchestration')).toBeInTheDocument();
   });
 
-  it('renders the architecture diagram and commitment principles', () => {
+  it('renders the ManifestoCarousel with engineering assurance content', () => {
     render(
       <MemoryRouter>
         <Metodologia />
       </MemoryRouter>,
     );
 
-    expect(screen.getByText(/ARQUITECTURA DE FLUJO & AUDITORÍA/i)).toBeInTheDocument();
-    expect(screen.getByText(/Nuestros 4 Principios de Aseguramiento/i)).toBeInTheDocument();
+    // ManifestoCarousel renders as carousel region
+    const carousel = screen.getByRole('region', { name: /Manifiesto de Ingeniería Inmerge/i });
+    expect(carousel).toBeInTheDocument();
   });
 });

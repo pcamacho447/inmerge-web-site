@@ -1,11 +1,12 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
 import StackTabs from '../components/StackTabs.jsx';
-import ArchitectureDiagram from '../components/ArchitectureDiagram.jsx';
+import ManifestoCarousel from '../components/ManifestoCarousel.jsx';
+import DirectorsCarousel from '../components/DirectorsCarousel.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Nosotros() {
@@ -36,135 +37,170 @@ export default function Nosotros() {
 
   const whatsappCta = content.waLink(
     isEn
-      ? 'Hello Inmerge team, I have reviewed your team, methodology, and technology stack. I would like to coordinate a technical consultation for a project.'
-      : 'Hola Inmerge, he revisado su equipo, metodología y stack técnico. Me gustaría coordinar una reunión técnica para un proyecto.',
+      ? 'Hello Inmerge team, I have reviewed your leadership, methodology, and technology stack. I would like to coordinate a technical consultation for a project.'
+      : 'Hola Inmerge, he revisado su equipo directivo, metodología y stack técnico. Me gustaría coordinar una reunión técnica para un proyecto.',
   );
+
+  // Accordion state for Compromisos section
+  const [openValue, setOpenValue] = useState(null);
+
+  // Método/Stack tab state
+  const [metodoTab, setMetodoTab] = useState('metodo');
 
   return (
     <>
-      {/* Hero Section */}
-      <div style={{ padding: '100px clamp(20px,5vw,40px) 40px', maxWidth: 1240, margin: '0 auto' }}>
-        <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 24 }}>
-          {isEn ? 'THE FIRM // INMERGE' : 'LA FIRMA // INMERGE'}
-        </div>
-        <h1
-          style={{
-            fontFamily: "'Spectral', serif",
-            fontWeight: 700,
-            fontSize: 'clamp(40px,7vw,88px)',
-            lineHeight: 1.05,
-            letterSpacing: -1,
-            maxWidth: 980,
-            margin: '0 0 24px 0',
-            color: 'var(--ink)',
-          }}
-        >
-          {isEn
-            ? 'Rigorous engineering, strict auditing, and verifiable data.'
-            : 'Ingeniería rigurosa, auditoría estricta y datos reproducibles.'}
-        </h1>
-        <p style={{ fontSize: 18, color: 'var(--muted)', maxWidth: 720, lineHeight: 1.7, margin: '0 0 32px 0' }}>
-          {isEn
-            ? 'We are a boutique consultancy specializing in systems auditing, cloud software engineering, and applied data science. We architect platforms where every computation is citable and every line of code is verifiable, executing without intermediaries.'
-            : 'Somos una firma boutique especializada en auditoría de sistemas, ingeniería de software cloud y ciencia de datos. Diseñamos soluciones donde cada cálculo es citable y cada línea de código es mantenible, ejecutando proyectos sin intermediarios.'}
-        </p>
-
-        {/* Quick Anchor Subnav */}
+      {/* =====================================================================
+          1. HERO CINEMÁTICO — Parallax-ready with editorial Spectral statement
+          ===================================================================== */}
+      <div
+        style={{
+          position: 'relative',
+          minHeight: '70vh',
+          display: 'flex',
+          alignItems: 'center',
+          background: 'var(--ink)',
+          color: '#F3EADA',
+          overflow: 'hidden',
+          padding: '140px clamp(20px,5vw,40px) 100px',
+        }}
+      >
+        {/* Parallax-ready gradient overlay */}
         <div
+          aria-hidden="true"
           style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 10,
-            paddingTop: 12,
-            borderTop: '1px solid var(--border)',
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(36,26,18,0.6) 0%, rgba(36,26,18,0.82) 50%, rgba(36,26,18,0.95) 100%)',
+            zIndex: 1,
+            pointerEvents: 'none',
           }}
-        >
-          <a
-            href="#mision"
+        />
+
+        {/* Decorative breathe-diamond */}
+        <div
+          className="breathe-diamond"
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            right: 'clamp(16px,6vw,60px)',
+            top: '18%',
+            width: 'clamp(32px,5vw,56px)',
+            height: 'clamp(32px,5vw,56px)',
+            background: 'var(--terracotta)',
+            zIndex: 2,
+          }}
+        />
+
+        {/* Secondary decorative diamond */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: '-40px',
+            bottom: '10%',
+            width: 120,
+            height: 120,
+            background: 'var(--gold)',
+            opacity: 0.06,
+            transform: 'rotate(45deg)',
+            zIndex: 0,
+          }}
+        />
+
+        <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', width: '100%', zIndex: 2 }}>
+          <div
             style={{
               fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              padding: '6px 14px',
-              borderRadius: 20,
-              background: 'var(--cream2)',
-              color: 'var(--ink)',
-              textDecoration: 'none',
-              border: '1px solid var(--border)',
+              fontSize: 13,
+              letterSpacing: 4,
+              color: 'var(--gold)',
+              fontWeight: 600,
+              marginBottom: 28,
+              textTransform: 'uppercase',
             }}
-            className="link-hover"
           >
-            {isEn ? '# Mission & Purpose' : '# Misión & Propósito'}
-          </a>
-          <a
-            href="#metodo"
+            {isEn ? 'THE FIRM // INMERGE' : 'LA FIRMA // INMERGE'}
+          </div>
+          <h1
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              padding: '6px 14px',
-              borderRadius: 20,
-              background: 'var(--cream2)',
-              color: 'var(--ink)',
-              textDecoration: 'none',
-              border: '1px solid var(--border)',
+              fontFamily: "'Spectral', serif",
+              fontWeight: 700,
+              fontSize: 'clamp(42px,7.5vw,96px)',
+              lineHeight: 1.04,
+              letterSpacing: -1.5,
+              maxWidth: 980,
+              margin: '0 0 28px 0',
+              color: '#F3EADA',
             }}
-            className="link-hover"
           >
-            {isEn ? '# The Method (4 Phases)' : '# El Método (4 Etapas)'}
-          </a>
-          <a
-            href="#arquitectura"
+            {isEn
+              ? 'Rigorous engineering, strict auditing, and verifiable data.'
+              : 'Ingeniería rigurosa, auditoría estricta y datos reproducibles.'}
+          </h1>
+          <p
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              padding: '6px 14px',
-              borderRadius: 20,
-              background: 'var(--cream2)',
-              color: 'var(--ink)',
-              textDecoration: 'none',
-              border: '1px solid var(--border)',
+              fontFamily: "'Spectral', serif",
+              fontStyle: 'italic',
+              fontSize: 'clamp(17px, 2vw, 22px)',
+              color: 'rgba(243,234,218,0.9)',
+              maxWidth: 700,
+              lineHeight: 1.65,
+              margin: '0 0 40px 0',
+              borderLeft: '3px solid var(--terracotta)',
+              paddingLeft: 20,
             }}
-            className="link-hover"
           >
-            {isEn ? '# Cloud Architecture' : '# Arquitectura Cloud'}
-          </a>
-          <a
-            href="#stack"
+            {isEn
+              ? 'We are a boutique consultancy specializing in systems auditing, cloud software engineering, and applied data science. We architect platforms where every computation is citable and every line of code is verifiable.'
+              : 'Somos una firma boutique especializada en auditoría de sistemas, ingeniería de software cloud y ciencia de datos. Diseñamos soluciones donde cada cálculo es citable y cada línea de código es mantenible.'}
+          </p>
+
+          {/* Sticky anchor subnav pills — Sequenced in Flujo A */}
+          <div
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              padding: '6px 14px',
-              borderRadius: 20,
-              background: 'var(--cream2)',
-              color: 'var(--ink)',
-              textDecoration: 'none',
-              border: '1px solid var(--border)',
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 10,
+              paddingTop: 16,
+              borderTop: '1px solid rgba(243,234,218,0.15)',
             }}
-            className="link-hover"
           >
-            {isEn ? '# Tech Stack' : '# Stack Tecnológico'}
-          </a>
-          <a
-            href="#equipo"
-            style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              padding: '6px 14px',
-              borderRadius: 20,
-              background: 'var(--cream2)',
-              color: 'var(--ink)',
-              textDecoration: 'none',
-              border: '1px solid var(--border)',
-            }}
-            className="link-hover"
-          >
-            {isEn ? '# Senior Specialists' : '# Especialistas Senior'}
-          </a>
+            {[
+              { href: '#mision', label: isEn ? '# Mission & Purpose' : '# Misión & Propósito' },
+              { href: '#directores', label: isEn ? '# Practice Directors' : '# Directores de Práctica' },
+              { href: '#manifiesto', label: isEn ? '# Engineering Manifesto' : '# Manifiesto de Ingeniería' },
+              { href: '#metodo', label: isEn ? '# The Method (4 Phases)' : '# El Método (4 Etapas)' },
+              { href: '#stack', label: isEn ? '# Tech Stack' : '# Stack Tecnológico' },
+              { href: '#compromisos', label: isEn ? '# Commitments' : '# Compromisos' },
+            ].map((pill) => (
+              <a
+                key={pill.href}
+                href={pill.href}
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 12,
+                  padding: '6px 14px',
+                  borderRadius: 20,
+                  background: 'rgba(243,234,218,0.08)',
+                  color: 'rgba(243,234,218,0.75)',
+                  textDecoration: 'none',
+                  border: '1px solid rgba(243,234,218,0.12)',
+                  transition: 'all 0.2s ease',
+                }}
+                className="link-hover"
+              >
+                {pill.label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 
       <Frieze border="#A8472B" upColor="#D8A84E" downColor="#C68A3D" medallionBg="#A8472B" medallionBorder="#F3EADA" />
 
-      {/* Núcleo Estratégico: Propósito, Misión y Visión */}
+      {/* =====================================================================
+          2. MANIFIESTO — Propósito, Misión y Visión (Declaraciones de Rigor I, II, III)
+          ===================================================================== */}
       <section id="mision" style={{ maxWidth: 1240, margin: '0 auto', padding: '90px clamp(20px,5vw,40px)' }}>
         <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 16 }}>
           {isEn ? 'STATEMENTS OF RIGOR' : 'DECLARACIONES DE RIGOR'}
@@ -191,17 +227,29 @@ export default function Nosotros() {
         >
           {/* Propósito */}
           <div data-reveal="" className="card-hover" style={{ background: 'var(--bg)', padding: 40 }}>
-            <div
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 11,
-                letterSpacing: 1.5,
-                color: 'var(--terracotta)',
-                fontWeight: 700,
-                marginBottom: 16,
-              }}
-            >
-              {isEn ? '[PRINCIPLE // PURPOSE]' : '[PRINCIPIO // PROPÓSITO]'}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
+              <span
+                style={{
+                  fontFamily: "'Spectral', serif",
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: 'var(--terracotta)',
+                  lineHeight: 1,
+                }}
+              >
+                I
+              </span>
+              <div
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 11,
+                  letterSpacing: 1.5,
+                  color: 'var(--terracotta)',
+                  fontWeight: 700,
+                }}
+              >
+                {isEn ? '[PRINCIPLE // PURPOSE]' : '[PRINCIPIO // PROPÓSITO]'}
+              </div>
             </div>
             <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 14 }}>
               {isEn ? 'Operational Truth Assurance' : 'Garantía de Verdad Operativa'}
@@ -215,17 +263,29 @@ export default function Nosotros() {
 
           {/* Misión */}
           <div data-reveal="" className="card-hover" style={{ background: 'var(--bg)', padding: 40 }}>
-            <div
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 11,
-                letterSpacing: 1.5,
-                color: 'var(--terracotta)',
-                fontWeight: 700,
-                marginBottom: 16,
-              }}
-            >
-              {isEn ? '[COMMITMENT // MISSION]' : '[COMPROMISO // MISIÓN]'}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
+              <span
+                style={{
+                  fontFamily: "'Spectral', serif",
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: 'var(--terracotta)',
+                  lineHeight: 1,
+                }}
+              >
+                II
+              </span>
+              <div
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 11,
+                  letterSpacing: 1.5,
+                  color: 'var(--terracotta)',
+                  fontWeight: 700,
+                }}
+              >
+                {isEn ? '[COMMITMENT // MISSION]' : '[COMPROMISO // MISIÓN]'}
+              </div>
             </div>
             <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 14 }}>
               {isEn ? 'Engineering Without Black Boxes' : 'Ingeniería sin Cajas Negras'}
@@ -239,405 +299,399 @@ export default function Nosotros() {
 
           {/* Visión */}
           <div data-reveal="" className="card-hover" style={{ background: 'var(--bg)', padding: 40 }}>
-            <div
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 11,
-                letterSpacing: 1.5,
-                color: 'var(--terracotta)',
-                fontWeight: 700,
-                marginBottom: 16,
-              }}
-            >
-              {isEn ? '[HORIZON // VISION]' : '[HORIZONTE // VISIÓN]'}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
+              <span
+                style={{
+                  fontFamily: "'Spectral', serif",
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: 'var(--terracotta)',
+                  lineHeight: 1,
+                }}
+              >
+                III
+              </span>
+              <div
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 11,
+                  letterSpacing: 1.5,
+                  color: 'var(--terracotta)',
+                  fontWeight: 700,
+                }}
+              >
+                {isEn ? '[HORIZON // VISION]' : '[HORIZONTE // VISIÓN]'}
+              </div>
             </div>
             <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 14 }}>
               {isEn ? 'Regional Technical Benchmark' : 'Referencia Técnica Regional'}
             </h3>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--muted)', margin: 0 }}>
               {isEn
-                ? 'To stand as Latin America’s premier boutique consultancy for discerning enterprises that reject opaque black boxes, metric inconsistencies, or cloud vulnerabilities.'
+                ? "To stand as Latin America's premier boutique consultancy for discerning enterprises that reject opaque black boxes, metric inconsistencies, or cloud vulnerabilities."
                 : 'Ser la firma boutique de referencia en Latinoamérica para organizaciones que no aceptan cajas negras, inconsistencias en sus métricas ni vulnerabilidades en su stack tecnológico.'}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Ciclo de Vida: El Método Inmerge en 4 etapas */}
-      <section id="metodo" style={{ maxWidth: 1240, margin: '0 auto', padding: '0 clamp(20px,5vw,40px) 100px' }}>
-        <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 16 }}>
-          {isEn ? 'PROJECT LIFECYCLE' : 'CICLO DE VIDA DEL PROYECTO'}
-        </div>
-        <h2
-          style={{
-            fontFamily: "'Spectral', serif",
-            fontSize: 'clamp(32px, 5vw, 48px)',
-            fontWeight: 700,
-            color: 'var(--ink)',
-            margin: '0 0 40px 0',
-          }}
-        >
-          {isEn ? 'The 4-Phase Inmerge Methodology' : 'El Método Inmerge en 4 etapas'}
-        </h2>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: 24,
-          }}
-        >
-          {stack.METHODOLOGY_STEPS.map((step) => (
-            <div
-              key={step.step}
-              data-reveal=""
-              style={{
-                background: 'var(--cream2)',
-                border: '1px solid var(--border)',
-                padding: 32,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}
-              className="card-hover"
-            >
-              <div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: 16,
-                    borderBottom: '1px solid var(--border)',
-                    paddingBottom: 8,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 16,
-                      fontWeight: 700,
-                      color: 'var(--terracotta)',
-                    }}
-                  >
-                    {step.step}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 11,
-                      textTransform: 'uppercase',
-                      color: 'var(--muted)',
-                    }}
-                  >
-                    {step.tag}
-                  </span>
-                </div>
-
-                <h3
-                  style={{
-                    fontFamily: "'Spectral', serif",
-                    fontSize: 22,
-                    fontWeight: 700,
-                    color: 'var(--ink)',
-                    margin: '0 0 8px 0',
-                  }}
-                >
-                  {step.phase}
-                </h3>
-
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--terracotta)', marginBottom: 12 }}>{step.title}</div>
-
-                <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, margin: '0 0 20px 0' }}>{step.desc}</p>
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
-                <div
-                  style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    fontSize: 11,
-                    textTransform: 'uppercase',
-                    color: 'var(--ink)',
-                    fontWeight: 600,
-                    marginBottom: 8,
-                  }}
-                >
-                  {isEn ? 'Key Deliverables:' : 'Entregables Clave:'}
-                </div>
-                <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
-                  {step.deliverables.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Sección: Diagrama de Arquitectura */}
-      <section id="arquitectura" style={{ maxWidth: 1240, margin: '0 auto', padding: '0 clamp(20px,5vw,40px) 100px' }} data-reveal="">
-        <ArchitectureDiagram />
-      </section>
-
-      {/* Sección: Stack Tecnológico Interactivo */}
-      <section id="stack" style={{ maxWidth: 1240, margin: '0 auto', padding: '0 clamp(20px,5vw,40px) 100px' }}>
-        <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 16 }}>
-          {isEn ? 'TOOLS & TECHNICAL EFFICIENCY' : 'HERRAMIENTAS & ECOEFICIENCIA TÉCNICA'}
-        </div>
-        <h2
-          style={{
-            fontFamily: "'Spectral', serif",
-            fontSize: 'clamp(32px, 5vw, 48px)',
-            fontWeight: 700,
-            color: 'var(--ink)',
-            margin: '0 0 16px 0',
-          }}
-        >
-          {isEn ? 'Curated Technology Stack' : 'Stack Tecnológico Seleccionado'}
-        </h2>
-        <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 680, margin: 0 }}>
-          {isEn
-            ? 'We build exclusively on production-proven, open standards and battle-tested cloud backbones (AWS), ensuring the client retains absolute sovereignty over all code and infrastructure.'
-            : 'Utilizamos tecnologías probadas en producción, de código abierto o estándares globales en la nube (AWS), garantizando que el cliente sea dueño absoluto de su infraestructura y código.'}
-        </p>
-
-        <StackTabs />
-      </section>
-
-      {/* Sección: Principios de Aseguramiento Técnico */}
-      <div
-        style={{
-          background: 'var(--ink)',
-          color: '#F3EADA',
-          padding: 'clamp(60px, 8vw, 100px) clamp(20px, 5vw, 40px)',
-        }}
-        data-reveal=""
-      >
-        <div style={{ maxWidth: 1240, margin: '0 auto' }}>
-          <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--gold)', fontWeight: 600, marginBottom: 16 }}>
-            {isEn ? 'TECHNICAL COMMITMENT' : 'COMPROMISO TÉCNICO'}
-          </div>
-          <h2
-            style={{
-              fontFamily: "'Spectral', serif",
-              fontSize: 'clamp(28px, 4vw, 44px)',
-              fontWeight: 700,
-              margin: '0 0 24px 0',
-            }}
-          >
-            {isEn ? 'Our 4 Principles of Engineering Assurance' : 'Nuestros 4 Principios de Aseguramiento'}
-          </h2>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: 32,
-              marginTop: 36,
-            }}
-          >
-            <div>
-              <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: 'var(--terracotta)', marginBottom: 8 }}>
-                {isEn ? '01. TESTED CODE & CI/CD' : '01. CÓDIGO PROBADO & CI/CD'}
-              </div>
-              <p style={{ fontSize: 14, color: 'rgba(243,234,218,0.8)', lineHeight: 1.6, margin: 0 }}>
-                {isEn
-                  ? 'Every software module is validated with automated unit and integration suites to guarantee zero regression.'
-                  : 'Cada módulo cuenta con suites de pruebas unitarias y de integración automáticas para garantizar cero regresiones.'}
-              </p>
-            </div>
-
-            <div>
-              <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: 'var(--ochre)', marginBottom: 8 }}>
-                {isEn ? '02. SECURITY & COMPLIANCE' : '02. SEGURIDAD & COMPLIANCE'}
-              </div>
-              <p style={{ fontSize: 14, color: 'rgba(243,234,218,0.8)', lineHeight: 1.6, margin: 0 }}>
-                {isEn
-                  ? 'Granular access control with Row Level Security (RLS), full data encryption at rest and in transit across AWS.'
-                  : 'Control de acceso granular con Row Level Security (RLS), cifrado de datos en reposo y en tránsito sobre AWS.'}
-              </p>
-            </div>
-
-            <div>
-              <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: 'var(--gold)', marginBottom: 8 }}>
-                {isEn ? '03. TOTAL REPRODUCIBILITY' : '03. REPRODUCIBILIDAD TOTAL'}
-              </div>
-              <p style={{ fontSize: 14, color: 'rgba(243,234,218,0.8)', lineHeight: 1.6, margin: 0 }}>
-                {isEn
-                  ? 'Declarative, idempotent pipelines where each calculation is traced from raw ingestion to client dashboards.'
-                  : 'Pipelines declarativos de datos donde cada transformación es rastreable desde la fuente de origen hasta la interfaz.'}
-              </p>
-            </div>
-
-            <div>
-              <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: 'var(--green)', marginBottom: 8 }}>
-                {isEn ? '04. TECHNOLOGICAL SOVEREIGNTY' : '04. SOBERANÍA TECNOLÓGICA'}
-              </div>
-              <p style={{ fontSize: 14, color: 'rgba(243,234,218,0.8)', lineHeight: 1.6, margin: 0 }}>
-                {isEn
-                  ? 'Zero proprietary vendor lock-in: infrastructure provisioned directly within your own corporate cloud accounts.'
-                  : 'Sin ataduras a plataformas propietarias: arquitectura desplegada en las cuentas cloud de tu propia organización.'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sección: El Arquetipo (Es vs No Es) */}
-      <div style={{ background: 'var(--bg)', color: 'var(--ink)', padding: '100px clamp(20px,5vw,40px)' }}>
-        <div
-          style={{
-            maxWidth: 1240,
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
-            gap: 56,
-            alignItems: 'center',
-          }}
-        >
-          <div data-reveal="">
-            <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 16 }}>
-              {isEn ? 'ARCHETYPE' : 'ARQUETIPO'}
-            </div>
-            <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,4vw,48px)', lineHeight: 1.1 }}>
-              {isEn ? 'The Strategic Engineer & Technical Auditor.' : 'El Ingeniero & Auditor Estratégico.'}
-            </div>
-          </div>
-          <div data-reveal="" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-            <div style={{ background: 'var(--cream2)', borderRadius: 4, padding: 28, border: '1px solid var(--border)' }}>
-              <div style={{ fontSize: 12, letterSpacing: 1.5, color: 'var(--green)', fontWeight: 700, marginBottom: 12 }}>
-                {isEn ? 'WHAT WE ARE' : 'ES'}
-              </div>
-              <div style={{ fontSize: 14, lineHeight: 1.8, color: 'var(--ink)' }}>
-                {isEn
-                  ? 'Hands-on specialists who audit, write code, and communicate clearly; rigorous with numbers and transparent with code.'
-                  : 'Experto que audita, programa y explica; riguroso con los números y transparente con el código.'}
-              </div>
-            </div>
-            <div style={{ background: 'var(--cream2)', borderRadius: 4, padding: 28, border: '1px solid var(--border)' }}>
-              <div style={{ fontSize: 12, letterSpacing: 1.5, color: 'var(--terracotta)', fontWeight: 700, marginBottom: 12 }}>
-                {isEn ? 'WHAT WE ARE NOT' : 'NO ES'}
-              </div>
-              <div style={{ fontSize: 14, lineHeight: 1.8, color: 'var(--muted)' }}>
-                {isEn
-                  ? 'Commission salespeople, ivory-tower theorists detached from deployment, or slide-deck agencies.'
-                  : 'Vendedor comisionista, teórico desconectado de la implementación ni consultora de diapositivas vacías.'}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sección: Por qué elegir a Inmerge */}
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 clamp(20px,5vw,40px) 100px' }}>
-        <div data-reveal="" style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(32px,4vw,52px)', marginBottom: 16 }}>
-          {isEn ? 'Why Partner with Inmerge' : 'Por qué elegir a Inmerge'}
-        </div>
-        <div data-reveal="" style={{ fontSize: 15, color: 'var(--muted)', marginBottom: 56, maxWidth: 680 }}>
-          {isEn
-            ? 'We merge forensic audit precision with production-grade engineering and applied machine learning execution.'
-            : 'Combinamos la profundidad de auditoría con la capacidad de ejecución en ingeniería de software y ciencia de datos.'}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 0 }}>
-          <div data-reveal="" className="row-hover" style={{ padding: 32, borderRight: '1px solid var(--border)' }}>
-            <div style={{ fontSize: 12, letterSpacing: 1.5, color: 'var(--muted)', fontWeight: 600, marginBottom: 12 }}>
-              {isEn ? 'GENERALIST CONSULTANCIES' : 'CONSULTORAS GENERALISTAS'}
-            </div>
-            <div style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--muted)' }}>
-              {isEn
-                ? 'Deliver recommendations in PowerPoint decks but lack the technical depth to audit source code or configure AWS infrastructure.'
-                : 'Entregan diagnósticos en diapositivas pero no tienen capacidad técnica para construir o auditar el código fuente.'}
-            </div>
-          </div>
-          <div data-reveal="" className="row-hover" style={{ padding: 32, borderRight: '1px solid var(--border)' }}>
-            <div style={{ fontSize: 12, letterSpacing: 1.5, color: 'var(--muted)', fontWeight: 600, marginBottom: 12 }}>
-              {isEn ? 'GENERIC SOFTWARE FACTORIES' : 'SOFTWARE FACTORIES GENÉRICAS'}
-            </div>
-            <div style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--muted)' }}>
-              {isEn
-                ? 'Ship frontends quickly without data audit protocols, governance models, or mathematical ML grounding.'
-                : 'Construyen interfaces sin criterio de auditoría de datos, gobernanza ni modelos predictivos matemáticos.'}
-            </div>
-          </div>
-          <div data-reveal="" className="card-hover" style={{ padding: 32, background: 'var(--ink)', color: 'var(--bg)' }}>
-            <div style={{ fontSize: 12, letterSpacing: 1.5, color: 'var(--gold)', fontWeight: 600, marginBottom: 12 }}>INMERGE</div>
-            <div style={{ fontSize: 14, lineHeight: 1.7 }}>
-              {isEn
-                ? 'Rigorous auditing, cloud engineering, and advanced data science executed directly by the same senior technical partners.'
-                : 'Auditoría rigurosa, ingeniería de software en la nube y ciencia de datos avanzada ejecutadas por el mismo equipo senior.'}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sección: Especialistas Senior */}
-      <div id="equipo" style={{ background: 'var(--cream2)', padding: '100px clamp(20px,5vw,40px)' }}>
+      {/* =====================================================================
+          3. DIRECTORES DE PRÁCTICA & ESPECIALISTAS SENIOR (Flujo A: Segundo/Tercer Bloque)
+          ===================================================================== */}
+      <section id="directores" style={{ background: 'var(--cream2)', padding: '90px clamp(20px,5vw,40px)' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           <div
             data-reveal=""
-            style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(32px,4vw,52px)', marginBottom: 16 }}
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 12,
+              letterSpacing: 2,
+              color: 'var(--terracotta)',
+              fontWeight: 700,
+              marginBottom: 14,
+              textTransform: 'uppercase',
+            }}
           >
-            {isEn ? 'Senior Technical Specialists' : 'Especialistas Senior'}
+            {isEn ? 'LEADERSHIP & PRACTICE DIRECTORS' : 'EQUIPO DIRECTIVO & PRÁCTICAS'}
           </div>
-          <div data-reveal="" style={{ fontSize: 15, color: 'var(--muted)', marginBottom: 56, maxWidth: 680 }}>
+          <div
+            data-reveal=""
+            style={{
+              fontFamily: "'Spectral',serif",
+              fontWeight: 700,
+              fontSize: 'clamp(32px,4vw,52px)',
+              marginBottom: 14,
+              color: 'var(--ink)',
+            }}
+          >
+            {isEn ? 'Senior Leadership & Technical Directors' : 'Directores de Práctica & Especialistas Senior'}
+          </div>
+          <p data-reveal="" style={{ fontSize: 16, color: 'var(--muted)', marginBottom: 36, maxWidth: 720, lineHeight: 1.6 }}>
             {isEn
-              ? 'Zero commercial middle layers: every project mandate is led and built by dedicated senior practitioners.'
-              : 'Sin intermediarios comerciales: cada proyecto es liderado e implementado directamente por perfiles especializados.'}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20 }}>
-            {content.ROLES.map((r) => (
-              <div key={r.name} data-reveal="" className="card-hover" style={{ background: 'var(--bg)', padding: 28 }}>
-                <div style={{ width: 8, height: 8, background: 'var(--terracotta)', transform: 'rotate(45deg)', marginBottom: 16 }} />
-                <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 17, marginBottom: 8, color: 'var(--ink)' }}>
-                  {r.name}
-                </div>
-                <div style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>{r.desc}</div>
-              </div>
-            ))}
-          </div>
+              ? 'Zero commercial middle layers: every project mandate is led, audited, and built directly by our four practice directors.'
+              : 'Sin intermediarios comerciales: cada proyecto es liderado, auditado y construido directamente por nuestros 4 directores de práctica.'}
+          </p>
+
+          <DirectorsCarousel />
         </div>
+      </section>
+
+      {/* =====================================================================
+          4. MANIFIESTO & DIFERENCIAL — ManifestoCarousel (Principios + Arquetipo + Comparativa)
+          ===================================================================== */}
+      <div id="manifiesto">
+        <ManifestoCarousel />
       </div>
 
-      {/* Sección: Nuestros Compromisos / Valores */}
-      <div id="compromisos" style={{ maxWidth: 1240, margin: '0 auto', padding: '100px clamp(20px,5vw,40px)' }}>
-        <div data-reveal="" style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 'clamp(32px,4vw,52px)', marginBottom: 56 }}>
-          {isEn ? 'Our Technical Commitments' : 'Nuestros Compromisos'}
+      {/* =====================================================================
+          5. MÉTODO + STACK — Combined tabbed section
+          ===================================================================== */}
+      <section id="metodo" style={{ maxWidth: 1240, margin: '0 auto', padding: '80px clamp(20px,5vw,40px) 100px' }}>
+        <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 16 }}>
+          {isEn ? 'METHODOLOGY & TECHNOLOGY' : 'METODOLOGÍA & TECNOLOGÍA'}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {content.VALUES.map((v) => (
+        <h2
+          style={{
+            fontFamily: "'Spectral', serif",
+            fontSize: 'clamp(32px, 5vw, 48px)',
+            fontWeight: 700,
+            color: 'var(--ink)',
+            margin: '0 0 28px 0',
+          }}
+        >
+          {isEn ? 'How We Build & What We Build With' : 'Cómo Construimos y Con Qué'}
+        </h2>
+
+        {/* Tab switcher */}
+        <div
+          role="tablist"
+          style={{
+            display: 'flex',
+            gap: 8,
+            borderBottom: '1px solid var(--border)',
+            paddingBottom: 16,
+            marginBottom: 40,
+          }}
+        >
+          <button
+            role="tab"
+            type="button"
+            aria-selected={metodoTab === 'metodo'}
+            onClick={() => setMetodoTab('metodo')}
+            style={{
+              background: metodoTab === 'metodo' ? 'var(--terracotta)' : 'transparent',
+              color: metodoTab === 'metodo' ? '#F3EADA' : 'var(--ink)',
+              border: '1px solid',
+              borderColor: metodoTab === 'metodo' ? 'var(--terracotta)' : 'var(--border)',
+              padding: '10px 22px',
+              fontSize: 14,
+              fontFamily: "'IBM Plex Sans', sans-serif",
+              fontWeight: metodoTab === 'metodo' ? 600 : 400,
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            {isEn ? 'The 4-Phase Method' : 'El Método (4 Etapas)'}
+          </button>
+          <button
+            role="tab"
+            type="button"
+            aria-selected={metodoTab === 'stack'}
+            onClick={() => setMetodoTab('stack')}
+            style={{
+              background: metodoTab === 'stack' ? 'var(--terracotta)' : 'transparent',
+              color: metodoTab === 'stack' ? '#F3EADA' : 'var(--ink)',
+              border: '1px solid',
+              borderColor: metodoTab === 'stack' ? 'var(--terracotta)' : 'var(--border)',
+              padding: '10px 22px',
+              fontSize: 14,
+              fontFamily: "'IBM Plex Sans', sans-serif",
+              fontWeight: metodoTab === 'stack' ? 600 : 400,
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            {isEn ? 'Technology Stack' : 'Stack Tecnológico'}
+          </button>
+        </div>
+
+        {/* Tab Panel: Methodology */}
+        {metodoTab === 'metodo' && (
+          <div role="tabpanel" id="stack">
+            {/* Horizontal Timeline */}
             <div
-              key={v.name}
-              data-reveal=""
-              className="row-hover"
               style={{
                 display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'baseline',
-                gap: '12px 24px',
-                padding: '28px 0',
-                borderTop: '1px solid var(--border)',
+                gap: 0,
+                overflowX: 'auto',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
               }}
             >
-              <div
-                style={{
-                  width: 10,
-                  height: 10,
-                  background: 'var(--terracotta)',
-                  transform: 'rotate(45deg)',
-                  flexShrink: 0,
-                  alignSelf: 'center',
-                }}
-              />
-              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, flex: '0 0 240px' }}>{v.name}</div>
-              <div style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, flex: 1, minWidth: 220 }}>{v.desc}</div>
+              {stack.METHODOLOGY_STEPS.map((step, idx) => (
+                <div
+                  key={step.step}
+                  data-reveal=""
+                  style={{
+                    flex: '1 0 260px',
+                    maxWidth: 320,
+                    padding: 28,
+                    borderLeft: idx > 0 ? '1px solid var(--border)' : 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                  }}
+                  className="card-hover"
+                >
+                  {/* Timeline connector dot */}
+                  {idx > 0 && (
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        position: 'absolute',
+                        left: -5,
+                        top: 36,
+                        width: 10,
+                        height: 10,
+                        background: 'var(--terracotta)',
+                        borderRadius: '50%',
+                      }}
+                    />
+                  )}
+                  <div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: 16,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontSize: 16,
+                          fontWeight: 700,
+                          color: 'var(--terracotta)',
+                        }}
+                      >
+                        {step.step}
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontSize: 11,
+                          textTransform: 'uppercase',
+                          color: 'var(--muted)',
+                        }}
+                      >
+                        {step.tag}
+                      </span>
+                    </div>
+
+                    <h3
+                      style={{
+                        fontFamily: "'Spectral', serif",
+                        fontSize: 20,
+                        fontWeight: 700,
+                        color: 'var(--ink)',
+                        margin: '0 0 6px 0',
+                      }}
+                    >
+                      {step.phase}
+                    </h3>
+
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--terracotta)', marginBottom: 12 }}>{step.title}</div>
+
+                    <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.6, margin: '0 0 20px 0' }}>{step.desc}</p>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
+                    <div
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: 11,
+                        textTransform: 'uppercase',
+                        color: 'var(--ink)',
+                        fontWeight: 600,
+                        marginBottom: 8,
+                      }}
+                    >
+                      {isEn ? 'Key Deliverables:' : 'Entregables Clave:'}
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
+                      {step.deliverables.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-          <div style={{ borderTop: '1px solid var(--border)' }} />
+          </div>
+        )}
+
+        {/* Tab Panel: Stack */}
+        {metodoTab === 'stack' && (
+          <div role="tabpanel" id="stack">
+            <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 680, margin: '0 0 16px 0' }}>
+              {isEn
+                ? 'We build exclusively on production-proven, open standards and battle-tested cloud backbones (AWS), ensuring the client retains absolute sovereignty over all code and infrastructure.'
+                : 'Utilizamos tecnologías probadas en producción, de código abierto o estándares globales en la nube (AWS), garantizando que el cliente sea dueño absoluto de su infraestructura y código.'}
+            </p>
+            <StackTabs />
+          </div>
+        )}
+      </section>
+
+      {/* =====================================================================
+          6. COMPROMISOS TÉCNICOS & SLA — Editorial Accordion
+          ===================================================================== */}
+      <div id="compromisos" style={{ background: 'var(--cream2)', padding: '100px clamp(20px,5vw,40px)' }}>
+        <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+          <div
+            data-reveal=""
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 12,
+              letterSpacing: 2,
+              color: 'var(--terracotta)',
+              fontWeight: 700,
+              marginBottom: 14,
+              textTransform: 'uppercase',
+            }}
+          >
+            {isEn ? 'TECHNICAL ASSURANCE & SLA' : 'ASEGURAMIENTO TÉCNICO & SLA'}
+          </div>
+          <div
+            data-reveal=""
+            style={{
+              fontFamily: "'Spectral',serif",
+              fontWeight: 700,
+              fontSize: 'clamp(28px,3.5vw,44px)',
+              marginBottom: 32,
+              color: 'var(--ink)',
+            }}
+          >
+            {isEn ? 'Our Technical Commitments' : 'Nuestros Compromisos'}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {content.VALUES.map((v, idx) => {
+              const isOpen = openValue === idx;
+              return (
+                <div
+                  key={v.name}
+                  data-reveal=""
+                  className="row-hover"
+                  style={{
+                    borderTop: '1px solid var(--border)',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s ease',
+                  }}
+                  onClick={() => setOpenValue(isOpen ? null : idx)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setOpenValue(isOpen ? null : idx);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isOpen}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px 24px',
+                      padding: '24px 0',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 10,
+                        height: 10,
+                        background: 'var(--terracotta)',
+                        transform: isOpen ? 'rotate(0deg)' : 'rotate(45deg)',
+                        transition: 'transform 0.3s ease',
+                        flexShrink: 0,
+                      }}
+                    />
+                    <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, flex: 1 }}>{v.name}</div>
+                    <span
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: 14,
+                        color: 'var(--terracotta)',
+                        transition: 'transform 0.3s ease',
+                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      }}
+                    >
+                      ▾
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      maxHeight: isOpen ? 200 : 0,
+                      overflow: 'hidden',
+                      transition: 'max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                      paddingLeft: 46,
+                    }}
+                  >
+                    <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.7, margin: '0 0 20px 0' }}>{v.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+            <div style={{ borderTop: '1px solid var(--border)' }} />
+          </div>
         </div>
       </div>
 
-      {/* CTA Final */}
+      {/* =====================================================================
+          7. CTA FINAL CINEMÁTICO
+          ===================================================================== */}
       <div
         data-reveal=""
         style={{
@@ -649,6 +703,8 @@ export default function Nosotros() {
         }}
       >
         <div
+          className="breathe-diamond"
+          aria-hidden="true"
           style={{
             position: 'absolute',
             left: -100,
@@ -657,7 +713,6 @@ export default function Nosotros() {
             height: 340,
             background: 'var(--terracotta)',
             opacity: 0.15,
-            transform: 'rotate(45deg)',
           }}
         />
         <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>

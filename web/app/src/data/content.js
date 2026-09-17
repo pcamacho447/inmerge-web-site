@@ -168,6 +168,77 @@ export const ROLES = [
   { name: 'Full-Stack Engineer', desc: 'Desarrollo de software de alta performance, interfaces reactivas y APIs resilientes.' },
 ];
 
+export const DIRECTORS = [
+  {
+    id: 'auditor-director',
+    number: '01',
+    role: 'Director de Auditoría Técnica & Calidad de Datos',
+    englishRole: 'Lead Auditor & Data Strategist',
+    pillar: 'Pilar 01 — Auditoría Técnica y de Datos',
+    tag: 'INTEGRIDAD FORENSE & GOBERNANZA',
+    subtitle: 'Garantía de veracidad operativa, cumplimiento normativo y diagnóstico estructural de bases de datos.',
+    desc: 'Lidera auditorías técnicas independientes, integridad de modelos relacionales, consistencia de reglas de negocio y seguridad perimetral para eliminar riesgos operativos y pérdidas de información.',
+    credentials: [
+      '10+ años en auditoría de sistemas y bases de datos',
+      'Experto en PostgreSQL, SQL Server & RLS',
+      'Gobernanza de Datos & Cumplimiento SUNAT',
+    ],
+    quote: 'La integridad de la información no es un supuesto de fe: se audita y se demuestra matemáticamente en cada tabla y transacción.',
+    accent: 'var(--terracotta)',
+  },
+  {
+    id: 'cloud-director',
+    number: '02',
+    role: 'Director de Arquitectura Cloud & DevOps',
+    englishRole: 'Cloud & DevOps Architect',
+    pillar: 'Pilar 02 — Desarrollo Tecnológico & Cloud',
+    tag: 'AWS ENTERPRISE ARCHITECTURE',
+    subtitle: 'Diseño e ingeniería de arquitecturas en la nube de alta disponibilidad, tolerancia a fallos y optimización de costos.',
+    desc: 'Diseña e implementa infraestructura como código (IaC) sobre AWS (ECS Fargate, RDS Multi-AZ, Lambda, VPCs aisladas), pipelines CI/CD automatizados y políticas Zero-Trust para aplicaciones críticas.',
+    credentials: [
+      'AWS Certified Solutions Architect',
+      'Infraestructura como Código (Terraform / CDK)',
+      'Contenedores, Microservicios & Zero-Downtime',
+    ],
+    quote: 'Una plataforma empresarial resiliente no depende de la suerte, sino de infraestructura reproducible e inmutable.',
+    accent: 'var(--gold)',
+  },
+  {
+    id: 'data-science-director',
+    number: '03',
+    role: 'Director de Ciencia de Datos & Agentes IA',
+    englishRole: 'Senior Data Scientist',
+    pillar: 'Pilar 03 — Ciencia de Datos & IA',
+    tag: 'MACHINE LEARNING & MODELOS PREDICTIVOS',
+    subtitle: 'Modelado estadístico avanzado, forecasting operativo e integración de agentes de inteligencia artificial.',
+    desc: 'Lidera el diseño de algoritmos de Machine Learning en producción, pipelines MLOps reproducibles, detección estadística de anomalías y orquestación de agentes inteligentes con foco en impacto financiero real.',
+    credentials: [
+      'MSc en Inteligencia Artificial & Estadística',
+      'Pipelines MLOps (Python, PyTorch, Airflow)',
+      'Sistemas Predictivos & Agentes Autónomos',
+    ],
+    quote: 'La IA en producción solo tiene valor si genera impacto operativo medible y trazabilidad algorítmica total.',
+    accent: 'var(--ochre)',
+  },
+  {
+    id: 'software-director',
+    number: '04',
+    role: 'Director de Ingeniería de Software & Plataformas',
+    englishRole: 'Full-Stack Engineer',
+    pillar: 'Pilar 02 — Ingeniería de Software',
+    tag: 'PLATAFORMAS REACTIVAS & APIS',
+    subtitle: 'Desarrollo de software a medida de alto rendimiento, interfaces reactivas y APIs resilientes.',
+    desc: 'Especialista en desarrollo frontend y backend de alta concurrencia, diseño de APIs REST/GraphQL, arquitecturas orientadas a eventos y portales corporativos con altos estándares de usabilidad y accesibilidad.',
+    credentials: [
+      'Arquitectura de Sistemas Distribuidos',
+      'React, Node.js, TypeScript & Next.js',
+      'Seguridad en Aplicaciones & WCAG 2.1 AA',
+    ],
+    quote: 'El software de calidad se mide por su mantenibilidad, velocidad de respuesta y absoluta ausencia de cajas negras.',
+    accent: 'var(--terracotta)',
+  },
+];
+
 export const TRUST_BADGES = [
   {
     title: 'Compromiso de Respuesta',

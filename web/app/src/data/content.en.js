@@ -171,6 +171,73 @@ export const ROLES = [
   { name: 'Full-Stack Engineer', desc: 'Engineers high-performance web applications and resilient API platforms.' },
 ];
 
+export const DIRECTORS = [
+  {
+    id: 'auditor-director',
+    number: '01',
+    role: 'Lead Technical Auditor & Data Strategist',
+    englishRole: 'Lead Auditor & Data Strategist',
+    pillar: 'Pilar 01 — Technical & Data Auditing',
+    tag: 'FORENSIC INTEGRITY & GOVERNANCE',
+    subtitle: 'Operational truth assurance, regulatory compliance, and relational database diagnosis.',
+    desc: 'Leads independent technical audit mandates, database structural integrity diagnostics, business rule validation, and perimeter security to eliminate mission-critical risks and data corruption.',
+    credentials: [
+      '10+ years in critical systems and database audit',
+      'Expert in PostgreSQL, SQL Server & RLS',
+      'Data Governance & Regulatory Compliance',
+    ],
+    quote: 'Data integrity is never an assumption of faith: it is audited and proven mathematically across every table and transaction.',
+    accent: 'var(--terracotta)',
+  },
+  {
+    id: 'cloud-director',
+    number: '02',
+    role: 'Cloud & DevOps Principal Architect',
+    englishRole: 'Cloud & DevOps Architect',
+    pillar: 'Pilar 02 — Cloud Systems & Development',
+    tag: 'AWS ENTERPRISE ARCHITECTURE',
+    subtitle: 'High-availability cloud engineering, fault-tolerant infrastructure, and financial cost optimization.',
+    desc: 'Architects and deploys Infrastructure as Code (IaC) on AWS (ECS Fargate, RDS Multi-AZ, Lambda, isolated VPCs), automated CI/CD pipelines, and Zero-Trust policies for high-throughput enterprise systems.',
+    credentials: [
+      'AWS Certified Solutions Architect',
+      'Infrastructure as Code (Terraform / CDK)',
+      'Zero-Downtime Multi-AZ Containerization',
+    ],
+    quote: 'A resilient enterprise cloud does not depend on luck, but on reproducible, immutable infrastructure.',
+    accent: 'var(--gold)',
+  },
+  {
+    id: 'data-science-director',
+    number: '03',
+    role: 'Senior Data Scientist & AI Director',
+    englishRole: 'Senior Data Scientist',
+    pillar: 'Pilar 03 — Data Science & AI',
+    tag: 'MACHINE LEARNING & PREDICTIVE MODELS',
+    subtitle: 'Advanced statistical modeling, operational forecasting, and autonomous AI agent orchestration.',
+    desc: 'Leads production machine learning architectures, reproducible MLOps pipelines, statistical anomaly detection, and AI agents strictly grounded in verifiable business ROI.',
+    credentials: [
+      'MSc in Applied AI & Statistical Modeling',
+      'MLOps Pipelines (Python, PyTorch, Airflow)',
+      'Predictive Systems & Autonomous Agents',
+    ],
+    quote: 'Applied AI only holds value when delivering measurable operational impact and zero black-box opacity.',
+    accent: 'var(--ochre)',
+  },
+  {
+    id: 'software-director',
+    number: '04',
+    role: 'Principal Full-Stack & Platforms Engineer',
+    englishRole: 'Full-Stack Engineer',
+    pillar: 'Pilar 02 — Software Engineering',
+    tag: 'REACTIVE PLATFORMS & APIS',
+    subtitle: 'Custom high-performance web applications, reactive user interfaces, and resilient API gateways.',
+    desc: 'Specialist in high-concurrency frontend and backend architectures, resilient REST/GraphQL API design, event-driven distributed systems, and enterprise portals adhering to WCAG 2.1 AA accessibility.',
+    credentials: ['Distributed Systems Architecture', 'React, Node.js, TypeScript & Next.js', 'AppSec Hardening & WCAG 2.1 AA Standards'],
+    quote: 'Clean, well-engineered code accelerates today’s velocity while guaranteeing technological sovereignty tomorrow.',
+    accent: 'var(--terracotta)',
+  },
+];
+
 export const TRUST_BADGES = [
   {
     title: 'Response Commitment',

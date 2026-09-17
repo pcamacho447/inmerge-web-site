@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import Nosotros from './Nosotros.jsx';
 
-describe('Nosotros Page (Unified with Metodología & Misión/Visión)', () => {
-  it('renders the header and core manifest', () => {
+describe('Nosotros Page (Redesigned — Cinematic Hero + ManifestoCarousel + DirectorsCarousel)', () => {
+  it('renders the cinematic hero header and core manifest', () => {
     render(
       <MemoryRouter>
         <Nosotros />
@@ -24,19 +24,35 @@ describe('Nosotros Page (Unified with Metodología & Misión/Visión)', () => {
     expect(screen.getByText(/Referencia Técnica Regional/i)).toBeInTheDocument();
   });
 
-  it('renders the 4 methodology stages', () => {
+  it('renders the ManifestoCarousel with engineering assurance content', () => {
     render(
       <MemoryRouter>
         <Nosotros />
       </MemoryRouter>,
     );
 
-    expect(screen.getByText('El Método Inmerge en 4 etapas')).toBeInTheDocument();
+    // ManifestoCarousel renders as region with carousel role
+    const carousel = screen.getByRole('region', { name: /Manifiesto de Ingeniería Inmerge/i });
+    expect(carousel).toBeInTheDocument();
+
+    // First slide content should be visible
+    expect(screen.getByText(/Código Probado, Infraestructura Infalible/i)).toBeInTheDocument();
+  });
+
+  it('renders the 4 methodology stages via the Método tab', () => {
+    render(
+      <MemoryRouter>
+        <Nosotros />
+      </MemoryRouter>,
+    );
+
+    // The method tab should be active by default
+    expect(screen.getByRole('tab', { name: /El Método \(4 Etapas\)/i })).toBeInTheDocument();
     expect(screen.getByText('Auditoría & Diagnóstico Inicial')).toBeInTheDocument();
     expect(screen.getByText('Validación, Certificación & Despliegue')).toBeInTheDocument();
   });
 
-  it('renders and allows interacting with the StackTabs component', async () => {
+  it('switches to Stack tab and shows technology content', async () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
@@ -44,27 +60,54 @@ describe('Nosotros Page (Unified with Metodología & Misión/Visión)', () => {
       </MemoryRouter>,
     );
 
-    // Initial tab is Cloud & DevOps
+    // Switch to Stack tab
+    const stackTab = screen.getByRole('tab', { name: /Stack Tecnológico/i });
+    await user.click(stackTab);
+
+    // StackTabs component should render
     expect(screen.getByText('Amazon Web Services (AWS)')).toBeInTheDocument();
-
-    // Click on Ciencia de Datos tab
-    const dataTab = screen.getByRole('tab', { name: /Ciencia de Datos & IA/i });
-    await user.click(dataTab);
-
-    expect(screen.getByText('Apache Airflow / Orchestration')).toBeInTheDocument();
   });
 
-  it('renders architecture diagram, assurance principles, and senior roles', () => {
+  it('renders the 4 practice directors via DirectorsCarousel', async () => {
+    const user = userEvent.setup();
     render(
       <MemoryRouter>
         <Nosotros />
       </MemoryRouter>,
     );
 
-    expect(screen.getByText(/ARQUITECTURA DE FLUJO & AUDITORÍA/i)).toBeInTheDocument();
-    expect(screen.getByText(/Nuestros 4 Principios de Aseguramiento/i)).toBeInTheDocument();
-    expect(screen.getByText(/El Ingeniero & Auditor Estratégico/i)).toBeInTheDocument();
-    expect(screen.getByText('Especialistas Senior')).toBeInTheDocument();
-    expect(screen.getByText('Cloud & DevOps Architect')).toBeInTheDocument();
+    // Directors Carousel region
+    const directorsCarousel = screen.getByRole('region', {
+      name: /Directorio de Especialistas Senior y Directores/i,
+    });
+    expect(directorsCarousel).toBeInTheDocument();
+
+    // Initial active director profile heading
+    expect(screen.getByRole('heading', { name: /Director de Auditoría Técnica & Calidad de Datos/i })).toBeInTheDocument();
+    expect(screen.getByText(/La integridad de la información no es un supuesto de fe/i)).toBeInTheDocument();
+
+    // Switch to Cloud Director via pill button
+    const cloudPill = screen.getByRole('tab', {
+      name: /Director de Arquitectura Cloud & DevOps/i,
+    });
+    await user.click(cloudPill);
+
+    expect(screen.getByRole('heading', { name: /Director de Arquitectura Cloud & DevOps/i })).toBeInTheDocument();
+    expect(screen.getByText(/Una plataforma empresarial resiliente no depende de la suerte/i)).toBeInTheDocument();
+  });
+
+  it('expands a commitment accordion item on click', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <Nosotros />
+      </MemoryRouter>,
+    );
+
+    // Click on "Rigor y Trazabilidad" to expand
+    const rigorItem = screen.getByText('Rigor y Trazabilidad').closest('[role="button"]');
+    await user.click(rigorItem);
+
+    expect(rigorItem).toHaveAttribute('aria-expanded', 'true');
   });
 });
