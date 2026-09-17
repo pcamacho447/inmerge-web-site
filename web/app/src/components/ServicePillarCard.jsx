@@ -13,7 +13,7 @@ function MocheWallRelief({ pillarId, color = 'var(--terracotta)' }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
-        style={{ width: '100%', height: 100, margin: '16px 0 20px', display: 'block' }}
+        className="moche-frieze-svg"
       >
         <g stroke={color} strokeWidth="1.75" opacity="0.85">
           {/* Fila base de grecas escalonadas */}
@@ -38,7 +38,7 @@ function MocheWallRelief({ pillarId, color = 'var(--terracotta)' }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
-        style={{ width: '100%', height: 100, margin: '16px 0 20px', display: 'block' }}
+        className="moche-frieze-svg"
       >
         <g stroke={color} strokeWidth="1.75" opacity="0.85">
           {/* Doble greca laberíntica continua */}
@@ -70,7 +70,7 @@ function MocheWallRelief({ pillarId, color = 'var(--terracotta)' }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
-      style={{ width: '100%', height: 100, margin: '16px 0 20px', display: 'block' }}
+      className="moche-frieze-svg"
     >
       <g stroke={color} strokeWidth="1.75" opacity="0.85">
         {/* Celosía triangular rítmica */}

@@ -28,6 +28,24 @@ export const VALUES = [
   { name: 'Autonomía del Cliente', desc: 'Transferencia total de infraestructura y código sin cajas negras.' },
 ];
 
+export const HERO_CERTAINTIES = [
+  {
+    metric: '100%',
+    label: 'Código Verificable & Citable',
+    desc: 'Auditoría sin cajas negras, pruebas continuas y trazabilidad.',
+  },
+  {
+    metric: '0%',
+    label: 'Vendor Lock-in',
+    desc: 'Infraestructura desplegada en tus propias cuentas AWS / GCP.',
+  },
+  {
+    metric: '1 - 2 Sem',
+    label: 'Sprints de Alta Densidad',
+    desc: 'Entregables auditables y feedback continuo cada semana.',
+  },
+];
+
 export const PILLARS = [
   {
     id: 'auditoria',

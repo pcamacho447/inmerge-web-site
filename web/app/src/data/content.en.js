@@ -25,6 +25,24 @@ export const VALUES = [
   { name: 'Client Autonomy', desc: 'Total transfer of infrastructure, code, and blueprints with zero black boxes.' },
 ];
 
+export const HERO_CERTAINTIES = [
+  {
+    metric: '100%',
+    label: 'Verifiable & Citable Code',
+    desc: 'Zero black-box auditing, automated test suites, and traceability.',
+  },
+  {
+    metric: '0%',
+    label: 'Vendor Lock-in',
+    desc: 'Infrastructure provisioned directly inside your own AWS / GCP accounts.',
+  },
+  {
+    metric: '1 - 2 Wks',
+    label: 'High-Density Sprints',
+    desc: 'Auditable milestone deliverables with continuous weekly cadences.',
+  },
+];
+
 export const PILLARS = [
   {
     id: 'auditoria',

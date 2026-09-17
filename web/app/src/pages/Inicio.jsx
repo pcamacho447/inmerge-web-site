@@ -202,6 +202,51 @@ export default function Inicio() {
               </Link>
             </div>
           </div>
+
+          {/* High-Impact Certainties Strip */}
+          {content.HERO_CERTAINTIES && (
+            <div
+              style={{
+                marginTop: 64,
+                paddingTop: 36,
+                borderTop: '1px solid rgba(243, 234, 218, 0.15)',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                gap: 'clamp(24px, 4vw, 48px)',
+              }}
+            >
+              {content.HERO_CERTAINTIES.map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div
+                    style={{
+                      fontFamily: "'Spectral', serif",
+                      fontSize: 'clamp(32px, 4vw, 44px)',
+                      fontWeight: 700,
+                      color: 'var(--gold)',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {item.metric}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      letterSpacing: 1.5,
+                      textTransform: 'uppercase',
+                      color: 'var(--terracotta)',
+                    }}
+                  >
+                    {item.label}
+                  </div>
+                  <div style={{ fontSize: 13.5, color: 'rgba(243, 234, 218, 0.8)', lineHeight: 1.5 }}>
+                    {item.desc}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

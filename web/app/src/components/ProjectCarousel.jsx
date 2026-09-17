@@ -376,9 +376,22 @@ export default function ProjectCarousel({ onQuoteProject }) {
               >
                 {/* Header Meta */}
                 <div className="card-top-meta">
-                  <span className="card-pillar-tag" style={{ borderColor: badge.color, color: badge.color }}>
-                    {badge.label}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span className="card-pillar-tag" style={{ borderColor: badge.color, color: badge.color }}>
+                      {badge.label}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        color: 'var(--terracotta)',
+                        letterSpacing: '0.08em',
+                      }}
+                    >
+                      {String(realIdx + 1).padStart(2, '0')} // {String(N).padStart(2, '0')}
+                    </span>
+                  </div>
                   <span className="card-duration-tag">
                     {isEn ? project.duration.en : project.duration.es}
                   </span>

@@ -163,14 +163,25 @@ export default function Servicios() {
                   </div>
                   <div
                     style={{
-                      fontFamily: "'Spectral',serif",
-                      fontWeight: 700,
-                      fontSize: 'clamp(20px,2.4vw,28px)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 4,
                       flex: 1,
-                      minWidth: 220,
+                      minWidth: 260,
                     }}
                   >
-                    {s.name}
+                    <div
+                      style={{
+                        fontFamily: "'Spectral',serif",
+                        fontWeight: 700,
+                        fontSize: 'clamp(20px,2.4vw,28px)',
+                      }}
+                    >
+                      {s.name}
+                    </div>
+                    <div style={{ fontSize: 13.5, color: 'var(--muted)', fontWeight: 400, lineHeight: 1.4 }}>
+                      {s.line}
+                    </div>
                   </div>
                   <div
                     style={{
