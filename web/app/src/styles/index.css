@@ -1109,20 +1109,20 @@ details.service-accordion-item > summary::marker {
 .estimator-layout-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 36px;
+  gap: clamp(20px, 3.5vw, 36px);
 }
 
 @media (max-width: 840px) {
   .estimator-layout-grid {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 24px;
   }
 }
 
 .estimator-controls-col {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 20px;
 }
 
 .control-group {
@@ -1139,22 +1139,32 @@ details.service-accordion-item > summary::marker {
 }
 
 .estimator-select {
-  padding: 13px 16px;
+  padding: 13px 36px 13px 16px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--cream2);
-  font-size: 0.92rem;
+  background-color: var(--cream2);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23241A12' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px 14px;
+  font-size: 0.95rem;
   font-family: 'IBM Plex Sans', sans-serif;
   color: var(--ink);
   outline: none;
   font-weight: 500;
   cursor: pointer;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   transition: all 0.2s ease;
 }
 
 .estimator-select:focus {
   border-color: var(--terracotta);
-  background: var(--cream2);
+  background-color: var(--cream2);
   box-shadow: 0 0 0 1px var(--terracotta);
 }
 
@@ -1163,7 +1173,7 @@ details.service-accordion-item > summary::marker {
   color: var(--bg);
   border: 1px solid rgba(216, 168, 78, 0.35);
   border-radius: 8px;
-  padding: 28px;
+  padding: clamp(20px, 3.5vw, 28px);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -1174,21 +1184,25 @@ details.service-accordion-item > summary::marker {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   margin-bottom: 18px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
 }
 
 .res-badge-pillar {
   font-weight: 700;
   color: var(--gold);
+  line-height: 1.3;
 }
 
 .res-badge-model {
   color: var(--tan-text);
   opacity: 0.85;
+  line-height: 1.3;
 }
 
 .results-key-metrics {
@@ -1206,11 +1220,14 @@ details.service-accordion-item > summary::marker {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .res-metric-label {
   font-size: 0.86rem;
   color: var(--tan-text);
+  line-height: 1.3;
 }
 
 .res-metric-val {
@@ -1218,6 +1235,7 @@ details.service-accordion-item > summary::marker {
   font-weight: 700;
   font-size: 1.05rem;
   color: #fff;
+  line-height: 1.3;
 }
 
 .res-metric-val.highlight-val {
@@ -1245,7 +1263,7 @@ details.service-accordion-item > summary::marker {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .deliverables-list li {
@@ -1255,12 +1273,14 @@ details.service-accordion-item > summary::marker {
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  word-break: break-word;
 }
 
 .deliverables-list li::before {
   content: '✓';
   color: var(--gold);
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .results-actions {
@@ -1280,6 +1300,11 @@ details.service-accordion-item > summary::marker {
   border-radius: 4px;
   text-decoration: none;
   transition: background 0.2s ease;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .btn-estimator-wa:hover {
@@ -1298,15 +1323,75 @@ details.service-accordion-item > summary::marker {
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .btn-estimator-llm:hover {
   background: var(--gold);
   color: var(--ink);
+  opacity: 0.9;
 }
 
-.btn-estimator-llm:hover {
-  opacity: 0.9;
+@media (max-width: 640px) {
+  .quick-estimator-section {
+    margin: 40px 0;
+  }
+
+  .estimator-header {
+    margin-bottom: 24px;
+  }
+
+  .estimator-title {
+    font-size: clamp(1.45rem, 5vw, 1.85rem);
+  }
+
+  .estimator-subtitle {
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .results-summary-card {
+    padding: clamp(16px, 4vw, 22px);
+  }
+
+  .results-badge-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding-bottom: 10px;
+  }
+
+  .res-metric-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px 14px;
+  }
+
+  .res-metric-label {
+    font-size: 0.82rem;
+  }
+
+  .res-metric-val {
+    font-size: 1.12rem;
+  }
+
+  .res-metric-val.highlight-val {
+    font-size: 1.25rem;
+  }
+
+  .estimator-select {
+    font-size: 1rem; /* Eliminates iOS Safari auto-zoom on form controls */
+    padding: 12px 34px 12px 14px;
+  }
+
+  .deliverables-list li {
+    font-size: 0.82rem;
+  }
 }
 
 /* ==========================================================================
