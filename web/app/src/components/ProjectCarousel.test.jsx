@@ -79,6 +79,22 @@ describe('ProjectCarousel Component', () => {
     expect(dots[1]).toHaveAttribute('aria-current', 'true');
   });
 
+  it('navigates to next and previous slide using directional arrow buttons', () => {
+    renderWithLang(<ProjectCarousel onQuoteProject={vi.fn()} />);
+
+    const nextBtn = screen.getByRole('button', { name: /siguiente tarjeta/i });
+    const prevBtn = screen.getByRole('button', { name: /tarjeta anterior/i });
+    const dots = screen.getAllByRole('button', { name: /ir a tarjeta/i });
+
+    expect(dots[0]).toHaveAttribute('aria-current', 'true');
+
+    fireEvent.click(nextBtn);
+    expect(dots[1]).toHaveAttribute('aria-current', 'true');
+
+    fireEvent.click(prevBtn);
+    expect(dots[0]).toHaveAttribute('aria-current', 'true');
+  });
+
   it('triggers onQuoteProject callback with project data when CTA is clicked', () => {
     const onQuoteProject = vi.fn();
     renderWithLang(<ProjectCarousel onQuoteProject={onQuoteProject} />);

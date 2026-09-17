@@ -115,18 +115,36 @@ export default function ProjectCarousel({ onQuoteProject }) {
 
     if (virtualIndex >= 2 * N || virtualIndex < N) {
       const normalizedVIdx = (((virtualIndex % N) + N) % N) + N;
+      if (trackRef.current) {
+        trackRef.current.style.transition = 'none';
+      }
       setWithTransition(false);
       setVirtualIndex(normalizedVIdx);
       const offset = calculateTranslateForIndex(normalizedVIdx);
       setTranslateX(offset);
+
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translate3d(${offset}px, 0, 0)`;
+        void trackRef.current.offsetHeight;
+      }
     }
   };
 
-  // Jump directly to card from bottom pagination dots
-  const goToRealIndex = useCallback((realIdx) => {
+  // Jump directly to card from bottom pagination dots using the shortest circular path (never rewinding across all cards)
+  const goToRealIndex = useCallback((targetRealIdx) => {
     if (N === 0) return;
-    moveToVirtualIndex(N + realIdx, true);
-  }, [N, moveToVirtualIndex]);
+    const currentRealIdx = ((virtualIndex % N) + N) % N;
+    if (currentRealIdx === targetRealIdx) return;
+
+    const forwardDistance = (targetRealIdx - currentRealIdx + N) % N;
+    const backwardDistance = (currentRealIdx - targetRealIdx + N) % N;
+
+    if (forwardDistance <= backwardDistance) {
+      moveToVirtualIndex(virtualIndex + forwardDistance, true);
+    } else {
+      moveToVirtualIndex(virtualIndex - backwardDistance, true);
+    }
+  }, [N, virtualIndex, moveToVirtualIndex]);
 
   // Smooth automatic motion progression every 5 seconds
   useEffect(() => {
@@ -461,8 +479,18 @@ export default function ProjectCarousel({ onQuoteProject }) {
         </div>
       </div>
 
-      {/* Slide Pagination Dots & Autoplay Toggle */}
+      {/* Slide Pagination Dots, Direction Arrows & Autoplay Toggle */}
       <div className="carousel-dots-pagination" role="group" aria-label={isEn ? 'Slide pagination' : 'Paginación de tarjetas'}>
+        <button
+          type="button"
+          className="carousel-arrow-btn carousel-arrow-prev"
+          onClick={handlePrev}
+          aria-label={isEn ? 'Previous slide' : 'Tarjeta anterior'}
+          title={isEn ? 'Previous slide' : 'Tarjeta anterior'}
+        >
+          ←
+        </button>
+
         {filteredProjects.map((project, idx) => (
           <button
             key={project.id}
@@ -475,6 +503,16 @@ export default function ProjectCarousel({ onQuoteProject }) {
             <span className="dot-inner" />
           </button>
         ))}
+
+        <button
+          type="button"
+          className="carousel-arrow-btn carousel-arrow-next"
+          onClick={handleNext}
+          aria-label={isEn ? 'Next slide' : 'Siguiente tarjeta'}
+          title={isEn ? 'Next slide' : 'Siguiente tarjeta'}
+        >
+          →
+        </button>
 
         <button
           type="button"

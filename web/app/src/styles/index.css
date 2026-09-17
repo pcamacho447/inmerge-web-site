@@ -602,6 +602,31 @@ details.service-accordion-item > summary::marker {
   background: var(--terracotta);
 }
 
+.carousel-arrow-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-family: 'IBM Plex Mono', monospace;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.carousel-arrow-btn:hover {
+  border-color: var(--terracotta);
+  color: var(--terracotta);
+  background: var(--cream2);
+  transform: scale(1.08);
+}
+
 .carousel-autoplay-toggle {
   background: transparent;
   border: none;
