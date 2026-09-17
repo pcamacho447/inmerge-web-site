@@ -25,22 +25,6 @@ describe('ManifestoCarousel Component', () => {
     expect(screen.getByText(/01 — CI\/CD & SEGURIDAD/i)).toBeInTheDocument();
   });
 
-  it('allows navigating across slides via next/prev buttons', async () => {
-    const user = userEvent.setup();
-    renderWithLang(<ManifestoCarousel />, '/nosotros');
-
-    const nextBtn = screen.getByRole('button', { name: /Siguiente diapositiva/i });
-    await user.click(nextBtn);
-
-    // Second slide content
-    expect(screen.getByText(/Cada Dato Rastreable, Sin Ataduras/i)).toBeInTheDocument();
-
-    const prevBtn = screen.getByRole('button', { name: /Diapositiva anterior/i });
-    await user.click(prevBtn);
-
-    expect(screen.getByText(/Código Probado, Infraestructura Infalible/i)).toBeInTheDocument();
-  });
-
   it('navigates slides using keyboard ArrowRight and ArrowLeft', async () => {
     const user = userEvent.setup();
     renderWithLang(<ManifestoCarousel />, '/nosotros');

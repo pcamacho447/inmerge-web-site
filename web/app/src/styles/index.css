@@ -1110,101 +1110,6 @@ details.service-accordion-item > summary::marker {
   color: var(--ink);
 }
 
-/* Controls: arrows + progress bar */
-.manifesto-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 20px 24px;
-  background: var(--bg);
-}
-
-.manifesto-arrow {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--ink);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.85rem;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: all 0.2s ease;
-  user-select: none;
-  flex-shrink: 0;
-}
-
-.manifesto-arrow:hover {
-  border-color: var(--terracotta);
-  color: var(--terracotta);
-  background: var(--cream2);
-  transform: scale(1.08);
-}
-
-/* Segmented progress bar */
-.manifesto-progress-bar {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  flex: 0 1 280px;
-}
-
-.manifesto-progress-segment {
-  flex: 1;
-  height: 3px;
-  background: var(--border);
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  border-radius: 2px;
-  transition: background 0.3s ease;
-}
-
-.manifesto-progress-segment .segment-fill {
-  position: absolute;
-  inset: 0;
-  background: var(--terracotta);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-  border-radius: 2px;
-}
-
-.manifesto-progress-segment.is-active .segment-fill {
-  transform: scaleX(1);
-}
-
-.manifesto-progress-segment:hover {
-  background: var(--cream2);
-}
-
-.manifesto-autoplay-toggle {
-  background: transparent;
-  border: none;
-  font-size: 0.8rem;
-  color: var(--muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 6px;
-  margin-left: 4px;
-  border-radius: 4px;
-  transition: color 0.15s ease;
-  flex-shrink: 0;
-}
-
-.manifesto-autoplay-toggle:hover {
-  color: var(--terracotta);
-}
-
 /* Responsive: mobile */
 @media (max-width: 768px) {
   .manifesto-slides-viewport {
@@ -1224,19 +1129,11 @@ details.service-accordion-item > summary::marker {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-
-  .manifesto-progress-bar {
-    flex: 0 1 160px;
-  }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .manifesto-slide {
-    transition: none !important;
-  }
-
-  .manifesto-progress-segment .segment-fill {
     transition: none !important;
   }
 }

@@ -427,43 +427,6 @@ export default function ManifestoCarousel() {
           );
         })}
       </div>
-
-      {/* Controls: arrows + segmented progress bar */}
-      <div className="manifesto-controls" aria-label={isEn ? 'Carousel controls' : 'Controles del carrusel'}>
-        <button
-          type="button"
-          className="manifesto-arrow manifesto-arrow--prev"
-          onClick={handlePrev}
-          aria-label={isEn ? 'Previous slide' : 'Diapositiva anterior'}
-        >
-          ←
-        </button>
-
-        {/* Segmented progress bar */}
-        <div className="manifesto-progress-bar" role="group" aria-label={isEn ? 'Slide progress' : 'Progreso'}>
-          {slides.map((slide, idx) => (
-            <button
-              key={slide.id}
-              type="button"
-              className={`manifesto-progress-segment ${idx === activeIndex ? 'is-active' : ''}`}
-              onClick={() => goTo(idx)}
-              aria-label={`${isEn ? 'Go to slide' : 'Ir a diapositiva'} ${idx + 1}`}
-              aria-current={idx === activeIndex ? 'true' : 'false'}
-            >
-              <span className="segment-fill" style={{ background: slide.accent }} />
-            </button>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          className="manifesto-arrow manifesto-arrow--next"
-          onClick={handleNext}
-          aria-label={isEn ? 'Next slide' : 'Siguiente diapositiva'}
-        >
-          →
-        </button>
-      </div>
     </section>
   );
 }
