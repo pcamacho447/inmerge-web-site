@@ -21,39 +21,27 @@ describe('ProjectCarousel Component', () => {
     );
   };
 
-  it('renders carousel header and initial case studies in Spanish with deck counter', () => {
+  it('renders clean editorial carousel header without redundant counter or arrow clutter', () => {
     renderWithLang(<ProjectCarousel onQuoteProject={vi.fn()} />);
 
     expect(screen.getByText('CASOS DE ÉXITO & PROYECTOS REALES')).toBeInTheDocument();
     expect(screen.getByText('Resultados de Ingeniería en Días, No en Meses')).toBeInTheDocument();
-    expect(screen.getByText('Saneamiento y Auditoría Forense de Base de Datos de 18M Registros')).toBeInTheDocument();
-    expect(screen.getByText(/01 \/ 06/)).toBeInTheDocument();
+    expect(screen.getAllByText('Saneamiento y Auditoría Forense de Base de Datos de 18M Registros').length).toBeGreaterThanOrEqual(1);
+
+    // Verify removed clutter
+    expect(screen.queryByText(/01 \/ 06/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /ver proyecto siguiente/i })).not.toBeInTheDocument();
   });
 
-  it('filters projects by pillar and updates deck counter', () => {
+  it('filters projects by pillar and updates active slide items', () => {
     renderWithLang(<ProjectCarousel onQuoteProject={vi.fn()} />);
 
     // Click on Pillar 03: Data & AI
     const dataTab = screen.getByRole('tab', { name: /pilar 03: datos & ia/i });
     fireEvent.click(dataTab);
 
-    expect(screen.getByText('Asistente RAG & Búsqueda Semántica sobre 50,000 Documentos')).toBeInTheDocument();
+    expect(screen.getAllByText('Asistente RAG & Búsqueda Semántica sobre 50,000 Documentos').length).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText('Saneamiento y Auditoría Forense de Base de Datos de 18M Registros')).not.toBeInTheDocument();
-    expect(screen.getByText(/01 \/ 02/)).toBeInTheDocument();
-  });
-
-  it('navigates next and prev slides using arrows and updates active slide counter', () => {
-    renderWithLang(<ProjectCarousel onQuoteProject={vi.fn()} />);
-
-    const nextBtn = screen.getByRole('button', { name: /ver proyecto siguiente/i });
-    fireEvent.click(nextBtn);
-
-    expect(screen.getByText(/02 \/ 06/)).toBeInTheDocument();
-
-    const prevBtn = screen.getByRole('button', { name: /ver proyecto anterior/i });
-    fireEvent.click(prevBtn);
-
-    expect(screen.getByText(/01 \/ 06/)).toBeInTheDocument();
   });
 
   it('jumps directly to card when pagination dot is clicked', () => {
@@ -63,7 +51,7 @@ describe('ProjectCarousel Component', () => {
     expect(dots.length).toBe(6);
 
     fireEvent.click(dots[2]); // 3rd card
-    expect(screen.getByText(/03 \/ 06/)).toBeInTheDocument();
+    expect(dots[2]).toHaveAttribute('aria-current', 'true');
   });
 
   it('toggles autoplay state on button click', () => {
@@ -76,18 +64,19 @@ describe('ProjectCarousel Component', () => {
     expect(screen.getByTitle(/activar auto-slide/i)).toBeInTheDocument();
   });
 
-  it('handles mouse dragging gesture to advance slides', () => {
+  it('handles mouse dragging gesture to navigate infinitely', () => {
     renderWithLang(<ProjectCarousel onQuoteProject={vi.fn()} />);
 
     const track = screen.getByRole('region', { name: /casos de éxito/i }).querySelector('.carousel-track');
     expect(track).toBeInTheDocument();
 
-    // Drag left (> 50px) to go next
+    // Drag left (> 40px) to advance
     fireEvent.mouseDown(track, { clientX: 200, pageX: 200 });
     fireEvent.mouseMove(track, { clientX: 100, pageX: 100 });
     fireEvent.mouseUp(track, { clientX: 100, pageX: 100 });
 
-    expect(screen.getByText(/02 \/ 06/)).toBeInTheDocument();
+    const dots = screen.getAllByRole('button', { name: /ir a tarjeta/i });
+    expect(dots[1]).toHaveAttribute('aria-current', 'true');
   });
 
   it('triggers onQuoteProject callback with project data when CTA is clicked', () => {

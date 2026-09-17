@@ -5,7 +5,6 @@ import { PROJECTS_DATA } from '../data/projectsData';
 export default function ProjectCarousel({ onQuoteProject }) {
   const { lang } = useLanguage();
   const [selectedPillar, setSelectedPillar] = useState('all');
-  const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoplay, setIsAutoplay] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -15,11 +14,21 @@ export default function ProjectCarousel({ onQuoteProject }) {
   const startXRef = useRef(0);
   const startScrollLeftRef = useRef(0);
   const hasMovedRef = useRef(false);
+  const isDraggingRef = useRef(false);
+  const rebaseTimeoutRef = useRef(null);
 
   const filteredProjects =
     selectedPillar === 'all'
       ? PROJECTS_DATA
       : PROJECTS_DATA.filter((p) => p.pillarId === selectedPillar);
+
+  const N = filteredProjects.length;
+
+  // Triplicated virtual buffer for continuous 360° infinite scrolling
+  const virtualProjects = N > 0 ? [...filteredProjects, ...filteredProjects, ...filteredProjects] : [];
+
+  // Start in the middle buffer (index N)
+  const [virtualIndex, setVirtualIndex] = useState(N);
 
   const isEn = lang === 'en';
 
@@ -30,24 +39,19 @@ export default function ProjectCarousel({ onQuoteProject }) {
     { id: 'datos', label: isEn ? 'Pillar 03: Data & AI' : 'Pilar 03: Datos & IA' },
   ];
 
-  // Reset activeIndex when filter changes
-  useEffect(() => {
-    setActiveIndex(0);
-    if (carouselRef.current) {
-      if (typeof carouselRef.current.scrollTo === 'function') {
-        carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        carouselRef.current.scrollLeft = 0;
-      }
+  // Normalized active index (0 to N - 1) for indicators and pagination dots
+  const realActiveIndex = N > 0 ? ((virtualIndex % N) + N) % N : 0;
+
+  // Scroll to a specific virtual card with center alignment
+  const scrollToVirtualIndex = useCallback((vIdx, smooth = true) => {
+    if (N === 0) return;
+    setVirtualIndex(vIdx);
+
+    if (rebaseTimeoutRef.current) {
+      clearTimeout(rebaseTimeoutRef.current);
     }
-  }, [selectedPillar]);
 
-  // Scroll to specific card by index with center alignment
-  const scrollToIndex = useCallback((index) => {
-    if (index < 0 || index >= filteredProjects.length) return;
-    setActiveIndex(index);
-
-    const targetCard = cardRefs.current[index];
+    const targetCard = cardRefs.current[vIdx];
     if (targetCard && carouselRef.current) {
       const container = carouselRef.current;
       const cardLeft = targetCard.offsetLeft || 0;
@@ -58,27 +62,68 @@ export default function ProjectCarousel({ onQuoteProject }) {
       if (typeof container.scrollTo === 'function') {
         container.scrollTo({
           left: Math.max(0, targetScroll),
-          behavior: 'smooth',
+          behavior: smooth ? 'smooth' : 'auto',
         });
       } else {
         container.scrollLeft = Math.max(0, targetScroll);
       }
     }
-  }, [filteredProjects.length]);
 
-  const handlePrev = useCallback(() => {
-    const nextIdx = activeIndex > 0 ? activeIndex - 1 : filteredProjects.length - 1;
-    scrollToIndex(nextIdx);
-  }, [activeIndex, filteredProjects.length, scrollToIndex]);
+    // Seamless infinite buffer rebase: if we drifted into the left or right clone zone,
+    // silently reset position to the middle clone after the smooth animation completes.
+    if (vIdx < N || vIdx >= 2 * N) {
+      const normalizedVIdx = (((vIdx % N) + N) % N) + N;
+      rebaseTimeoutRef.current = setTimeout(() => {
+        setVirtualIndex(normalizedVIdx);
+        const middleCard = cardRefs.current[normalizedVIdx];
+        if (middleCard && carouselRef.current) {
+          const container = carouselRef.current;
+          const cardLeft = middleCard.offsetLeft || 0;
+          const cardWidth = middleCard.offsetWidth || 0;
+          const containerWidth = container.offsetWidth || 0;
+          const targetScroll = cardLeft - (containerWidth / 2) + (cardWidth / 2);
+
+          if (typeof container.scrollTo === 'function') {
+            container.scrollTo({
+              left: Math.max(0, targetScroll),
+              behavior: 'auto',
+            });
+          } else {
+            container.scrollLeft = Math.max(0, targetScroll);
+          }
+        }
+      }, smooth ? 400 : 0);
+    }
+  }, [N]);
+
+  // Reset virtual index to the center set whenever filter changes
+  useEffect(() => {
+    setVirtualIndex(N);
+    const timer = setTimeout(() => {
+      scrollToVirtualIndex(N, false);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [selectedPillar, N, scrollToVirtualIndex]);
 
   const handleNext = useCallback(() => {
-    const nextIdx = activeIndex < filteredProjects.length - 1 ? activeIndex + 1 : 0;
-    scrollToIndex(nextIdx);
-  }, [activeIndex, filteredProjects.length, scrollToIndex]);
+    if (N === 0) return;
+    scrollToVirtualIndex(virtualIndex + 1, true);
+  }, [virtualIndex, N, scrollToVirtualIndex]);
+
+  const handlePrev = useCallback(() => {
+    if (N === 0) return;
+    scrollToVirtualIndex(virtualIndex - 1, true);
+  }, [virtualIndex, N, scrollToVirtualIndex]);
+
+  // Jump directly to item from bottom pagination dots
+  const goToRealIndex = useCallback((realIdx) => {
+    if (N === 0) return;
+    scrollToVirtualIndex(N + realIdx, true);
+  }, [N, scrollToVirtualIndex]);
 
   // Smooth automatic motion progression every 5 seconds
   useEffect(() => {
-    if (!isAutoplay || isPaused || isDragging || filteredProjects.length <= 1) {
+    if (!isAutoplay || isPaused || isDragging || N <= 1) {
       return;
     }
 
@@ -87,9 +132,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
     }, 5000);
 
     return () => clearInterval(timer);
-  }, [isAutoplay, isPaused, isDragging, handleNext, filteredProjects.length]);
-
-  const isDraggingRef = useRef(false);
+  }, [isAutoplay, isPaused, isDragging, handleNext, N]);
 
   const getEventCoord = (e) => {
     if (e.clientX !== undefined) return e.clientX;
@@ -133,7 +176,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
     } else if (walk > 40) {
       handlePrev();
     } else {
-      scrollToIndex(activeIndex);
+      scrollToVirtualIndex(virtualIndex, true);
     }
   };
 
@@ -142,7 +185,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
       isDraggingRef.current = false;
       setIsDragging(false);
       setIsPaused(false);
-      scrollToIndex(activeIndex);
+      scrollToVirtualIndex(virtualIndex, true);
     }
   };
 
@@ -177,7 +220,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
     } else if (walk > 40) {
       handlePrev();
     } else {
-      scrollToIndex(activeIndex);
+      scrollToVirtualIndex(virtualIndex, true);
     }
   };
 
@@ -218,6 +261,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
       onFocus={() => setIsPaused(true)}
       onBlur={() => setIsPaused(false)}
     >
+      {/* Clean Editorial Header (No redundant counter boxes or arrows) */}
       <div className="carousel-header">
         <div className="carousel-titles">
           <span className="carousel-eyebrow">
@@ -233,47 +277,6 @@ export default function ProjectCarousel({ onQuoteProject }) {
               ? 'Auditable production-ready systems, scalable cloud architectures, and verifiable business ROI.'
               : 'Arquitecturas cloud en producción, modelos de datos de alta precisión y entregables forenses con ROI verificable.'}
           </p>
-        </div>
-
-        {/* Deck Navigation & Controls */}
-        <div className="carousel-top-controls">
-          <div className="carousel-deck-meta">
-            <span className="deck-counter" aria-live="polite">
-              {String(activeIndex + 1).padStart(2, '0')} / {String(filteredProjects.length).padStart(2, '0')}
-            </span>
-            <button
-              type="button"
-              className={`carousel-autoplay-toggle ${isAutoplay ? 'is-playing' : 'is-paused'}`}
-              onClick={() => setIsAutoplay(!isAutoplay)}
-              aria-label={
-                isAutoplay
-                  ? (isEn ? 'Pause automatic slide progression' : 'Pausar avance automático')
-                  : (isEn ? 'Play automatic slide progression' : 'Iniciar avance automático')
-              }
-              title={isAutoplay ? (isEn ? 'Pause Auto-slide' : 'Pausar Auto-slide') : (isEn ? 'Play Auto-slide' : 'Activar Auto-slide')}
-            >
-              {isAutoplay ? '⏸' : '▶'}
-            </button>
-          </div>
-
-          <div className="carousel-arrow-group" aria-label={isEn ? 'Carousel navigation' : 'Navegación del carrusel'}>
-            <button
-              type="button"
-              className="carousel-arrow-btn"
-              onClick={handlePrev}
-              aria-label={isEn ? 'Previous project card' : 'Ver proyecto anterior'}
-            >
-              ←
-            </button>
-            <button
-              type="button"
-              className="carousel-arrow-btn"
-              onClick={handleNext}
-              aria-label={isEn ? 'Next project card' : 'Ver proyecto siguiente'}
-            >
-              →
-            </button>
-          </div>
         </div>
       </div>
 
@@ -293,7 +296,7 @@ export default function ProjectCarousel({ onQuoteProject }) {
         ))}
       </div>
 
-      {/* Interactive Single-Card Track with Drag & Auto-motion */}
+      {/* Interactive Infinite Single-Card Track with Drag & Auto-motion */}
       <div
         className={`carousel-track single-card-track ${isDragging ? 'is-dragging' : ''}`}
         ref={carouselRef}
@@ -308,21 +311,30 @@ export default function ProjectCarousel({ onQuoteProject }) {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {filteredProjects.map((project, idx) => {
+        {virtualProjects.map((project, vIdx) => {
           const badge = getPillarBadge(project.pillarId);
-          const isActive = idx === activeIndex;
+          const isActive = vIdx === virtualIndex;
+          const realIdx = vIdx % N;
+
+          // Safe extraction of diagram steps and deliverables
+          const diagramSteps = project.diagram ? (project.diagram.steps || project.diagram.nodes || []) : [];
+          const deliverablesList = project.deliverables
+            ? (Array.isArray(project.deliverables)
+                ? project.deliverables
+                : isEn ? (project.deliverables.en || []) : (project.deliverables.es || []))
+            : [];
 
           return (
             <article
-              key={project.id}
-              ref={(el) => (cardRefs.current[idx] = el)}
+              key={`${project.id}-v${vIdx}`}
+              ref={(el) => (cardRefs.current[vIdx] = el)}
               className={`carousel-card single-focus-card ${isActive ? 'is-active-card' : 'is-inactive-card'}`}
               role="group"
               aria-roledescription="slide"
-              aria-label={`${isEn ? 'Case' : 'Caso'} ${idx + 1} ${isEn ? 'of' : 'de'} ${filteredProjects.length}: ${isEn ? project.title.en : project.title.es}`}
+              aria-label={`${isEn ? 'Case' : 'Caso'} ${realIdx + 1} ${isEn ? 'of' : 'de'} ${N}: ${isEn ? project.title.en : project.title.es}`}
               onClick={() => {
                 if (!hasMovedRef.current) {
-                  scrollToIndex(idx);
+                  scrollToVirtualIndex(vIdx, true);
                 }
               }}
             >
@@ -346,17 +358,17 @@ export default function ProjectCarousel({ onQuoteProject }) {
               </div>
 
               {/* Visual Architecture Blueprint Schematics */}
-              {project.diagram && (
+              {project.diagram && diagramSteps.length > 0 && (
                 <div className="card-blueprint-container" aria-label={isEn ? 'System Architecture Blueprint' : 'Blueprint de Arquitectura Técnica'}>
                   <div className="blueprint-top-bar">
-                    <span className="blueprint-tag">SYSTEM BLUEPRINT</span>
+                    <span className="blueprint-tag">{isEn ? 'SYSTEM ARCHITECTURE' : 'ARQUITECTURA DE SISTEMA'}</span>
                     <span className="blueprint-badge-text">{project.diagram.badge}</span>
                   </div>
                   <div className="blueprint-nodes-row">
-                    {project.diagram.steps.map((step, sIdx) => (
-                      <div key={sIdx} className="blueprint-node-item">
-                        <span className="node-step-index">0{sIdx + 1}</span>
-                        <span className="node-title">{step.name}</span>
+                    {diagramSteps.map((step, nIdx) => (
+                      <div key={nIdx} className="blueprint-node-item">
+                        <span className="node-step-index">0{nIdx + 1}</span>
+                        <span className="node-title">{step.name || step.title}</span>
                         <span className="node-detail">{step.detail}</span>
                       </div>
                     ))}
@@ -364,36 +376,37 @@ export default function ProjectCarousel({ onQuoteProject }) {
                 </div>
               )}
 
-              {/* Challenge & Solution Grid */}
+              {/* Problem vs Solution Split Grid */}
               <div className="card-challenge-solution dual-grid">
                 <div className="challenge-block">
-                  <span className="block-label">{isEn ? 'Critical Challenge:' : 'Desafío Crítico:'}</span>
+                  <span className="block-label">{isEn ? 'The Technical Challenge' : 'El Desafío Técnico'}</span>
                   <p>{isEn ? project.challenge.en : project.challenge.es}</p>
                 </div>
                 <div className="solution-block">
-                  <span className="block-label">{isEn ? 'Engineering Solution:' : 'Solución de Ingeniería:'}</span>
+                  <span className="block-label">{isEn ? 'Inmerge Solution & Architecture' : 'Solución & Arquitectura Inmerge'}</span>
                   <p>{isEn ? project.solution.en : project.solution.es}</p>
                 </div>
               </div>
 
-              {/* Deliverables Checklist */}
-              {project.deliverables && (
+              {/* Forensic Deliverables Checklist */}
+              {deliverablesList.length > 0 && (
                 <div className="card-deliverables-box">
                   <span className="deliverables-box-title">
-                    {isEn ? 'AUDITED DELIVERABLES:' : 'ENTREGABLES AUDITADOS:'}
+                    {isEn ? 'AUDITABLE DELIVERABLES PRODUCED:' : 'ENTREGABLES AUDITABLES GENERADOS:'}
                   </span>
                   <ul className="deliverables-box-list">
-                    {(isEn ? project.deliverables.en : project.deliverables.es).map((item, dIdx) => (
+                    {deliverablesList.map((deliv, dIdx) => (
                       <li key={dIdx}>
-                        <span className="deliv-check">✓</span> {item}
+                        <span className="deliv-check">✓</span>
+                        {typeof deliv === 'string' ? deliv : isEn ? deliv.en : deliv.es}
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
 
-              {/* Impact Metrics */}
-              <div className="card-metrics-grid">
+              {/* Metrics Grid */}
+              <div className="card-metrics-grid" aria-label={isEn ? 'Results and KPIs' : 'Métricas y Resultados'}>
                 {project.metrics.map((m, mIdx) => (
                   <div key={mIdx} className="metric-box">
                     <span className="metric-number">{m.value}</span>
@@ -429,20 +442,34 @@ export default function ProjectCarousel({ onQuoteProject }) {
         })}
       </div>
 
-      {/* Slide Pagination Dots */}
+      {/* Slide Pagination Dots & Autoplay Toggle */}
       <div className="carousel-dots-pagination" role="group" aria-label={isEn ? 'Slide pagination' : 'Paginación de tarjetas'}>
         {filteredProjects.map((project, idx) => (
           <button
             key={project.id}
             type="button"
-            className={`carousel-dot-btn ${idx === activeIndex ? 'is-active-dot' : ''}`}
-            onClick={() => scrollToIndex(idx)}
+            className={`carousel-dot-btn ${idx === realActiveIndex ? 'is-active-dot' : ''}`}
+            onClick={() => goToRealIndex(idx)}
             aria-label={`${isEn ? 'Go to slide' : 'Ir a tarjeta'} ${idx + 1}: ${isEn ? project.title.en : project.title.es}`}
-            aria-current={idx === activeIndex ? 'true' : 'false'}
+            aria-current={idx === realActiveIndex ? 'true' : 'false'}
           >
             <span className="dot-inner" />
           </button>
         ))}
+
+        <button
+          type="button"
+          className={`carousel-autoplay-toggle ${isAutoplay ? 'is-playing' : 'is-paused'}`}
+          onClick={() => setIsAutoplay(!isAutoplay)}
+          aria-label={
+            isAutoplay
+              ? (isEn ? 'Pause automatic slide progression' : 'Pausar avance automático')
+              : (isEn ? 'Play automatic slide progression' : 'Iniciar avance automático')
+          }
+          title={isAutoplay ? (isEn ? 'Pause Auto-slide' : 'Pausar Auto-slide') : (isEn ? 'Play Auto-slide' : 'Activar Auto-slide')}
+        >
+          {isAutoplay ? '⏸' : '▶'}
+        </button>
       </div>
     </section>
   );

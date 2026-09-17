@@ -465,74 +465,6 @@ details.service-accordion-item > summary::marker {
   margin: 0;
 }
 
-.carousel-top-controls {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.carousel-deck-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--cream2);
-  border: 1px solid var(--border);
-  padding: 6px 12px;
-  border-radius: 20px;
-}
-
-.deck-counter {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: 0.05em;
-}
-
-.carousel-autoplay-toggle {
-  background: transparent;
-  border: none;
-  font-size: 0.85rem;
-  color: var(--terracotta);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 4px;
-  border-radius: 4px;
-  transition: transform 0.15s ease;
-}
-
-.carousel-autoplay-toggle:hover {
-  transform: scale(1.15);
-}
-
-.carousel-arrow-group {
-  display: flex;
-  gap: 8px;
-}
-
-.carousel-arrow-btn {
-  background: var(--cream2);
-  color: var(--ink);
-  border: 1px solid var(--border);
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.carousel-arrow-btn:hover {
-  background: var(--terracotta);
-  color: #fff;
-  border-color: var(--terracotta);
-}
-
 .carousel-filter-bar {
   display: flex;
   gap: 8px;
@@ -646,7 +578,7 @@ details.service-accordion-item > summary::marker {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .carousel-dot-btn {
@@ -674,6 +606,26 @@ details.service-accordion-item > summary::marker {
 .carousel-dot-btn.is-active-dot .dot-inner {
   width: 24px;
   background: var(--terracotta);
+}
+
+.carousel-autoplay-toggle {
+  background: transparent;
+  border: none;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  margin-left: 6px;
+  border-radius: 4px;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.carousel-autoplay-toggle:hover {
+  color: var(--terracotta);
+  transform: scale(1.1);
 }
 
 .card-top-meta {
