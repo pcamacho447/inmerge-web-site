@@ -74,8 +74,6 @@ export default function Servicios() {
             flexWrap: 'wrap',
             gap: 12,
             marginBottom: 48,
-            borderBottom: '1px solid var(--border)',
-            paddingBottom: 20,
           }}
         >
           <button
@@ -184,13 +182,10 @@ export default function Servicios() {
                       fontWeight: 600,
                       letterSpacing: 0.5,
                       color: 'var(--terracotta)',
-                      background: 'rgba(168,71,43,0.08)',
-                      padding: '4px 10px',
-                      borderRadius: 4,
                       flexShrink: 0,
                     }}
                   >
-                    {s.pillarName}
+                    [{s.pillarName}]
                   </div>
                   <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: 'var(--muted)', fontWeight: 600, flexShrink: 0 }}>
                     {s.timeline}

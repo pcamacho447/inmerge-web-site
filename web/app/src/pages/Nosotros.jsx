@@ -155,21 +155,22 @@ export default function Nosotros() {
               : 'Somos una firma boutique especializada en auditoría de sistemas, ingeniería de software cloud y ciencia de datos. Diseñamos soluciones donde cada cálculo es citable y cada línea de código es mantenible.'}
           </p>
 
-          {/* Sticky anchor subnav pills — Sequenced in Flujo A */}
-          <div
+          {/* Editorial table of contents */}
+          <nav
+            aria-label={isEn ? 'Section index' : 'Índice de secciones'}
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: 10,
-              paddingTop: 16,
-              borderTop: '1px solid rgba(243,234,218,0.15)',
+              alignItems: 'center',
+              gap: '8px 18px',
+              paddingTop: 8,
             }}
           >
             {[
               { href: '#mision', label: isEn ? '# Mission & Purpose' : '# Misión & Propósito' },
               { href: '#directores', label: isEn ? '# Practice Directors' : '# Directores de Práctica' },
               { href: '#manifiesto', label: isEn ? '# Engineering Manifesto' : '# Manifiesto de Ingeniería' },
-              { href: '#metodo', label: isEn ? '# The Method (4 Phases)' : '# El Método (4 Etapas)' },
+              { href: '#metodo', label: isEn ? '# The Method' : '# El Método' },
               { href: '#stack', label: isEn ? '# Tech Stack' : '# Stack Tecnológico' },
               { href: '#compromisos', label: isEn ? '# Commitments' : '# Compromisos' },
             ].map((pill) => (
@@ -178,21 +179,17 @@ export default function Nosotros() {
                 href={pill.href}
                 style={{
                   fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 12,
-                  padding: '6px 14px',
-                  borderRadius: 20,
-                  background: 'rgba(243,234,218,0.08)',
+                  fontSize: 12.5,
                   color: 'rgba(243,234,218,0.75)',
                   textDecoration: 'none',
-                  border: '1px solid rgba(243,234,218,0.12)',
-                  transition: 'all 0.2s ease',
+                  transition: 'color 0.2s ease',
                 }}
                 className="link-hover"
               >
                 {pill.label}
               </a>
             ))}
-          </div>
+          </nav>
         </div>
       </div>
 
@@ -221,8 +218,7 @@ export default function Nosotros() {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
             gap: 'clamp(28px, 4vw, 48px)',
-            borderTop: '1px solid var(--border)',
-            paddingTop: 40,
+            paddingTop: 12,
           }}
         >
           {/* Propósito */}
@@ -338,7 +334,7 @@ export default function Nosotros() {
       {/* =====================================================================
           3. DIRECTORES DE PRÁCTICA & ESPECIALISTAS SENIOR (Flujo A: Segundo/Tercer Bloque)
           ===================================================================== */}
-      <section id="directores" style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)', padding: '90px clamp(20px,5vw,40px)' }}>
+      <section id="directores" style={{ background: 'var(--bg)', padding: '90px clamp(20px,5vw,40px)' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           <div
             data-reveal=""
@@ -587,7 +583,7 @@ export default function Nosotros() {
       {/* =====================================================================
           6. COMPROMISOS TÉCNICOS & SLA — Editorial Accordion
           ===================================================================== */}
-      <div id="compromisos" style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)', padding: '100px clamp(20px,5vw,40px)' }}>
+      <div id="compromisos" style={{ background: 'var(--bg)', padding: '100px clamp(20px,5vw,40px)' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           <div
             data-reveal=""

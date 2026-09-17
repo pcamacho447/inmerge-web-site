@@ -124,9 +124,8 @@ export default function StackTabs() {
                       fontSize: 11,
                       letterSpacing: 0.5,
                       textTransform: 'uppercase',
-                      padding: '2px 6px',
-                      background: 'rgba(168, 71, 43, 0.08)',
                       color: 'var(--terracotta)',
+                      fontWeight: 600,
                     }}
                   >
                     {tool.level}

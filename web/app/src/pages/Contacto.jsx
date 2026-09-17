@@ -235,8 +235,7 @@ export default function Contacto() {
             data-reveal=""
             style={{
               background: 'transparent',
-              borderTop: '1px solid var(--border)',
-              padding: '28px 0 0 0',
+              padding: 0,
             }}
           >
             <div
@@ -254,22 +253,17 @@ export default function Contacto() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {(content.TRUST_BADGES || []).map((badge, idx) => (
                 <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <div
+                  <span
                     style={{
-                      fontSize: 16,
-                      background: 'rgba(168,71,43,0.08)',
+                      fontSize: 18,
                       color: 'var(--terracotta)',
-                      width: 28,
-                      height: 28,
-                      borderRadius: 4,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      lineHeight: 1.2,
                       flexShrink: 0,
                     }}
+                    aria-hidden="true"
                   >
                     {badge.icon}
-                  </div>
+                  </span>
                   <div>
                     <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--ink)' }}>{badge.title}</div>
                     <div style={{ fontSize: 12.5, color: 'var(--muted)', marginTop: 2, lineHeight: 1.4 }}>{badge.detail}</div>
@@ -283,8 +277,7 @@ export default function Contacto() {
             data-reveal=""
             style={{
               background: 'transparent',
-              borderTop: '1px solid var(--border)',
-              padding: '28px 0 0 0',
+              padding: 0,
             }}
           >
             <div

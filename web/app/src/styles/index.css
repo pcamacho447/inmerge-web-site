@@ -426,8 +426,7 @@ details.service-accordion-item > summary::marker {
 .project-carousel-section {
   margin: 60px 0;
   padding: 40px 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border: none;
 }
 
 .carousel-header {
@@ -530,19 +529,17 @@ details.service-accordion-item > summary::marker {
 .carousel-card {
   flex: 0 0 clamp(320px, 46vw, 460px);
   scroll-snap-align: center;
-  background: var(--cream2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 26px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 16px 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 16px rgba(36, 26, 18, 0.04);
+  box-shadow: none;
   cursor: pointer;
   position: relative;
   transition:
     transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.4s ease,
-    border-color 0.4s ease,
     opacity 0.4s ease,
     filter 0.4s ease;
 }
@@ -555,23 +552,20 @@ details.service-accordion-item > summary::marker {
 
 .carousel-card.is-inactive-card {
   opacity: 0.35;
-  transform: scale(0.9);
+  transform: scale(0.95);
   filter: blur(2px) grayscale(45%);
   backdrop-filter: blur(4px);
 }
 
 .carousel-card.is-active-card {
   opacity: 1;
-  border-color: var(--terracotta);
-  box-shadow:
-    0 20px 48px rgba(168, 71, 43, 0.14),
-    0 0 0 1px var(--terracotta);
   transform: scale(1);
   filter: none;
+  box-shadow: none;
 }
 
 .carousel-card:hover {
-  box-shadow: 0 16px 40px rgba(36, 26, 18, 0.12);
+  box-shadow: none;
 }
 
 .carousel-dots-pagination {
@@ -665,12 +659,13 @@ details.service-accordion-item > summary::marker {
 
 .card-pillar-tag {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  border: 1px solid;
-  padding: 3px 10px;
-  border-radius: 4px;
-  letter-spacing: 0.03em;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .card-duration-tag {
@@ -695,21 +690,23 @@ details.service-accordion-item > summary::marker {
   margin-bottom: 16px;
 }
 
-/* Visual Architecture Blueprint Schematics */
+/* Visual Architecture Blueprint Schematics — Continuous Editorial */
 .card-blueprint-container {
-  background: var(--ink);
-  color: #fff;
-  border-radius: 8px;
-  padding: 16px 20px;
+  background: transparent;
+  color: var(--ink);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 16px 0;
   margin-bottom: 20px;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: none;
 }
 
 .blueprint-top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
   margin-bottom: 12px;
 }
@@ -719,34 +716,33 @@ details.service-accordion-item > summary::marker {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--gold);
+  color: var(--terracotta);
 }
 
 .blueprint-badge-text {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
-  color: #fff;
-  opacity: 0.85;
+  color: var(--muted);
 }
 
 .blueprint-nodes-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 16px;
 }
 
 @media (max-width: 680px) {
   .blueprint-nodes-row {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 10px;
   }
 }
 
 .blueprint-node-item {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-  padding: 10px 12px;
+  background: transparent;
+  border-left: 2px solid var(--terracotta);
+  border-radius: 0;
+  padding: 4px 0 4px 12px;
   display: flex;
   flex-direction: column;
 }
@@ -754,21 +750,21 @@ details.service-accordion-item > summary::marker {
 .node-step-index {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.68rem;
-  color: var(--gold);
+  color: var(--terracotta);
   font-weight: 700;
   margin-bottom: 2px;
 }
 
 .node-title {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  color: #fff;
-  line-height: 1.2;
+  color: var(--ink);
+  line-height: 1.25;
 }
 
 .node-detail {
-  font-size: 0.7rem;
-  color: rgba(243, 234, 218, 0.7);
+  font-size: 0.72rem;
+  color: var(--muted);
   margin-top: 2px;
 }
 
@@ -893,12 +889,22 @@ details.service-accordion-item > summary::marker {
 
 .stack-pill {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--ink);
-  padding: 3px 8px;
-  border-radius: 4px;
+  font-size: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 0 4px 0 0;
+  border-radius: 0;
+}
+
+.stack-pill::after {
+  content: ' /';
+  color: var(--border);
+  margin-left: 6px;
+}
+
+.stack-pill:last-child::after {
+  content: '';
 }
 
 .btn-quote-similar {
@@ -1242,12 +1248,13 @@ details.service-accordion-item > summary::marker {
 
 .director-number-badge {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  border: 1px solid;
-  padding: 3px 8px;
-  border-radius: 3px;
-  letter-spacing: 0.06em;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .director-pillar-badge {
@@ -1639,15 +1646,16 @@ details.service-accordion-item > summary::marker {
 
 .estimator-badge {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--gold);
-  background: var(--ink);
-  padding: 5px 14px;
-  border-radius: 4px;
+  letter-spacing: 0.12em;
+  color: var(--terracotta);
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
   display: inline-block;
   margin-bottom: 14px;
+  text-transform: uppercase;
 }
 
 .estimator-title {
@@ -1727,15 +1735,24 @@ details.service-accordion-item > summary::marker {
 }
 
 .results-summary-card {
-  background: var(--ink);
-  color: var(--bg);
-  border: 1px solid rgba(216, 168, 78, 0.35);
-  border-radius: 8px;
-  padding: clamp(20px, 3.5vw, 28px);
+  background: transparent;
+  color: var(--ink);
+  border: none;
+  border-left: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0 0 0 clamp(20px, 3.5vw, 32px);
   display: flex;
   flex-direction: column;
   height: 100%;
-  box-shadow: 0 12px 32px rgba(36, 26, 18, 0.3);
+  box-shadow: none;
+}
+
+@media (max-width: 840px) {
+  .results-summary-card {
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding: 28px 0 0 0;
+  }
 }
 
 .results-badge-row {
@@ -1745,7 +1762,7 @@ details.service-accordion-item > summary::marker {
   flex-wrap: wrap;
   gap: 8px 12px;
   margin-bottom: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid var(--border);
   padding-bottom: 12px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.78rem;
@@ -1753,38 +1770,38 @@ details.service-accordion-item > summary::marker {
 
 .res-badge-pillar {
   font-weight: 700;
-  color: var(--gold);
+  color: var(--terracotta);
   line-height: 1.3;
 }
 
 .res-badge-model {
-  color: var(--tan-text);
-  opacity: 0.85;
+  color: var(--muted);
   line-height: 1.3;
 }
 
 .results-key-metrics {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 22px;
 }
 
 .res-metric-item {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 12px 18px;
-  border-radius: 6px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+  border-radius: 0;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   gap: 8px;
   flex-wrap: wrap;
 }
 
 .res-metric-label {
-  font-size: 0.86rem;
-  color: var(--tan-text);
+  font-size: 0.88rem;
+  color: var(--muted);
   line-height: 1.3;
 }
 
@@ -1792,13 +1809,14 @@ details.service-accordion-item > summary::marker {
   font-family: 'IBM Plex Mono', monospace;
   font-weight: 700;
   font-size: 1.05rem;
-  color: #fff;
+  color: var(--ink);
   line-height: 1.3;
 }
 
 .res-metric-val.highlight-val {
-  color: var(--gold);
-  font-size: 1.2rem;
+  color: var(--terracotta);
+  font-size: 1.25rem;
+  font-family: 'Spectral', Georgia, serif;
 }
 
 .results-deliverables {
@@ -1810,7 +1828,7 @@ details.service-accordion-item > summary::marker {
   font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.06em;
-  color: var(--gold);
+  color: var(--terracotta);
   display: block;
   margin-bottom: 10px;
 }
@@ -1825,8 +1843,8 @@ details.service-accordion-item > summary::marker {
 }
 
 .deliverables-list li {
-  font-size: 0.85rem;
-  color: var(--tan-text);
+  font-size: 0.86rem;
+  color: var(--ink);
   line-height: 1.45;
   display: flex;
   align-items: flex-start;
@@ -1836,7 +1854,7 @@ details.service-accordion-item > summary::marker {
 
 .deliverables-list li::before {
   content: '✓';
-  color: var(--gold);
+  color: var(--terracotta);
   font-weight: 700;
   flex-shrink: 0;
 }
