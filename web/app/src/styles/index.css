@@ -604,7 +604,7 @@ details.service-accordion-item > summary::marker {
 .carousel-card {
   flex: 0 0 clamp(320px, 46vw, 460px);
   scroll-snap-align: center;
-  background: #fff;
+  background: var(--cream2);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 26px;
@@ -613,7 +613,7 @@ details.service-accordion-item > summary::marker {
   box-shadow: 0 4px 16px rgba(36, 26, 18, 0.04);
   cursor: pointer;
   position: relative;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
 }
 
 .carousel-card.single-focus-card {
@@ -623,15 +623,16 @@ details.service-accordion-item > summary::marker {
 }
 
 .carousel-card.is-inactive-card {
-  opacity: 0.65;
-  transform: scale(0.95);
-  filter: grayscale(15%);
+  opacity: 0.35;
+  transform: scale(0.90);
+  filter: blur(2px) grayscale(45%);
+  backdrop-filter: blur(4px);
 }
 
 .carousel-card.is-active-card {
   opacity: 1;
   border-color: var(--terracotta);
-  box-shadow: 0 16px 40px rgba(168, 71, 43, 0.14), 0 0 0 1px var(--terracotta);
+  box-shadow: 0 20px 48px rgba(168, 71, 43, 0.14), 0 0 0 1px var(--terracotta);
   transform: scale(1);
   filter: none;
 }
@@ -911,7 +912,7 @@ details.service-accordion-item > summary::marker {
 .stack-pill {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
-  background: #fff;
+  background: var(--bg);
   border: 1px solid var(--border);
   color: var(--ink);
   padding: 3px 8px;
@@ -984,7 +985,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .service-blueprint-execution-card {
-  background: #fff;
+  background: var(--cream2);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 24px;
@@ -1014,7 +1015,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .phase-step-card {
-  background: var(--cream2);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 14px 16px;
@@ -1060,16 +1061,16 @@ details.service-accordion-item > summary::marker {
    Quick Estimator Component (Editorial Tech Redesign)
    ========================================================================== */
 .quick-estimator-section {
-  margin: 60px 0;
+  margin: 64px 0;
 }
 
 .estimator-card {
-  background: rgba(235, 223, 201, 0.45);
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--terracotta);
-  border-radius: 10px;
-  padding: clamp(24px, 4vw, 44px);
-  box-shadow: 0 16px 40px rgba(36, 26, 18, 0.06);
+  background: transparent;
+  border: none;
+  border-top: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
 
 .estimator-header {
@@ -1153,7 +1154,7 @@ details.service-accordion-item > summary::marker {
 
 .estimator-select:focus {
   border-color: var(--terracotta);
-  background: #fff;
+  background: var(--cream2);
   box-shadow: 0 0 0 1px var(--terracotta);
 }
 
@@ -1398,7 +1399,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .llm-msg-bubble.is-assistant {
-  background: #fff;
+  background: var(--cream2);
   border: 1px solid var(--border);
   align-self: flex-start;
 }
@@ -1445,7 +1446,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .llm-sug-chip {
-  background: #fff;
+  background: var(--cream2);
   border: 1px solid var(--border);
   padding: 6px 10px;
   border-radius: 14px;
@@ -1457,14 +1458,14 @@ details.service-accordion-item > summary::marker {
 }
 
 .llm-sug-chip:hover {
-  background: var(--cream2);
+  background: var(--bg);
   border-color: var(--terracotta);
 }
 
 .llm-input-form {
   display: flex;
   padding: 12px 20px;
-  background: #fff;
+  background: var(--cream2);
   border-top: 1px solid var(--border);
   gap: 8px;
 }
