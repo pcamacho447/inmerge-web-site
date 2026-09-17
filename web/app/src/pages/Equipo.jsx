@@ -564,6 +564,19 @@ export default function Equipo() {
     navigate('/');
   }
 
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isDrawerOpen) {
+        setIsDrawerOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDrawerOpen]);
+
   // Filter activity logs by active filter category
   const filteredActivityLogs = activityLogs.filter((log) => {
     if (activityFilter === 'ALL') return true;
@@ -575,11 +588,11 @@ export default function Equipo() {
   });
 
   const tabs = [
-    { id: 'leads', label: 'Bandeja de Leads & TDR', count: leads.length },
-    { id: 'projects', label: 'Proyectos & Auditorías', count: projects.length },
-    ...(user?.isAdmin ? [{ id: 'new_project', label: '+ Crear Proyecto / Entregable' }] : []),
-    { id: 'activity', label: 'Bitácora & Auditoría', count: activityLogs.length },
-    ...(user?.isAdmin ? [{ id: 'team', label: 'Gestión de Colaboradores', count: staffList.length }] : []),
+    { id: 'leads', label: 'Bandeja de Leads & TDR', icon: '📥', count: leads.length },
+    { id: 'projects', label: 'Proyectos & Auditorías', icon: '⚡', count: projects.length },
+    ...(user?.isAdmin ? [{ id: 'new_project', label: 'Crear Proyecto / Entregables', icon: '➕' }] : []),
+    { id: 'activity', label: 'Bitácora & Auditoría', icon: '📜', count: activityLogs.length },
+    ...(user?.isAdmin ? [{ id: 'team', label: 'Gestión de Colaboradores', icon: '👥', count: staffList.length }] : []),
   ];
 
   const handleTabKeyDown = (e, currentTabId) => {
@@ -588,9 +601,9 @@ export default function Equipo() {
     if (currentIndex === -1) return;
 
     let nextIndex = -1;
-    if (e.key === 'ArrowRight') {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       nextIndex = (currentIndex + 1) % tabIds.length;
-    } else if (e.key === 'ArrowLeft') {
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       nextIndex = (currentIndex - 1 + tabIds.length) % tabIds.length;
     } else if (e.key === 'Home') {
       nextIndex = 0;
@@ -606,28 +619,30 @@ export default function Equipo() {
     }
   };
 
+  const activeTabMeta = tabs.find((t) => t.id === activeTab) || tabs[0];
+
   return (
-    <>
-      <div style={{ maxWidth: 1120, margin: '0 auto', padding: '120px clamp(20px,5vw,40px) 80px' }}>
-        {/* Header Bar */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'baseline',
-            flexWrap: 'wrap',
-            gap: 16,
-            marginBottom: 12,
-          }}
-        >
-          <div>
+    <div className="equipo-layout-root">
+      {/* Sticky Editorial Top Bar */}
+      <header className="equipo-topbar">
+        <div className="equipo-topbar-left">
+          <button
+            type="button"
+            className="equipo-sidebar-toggle"
+            onClick={() => setIsSidebarCollapsed((prev) => !prev)}
+            title={isSidebarCollapsed ? 'Expandir barra lateral' : 'Colapsar barra lateral'}
+            aria-label={isSidebarCollapsed ? 'Expandir barra lateral' : 'Colapsar barra lateral'}
+          >
+            {isSidebarCollapsed ? '☰' : '✕'}
+          </button>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div
               style={{
                 fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 12,
+                fontSize: 10,
                 color: 'var(--terracotta)',
                 letterSpacing: 2,
-                marginBottom: 6,
                 fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
@@ -639,8 +654,8 @@ export default function Equipo() {
                 style={{
                   background: 'var(--terracotta)',
                   color: '#fff',
-                  fontSize: 10,
-                  padding: '2px 8px',
+                  fontSize: 9,
+                  padding: '1px 6px',
                   borderRadius: 4,
                   textTransform: 'uppercase',
                 }}
@@ -654,20 +669,20 @@ export default function Equipo() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 4,
-                  fontSize: 10,
+                  fontSize: 9,
                   fontFamily: "'IBM Plex Mono', monospace",
                   fontWeight: 600,
                   color: '#2E7559',
                   background: 'rgba(46, 117, 89, 0.1)',
-                  padding: '2px 8px',
-                  borderRadius: 12,
+                  padding: '1px 6px',
+                  borderRadius: 10,
                   border: '1px solid rgba(46, 117, 89, 0.25)',
                 }}
               >
                 <span
                   style={{
-                    width: 6,
-                    height: 6,
+                    width: 5,
+                    height: 5,
                     borderRadius: '50%',
                     background: '#2E7559',
                   }}
@@ -675,230 +690,338 @@ export default function Equipo() {
                 REALTIME ACTIVO
               </span>
             </div>
-            <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,42px)', margin: 0 }}>
-              Gestión Operativa de Auditorías & Proyectos
-            </h1>
+            <h1 className="equipo-brand-title">Gestión Operativa de Auditorías & Proyectos</h1>
           </div>
+        </div>
 
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            {user?.isAdmin && (
-              <Link
-                to="/cuenta"
-                style={{
-                  fontSize: 13,
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  color: 'var(--ink)',
-                  textDecoration: 'none',
-                  borderBottom: '1px dotted var(--terracotta)',
-                }}
-              >
-                Vista de Cliente (Admin) →
-              </Link>
-            )}
+        {/* Center / KPI Metric Strip */}
+        <div className="equipo-kpi-strip">
+          <div className="equipo-kpi-pill" title="Total de solicitudes y TDRs recibidos">
+            <span>📥 Leads TDR:</span>
+            <span className="equipo-kpi-val">{leads.length}</span>
+          </div>
+          <div className="equipo-kpi-pill" title="Proyectos y auditorías en ejecución">
+            <span>⚡ Proyectos:</span>
+            <span className="equipo-kpi-val">{projects.length}</span>
+          </div>
+          <div className="equipo-kpi-pill" title="Colaboradores e ingenieros asignados">
+            <span>👥 Staff:</span>
+            <span className="equipo-kpi-val">{staffList.length}</span>
+          </div>
+        </div>
+
+        {/* Right Action Bar */}
+        <div className="equipo-topbar-actions">
+          {user?.isAdmin && (
             <button
               type="button"
-              onClick={handleLogout}
-              className="btn-outline-hover"
+              className="btn-drawer-trigger"
+              onClick={() => setIsDrawerOpen(true)}
+              title="Abrir ventana de opciones y creación rápida"
+            >
+              <span>+ Opciones & Creación</span>
+            </button>
+          )}
+
+          {user?.isAdmin && (
+            <Link
+              to="/cuenta"
               style={{
-                background: 'none',
-                border: '1px solid var(--border)',
+                fontSize: 12,
+                fontFamily: "'IBM Plex Mono', monospace",
                 color: 'var(--ink)',
-                borderRadius: 20,
-                padding: '8px 18px',
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontFamily: "'IBM Plex Sans',sans-serif",
+                textDecoration: 'none',
+                borderBottom: '1px dotted var(--terracotta)',
+                padding: '4px 6px',
               }}
             >
-              Cerrar sesión
-            </button>
-          </div>
-        </div>
+              Vista Cliente →
+            </Link>
+          )}
 
-        <div style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 32 }}>
-          Consultor conectado: <strong style={{ color: 'var(--ink)' }}>{user?.email}</strong> ({user?.fullName || 'Inmerge Staff'})
-        </div>
-
-        {error && (
-          <div
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="btn-outline-hover"
             style={{
-              padding: '12px 18px',
-              borderRadius: 8,
-              background: 'rgba(168, 71, 43, 0.15)',
-              border: '1px solid var(--terracotta)',
-              color: 'var(--terracotta)',
-              marginBottom: 24,
-              fontSize: 14,
+              background: 'none',
+              border: '1px solid var(--border)',
+              color: 'var(--ink)',
+              borderRadius: 20,
+              padding: '6px 14px',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: "'IBM Plex Sans',sans-serif",
             }}
           >
-            ⚠️ {error}
-          </div>
-        )}
+            Cerrar sesión
+          </button>
+        </div>
+      </header>
 
-        {/* Feedback Alert */}
-        {statusMsg && (
-          <div
-            style={{
-              padding: '12px 18px',
-              borderRadius: 8,
-              background: 'rgba(46, 117, 89, 0.15)',
-              border: '1px solid #2E7559',
-              color: '#1b4d3a',
-              marginBottom: 24,
-              fontSize: 14,
-              fontWeight: 500,
-            }}
-          >
-            ✓ {statusMsg}
+      {/* Main App Canvas Container */}
+      <div className="equipo-body-container">
+        {/* Collapsible Sidebar Navigation */}
+        <aside className={`equipo-sidebar ${isSidebarCollapsed ? 'is-collapsed' : ''}`} aria-label="Navegación lateral de operaciones">
+          <div className="equipo-sidebar-nav" role="tablist" aria-label="Secciones del panel de consultores">
+            {tabs.map((tab) => {
+              const isSelected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  id={`tab-${tab.id}`}
+                  role="tab"
+                  aria-selected={isSelected}
+                  aria-controls={`panel-${tab.id}`}
+                  tabIndex={isSelected ? 0 : -1}
+                  type="button"
+                  className={`equipo-nav-item ${isSelected ? 'is-active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
+                  title={tab.label}
+                >
+                  <span className="equipo-nav-icon">{tab.icon}</span>
+                  {!isSidebarCollapsed && <span className="equipo-nav-label">{tab.label}</span>}
+                  {!isSidebarCollapsed && tab.count !== undefined && (
+                    <span className="equipo-nav-badge">{tab.count}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
-        )}
 
-        {/* Navigation Tabs - Accessible WCAG Tablist */}
-        <div
-          role="tablist"
-          aria-label="Secciones del panel de consultores"
-          style={{
-            display: 'flex',
-            gap: 12,
-            borderBottom: '1px solid var(--border)',
-            marginBottom: 36,
-            overflowX: 'auto',
-          }}
-        >
-          {tabs.map((tab) => {
-            const isSelected = activeTab === tab.id;
-            return (
+          <div className="equipo-sidebar-footer">
+            {!isSidebarCollapsed ? (
+              <div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>
+                <div>Consultor:</div>
+                <strong style={{ color: 'var(--ink)', wordBreak: 'break-all' }}>{user?.email}</strong>
+                <div style={{ marginTop: 4, fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: 'var(--terracotta)' }}>
+                  {user?.fullName || 'Inmerge Staff'}
+                </div>
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', fontSize: 14 }} title={`${user?.email} (${user?.role})`}>
+                👤
+              </div>
+            )}
+          </div>
+        </aside>
+
+        {/* Fluid Workspace Canvas */}
+        <main className="equipo-workspace">
+          {/* Workspace Subheader */}
+          <div className="equipo-workspace-header">
+            <div>
+              <h2 className="equipo-workspace-title">{activeTabMeta.label}</h2>
+              <p className="equipo-workspace-subtitle">
+                {activeTab === 'leads' && 'Gestión y triaje de solicitudes TDR enviadas por clientes y empresas.'}
+                {activeTab === 'projects' && 'Supervisión integral de proyectos, hitos Gantt, entregables y matriz de riesgos.'}
+                {activeTab === 'new_project' && 'Centro de operaciones para creación de proyectos, hitos técnicos y subida de entregables.'}
+                {activeTab === 'activity' && 'Registro cronológico forense y eventos de auditoría en tiempo real.'}
+                {activeTab === 'team' && 'Directorio técnico y gestión de roles para ingenieros y auditores.'}
+              </p>
+            </div>
+
+            {user?.isAdmin && activeTab !== 'new_project' && (
               <button
-                key={tab.id}
-                id={`tab-${tab.id}`}
-                role="tab"
-                aria-selected={isSelected}
-                aria-controls={`panel-${tab.id}`}
-                tabIndex={isSelected ? 0 : -1}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
-                onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  borderBottom: isSelected ? '3px solid var(--terracotta)' : '3px solid transparent',
-                  padding: '12px 20px',
-                  fontSize: 15,
-                  fontWeight: isSelected ? 700 : 500,
-                  color: isSelected ? 'var(--terracotta)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  fontFamily: "'IBM Plex Sans', sans-serif",
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  whiteSpace: 'nowrap',
-                }}
+                className="btn-drawer-trigger"
+                onClick={() => setIsDrawerOpen(true)}
+                style={{ fontSize: 13, padding: '6px 12px' }}
               >
-                <span>{tab.label}</span>
-                {tab.count !== undefined && (
-                  <span
-                    style={{
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 11,
-                      padding: '2px 6px',
-                      borderRadius: 10,
-                      background: isSelected ? 'var(--terracotta)' : 'var(--border)',
-                      color: isSelected ? '#fff' : 'var(--ink)',
-                    }}
-                  >
-                    {tab.count}
-                  </span>
-                )}
+                <span>⚡ Opciones Rápidas</span>
               </button>
-            );
-          })}
+            )}
+          </div>
+
+          {error && (
+            <div
+              style={{
+                padding: '12px 18px',
+                borderRadius: 8,
+                background: 'rgba(168, 71, 43, 0.15)',
+                border: '1px solid var(--terracotta)',
+                color: 'var(--terracotta)',
+                marginBottom: 24,
+                fontSize: 14,
+              }}
+            >
+              ⚠️ {error}
+            </div>
+          )}
+
+          {statusMsg && (
+            <div
+              style={{
+                padding: '12px 18px',
+                borderRadius: 8,
+                background: 'rgba(46, 117, 89, 0.15)',
+                border: '1px solid #2E7559',
+                color: '#1b4d3a',
+                marginBottom: 24,
+                fontSize: 14,
+                fontWeight: 500,
+              }}
+            >
+              ✓ {statusMsg}
+            </div>
+          )}
+
+          {/* Dynamic Content Views */}
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '80px 20px', color: 'var(--muted)' }}>
+              <p style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Cargando consola del equipo técnico...</p>
+            </div>
+          ) : (
+            <div id={`panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`} tabIndex={0} style={{ outline: 'none' }}>
+              {activeTab === 'leads' && (
+                <LeadsInboxTable
+                  leads={leads}
+                  clients={clients}
+                  staffList={staffList}
+                  user={user}
+                  isAdmin={Boolean(user?.isAdmin)}
+                  onUpdateLeadStatus={handleUpdateLead}
+                  onConvertLeadToProject={handleConvertLeadToProject}
+                />
+              )}
+
+              {activeTab === 'projects' && (
+                <ProjectsManagementView
+                  projects={projects}
+                  staffList={staffList}
+                  isAdmin={Boolean(user?.isAdmin)}
+                  onUpdateProjectStatus={handleUpdateProjectStatus}
+                  onProjectHealthChange={handleProjectHealthChange}
+                  onUpdateMilestone={handleUpdateMilestone}
+                  onAddMilestone={handleAddMilestone}
+                  onUpdateProjectStaff={handleUpdateProjectStaff}
+                  onTaskCreated={handleTaskCreated}
+                  onTaskUpdated={handleTaskUpdated}
+                  onTaskDeleted={handleTaskDeleted}
+                  onRiskCreated={handleRiskCreated}
+                  onRiskUpdated={handleRiskUpdated}
+                  onUploadDeliverable={handleUploadDeliverable}
+                  onOpenNewProject={() => {
+                    setIsDrawerOpen(true);
+                  }}
+                  showToast={showToast}
+                />
+              )}
+
+              {activeTab === 'new_project' && user?.isAdmin && (
+                <NewProjectModal
+                  clients={clients}
+                  projects={projects}
+                  staffList={staffList}
+                  isAdmin={Boolean(user?.isAdmin)}
+                  newProj={newProj}
+                  setNewProj={setNewProj}
+                  handleCreateProject={handleCreateProject}
+                  newMilestone={newMilestone}
+                  setNewMilestone={setNewMilestone}
+                  handleAddMilestone={handleAddMilestone}
+                  newDeliv={newDeliv}
+                  setNewDeliv={setNewDeliv}
+                  delivFile={delivFile}
+                  setDelivFile={setDelivFile}
+                  handleUploadDeliverable={handleUploadDeliverable}
+                  uploading={uploading}
+                />
+              )}
+
+              {activeTab === 'activity' && (
+                <TeamActivityFeed
+                  filteredActivityLogs={filteredActivityLogs}
+                  activityFilter={activityFilter}
+                  setActivityFilter={setActivityFilter}
+                />
+              )}
+
+              {activeTab === 'team' && user?.isAdmin && (
+                <StaffManagementView
+                  staffList={staffList}
+                  newStaff={newStaff}
+                  setNewStaff={setNewStaff}
+                  handleCreateStaff={handleCreateStaff}
+                  staffSubmitting={staffSubmitting}
+                />
+              )}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Slide-Over Drawer de Opciones & Creación */}
+      <div
+        className={`equipo-drawer-overlay ${isDrawerOpen ? 'is-open' : ''}`}
+        onClick={() => setIsDrawerOpen(false)}
+        aria-hidden={!isDrawerOpen}
+      />
+      <div
+        className={`equipo-drawer-panel ${isDrawerOpen ? 'is-open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="drawer-title"
+        aria-hidden={!isDrawerOpen}
+      >
+        <div className="equipo-drawer-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: '1.2rem' }}>⚡</span>
+            <h3 id="drawer-title" className="equipo-drawer-title">
+              Centro de Opciones & Creación
+            </h3>
+          </div>
+          <button
+            type="button"
+            className="equipo-drawer-close"
+            onClick={() => setIsDrawerOpen(false)}
+            title="Cerrar ventana de opciones (Esc)"
+            aria-label="Cerrar ventana de opciones"
+          >
+            ✕ Cerrar
+          </button>
         </div>
 
-        {/* Content Tabs */}
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)' }}>
-            <p>Cargando información del equipo técnico...</p>
-          </div>
-        ) : (
-          <div id={`panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`} tabIndex={0} style={{ outline: 'none' }}>
-            {activeTab === 'leads' && (
-              <LeadsInboxTable
-                leads={leads}
-                clients={clients}
-                staffList={staffList}
-                user={user}
-                isAdmin={Boolean(user?.isAdmin)}
-                onUpdateLeadStatus={handleUpdateLead}
-                onConvertLeadToProject={handleConvertLeadToProject}
-              />
-            )}
+        <div className="equipo-drawer-body">
+          <p style={{ fontSize: 13, color: 'var(--muted)', margin: '0 0 20px' }}>
+            Acceso rápido para registrar proyectos, añadir hitos a la metodología Inmerge y subir entregables forenses sin perder tu vista de trabajo.
+          </p>
 
-            {activeTab === 'projects' && (
-              <ProjectsManagementView
-                projects={projects}
-                staffList={staffList}
-                isAdmin={Boolean(user?.isAdmin)}
-                onUpdateProjectStatus={handleUpdateProjectStatus}
-                onProjectHealthChange={handleProjectHealthChange}
-                onUpdateMilestone={handleUpdateMilestone}
-                onAddMilestone={handleAddMilestone}
-                onUpdateProjectStaff={handleUpdateProjectStaff}
-                onTaskCreated={handleTaskCreated}
-                onTaskUpdated={handleTaskUpdated}
-                onTaskDeleted={handleTaskDeleted}
-                onRiskCreated={handleRiskCreated}
-                onRiskUpdated={handleRiskUpdated}
-                onUploadDeliverable={handleUploadDeliverable}
-                onOpenNewProject={() => setActiveTab('new_project')}
-                showToast={showToast}
-              />
-            )}
-
-            {activeTab === 'new_project' && user?.isAdmin && (
-              <NewProjectModal
-                clients={clients}
-                projects={projects}
-                staffList={staffList}
-                isAdmin={Boolean(user?.isAdmin)}
-                newProj={newProj}
-                setNewProj={setNewProj}
-                handleCreateProject={handleCreateProject}
-                newMilestone={newMilestone}
-                setNewMilestone={setNewMilestone}
-                handleAddMilestone={handleAddMilestone}
-                newDeliv={newDeliv}
-                setNewDeliv={setNewDeliv}
-                delivFile={delivFile}
-                setDelivFile={setDelivFile}
-                handleUploadDeliverable={handleUploadDeliverable}
-                uploading={uploading}
-              />
-            )}
-
-            {activeTab === 'activity' && (
-              <TeamActivityFeed
-                filteredActivityLogs={filteredActivityLogs}
-                activityFilter={activityFilter}
-                setActivityFilter={setActivityFilter}
-              />
-            )}
-
-            {activeTab === 'team' && user?.isAdmin && (
-              <StaffManagementView
-                staffList={staffList}
-                newStaff={newStaff}
-                setNewStaff={setNewStaff}
-                handleCreateStaff={handleCreateStaff}
-                staffSubmitting={staffSubmitting}
-              />
-            )}
-          </div>
-        )}
+          <NewProjectModal
+            clients={clients}
+            projects={projects}
+            staffList={staffList}
+            isAdmin={Boolean(user?.isAdmin)}
+            newProj={newProj}
+            setNewProj={setNewProj}
+            handleCreateProject={async (e) => {
+              await handleCreateProject(e);
+              setIsDrawerOpen(false);
+            }}
+            newMilestone={newMilestone}
+            setNewMilestone={setNewMilestone}
+            handleAddMilestone={async (e, override) => {
+              await handleAddMilestone(e, override);
+              setIsDrawerOpen(false);
+            }}
+            newDeliv={newDeliv}
+            setNewDeliv={setNewDeliv}
+            delivFile={delivFile}
+            setDelivFile={setDelivFile}
+            handleUploadDeliverable={async (e) => {
+              await handleUploadDeliverable(e);
+              setIsDrawerOpen(false);
+            }}
+            uploading={uploading}
+          />
+        </div>
       </div>
 
       <ToastNotification toast={activeToast} onDismiss={dismissToast} />
       <Footer />
-    </>
+    </div>
   );
 }
+

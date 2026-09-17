@@ -1578,3 +1578,356 @@ details.service-accordion-item > summary::marker {
   box-shadow: 0 12px 30px rgba(36, 26, 18, 0.4);
 }
 
+/* ==========================================================================
+   EQUIPO CONSOLE — Full-Canvas Editorial Workspace & Slide-Over Drawer
+   ========================================================================== */
+
+.equipo-layout-root {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.equipo-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(243, 234, 218, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px clamp(16px, 2vw, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.equipo-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.equipo-sidebar-toggle {
+  background: var(--cream2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--ink);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.equipo-sidebar-toggle:hover {
+  background: var(--border);
+  color: var(--terracotta);
+}
+
+.equipo-brand-title {
+  font-family: 'Spectral', serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--ink);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.equipo-kpi-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.equipo-kpi-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cream2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--ink);
+  transition: background 0.15s ease;
+}
+
+.equipo-kpi-pill:hover {
+  border-color: var(--terracotta);
+}
+
+.equipo-kpi-val {
+  font-weight: 700;
+  color: var(--terracotta);
+}
+
+.equipo-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-drawer-trigger {
+  background: var(--terracotta);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-drawer-trigger:hover {
+  background: #8e3820;
+  transform: translateY(-1px);
+}
+
+.equipo-body-container {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 65px);
+  width: 100%;
+  position: relative;
+}
+
+.equipo-sidebar {
+  background: var(--cream2);
+  border-right: 1px solid var(--border);
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 61px;
+  height: calc(100vh - 61px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 90;
+  width: 240px;
+}
+
+.equipo-sidebar.is-collapsed {
+  width: 68px;
+}
+
+.equipo-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  gap: 4px;
+}
+
+.equipo-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 18px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+}
+
+.equipo-nav-item:hover {
+  background: rgba(36, 26, 18, 0.04);
+  color: var(--terracotta);
+}
+
+.equipo-nav-item.is-active {
+  background: rgba(168, 71, 43, 0.09);
+  color: var(--terracotta);
+  border-left-color: var(--terracotta);
+  font-weight: 700;
+}
+
+.equipo-nav-icon {
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+}
+
+.equipo-nav-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.equipo-nav-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--border);
+  color: var(--ink);
+}
+
+.equipo-nav-item.is-active .equipo-nav-badge {
+  background: var(--terracotta);
+  color: #fff;
+}
+
+.equipo-sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.equipo-workspace {
+  flex: 1;
+  min-width: 0;
+  padding: clamp(16px, 2.5vw, 32px);
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+.equipo-workspace-header {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.equipo-workspace-title {
+  font-family: 'Spectral', serif;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+
+.equipo-workspace-subtitle {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Slide-Over Drawer */
+.equipo-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 26, 18, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.equipo-drawer-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.equipo-drawer-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(660px, 94vw);
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  box-shadow: -10px 0 36px rgba(36, 26, 18, 0.25);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.equipo-drawer-panel.is-open {
+  transform: translateX(0);
+}
+
+.equipo-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--cream2);
+}
+
+.equipo-drawer-title {
+  font-family: 'Spectral', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.equipo-drawer-close {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--ink);
+  transition: all 0.15s ease;
+}
+
+.equipo-drawer-close:hover {
+  background: var(--border);
+  color: var(--terracotta);
+}
+
+.equipo-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+@media (max-width: 900px) {
+  .equipo-sidebar {
+    position: fixed;
+    top: 61px;
+    bottom: 0;
+    left: 0;
+    height: auto;
+    box-shadow: 4px 0 16px rgba(36, 26, 18, 0.1);
+    transform: translateX(0);
+  }
+  
+  .equipo-sidebar.is-collapsed {
+    transform: translateX(-100%);
+    width: 240px;
+  }
+}
