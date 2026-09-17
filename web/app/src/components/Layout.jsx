@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Preloader from './Preloader.jsx';
 import Nav from './Nav.jsx';
 import MobileMenu from './MobileMenu.jsx';
@@ -9,6 +9,8 @@ export default function Layout() {
   const [preloaderDone, setPreloaderDone] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isEn } = useLanguage();
+  const { pathname } = useLocation();
+  const isHome = pathname === '/' || pathname === '/en';
 
   useEffect(() => {
     // Reduced-motion users get no preloader intro at all — it's a branded
@@ -50,14 +52,14 @@ export default function Layout() {
   const closeMenu = useCallback(() => setMobileMenuOpen(false), []);
 
   return (
-    <div style={{ fontFamily: "'IBM Plex Sans',sans-serif", background: 'var(--bg)', color: 'var(--ink)', overflowX: 'hidden' }}>
+    <div style={{ fontFamily: "'IBM Plex Sans',sans-serif", background: 'var(--bg)', color: 'var(--ink)' }}>
       <a href="#main-content" className="skip-to-content">
         {isEn ? 'Skip to main content' : 'Saltar al contenido principal'}
       </a>
       <Preloader done={preloaderDone} />
       <Nav mobileMenuOpen={mobileMenuOpen} onToggleMenu={toggleMenu} />
       {mobileMenuOpen && <MobileMenu onClose={closeMenu} />}
-      <main id="main-content" tabIndex="-1" style={{ outline: 'none' }}>
+      <main id="main-content" tabIndex="-1" style={{ outline: 'none', paddingTop: isHome ? 0 : '72px' }}>
         <Outlet />
       </main>
     </div>

@@ -4,9 +4,7 @@ import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
 import ServicePillarCard from '../components/ServicePillarCard.jsx';
-import ArchitectureDiagram from '../components/ArchitectureDiagram.jsx';
 import ProjectCarousel from '../components/ProjectCarousel.jsx';
-import QuickEstimator from '../components/QuickEstimator.jsx';
 import LLMAssistantModal from '../components/LLMAssistantModal.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
@@ -271,105 +269,9 @@ export default function Inicio() {
         </div>
       </div>
 
-      {/* Architecture & Flow Section */}
-      <div style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '100px clamp(20px,5vw,40px)' }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto' }}>
-          <div data-reveal="" style={{ maxWidth: 700, marginBottom: 40 }}>
-            <div
-              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--gold)', letterSpacing: 2, marginBottom: 12 }}
-            >
-              {isEn ? 'DESIGN & ENGINEERING' : 'DISEÑO & INGENIERÍA'}
-            </div>
-            <h2
-              style={{
-                fontFamily: "'Spectral',serif",
-                fontWeight: 700,
-                fontSize: 'clamp(32px,4vw,52px)',
-                lineHeight: 1.1,
-                margin: '0 0 16px 0',
-              }}
-            >
-              {isEn ? 'From raw ingestion to live enterprise product.' : 'De la ingestión cruda al producto vivo.'}
-            </h2>
-            <p style={{ fontSize: 16, color: 'rgba(243,234,218,0.8)', lineHeight: 1.6, margin: 0 }}>
-              {isEn
-                ? 'Our solutions embed continuous auditing into every layer of the technical lifecycle, ensuring that all data driving your executive dashboards or machine learning models originates from sanitized, verified pipelines.'
-                : 'Nuestras soluciones integran auditoría continua en cada capa del flujo técnico, asegurando que cada dato que alimenta tus dashboards o modelos provenga de fuentes sanitizadas.'}
-            </p>
-          </div>
-
-          <div data-reveal="">
-            <ArchitectureDiagram />
-          </div>
-
-          <div data-reveal="" style={{ textAlign: 'center', marginTop: 40 }}>
-            <Link
-              to={isEn ? '/en/about#metodo' : '/nosotros#metodo'}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                color: 'var(--gold)',
-                fontSize: 15,
-                fontWeight: 600,
-                textDecoration: 'none',
-                borderBottom: '1px solid var(--gold)',
-                paddingBottom: 4,
-              }}
-            >
-              <span>
-                {isEn
-                  ? 'Explore our technology stack and 4-phase engineering methodology'
-                  : 'Explorar nuestro stack tecnológico y metodología de 4 fases'}
-              </span>
-              <span>→</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Case Studies & Estimator Section */}
-      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 clamp(20px,5vw,40px)' }}>
+      {/* Case Studies Section */}
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 clamp(20px,5vw,40px) 60px' }}>
         <ProjectCarousel onQuoteProject={(proj) => handleOpenAssistant(proj)} />
-        <QuickEstimator onOpenLLMAssistant={(ctx) => handleOpenAssistant(ctx)} />
-      </div>
-
-      {/* Segments Section */}
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {content.SEGMENTS.map((seg) => (
-          <div key={seg.name} style={{ padding: '90px clamp(20px,5vw,40px)', background: seg.bg, color: seg.fg }}>
-            <div
-              data-reveal=""
-              style={{
-                maxWidth: 1160,
-                margin: '0 auto',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
-                gap: 40,
-                alignItems: 'center',
-              }}
-            >
-              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(26px,3.2vw,38px)', lineHeight: 1.2 }}>
-                {seg.name}
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontFamily: "'Spectral',serif",
-                    fontWeight: 600,
-                    fontStyle: 'italic',
-                    fontSize: 'clamp(20px,2.2vw,26px)',
-                    lineHeight: 1.4,
-                    marginBottom: 14,
-                  }}
-                >
-                  &ldquo;{seg.quote}&rdquo;
-                </div>
-                <div style={{ fontSize: 14, opacity: 0.8, lineHeight: 1.6 }}>{seg.line}</div>
-              </div>
-            </div>
-          </div>
-        ))}
       </div>
 
       {/* Final CTA */}

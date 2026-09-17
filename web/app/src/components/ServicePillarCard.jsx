@@ -16,12 +16,12 @@ export default function ServicePillarCard({ pillar }) {
       style={{
         background: 'var(--cream2)',
         border: '1px solid var(--border)',
-        padding: 'clamp(28px, 4vw, 40px)',
+        borderTop: '3px solid var(--terracotta)',
+        padding: 'clamp(28px, 4vw, 36px)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         position: 'relative',
-        overflow: 'hidden',
         transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease',
       }}
       className="pillar-card-interactive"
