@@ -5,7 +5,15 @@ import { TASK_STATUS_CONFIG, TASK_PRIORITY_CONFIG, sanitizeTaskPayload } from '.
  * ProjectTaskManager - Gestor Operativo de Tareas Técnicas por Hito
  * Para el Panel de Consultores & Tech Leads (/equipo)
  */
-export default function ProjectTaskManager({ projectId, milestones = [], tasks = [], onTaskCreated, onTaskUpdated, onTaskDeleted }) {
+export default function ProjectTaskManager({
+  projectId,
+  milestones = [],
+  tasks = [],
+  staffList = [],
+  onTaskCreated,
+  onTaskUpdated,
+  onTaskDeleted,
+}) {
   const [selectedMilestoneId, setSelectedMilestoneId] = useState(milestones[0]?.id || '');
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState({
@@ -237,20 +245,58 @@ export default function ProjectTaskManager({ projectId, milestones = [], tasks =
               >
                 Consultor Responsable
               </label>
-              <input
-                type="text"
-                placeholder="Ej. Tech Lead / Data Architect"
-                value={formData.assigned_to_name}
-                onChange={(e) => setFormData({ ...formData, assigned_to_name: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border)',
-                  color: 'var(--ink)',
-                  fontSize: 13,
-                }}
-              />
+              {staffList && staffList.length > 0 ? (
+                <select
+                  aria-label="Seleccionar consultor responsable"
+                  value={formData.assigned_to_email || ''}
+                  onChange={(e) => {
+                    const member = staffList.find((s) => s.email === e.target.value);
+                    if (member) {
+                      setFormData({
+                        ...formData,
+                        assigned_to_name: member.full_name || member.email,
+                        assigned_to_email: member.email,
+                      });
+                    } else {
+                      setFormData({
+                        ...formData,
+                        assigned_to_name: '',
+                        assigned_to_email: '',
+                      });
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    background: 'var(--bg)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink)',
+                    fontSize: 13,
+                  }}
+                >
+                  <option value="">-- Sin asignar / Personalizado --</option>
+                  {staffList.map((st) => (
+                    <option key={st.id} value={st.email}>
+                      {st.full_name || st.email} ({st.role})
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  placeholder="Ej. Tech Lead / Data Architect"
+                  value={formData.assigned_to_name}
+                  onChange={(e) => setFormData({ ...formData, assigned_to_name: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    background: 'var(--bg)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink)',
+                    fontSize: 13,
+                  }}
+                />
+              )}
             </div>
           </div>
 
@@ -449,11 +495,43 @@ export default function ProjectTaskManager({ projectId, milestones = [], tasks =
                     >
                       P: {priorityCfg.label}
                     </span>
-                    {task.assigned_to_name && (
+                    {staffList && staffList.length > 0 ? (
+                      <select
+                        aria-label={`Asignar consultor para tarea ${task.title}`}
+                        value={task.assigned_to_email || ''}
+                        onChange={async (e) => {
+                          const selectedEmail = e.target.value;
+                          const selectedMember = staffList.find((s) => s.email === selectedEmail);
+                          if (onTaskUpdated) {
+                            await onTaskUpdated(task.id, {
+                              assigned_to_name: selectedMember ? selectedMember.full_name || selectedMember.email : null,
+                              assigned_to_email: selectedMember ? selectedMember.email : null,
+                            });
+                          }
+                        }}
+                        style={{
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontSize: 11,
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                          background: task.assigned_to_name ? 'rgba(46, 117, 89, 0.1)' : 'var(--cream2)',
+                          color: task.assigned_to_name ? '#1b4d3a' : 'var(--muted)',
+                          border: '1px solid var(--border)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <option value="">👤 Sin Asignar</option>
+                        {staffList.map((st) => (
+                          <option key={st.id} value={st.email}>
+                            👤 {st.full_name || st.email} ({st.role})
+                          </option>
+                        ))}
+                      </select>
+                    ) : task.assigned_to_name ? (
                       <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: "'IBM Plex Mono', monospace" }}>
                         👤 {task.assigned_to_name}
                       </span>
-                    )}
+                    ) : null}
                     {task.due_date && (
                       <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: "'IBM Plex Mono', monospace" }}>
                         📅 {task.due_date}

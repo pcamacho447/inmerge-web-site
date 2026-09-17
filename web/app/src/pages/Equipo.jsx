@@ -104,7 +104,7 @@ export default function Equipo() {
     loadData(true);
   }, []);
 
-  async function loadData(showSkeleton = true) {
+  async function loadData(showSkeleton = false) {
     if (showSkeleton) {
       setLoading(true);
     }
@@ -355,7 +355,7 @@ export default function Equipo() {
         assignedToName: '',
         assignedToEmail: '',
       });
-      await loadData();
+      await loadData(false);
     } catch (err) {
       showToast({
         type: 'error',
@@ -369,7 +369,7 @@ export default function Equipo() {
     try {
       await updateMilestoneStatus(milestoneId, statusOrUpdates);
       showTemporaryMsg('Hito actualizado correctamente.');
-      await loadData();
+      await loadData(false);
     } catch (err) {
       showToast({
         type: 'error',
@@ -474,7 +474,7 @@ export default function Equipo() {
         password: '',
         role: 'engineer',
       });
-      await loadData();
+      await loadData(false);
     } catch (err) {
       showToast({
         type: 'error',

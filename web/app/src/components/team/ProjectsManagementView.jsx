@@ -672,6 +672,7 @@ export default function ProjectsManagementView({
                     projectId={proj.id}
                     milestones={proj.milestones || []}
                     tasks={proj.tasks || []}
+                    staffList={staffList}
                     onTaskCreated={onTaskCreated}
                     onTaskUpdated={onTaskUpdated}
                     onTaskDeleted={onTaskDeleted}

@@ -79,6 +79,32 @@ describe('PM Components - ProjectTaskManager & ProjectRiskManager', () => {
         actual_hours: 5.5,
       });
     });
+
+    it('allows assigning a staff member directly via inline selector', async () => {
+      const onTaskUpdated = vi.fn();
+      const mockStaffList = [
+        { id: 's-1', full_name: 'Ana Auditora', email: 'ana@inmerge.pe', role: 'auditor' },
+      ];
+      render(
+        <ProjectTaskManager
+          projectId="p-1"
+          milestones={mockMilestones}
+          tasks={mockTasks}
+          staffList={mockStaffList}
+          onTaskUpdated={onTaskUpdated}
+        />,
+      );
+
+      const assignSelect = screen.getByLabelText(/Asignar consultor para tarea Validación de esquema SQL/i);
+      expect(assignSelect).toBeInTheDocument();
+
+      fireEvent.change(assignSelect, { target: { value: 'ana@inmerge.pe' } });
+
+      expect(onTaskUpdated).toHaveBeenCalledWith('t-1', {
+        assigned_to_name: 'Ana Auditora',
+        assigned_to_email: 'ana@inmerge.pe',
+      });
+    });
   });
 
   describe('ProjectRiskManager', () => {
