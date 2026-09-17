@@ -17,7 +17,7 @@ Consulte las especificaciones técnicas del entorno en:
 ## 2. Reglas de Navegación y Rutas
 - **Rutas Públicas:**
   - `/` (Inicio): Hero con video de fondo cinemático, navbar transparente sin bordes sobre el video, pilares interactivos, diagrama de arquitectura y segmentos de mercado directos al CTA. No incluir bloques redundantes del manifiesto ni la cuadrícula de "Principios de Ingeniería" (reservada para `/nosotros`).
-  - `/servicios` (Servicios): Catálogo filtrable por pilar, acordeones de diagnóstico/entregables y cotización directa.
+  - `/servicios` (Servicios & Estimación Ágil): Interfaz centrada exclusivamente en el Estimador Interactivo (`<QuickEstimator />`) para proyectar tiempos, costos en PEN/USD, entregables auditables por pilar y cotización directa vía WhatsApp/TDR/Asistente IA. Prohibido reintroducir el catálogo estático de acordeones repetitivos o carruseles de proyectos redundantes.
   - `/nosotros` (Nosotros): Manifiesto de ingeniería, Misión, Visión, Propósito, Compromisos técnicos (Valores), Método Inmerge y explorador de tecnologías (Stack).
   - `/contacto` (Contacto & TDR): Formulario estructurado con selector de pilares y enlace con mensaje pre-rellenado a WhatsApp.
 - **Estructura del Header Público:**

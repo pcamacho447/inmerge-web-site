@@ -49,6 +49,8 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
       3. `▦ Cuadrícula`: Vista responsive en 2 columnas para monitores anchos.
       4. `☰ Lista`: Vista lineal extendida al 100% de ancho.
     - **Centro de Opciones & Creación Segmentado ([`NewProjectModal.jsx`](file:///c:/papx/inmerge-website/inmerge/web/app/src/components/team/NewProjectModal.jsx)):** Pestañas independientes (`[🚀 Proyecto]`, `[⚡ Hito]`, `[📦 Entregable]`, `[👥 Staff]`) en el Slide-Over Drawer (`.equipo-drawer-panel`) para flujos in-situ sin perder el contexto de trabajo.
+12. **Diseño y Propósito de la Ruta `/servicios`:**
+    - La página `/servicios` concentra toda la exploración de soluciones mediante el componente **`<QuickEstimator />`**. No debe incluir listados estáticos redundantes de servicios ni duplicar el carrusel de casos de estudio (el cual pertenece exclusivamente a `/` Inicio).
 
 ---
 
