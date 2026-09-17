@@ -199,7 +199,7 @@ export default function Equipo() {
       showTemporaryMsg('Lead actualizado y registrado en la bitácora de auditoría.');
       fetchTeamActivityLogs({ limit: 50 })
         .then(setActivityLogs)
-        .catch(() => {});
+        .catch(() => { });
     } catch (err) {
       showToast({
         type: 'error',
@@ -220,7 +220,7 @@ export default function Equipo() {
       showTemporaryMsg(`Estado del proyecto actualizado a "${newStatus}" y notificación despachada al cliente.`);
       fetchTeamActivityLogs({ limit: 50 })
         .then(setActivityLogs)
-        .catch(() => {});
+        .catch(() => { });
     } catch (err) {
       showToast({
         type: 'error',
