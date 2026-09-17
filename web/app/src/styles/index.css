@@ -499,38 +499,32 @@ details.service-accordion-item > summary::marker {
   border-color: var(--ink);
 }
 
+.carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 16px 0 28px 0;
+  outline: none;
+}
+
 .carousel-track {
   display: flex;
   gap: 24px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  padding: 16px 10px 24px 10px;
+  width: max-content;
   outline: none;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   cursor: grab;
   touch-action: pan-y pinch-zoom;
-}
-
-.carousel-track::-webkit-scrollbar {
-  display: none !important;
+  will-change: transform;
 }
 
 .carousel-track.is-dragging {
   cursor: grabbing;
-  scroll-behavior: auto;
-  scroll-snap-type: none;
   user-select: none;
 }
 
 .carousel-track.is-dragging * {
   user-select: none;
   -webkit-user-drag: none;
-}
-
-.carousel-track.single-card-track {
-  padding: 20px 0 28px 0;
 }
 
 .carousel-card {
