@@ -33,13 +33,17 @@ import ProjectsManagementView from '../components/team/ProjectsManagementView.js
 import NewProjectModal from '../components/team/NewProjectModal.jsx';
 import TeamActivityFeed from '../components/team/TeamActivityFeed.jsx';
 import StaffManagementView from '../components/team/StaffManagementView.jsx';
+import CommandPaletteModal from '../components/team/CommandPaletteModal.jsx';
 
 export default function Equipo() {
   useDocumentHead({ title: 'Panel de Equipo & Consultores — Inmerge', path: '/equipo', noIndex: true });
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('leads'); // 'leads' | 'projects' | 'new_project' | 'activity' | 'team'
+  const [activeTab, setActiveTab] = useState('projects'); // 'leads' | 'projects' | 'new_project' | 'activity' | 'team'
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [activityFilter, setActivityFilter] = useState('ALL'); // 'ALL' | 'LEADS' | 'PROJECTS' | 'DELIVERABLES' | 'STAFF'
   const [leads, setLeads] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -127,6 +131,23 @@ export default function Equipo() {
       }
     }
   }
+
+  // Global shortcut: Cmd+K / Ctrl+K to toggle Command Palette
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
+  const totalDeliverablesCount = projects.reduce((acc, p) => acc + (p.deliverables?.length || 0), 0);
+  const activeLeadsCount = leads.filter((l) => l.status === 'NUEVO' || l.status === 'EN_REVISION').length;
+  const activeProjectsCount = projects.filter((p) => p.status !== 'FINALIZADO').length;
+  const totalTasksCount = projects.reduce((acc, p) => acc + (p.tasks?.length || 0), 0);
 
   // Escuchar suscripciones en tiempo real para el equipo
   const {
@@ -564,9 +585,6 @@ export default function Equipo() {
     navigate('/');
   }
 
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isDrawerOpen) {
@@ -712,6 +730,18 @@ export default function Equipo() {
 
         {/* Right Action Bar */}
         <div className="equipo-topbar-actions">
+          <button
+            type="button"
+            className="equipo-search-trigger"
+            onClick={() => setIsCommandPaletteOpen(true)}
+            title="Abrir Paleta de Comandos (⌘K / Ctrl+K)"
+            aria-label="Abrir Paleta de Comandos"
+          >
+            <span style={{ fontSize: 13 }}>🔍</span>
+            <span className="equipo-search-text">Buscar o ejecutar...</span>
+            <kbd className="equipo-search-kbd">⌘K</kbd>
+          </button>
+
           {user?.isAdmin && (
             <button
               type="button"
@@ -810,6 +840,79 @@ export default function Equipo() {
 
         {/* Fluid Workspace Canvas */}
         <main className="equipo-workspace">
+          {/* Executive Bento KPI Strip */}
+          <div className="equipo-bento-strip">
+            <div
+              className="equipo-bento-card"
+              onClick={() => setActiveTab('projects')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') setActiveTab('projects');
+              }}
+              title="Ver Proyectos Activos"
+            >
+              <div className="equipo-bento-icon">📂</div>
+              <div className="equipo-bento-info">
+                <div className="equipo-bento-value">
+                  {activeProjectsCount} <span style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400 }}>/ {projects.length}</span>
+                </div>
+                <div className="equipo-bento-label">Proyectos Activos</div>
+              </div>
+            </div>
+
+            <div
+              className="equipo-bento-card"
+              onClick={() => setActiveTab('leads')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') setActiveTab('leads');
+              }}
+              title="Ver Solicitudes TDR Pendientes"
+            >
+              <div className="equipo-bento-icon">📩</div>
+              <div className="equipo-bento-info">
+                <div className="equipo-bento-value">{activeLeadsCount}</div>
+                <div className="equipo-bento-label">Leads por Atender</div>
+              </div>
+            </div>
+
+            <div
+              className="equipo-bento-card"
+              onClick={() => setActiveTab('projects')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') setActiveTab('projects');
+              }}
+              title="Ver Entregables Técnicos Auditados"
+            >
+              <div className="equipo-bento-icon">📦</div>
+              <div className="equipo-bento-info">
+                <div className="equipo-bento-value">{totalDeliverablesCount}</div>
+                <div className="equipo-bento-label">Entregables Auditados</div>
+              </div>
+            </div>
+
+            <div
+              className="equipo-bento-card"
+              onClick={() => setActiveTab('activity')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') setActiveTab('activity');
+              }}
+              title="Ver Tareas & Bitácora Realtime"
+            >
+              <div className="equipo-bento-icon">⚡</div>
+              <div className="equipo-bento-info">
+                <div className="equipo-bento-value">{totalTasksCount}</div>
+                <div className="equipo-bento-label">Tareas & Sprints</div>
+              </div>
+            </div>
+          </div>
+
           {/* Workspace Subheader */}
           <div className="equipo-workspace-header">
             <div>
@@ -1018,6 +1121,34 @@ export default function Equipo() {
           />
         </div>
       </div>
+
+      <CommandPaletteModal
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        projects={projects}
+        leads={leads}
+        isAdmin={Boolean(user?.isAdmin)}
+        onSelectProject={(proj) => {
+          setActiveTab('projects');
+          showTemporaryMsg(`Navegando al proyecto: ${proj.title}`);
+        }}
+        onSelectLead={(lead) => {
+          setActiveTab('leads');
+          showTemporaryMsg(`Navegando a lead: ${lead.company || lead.full_name || lead.email}`);
+        }}
+        onOpenNewProject={() => {
+          setIsDrawerOpen(true);
+        }}
+        onOpenNewMilestone={() => {
+          setIsDrawerOpen(true);
+        }}
+        onOpenNewDeliverable={() => {
+          setIsDrawerOpen(true);
+        }}
+        onOpenNewStaff={() => {
+          setIsDrawerOpen(true);
+        }}
+      />
 
       <ToastNotification toast={activeToast} onDismiss={dismissToast} />
       <Footer />

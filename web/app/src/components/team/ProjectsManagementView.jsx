@@ -76,7 +76,8 @@ export default function ProjectsManagementView({
   const [inlineDelivFile, setInlineDelivFile] = useState(null);
   const [isUploadingDeliv, setIsUploadingDeliv] = useState(false);
   const [downloadingDelivId, setDownloadingDelivId] = useState(null);
-  const [viewLayout, setViewLayout] = useState('LIST'); // 'LIST' | 'GRID'
+  const [viewLayout, setViewLayout] = useState('LIST'); // 'LIST' | 'GRID' | 'SPLIT' | 'KANBAN'
+  const [selectedProjId, setSelectedProjId] = useState(projects[0]?.id || null);
 
   const setProjSubTab = (projId, tab) => {
     setProjectSubTabs((prev) => ({
@@ -85,159 +86,34 @@ export default function ProjectsManagementView({
     }));
   };
 
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-        <div>
-          <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: '0 0 4px', color: 'var(--ink)' }}>
-            Proyectos en Curso & Auditorías ({projects.length})
-          </h2>
-          <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)' }}>
-            {isAdmin
-              ? 'Supervisión técnica, cronograma de hitos, asignación de consultores y entregables firmados.'
-              : 'Seguimiento operativo de cronogramas y tareas técnicas asignadas.'}
-          </p>
-        </div>
+  const activeSelectedId = projects.find((p) => p.id === selectedProjId) ? selectedProjId : projects[0]?.id;
+  const selectedProject = projects.find((p) => p.id === activeSelectedId) || projects[0];
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          {/* Layout View Mode Switcher */}
-          <div
-            role="group"
-            aria-label="Modo de visualización de proyectos"
-            style={{
-              display: 'inline-flex',
-              background: 'var(--cream2)',
-              border: '1px solid var(--border)',
-              borderRadius: 6,
-              padding: 2,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setViewLayout('LIST')}
-              title="Vista Lista Extendida (100% Ancho)"
-              aria-pressed={viewLayout === 'LIST'}
-              style={{
-                background: viewLayout === 'LIST' ? 'var(--ink)' : 'transparent',
-                color: viewLayout === 'LIST' ? 'var(--gold)' : 'var(--muted)',
-                border: 'none',
-                borderRadius: 4,
-                padding: '6px 12px',
-                fontSize: 12,
-                fontWeight: 600,
-                fontFamily: "'IBM Plex Sans', sans-serif",
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <span>☰ Lista 100%</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewLayout('GRID')}
-              title="Vista Cuadrícula 2 Columnas (@container)"
-              aria-pressed={viewLayout === 'GRID'}
-              style={{
-                background: viewLayout === 'GRID' ? 'var(--ink)' : 'transparent',
-                color: viewLayout === 'GRID' ? 'var(--gold)' : 'var(--muted)',
-                border: 'none',
-                borderRadius: 4,
-                padding: '6px 12px',
-                fontSize: 12,
-                fontWeight: 600,
-                fontFamily: "'IBM Plex Sans', sans-serif",
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <span>▦ Cuadrícula 2-Col</span>
-            </button>
-          </div>
+  // Helper to render full project inspector card
+  const renderProjectCard = (proj, isSplitDetail = false) => {
+    const totalMilestones = proj.milestones?.length || 0;
+    const completedMilestones = proj.milestones?.filter((m) => m.status === 'COMPLETADO').length || 0;
+    const weightedProgress = calculateProjectProgress(proj.milestones, proj.tasks || []);
+    const progressPct =
+      proj.progress !== undefined && proj.progress !== null && proj.progress > 0 ? proj.progress : weightedProgress;
+    const hoursInfo = calculateProjectHours(proj.tasks || []);
+    const activeRisksCount = (proj.risks || []).filter((r) => r.status !== 'RESUELTO').length;
+    const currentSubTab = projectSubTabs[proj.id] || 'PM_GANTT';
 
-          {isAdmin && onOpenNewProject && (
-            <button
-              type="button"
-              onClick={onOpenNewProject}
-              className="btn-hover"
-              style={{
-                background: 'var(--terracotta)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 20,
-                padding: '9px 18px',
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontFamily: "'IBM Plex Sans', sans-serif",
-              }}
-            >
-              <span>+ Registrar Nuevo Proyecto</span>
-            </button>
-          )}
-        </div>
-      </div>
+    const healthCfg = HEALTH_STATUS_CONFIG[proj.health_status || 'ON_TRACK'] || HEALTH_STATUS_CONFIG.ON_TRACK;
+    const pColor = PROJECT_STATUS_COLORS[proj.status] || PROJECT_STATUS_COLORS.EN_PLANIFICACION;
 
-      {projects.length === 0 ? (
-        <div
-          style={{
-            padding: 40,
-            textAlign: 'center',
-            background: 'var(--cream2)',
-            borderRadius: 8,
-            border: '1px dashed var(--border)',
-          }}
-        >
-          <p style={{ color: 'var(--muted)', margin: 0 }}>No hay proyectos activos registrados.</p>
-        </div>
-      ) : (
-        <div
-          style={
-            viewLayout === 'GRID'
-              ? {
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 580px), 1fr))',
-                  gap: 20,
-                  alignItems: 'start',
-                }
-              : {
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 20,
-                }
-          }
-        >
-          {projects.map((proj) => {
-            const totalMilestones = proj.milestones?.length || 0;
-            const completedMilestones = proj.milestones?.filter((m) => m.status === 'COMPLETADO').length || 0;
-            const weightedProgress = calculateProjectProgress(proj.milestones, proj.tasks || []);
-            const progressPct =
-              proj.progress !== undefined && proj.progress !== null && proj.progress > 0 ? proj.progress : weightedProgress;
-            const hoursInfo = calculateProjectHours(proj.tasks || []);
-            const activeRisksCount = (proj.risks || []).filter((r) => r.status !== 'RESUELTO').length;
-            const currentSubTab = projectSubTabs[proj.id] || 'PM_GANTT';
-
-            const healthCfg = HEALTH_STATUS_CONFIG[proj.health_status || 'ON_TRACK'] || HEALTH_STATUS_CONFIG.ON_TRACK;
-            const pColor = PROJECT_STATUS_COLORS[proj.status] || PROJECT_STATUS_COLORS.EN_PLANIFICACION;
-
-            return (
-              <div
-                key={proj.id}
-                style={{
-                  background: 'var(--cream2)',
-                  borderRadius: 8,
-                  padding: '24px',
-                  border: '1px solid var(--border)',
-                }}
-              >
+    return (
+      <div
+        key={proj.id}
+        style={{
+          background: 'var(--cream2)',
+          borderRadius: 8,
+          padding: isSplitDetail ? '20px' : '24px',
+          border: '1px solid var(--border)',
+          boxShadow: isSplitDetail ? '0 4px 16px rgba(36,26,18,0.06)' : 'none',
+        }}
+      >
                 {/* Project Header */}
                 <div
                   style={{
@@ -1636,28 +1512,441 @@ export default function ProjectsManagementView({
                   </div>
                 )}
 
-                {/* Footer Info */}
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: 24,
-                    flexWrap: 'wrap',
-                    paddingTop: 14,
-                    marginTop: 16,
-                    borderTop: '1px solid var(--border)',
-                    fontSize: 12,
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    color: 'var(--muted)',
-                  }}
-                >
-                  <div>📍 {totalMilestones} Hitos</div>
-                  <div>📋 {proj.tasks?.length || 0} Tareas</div>
-                  <div>📦 {proj.deliverables?.length || 0} Entregables</div>
-                  <div>⚠️ {activeRisksCount} Bloqueos activos</div>
-                </div>
+        {/* Footer Info */}
+        <div
+          style={{
+            display: 'flex',
+            gap: 24,
+            flexWrap: 'wrap',
+            paddingTop: 14,
+            marginTop: 16,
+            borderTop: '1px solid var(--border)',
+            fontSize: 12,
+            fontFamily: "'IBM Plex Mono', monospace",
+            color: 'var(--muted)',
+          }}
+        >
+          <div>📍 {totalMilestones} Hitos</div>
+          <div>📋 {proj.tasks?.length || 0} Tareas</div>
+          <div>📦 {proj.deliverables?.length || 0} Entregables</div>
+          <div>⚠️ {activeRisksCount} Bloqueos activos</div>
+        </div>
+      </div>
+    );
+  };
+
+  const kanbanColumns = [
+    {
+      id: 'phase-01',
+      title: 'Fase 01 — Diagnóstico',
+      subtitle: 'Auditoría inicial & esquema',
+      badgeColor: 'var(--terracotta)',
+      projects: projects.filter(
+        (p) => p.status === 'EN_AUDITORIA' || (p.status === 'EN_PLANIFICACION' && p.pillar === 'auditoria'),
+      ),
+    },
+    {
+      id: 'phase-02',
+      title: 'Fase 02 — Arquitectura',
+      subtitle: 'Diseño técnico & solución cloud',
+      badgeColor: 'var(--ochre)',
+      projects: projects.filter((p) => p.status === 'EN_PLANIFICACION' && p.pillar !== 'auditoria'),
+    },
+    {
+      id: 'phase-03',
+      title: 'Fase 03 — Ingeniería & IA',
+      subtitle: 'Modelado, APIs & pipelines',
+      badgeColor: '#345995',
+      projects: projects.filter((p) => p.status === 'EN_DESARROLLO'),
+    },
+    {
+      id: 'phase-04',
+      title: 'Fase 04 — Certificación',
+      subtitle: 'Validación forense & entrega',
+      badgeColor: '#2E7559',
+      projects: projects.filter((p) => ['EN_VALIDACION', 'ENTREGADO', 'FINALIZADO'].includes(p.status)),
+    },
+  ];
+
+  const matchedProjectIds = new Set(kanbanColumns.flatMap((c) => c.projects.map((p) => p.id)));
+  const orphanProjects = projects.filter((p) => !matchedProjectIds.has(p.id));
+  if (orphanProjects.length > 0) {
+    kanbanColumns[0].projects.push(...orphanProjects);
+  }
+
+  return (
+    <div>
+      {/* Module Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, margin: '0 0 4px', color: 'var(--ink)' }}>
+            Proyectos en Curso & Auditorías ({projects.length})
+          </h2>
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)' }}>
+            {isAdmin
+              ? 'Supervisión técnica, cronograma de hitos, asignación de consultores y entregables firmados.'
+              : 'Seguimiento operativo de cronogramas y tareas técnicas asignadas.'}
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          {/* Layout View Mode Switcher (4 Modes) */}
+          <div
+            role="group"
+            aria-label="Modo de visualización de proyectos"
+            style={{
+              display: 'inline-flex',
+              background: 'var(--cream2)',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+              padding: 2,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setViewLayout('LIST')}
+              title="Vista Lista Extendida (100% Ancho)"
+              aria-pressed={viewLayout === 'LIST'}
+              style={{
+                background: viewLayout === 'LIST' ? 'var(--ink)' : 'transparent',
+                color: viewLayout === 'LIST' ? 'var(--gold)' : 'var(--muted)',
+                border: 'none',
+                borderRadius: 4,
+                padding: '6px 12px',
+                fontSize: 12,
+                fontWeight: 600,
+                fontFamily: "'IBM Plex Sans', sans-serif",
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <span>☰ Lista</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewLayout('GRID')}
+              title="Vista Cuadrícula 2 Columnas"
+              aria-pressed={viewLayout === 'GRID'}
+              style={{
+                background: viewLayout === 'GRID' ? 'var(--ink)' : 'transparent',
+                color: viewLayout === 'GRID' ? 'var(--gold)' : 'var(--muted)',
+                border: 'none',
+                borderRadius: 4,
+                padding: '6px 12px',
+                fontSize: 12,
+                fontWeight: 600,
+                fontFamily: "'IBM Plex Sans', sans-serif",
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <span>▦ Cuadrícula</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewLayout('SPLIT')}
+              title="Vista Maestro-Detalle Dividida (60/40)"
+              aria-pressed={viewLayout === 'SPLIT'}
+              style={{
+                background: viewLayout === 'SPLIT' ? 'var(--ink)' : 'transparent',
+                color: viewLayout === 'SPLIT' ? 'var(--gold)' : 'var(--muted)',
+                border: 'none',
+                borderRadius: 4,
+                padding: '6px 12px',
+                fontSize: 12,
+                fontWeight: 600,
+                fontFamily: "'IBM Plex Sans', sans-serif",
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <span>◫ Split 60/40</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewLayout('KANBAN')}
+              title="Vista Tablero Kanban por Fases Metodológicas"
+              aria-pressed={viewLayout === 'KANBAN'}
+              style={{
+                background: viewLayout === 'KANBAN' ? 'var(--ink)' : 'transparent',
+                color: viewLayout === 'KANBAN' ? 'var(--gold)' : 'var(--muted)',
+                border: 'none',
+                borderRadius: 4,
+                padding: '6px 12px',
+                fontSize: 12,
+                fontWeight: 600,
+                fontFamily: "'IBM Plex Sans', sans-serif",
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <span>☷ Kanban</span>
+            </button>
+          </div>
+
+          {isAdmin && onOpenNewProject && (
+            <button
+              type="button"
+              onClick={onOpenNewProject}
+              className="btn-hover"
+              style={{
+                background: 'var(--terracotta)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 20,
+                padding: '9px 18px',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontFamily: "'IBM Plex Sans', sans-serif",
+              }}
+            >
+              <span>+ Registrar Nuevo Proyecto</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {projects.length === 0 ? (
+        <div
+          style={{
+            padding: 40,
+            textAlign: 'center',
+            background: 'var(--cream2)',
+            borderRadius: 8,
+            border: '1px dashed var(--border)',
+          }}
+        >
+          <p style={{ color: 'var(--muted)', margin: 0 }}>No hay proyectos activos registrados.</p>
+        </div>
+      ) : viewLayout === 'SPLIT' ? (
+        /* VISTA SPLIT MAESTRO-DETALLE (60/40) */
+        <div className="equipo-split-container">
+          {/* Master List (Left Pane) */}
+          <div className="equipo-split-master">
+            <div className="equipo-split-master-header">
+              <span style={{ fontWeight: 600, fontSize: 13 }}>Proyectos Activos ({projects.length})</span>
+              <span style={{ fontSize: 11, color: 'var(--muted)' }}>Selecciona para inspeccionar</span>
+            </div>
+            <div className="equipo-split-master-list">
+              {projects.map((proj) => {
+                const isSelected = proj.id === activeSelectedId;
+                const totalMilestones = proj.milestones?.length || 0;
+                const weightedProgress = calculateProjectProgress(proj.milestones, proj.tasks || []);
+                const progressPct =
+                  proj.progress !== undefined && proj.progress !== null && proj.progress > 0
+                    ? proj.progress
+                    : weightedProgress;
+                const pColor = PROJECT_STATUS_COLORS[proj.status] || PROJECT_STATUS_COLORS.EN_PLANIFICACION;
+
+                return (
+                  <div
+                    key={proj.id}
+                    className={`equipo-split-master-card ${isSelected ? 'is-active' : ''}`}
+                    onClick={() => setSelectedProjId(proj.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedProjId(proj.id);
+                      }
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <span className="equipo-split-master-pillar">{PILLAR_LABELS[proj.pillar] || proj.pillar}</span>
+                      <span
+                        style={{
+                          fontSize: 10,
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                          background: pColor.bg,
+                          color: pColor.text,
+                          border: `1px solid ${pColor.border}`,
+                          fontWeight: 700,
+                          fontFamily: "'IBM Plex Mono', monospace",
+                        }}
+                      >
+                        {proj.status}
+                      </span>
+                    </div>
+                    <h4 className="equipo-split-master-title">{proj.title}</h4>
+                    <div className="equipo-split-master-client">
+                      Cliente: {proj.client?.full_name || proj.client?.email || 'Inmerge Client'}
+                    </div>
+                    <div className="equipo-split-master-progress-bar">
+                      <div
+                        className="equipo-split-master-progress-fill"
+                        style={{
+                          width: `${progressPct}%`,
+                          background: progressPct === 100 ? '#2E7559' : 'var(--terracotta)',
+                        }}
+                      />
+                    </div>
+                    <div className="equipo-split-master-meta">
+                      <span>{progressPct}% avance</span>
+                      <span>{totalMilestones} hitos</span>
+                      <span>{proj.tasks?.length || 0} tareas</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Detail Inspector (Right Pane) */}
+          <div className="equipo-split-detail">
+            {selectedProject ? (
+              renderProjectCard(selectedProject, true)
+            ) : (
+              <div className="equipo-split-detail-empty">
+                Selecciona un proyecto de la columna izquierda para inspeccionar sus hitos, entregables y tareas.
               </div>
-            );
-          })}
+            )}
+          </div>
+        </div>
+      ) : viewLayout === 'KANBAN' ? (
+        /* VISTA KANBAN POR FASES METODOLÓGICAS */
+        <div className="equipo-kanban-board">
+          {kanbanColumns.map((col) => (
+            <div key={col.id} className="equipo-kanban-column">
+              <div className="equipo-kanban-column-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      background: col.badgeColor,
+                      display: 'inline-block',
+                    }}
+                  />
+                  <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{col.title}</h4>
+                </div>
+                <span className="equipo-kanban-badge">{col.projects.length}</span>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 12 }}>{col.subtitle}</div>
+
+              <div className="equipo-kanban-cards-list">
+                {col.projects.length === 0 ? (
+                  <div className="equipo-kanban-empty">Sin proyectos en esta etapa</div>
+                ) : (
+                  col.projects.map((proj) => {
+                    const weightedProgress = calculateProjectProgress(proj.milestones, proj.tasks || []);
+                    const progressPct =
+                      proj.progress !== undefined && proj.progress !== null && proj.progress > 0
+                        ? proj.progress
+                        : weightedProgress;
+                    const pColor = PROJECT_STATUS_COLORS[proj.status] || PROJECT_STATUS_COLORS.EN_PLANIFICACION;
+
+                    return (
+                      <div key={proj.id} className="equipo-kanban-card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontFamily: "'IBM Plex Mono', monospace",
+                              color: 'var(--muted)',
+                            }}
+                          >
+                            {PILLAR_LABELS[proj.pillar] || proj.pillar}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: 10,
+                              padding: '2px 5px',
+                              borderRadius: 4,
+                              background: pColor.bg,
+                              color: pColor.text,
+                              fontWeight: 700,
+                              fontFamily: "'IBM Plex Mono', monospace",
+                            }}
+                          >
+                            {proj.status}
+                          </span>
+                        </div>
+
+                        <h5 className="equipo-kanban-card-title">{proj.title}</h5>
+                        <div className="equipo-kanban-card-client">
+                          {proj.client?.full_name || proj.client?.email || 'Inmerge Client'}
+                        </div>
+
+                        <div style={{ margin: '10px 0 6px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--muted)', marginBottom: 4 }}>
+                            <span>Progreso</span>
+                            <span>{progressPct}%</span>
+                          </div>
+                          <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+                            <div
+                              style={{
+                                height: '100%',
+                                width: `${progressPct}%`,
+                                background: progressPct === 100 ? '#2E7559' : 'var(--terracotta)',
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="equipo-kanban-card-footer">
+                          <div style={{ display: 'flex', gap: 8, fontSize: 11, color: 'var(--muted)' }}>
+                            <span>📍 {proj.milestones?.length || 0}</span>
+                            <span>📦 {proj.deliverables?.length || 0}</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            className="btn-kanban-inspect"
+                            onClick={() => {
+                              setSelectedProjId(proj.id);
+                              setViewLayout('SPLIT');
+                            }}
+                            title="Abrir inspector de proyecto en vista Split"
+                          >
+                            Inspeccionar →
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* VISTA LISTA O CUADRÍCULA */
+        <div
+          style={
+            viewLayout === 'GRID'
+              ? {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 580px), 1fr))',
+                  gap: 20,
+                  alignItems: 'start',
+                }
+              : {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 20,
+                }
+          }
+        >
+          {projects.map((proj) => renderProjectCard(proj, false))}
         </div>
       )}
     </div>

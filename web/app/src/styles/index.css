@@ -1931,3 +1931,575 @@ details.service-accordion-item > summary::marker {
     width: 240px;
   }
 }
+
+/* -------------------------------------------------------------
+   Command Palette & Omnisearch Modal
+------------------------------------------------------------- */
+.equipo-search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(36, 26, 18, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.82rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.equipo-search-trigger:hover {
+  background: var(--cream2);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+.equipo-search-kbd {
+  background: var(--cream2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  padding: 1px 5px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.command-palette-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(36, 26, 18, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: min(12vh, 100px) 16px 24px;
+  animation: cpFadeIn 0.18s ease-out;
+}
+
+@keyframes cpFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.command-palette-container {
+  width: 100%;
+  max-width: 640px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(36, 26, 18, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+  animation: cpSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cpSlideUp {
+  from { transform: translateY(-12px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.command-palette-input-box {
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--cream2);
+  gap: 12px;
+}
+
+.command-palette-search-icon {
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+.command-palette-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 1rem;
+  color: var(--ink);
+  outline: none;
+}
+
+.command-palette-badge {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  color: var(--muted);
+}
+
+.command-palette-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.command-palette-section {
+  padding: 4px 8px;
+}
+
+.command-palette-section-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 12px 4px;
+  letter-spacing: 0.04em;
+}
+
+.command-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  margin-bottom: 2px;
+}
+
+.command-palette-item.is-selected {
+  background: rgba(168, 71, 43, 0.1);
+  color: var(--terracotta);
+}
+
+.command-palette-item-icon {
+  font-size: 1.1rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream2);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.command-palette-item.is-selected .command-palette-item-icon {
+  background: var(--terracotta);
+  color: #fff;
+}
+
+.command-palette-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.command-palette-item-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.command-palette-item.is-selected .command-palette-item-title {
+  color: var(--terracotta);
+}
+
+.command-palette-item-meta {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.command-palette-item-hint {
+  font-size: 0.75rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.command-palette-item.is-selected .command-palette-item-hint {
+  opacity: 1;
+  color: var(--terracotta);
+}
+
+.command-palette-empty {
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.command-palette-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 10px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--cream2);
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.command-palette-shortcut-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.command-palette-shortcut-group kbd {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 0.7rem;
+}
+
+/* -------------------------------------------------------------
+   Executive Bento KPI Strip
+------------------------------------------------------------- */
+.equipo-bento-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.equipo-bento-card {
+  background: var(--cream2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.equipo-bento-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--terracotta);
+  box-shadow: 0 6px 18px rgba(36, 26, 18, 0.08);
+}
+
+.equipo-bento-card:hover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--terracotta);
+}
+
+.equipo-bento-icon {
+  font-size: 1.5rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: rgba(36, 26, 18, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.equipo-bento-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.equipo-bento-value {
+  font-family: 'Spectral', serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.equipo-bento-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* -------------------------------------------------------------
+   Master-Detail Split Layout (60/40)
+------------------------------------------------------------- */
+.equipo-split-container {
+  display: grid;
+  grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.equipo-split-master {
+  background: var(--cream2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 200px);
+  position: sticky;
+  top: 80px;
+}
+
+.equipo-split-master-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.equipo-split-master-list {
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.equipo-split-master-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.equipo-split-master-card:hover {
+  border-color: var(--gold);
+  transform: translateX(2px);
+}
+
+.equipo-split-master-card.is-active {
+  border-color: var(--terracotta);
+  background: rgba(168, 71, 43, 0.04);
+  box-shadow: 0 2px 10px rgba(168, 71, 43, 0.12);
+}
+
+.equipo-split-master-card.is-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--terracotta);
+  border-radius: 6px 0 0 6px;
+}
+
+.equipo-split-master-pillar {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.equipo-split-master-title {
+  font-family: 'Spectral', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 4px 0 2px;
+  line-height: 1.25;
+}
+
+.equipo-split-master-client {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.equipo-split-master-progress-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.equipo-split-master-progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.equipo-split-master-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--muted);
+}
+
+.equipo-split-detail {
+  min-width: 0;
+}
+
+.equipo-split-detail-empty {
+  padding: 60px 20px;
+  text-align: center;
+  background: var(--cream2);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 1100px) {
+  .equipo-split-container {
+    grid-template-columns: 1fr;
+  }
+  .equipo-split-master {
+    position: static;
+    max-height: none;
+  }
+}
+
+/* -------------------------------------------------------------
+   Methodology Kanban Board
+------------------------------------------------------------- */
+.equipo-kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(260px, 1fr));
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  align-items: start;
+}
+
+.equipo-kanban-column {
+  background: var(--cream2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.equipo-kanban-column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.equipo-kanban-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--ink);
+}
+
+.equipo-kanban-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.equipo-kanban-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(36, 26, 18, 0.04);
+  transition: all 0.15s ease;
+}
+
+.equipo-kanban-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.equipo-kanban-card-title {
+  font-family: 'Spectral', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 6px 0 2px;
+  line-height: 1.25;
+}
+
+.equipo-kanban-card-client {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.equipo-kanban-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+.btn-kanban-inspect {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: all 0.15s ease;
+}
+
+.btn-kanban-inspect:hover {
+  background: var(--ink);
+  color: var(--gold);
+  border-color: var(--ink);
+}
+
+.equipo-kanban-empty {
+  padding: 24px 10px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+@media (max-width: 1200px) {
+  .equipo-kanban-board {
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .equipo-kanban-board {
+    grid-template-columns: 1fr;
+  }
+}
+
