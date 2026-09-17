@@ -36,6 +36,13 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 9. **Rendimiento de Renderizado en Listas Extensas & Tablas:**
    - En feeds de actividad o bitácoras (`TeamActivityFeed.jsx`), aplicar `content-visibility: auto` y `contain-intrinsic-size: 0 80px` en cada fila para optimizar el trabajo del hilo principal y la memoria del navegador.
    - En tablas con filtrado en tiempo real (`LeadsInboxTable.jsx`), memoizar el procesamiento de datos con `useMemo`.
+10. **Carruseles Continuos 360° Infinitos (Hardware-Accelerated Transform):**
+   - Todo componente de carrusel continuo (`ProjectCarousel.jsx`) debe utilizar transformaciones CSS aceleradas por GPU (`transform: translate3d(translateX, 0, 0)`) sobre un buffer virtual triplicado (`3 * N`).
+   - Prohibido el uso de `scrollLeft` con `scroll-behavior: smooth` para ciclos continuos (genera rebobinados visuales hacia atrás).
+   - Al completar la animación de transición (`onTransitionEnd`), ejecutar un rebase instantáneo a 0ms sin transición (`withTransition = false`) para garantizar un avance continuo siempre en una sola dirección hacia adelante.
+11. **Consola de Operaciones Full-Canvas y Slide-Over Drawer (`/equipo`):**
+   - La vista de equipo opera siempre en modo **Full-Canvas (`100vw` / `100vh`)** para dar amplitud a diagramas de Gantt, matrices de riesgo y tablas de leads TDR.
+   - Estructura obligatoria: Topbar pegajosa con resumen de KPIs y estado Realtime, Sidebar colapsable (`.equipo-sidebar` de 240px a 68px) con patrón accesible `role="tablist"` y **Slide-Over Drawer** (`.equipo-drawer-panel`) para flujos de creación/edición sin desmontar la vista de trabajo.
 
 ---
 
