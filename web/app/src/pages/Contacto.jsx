@@ -147,13 +147,12 @@ export default function Contacto() {
           <div
             data-reveal=""
             style={{
-              background: 'var(--ink)',
-              color: 'var(--bg)',
-              padding: 'clamp(32px, 5vw, 48px)',
+              background: 'transparent',
+              borderLeft: '3px solid var(--terracotta)',
+              padding: '0 0 0 clamp(20px, 3vw, 28px)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              minHeight: 380,
             }}
           >
             <div>
@@ -162,7 +161,7 @@ export default function Contacto() {
                   fontFamily: "'IBM Plex Mono', monospace",
                   fontSize: 12,
                   letterSpacing: 2,
-                  color: 'var(--gold)',
+                  color: 'var(--terracotta)',
                   fontWeight: 600,
                   marginBottom: 16,
                 }}
@@ -176,19 +175,19 @@ export default function Contacto() {
                   fontSize: 'clamp(26px, 3vw, 36px)',
                   lineHeight: 1.25,
                   marginBottom: 16,
-                  color: '#F3EADA',
+                  color: 'var(--ink)',
                 }}
               >
                 {isEn ? 'Direct Conversation via WhatsApp' : 'Conversación directa por WhatsApp'}
               </h2>
-              <p style={{ fontSize: 15, color: 'var(--tan-text)', lineHeight: 1.6, margin: 0 }}>
+              <p style={{ fontSize: 15, color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>
                 {isEn
-                  ? 'Ideal for scheduling exploratory discovery sessions, sharing Terms of Reference (TDR) documents, or receiving an initial feasibility diagnostic.'
-                  : 'Ideal para coordinar reuniones exploratorias, compartir alcances de TDR o recibir un diagnóstico inicial de factibilidad.'}
+                  ? 'Exploratory discovery sessions, Terms of Reference (TDR) review, or preliminary feasibility diagnostics.'
+                  : 'Reuniones exploratorias, revisión de alcances de TDR o diagnóstico preliminar de factibilidad técnica.'}
               </p>
             </div>
 
-            <div style={{ marginTop: 32, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ marginTop: 28, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <a
                 href={customWaUrl}
                 target="_blank"
@@ -196,8 +195,8 @@ export default function Contacto() {
                 style={{
                   background: 'var(--gold)',
                   color: 'var(--ink)',
-                  padding: '16px 28px',
-                  fontSize: 15,
+                  padding: '14px 26px',
+                  fontSize: 14.5,
                   fontWeight: 700,
                   textDecoration: 'none',
                   display: 'inline-flex',
@@ -213,10 +212,10 @@ export default function Contacto() {
                 href={`mailto:inmerge3@gmail.com?subject=${encodeURIComponent(isEn ? 'Inmerge — Technical Scope Consultation' : 'Inmerge — Consulta Técnica y TDR')}`}
                 style={{
                   background: 'transparent',
-                  color: '#F3EADA',
-                  border: '1px solid rgba(243, 234, 218, 0.4)',
-                  padding: '16px 22px',
-                  fontSize: 15,
+                  color: 'var(--ink)',
+                  border: '1px solid var(--border)',
+                  padding: '14px 20px',
+                  fontSize: 14.5,
                   fontWeight: 600,
                   textDecoration: 'none',
                   display: 'inline-flex',
@@ -231,13 +230,13 @@ export default function Contacto() {
             </div>
           </div>
 
-          {/* Trust & SLA Badges */}
+          {/* Trust & SLA Badges — Continuous Editorial List */}
           <div
             data-reveal=""
             style={{
-              background: 'var(--cream2)',
-              border: '1px solid var(--border)',
-              padding: 32,
+              background: 'transparent',
+              borderTop: '1px solid var(--border)',
+              padding: '28px 0 0 0',
             }}
           >
             <div
@@ -258,7 +257,7 @@ export default function Contacto() {
                   <div
                     style={{
                       fontSize: 16,
-                      background: 'rgba(168,71,43,0.1)',
+                      background: 'rgba(168,71,43,0.08)',
                       color: 'var(--terracotta)',
                       width: 28,
                       height: 28,
@@ -272,8 +271,8 @@ export default function Contacto() {
                     {badge.icon}
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{badge.title}</div>
-                    <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2, lineHeight: 1.4 }}>{badge.detail}</div>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--ink)' }}>{badge.title}</div>
+                    <div style={{ fontSize: 12.5, color: 'var(--muted)', marginTop: 2, lineHeight: 1.4 }}>{badge.detail}</div>
                   </div>
                 </div>
               ))}
@@ -283,9 +282,9 @@ export default function Contacto() {
           <div
             data-reveal=""
             style={{
-              background: 'var(--cream2)',
-              border: '1px solid var(--border)',
-              padding: 32,
+              background: 'transparent',
+              borderTop: '1px solid var(--border)',
+              padding: '28px 0 0 0',
             }}
           >
             <div
@@ -300,7 +299,7 @@ export default function Contacto() {
             >
               {isEn ? 'INSTITUTIONAL METADATA' : 'DATOS INSTITUCIONALES'}
             </div>
-            <div style={{ fontSize: 14, lineHeight: 1.8, color: 'var(--ink)' }}>
+            <div style={{ fontSize: 13.5, lineHeight: 1.8, color: 'var(--ink)' }}>
               <div>
                 <strong>{isEn ? 'Firm:' : 'Firma:'}</strong> Inmerge Consultoría y Tecnología
               </div>
@@ -312,7 +311,7 @@ export default function Contacto() {
               </div>
               <div>
                 <strong>{isEn ? 'Timezone:' : 'Huso horario:'}</strong>{' '}
-                {isEn ? 'GMT-5 / UTC-5 (EST equivalent · Lima Time)' : 'GMT-5 (UTC-5 · Hora estándar de Lima)'}
+                {isEn ? 'GMT-5 / UTC-5 (Lima Time)' : 'GMT-5 (UTC-5 · Lima)'}
               </div>
               <div>
                 <strong>{isEn ? 'Fiscal Status:' : 'Régimen:'}</strong>{' '}
@@ -322,13 +321,13 @@ export default function Contacto() {
           </div>
         </div>
 
-        {/* Right Column: Structured B2B Quote Form */}
+        {/* Right Column: Structured B2B Quote Form — Open Continuous Layout */}
         <div
           data-reveal=""
           style={{
-            background: 'var(--bg)',
-            border: '1px solid var(--border)',
-            padding: 'clamp(32px, 5vw, 48px)',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
           }}
         >
           <div

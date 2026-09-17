@@ -58,9 +58,9 @@ export default function StackTabs() {
       <div
         role="tabpanel"
         style={{
-          background: 'var(--cream2)',
-          border: '1px solid var(--border)',
-          padding: 'clamp(24px, 4vw, 40px)',
+          background: 'transparent',
+          border: 'none',
+          padding: '16px 0',
           transition: 'opacity 0.25s ease',
         }}
       >
@@ -83,22 +83,20 @@ export default function StackTabs() {
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 16,
+            gap: 'clamp(20px, 3vw, 32px)',
           }}
         >
           {currentCategory.tools.map((tool) => (
             <div
               key={tool.name}
               style={{
-                background: 'var(--bg)',
-                border: '1px solid var(--border)',
-                padding: 20,
+                background: 'transparent',
+                borderTop: '1px solid var(--border)',
+                padding: '16px 0 8px 0',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                transition: 'transform 0.2s ease, border-color 0.2s ease',
               }}
-              className="stack-tool-card"
             >
               <div>
                 <div
@@ -106,7 +104,7 @@ export default function StackTabs() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'flex-start',
-                    marginBottom: 10,
+                    marginBottom: 8,
                   }}
                 >
                   <h4
@@ -126,10 +124,9 @@ export default function StackTabs() {
                       fontSize: 11,
                       letterSpacing: 0.5,
                       textTransform: 'uppercase',
-                      padding: '2px 8px',
+                      padding: '2px 6px',
                       background: 'rgba(168, 71, 43, 0.08)',
                       color: 'var(--terracotta)',
-                      border: '1px solid rgba(168, 71, 43, 0.2)',
                     }}
                   >
                     {tool.level}

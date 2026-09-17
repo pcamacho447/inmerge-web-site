@@ -810,12 +810,13 @@ details.service-accordion-item > summary::marker {
   color: var(--ink);
 }
 
-/* Deliverables checklist */
+/* Deliverables checklist — Continuous Editorial */
 .card-deliverables-box {
-  background: var(--cream2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  padding: 16px 0;
   margin-bottom: 20px;
 }
 
@@ -847,7 +848,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .deliv-check {
-  color: var(--green);
+  color: var(--terracotta);
   font-weight: 700;
 }
 
@@ -855,9 +856,10 @@ details.service-accordion-item > summary::marker {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  background: var(--cream2);
-  padding: 14px;
-  border-radius: 6px;
+  background: transparent;
+  padding: 16px 0 0 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
   margin-bottom: 20px;
 }
 
@@ -1041,20 +1043,20 @@ details.service-accordion-item > summary::marker {
   margin: 0;
 }
 
-/* Archetype grid (Es / No Es) */
+/* Archetype grid (Es / No Es) — Continuous Editorial */
 .manifesto-archetype-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-top: 12px;
+  gap: clamp(24px, 4vw, 48px);
+  margin-top: 16px;
 }
 
 .archetype-col {
-  padding: 30px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background: var(--cream2);
-  box-shadow: 0 4px 16px rgba(36, 26, 18, 0.04);
+  padding: 18px 0;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: transparent;
+  box-shadow: none;
 }
 
 .archetype-label {
@@ -1071,28 +1073,30 @@ details.service-accordion-item > summary::marker {
   color: var(--ink);
 }
 
-/* Comparative grid (Inmerge vs Market) */
+/* Comparative grid (Inmerge vs Market) — Continuous Editorial */
 .manifesto-comparative-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 18px;
-  margin-top: 12px;
+  gap: clamp(20px, 3vw, 36px);
+  margin-top: 16px;
 }
 
 .comparative-col {
-  padding: 26px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
+  padding: 18px 0;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: transparent;
+  box-shadow: none;
 }
 
 .comparative-other {
-  background: var(--cream2);
+  background: transparent;
 }
 
 .comparative-inmerge {
-  background: var(--bg);
-  border-color: var(--terracotta);
-  box-shadow: 0 8px 24px rgba(168, 71, 43, 0.08);
+  background: transparent;
+  border-top: 2px solid var(--terracotta);
+  box-shadow: none;
 }
 
 .comparative-label {
@@ -1200,10 +1204,10 @@ details.service-accordion-item > summary::marker {
 .director-slide-card {
   position: absolute;
   inset: 0;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: clamp(32px, 5vw, 48px);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: clamp(20px, 3vw, 32px) 0;
   opacity: 0;
   transform: scale(0.96);
   pointer-events: none;
@@ -1211,7 +1215,7 @@ details.service-accordion-item > summary::marker {
     opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(36, 26, 18, 0.05);
+  box-shadow: none;
 }
 
 .director-slide-card.is-active {
@@ -1278,11 +1282,11 @@ details.service-accordion-item > summary::marker {
 }
 
 .director-quote-box {
-  background: var(--cream2);
-  border-left: 3px solid var(--terracotta);
-  padding: 16px 20px;
+  background: transparent;
+  border-left: 2px solid var(--terracotta);
+  padding: 8px 0 8px 18px;
   margin: 0;
-  border-radius: 0 4px 4px 0;
+  border-radius: 0;
 }
 
 .director-quote-text {
@@ -1294,12 +1298,13 @@ details.service-accordion-item > summary::marker {
   margin: 0;
 }
 
-/* Right column credentials */
+/* Right column credentials — Continuous Editorial Divider */
 .director-credentials-col {
-  background: rgba(36, 26, 18, 0.03);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 28px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0 0 0 clamp(24px, 4vw, 40px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1459,6 +1464,12 @@ details.service-accordion-item > summary::marker {
     grid-template-columns: 1fr;
     gap: 24px;
   }
+
+  .director-credentials-col {
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding: 24px 0 0 0;
+  }
 }
 
 @media (max-width: 600px) {
@@ -1504,54 +1515,67 @@ details.service-accordion-item > summary::marker {
 }
 
 .service-problem-card {
-  background: var(--cream2);
-  border: 1px solid var(--border);
-  padding: 22px;
-  border-radius: 6px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  padding: 16px 0;
+  border-radius: 0;
 }
 
 .service-value-card {
-  background: var(--ink);
-  color: var(--bg);
-  padding: 22px;
-  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  border: none;
+  border-top: 2px solid var(--terracotta);
+  padding: 16px 0;
+  border-radius: 0;
 }
 
 .service-blueprint-execution-card {
-  background: var(--cream2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 24px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  padding: 24px 0 12px 0;
 }
 
 .blueprint-execution-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 8px;
+  padding-bottom: 10px;
 }
 
 .blueprint-phases-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: clamp(20px, 3vw, 36px);
   margin-bottom: 20px;
 }
 
 @media (max-width: 768px) {
   .blueprint-phases-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 16px;
   }
 }
 
 .phase-step-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0 0 0 18px;
+}
+
+@media (max-width: 768px) {
+  .phase-step-card {
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding: 12px 0 0 0;
+  }
 }
 
 .phase-num {
@@ -1565,16 +1589,16 @@ details.service-accordion-item > summary::marker {
 
 .phase-title {
   font-weight: 700;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   color: var(--ink);
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .phase-desc {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--muted);
-  line-height: 1.4;
+  line-height: 1.5;
   margin: 0;
 }
 
@@ -1584,10 +1608,11 @@ details.service-accordion-item > summary::marker {
   align-items: center;
   flex-wrap: wrap;
   gap: 20px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  padding: 24px 0 12px 0;
 }
 
 /* ==========================================================================

@@ -220,18 +220,18 @@ export default function Nosotros() {
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))',
-            gap: 1,
-            background: 'var(--border)',
-            border: '1px solid var(--border)',
+            gap: 'clamp(28px, 4vw, 48px)',
+            borderTop: '1px solid var(--border)',
+            paddingTop: 40,
           }}
         >
           {/* Propósito */}
-          <div data-reveal="" className="card-hover" style={{ background: 'var(--bg)', padding: 40 }}>
+          <article data-reveal="" style={{ padding: '8px 0' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
               <span
                 style={{
                   fontFamily: "'Spectral', serif",
-                  fontSize: 32,
+                  fontSize: 34,
                   fontWeight: 700,
                   color: 'var(--terracotta)',
                   lineHeight: 1,
@@ -251,23 +251,23 @@ export default function Nosotros() {
                 {isEn ? '[PRINCIPLE // PURPOSE]' : '[PRINCIPIO // PROPÓSITO]'}
               </div>
             </div>
-            <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 14 }}>
+            <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.2 }}>
               {isEn ? 'Operational Truth Assurance' : 'Garantía de Verdad Operativa'}
             </h3>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--muted)', margin: 0 }}>
               {isEn
-                ? 'Ensuring that high-stakes executive decisions and operational backbones rest strictly on mathematically sound, verifiable data and fault-tolerant cloud systems.'
-                : 'Garantizar que la toma de decisiones estratégicas y la infraestructura operacional descansen sobre datos matemáticamente íntegros, trazables y sobre arquitecturas cloud resilientes.'}
+                ? 'High-stakes decisions supported strictly by mathematically sound, verifiable data and fault-tolerant cloud backbones.'
+                : 'Decisiones críticas respaldadas estrictamente por datos matemáticamente íntegros, reproducibles y arquitecturas cloud resilientes.'}
             </p>
-          </div>
+          </article>
 
           {/* Misión */}
-          <div data-reveal="" className="card-hover" style={{ background: 'var(--bg)', padding: 40 }}>
+          <article data-reveal="" style={{ padding: '8px 0' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
               <span
                 style={{
                   fontFamily: "'Spectral', serif",
-                  fontSize: 32,
+                  fontSize: 34,
                   fontWeight: 700,
                   color: 'var(--terracotta)',
                   lineHeight: 1,
@@ -287,23 +287,23 @@ export default function Nosotros() {
                 {isEn ? '[COMMITMENT // MISSION]' : '[COMPROMISO // MISIÓN]'}
               </div>
             </div>
-            <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 14 }}>
+            <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.2 }}>
               {isEn ? 'Engineering Without Black Boxes' : 'Ingeniería sin Cajas Negras'}
             </h3>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--muted)', margin: 0 }}>
               {isEn
-                ? 'Auditing, engineering, and deploying custom software platforms, data pipelines, and AI models to tier-1 standards, ensuring fully auditable code where the client retains absolute ownership.'
-                : 'Auditar, desarrollar y desplegar plataformas de software, tuberías de datos y modelos de IA con estándares de ingeniería de clase mundial, asegurando código auditable donde el cliente conserva la propiedad total.'}
+                ? 'Auditing, engineering, and deploying tier-1 cloud systems, pipelines, and AI models with auditable code and complete client ownership.'
+                : 'Auditar, desarrollar y desplegar software cloud, pipelines de datos y modelos de IA bajo estándares estrictos y soberanía total del cliente.'}
             </p>
-          </div>
+          </article>
 
           {/* Visión */}
-          <div data-reveal="" className="card-hover" style={{ background: 'var(--bg)', padding: 40 }}>
+          <article data-reveal="" style={{ padding: '8px 0' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
               <span
                 style={{
                   fontFamily: "'Spectral', serif",
-                  fontSize: 32,
+                  fontSize: 34,
                   fontWeight: 700,
                   color: 'var(--terracotta)',
                   lineHeight: 1,
@@ -323,22 +323,22 @@ export default function Nosotros() {
                 {isEn ? '[HORIZON // VISION]' : '[HORIZONTE // VISIÓN]'}
               </div>
             </div>
-            <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 14 }}>
+            <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.2 }}>
               {isEn ? 'Regional Technical Benchmark' : 'Referencia Técnica Regional'}
             </h3>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--muted)', margin: 0 }}>
               {isEn
-                ? "To stand as Latin America's premier boutique consultancy for discerning enterprises that reject opaque black boxes, metric inconsistencies, or cloud vulnerabilities."
-                : 'Ser la firma boutique de referencia en Latinoamérica para organizaciones que no aceptan cajas negras, inconsistencias en sus métricas ni vulnerabilidades en su stack tecnológico.'}
+                ? 'The premier boutique consultancy in Latin America for organizations that reject opaque black boxes, metric discrepancies, or vendor lock-in.'
+                : 'La firma boutique referente en Latinoamérica para organizaciones que no aceptan cajas negras, inconsistencias métricas ni ataduras tecnológicas.'}
             </p>
-          </div>
+          </article>
         </div>
       </section>
 
       {/* =====================================================================
           3. DIRECTORES DE PRÁCTICA & ESPECIALISTAS SENIOR (Flujo A: Segundo/Tercer Bloque)
           ===================================================================== */}
-      <section id="directores" style={{ background: 'var(--cream2)', padding: '90px clamp(20px,5vw,40px)' }}>
+      <section id="directores" style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)', padding: '90px clamp(20px,5vw,40px)' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           <div
             data-reveal=""
@@ -482,7 +482,6 @@ export default function Nosotros() {
                     justifyContent: 'space-between',
                     position: 'relative',
                   }}
-                  className="card-hover"
                 >
                   {/* Timeline connector dot */}
                   {idx > 0 && (
@@ -588,7 +587,7 @@ export default function Nosotros() {
       {/* =====================================================================
           6. COMPROMISOS TÉCNICOS & SLA — Editorial Accordion
           ===================================================================== */}
-      <div id="compromisos" style={{ background: 'var(--cream2)', padding: '100px clamp(20px,5vw,40px)' }}>
+      <div id="compromisos" style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)', padding: '100px clamp(20px,5vw,40px)' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           <div
             data-reveal=""

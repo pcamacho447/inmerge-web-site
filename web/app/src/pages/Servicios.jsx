@@ -234,14 +234,14 @@ export default function Servicios() {
                           fontFamily: "'IBM Plex Mono', monospace",
                           fontSize: 11,
                           letterSpacing: 1.5,
-                          color: 'var(--gold)',
+                          color: 'var(--terracotta)',
                           fontWeight: 700,
                           marginBottom: 8,
                         }}
                       >
                         {isEn ? 'VALUE PROPOSITION' : 'PROPUESTA DE VALOR'}
                       </div>
-                      <div style={{ fontSize: 14.5, lineHeight: 1.6, color: 'var(--tan-text)' }}>{s.value}</div>
+                      <div style={{ fontSize: 14.5, lineHeight: 1.6, color: 'var(--ink)' }}>{s.value}</div>
                     </div>
                   </div>
 
@@ -309,16 +309,15 @@ export default function Servicios() {
                           <div
                             key={d}
                             style={{
-                              border: '1px solid var(--border)',
-                              background: 'var(--cream2)',
-                              padding: '6px 14px',
-                              fontSize: 13,
+                              border: 'none',
+                              background: 'transparent',
+                              padding: '4px 14px 4px 0',
+                              fontSize: 13.5,
                               fontWeight: 500,
                               color: 'var(--ink)',
-                              borderRadius: 4,
                             }}
                           >
-                            <span style={{ color: 'var(--green)', marginRight: 6 }}>✓</span>
+                            <span style={{ color: 'var(--terracotta)', marginRight: 6 }}>✓</span>
                             {d}
                           </div>
                         ))}
