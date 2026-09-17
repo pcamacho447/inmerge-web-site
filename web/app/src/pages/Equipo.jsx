@@ -822,17 +822,6 @@ export default function Equipo() {
                 {activeTab === 'team' && 'Directorio técnico y gestión de roles para ingenieros y auditores.'}
               </p>
             </div>
-
-            {user?.isAdmin && activeTab !== 'new_project' && (
-              <button
-                type="button"
-                className="btn-drawer-trigger"
-                onClick={() => setIsDrawerOpen(true)}
-                style={{ fontSize: 13, padding: '6px 12px' }}
-              >
-                <span>⚡ Opciones Rápidas</span>
-              </button>
-            )}
           </div>
 
           {error && (
