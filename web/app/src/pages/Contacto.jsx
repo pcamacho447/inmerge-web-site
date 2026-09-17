@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
-import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { submitLeadTdr } from '../lib/leads.js';
@@ -129,8 +128,6 @@ export default function Contacto() {
             : 'Respondemos directamente con el equipo de ingeniería y consultoría que ejecutará el proyecto — sin capas comerciales ni demoras.'}
         </p>
       </div>
-
-      <Frieze border="#A8472B" upColor="#D8A84E" downColor="#C68A3D" medallionBg="#A8472B" medallionBorder="#F3EADA" />
 
       <div
         style={{

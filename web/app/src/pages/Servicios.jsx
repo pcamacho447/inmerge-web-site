@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
-import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
 import ProjectCarousel from '../components/ProjectCarousel.jsx';
 import QuickEstimator from '../components/QuickEstimator.jsx';
@@ -62,8 +61,6 @@ export default function Servicios() {
             : 'Desde la auditoría de integridad de datos y sistemas, pasando por la arquitectura cloud a medida, hasta modelos predictivos de Machine Learning listos para producción en sprints ágiles de 1 a 2 semanas.'}
         </p>
       </div>
-
-      <Frieze border="#A8472B" upColor="#D8A84E" downColor="#C68A3D" medallionBg="#A8472B" medallionBorder="#F3EADA" />
 
       {/* Main Container */}
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '60px clamp(20px,5vw,40px) 140px' }}>
@@ -469,8 +466,6 @@ export default function Servicios() {
         onClose={() => setIsAssistantOpen(false)}
         initialContext={assistantContext}
       />
-
-      <Frieze border="#D8A84E" upColor="#C68A3D" downColor="#A8472B" medallionBg="#D8A84E" medallionBorder="#241A12" />
 
       <Footer />
     </>

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
-import Frieze from '../components/Frieze.jsx';
 import Footer from '../components/Footer.jsx';
 import StackTabs from '../components/StackTabs.jsx';
 import ManifestoCarousel from '../components/ManifestoCarousel.jsx';
@@ -192,8 +191,6 @@ export default function Nosotros() {
           </nav>
         </div>
       </div>
-
-      <Frieze border="#A8472B" upColor="#D8A84E" downColor="#C68A3D" medallionBg="#A8472B" medallionBorder="#F3EADA" />
 
       {/* =====================================================================
           2. MANIFIESTO — Propósito, Misión y Visión (Declaraciones de Rigor I, II, III)
