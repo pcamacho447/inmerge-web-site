@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
-import ProjectCarousel from '../components/ProjectCarousel.jsx';
 import QuickEstimator from '../components/QuickEstimator.jsx';
 import LLMAssistantModal from '../components/LLMAssistantModal.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -379,9 +378,6 @@ export default function Servicios() {
           initialPillar={selectedPillar !== 'all' ? selectedPillar : 'auditoria'}
           onOpenLLMAssistant={(ctx) => handleOpenAssistant(ctx)}
         />
-
-        {/* Real Projects Single-Card Focused Carousel */}
-        <ProjectCarousel onQuoteProject={(proj) => handleOpenAssistant(proj)} />
       </div>
 
       {/* Bottom CTA Banner */}
