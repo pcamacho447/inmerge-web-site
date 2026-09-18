@@ -52,8 +52,15 @@ Consulte las especificaciones técnicas del entorno en:
 - **Tipografía (Tokens CSS Variables):**
   - `Space Grotesk` (`--font-display`, `--font-sans`): Titulares, logotipo, cuerpo de texto editorial, interfaz de usuario y formularios.
   - `Space Mono` (`--font-mono`): Cifras tabulares, métricas, telemetría técnica, coordenadas, badges y código.
-  - **Regla de Tokens:** Toda declaración tipográfica en componentes y estilos debe utilizar variables CSS (`var(--font-display)`, `var(--font-sans)`, `var(--font-mono)`) evitando cadenas tipográficas hardcodeadas para mantener agilidad en futuros cambios de marca.
-- **Micro-interacciones:** Usar clases estándar (`.btn-accent`, `.btn-outline`, `.pillar-card-interactive`, `.card-hover`, `.stack-tool-card`).
+- **Líneas y Patrones de Inspiración Mochica (Identidad Visual):**
+  - **Línea escalonada:** Ángulos rectos y cambios de nivel inspirados en la arquitectura ceremonial Moche (Huacas).
+  - **Greca escalonada:** Secuencia geométrica ortogonal repetitiva continua.
+  - **Línea ondulante & serpenteante:** Curvas y trazos sinuosos que evocan agua, olas y movimiento natural.
+  - **Línea quebrada & dentada:** Diagonales dinámicas y picos triangulares consecutivos (cenefas geométricas prehispánicas).
+  - **Bandas geométricas & patrones modulares:** Franjas horizontales con módulos repetitivos como divisores de sección o cenefas decorativas.
+  - **Volutas y curvas orgánicas:** Espirales y detalles ornamentales sutiles.
+  - **Contorno grueso:** Delimitación marcada de figuras para separar visualmente planos de color (estilo pictórico de la cerámica Moche).
+- **Micro-interacciones:** Usar clases estándar (`.btn-accent`, `.btn-outline`, `.pillar-card-interactive`, `.stack-tool-card`).
 - **Política de Notificaciones (Prohibición de `window.alert`):** Queda terminantemente prohibido el uso de `window.alert()` o diálogos nativos bloqueantes. Toda notificación, alerta o feedback de operación debe canalizarse mediante `ToastNotification.jsx` usando `role="alert"` (errores/RBAC denegado) o `role="status"` (éxito y Supabase Realtime).
 
 ---

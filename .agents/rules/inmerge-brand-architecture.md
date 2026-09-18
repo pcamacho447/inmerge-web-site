@@ -58,6 +58,17 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 - **Tokens Tipográficos Centralizados:**
   - Todo componente debe utilizar `var(--font-display)` para titulares / logotipos, `var(--font-sans)` para textos generales y `var(--font-mono)` para métricas, badges, etiquetas de telemetría y coordenadas.
   - Las fuentes activas en producción son `Space Grotesk` y `Space Mono`. Toda modificación tipográfica global debe realizarse centralizadamente en los tokens `:root` de `web/app/src/styles/index.css`.
+- **Líneas y Patrones de Inspiración Mochica (Identidad Visual & Geometría):**
+  - **1. Línea escalonada:** Formada por pequeños ángulos rectos y cambios de nivel, inspirada en la arquitectura ceremonial Moche (Huaca de la Luna, frisos escalonados).
+  - **2. Greca escalonada:** Secuencia geométrica repetitiva ortogonal (signo escalonado) continua.
+  - **3. Línea ondulante:** Curvas sucesivas continuas que evocan agua, olas y dinamismo natural.
+  - **4. Línea serpenteante:** Recorrido sinuoso y continuo, característico de iconografía vegetal y fluvial.
+  - **5. Línea quebrada:** Sucesión de diagonales en zig-zag que producen tensión geométrica y dinamismo técnico.
+  - **6. Línea dentada:** Patrón de pequeños picos o triángulos consecutivos (cenefas prehispánicas).
+  - **7. Bandas geométricas:** Franjas horizontales compuestas por módulos repetitivos utilizadas como cenefas o divisores de sección.
+  - **8. Volutas y curvas orgánicas:** Líneas espirales y curvas para detalles ornamentales y viñetas técnicas.
+  - **9. Contorno grueso:** Figuras delimitadas mediante trazos nítidos (`strokeWidth: 2-3px`) para separar visualmente planos de color (estilo pictórico de la cerámica Moche).
+  - **10. Patrón modular:** Repetición de un mismo motivo o tesela para construir cenefas continuas y texturas vectoriales sutiles (`opacity: 0.15 - 0.35`).
 - **Bordes y Sombras:**
   - Las tarjetas utilizan fondo `var(--cream2)` o `var(--bg)` con borde `1px solid var(--border)`.
   - Al hover se activan sombras suaves: `box-shadow: 0 16px 32px rgba(36, 26, 18, 0.12)` y acento `border-color: var(--terracotta)`.
