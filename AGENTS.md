@@ -16,7 +16,7 @@ Consulte las especificaciones técnicas del entorno en:
 
 ## 2. Reglas de Navegación y Rutas
 - **Rutas Públicas:**
-  - `/` (Inicio): Hero con video de fondo cinemático, navbar transparente sin bordes sobre el video, pilares interactivos, diagrama de arquitectura y segmentos de mercado directos al CTA. No incluir bloques redundantes del manifiesto ni la cuadrícula de "Principios de Ingeniería" (reservada para `/nosotros`).
+  - `/` (Inicio): Hero con video de fondo cinemático, navbar transparente sin bordes sobre el video, pilares interactivos, diagrama de arquitectura y segmentos de mercado directos al CTA. No incluir bloques redundantes del manifiesto, la cuadrícula de "Principios de Ingeniería" (reservada para `/nosotros`) ni franjas intermedias de certezas o marquesinas repetitivas.
   - `/servicios` (Servicios & Estimación Ágil): Interfaz centrada exclusivamente en el Estimador Interactivo (`<QuickEstimator />`) para proyectar tiempos, costos en PEN/USD, entregables auditables por pilar y cotización directa vía WhatsApp/TDR/Asistente IA. Prohibido reintroducir el catálogo estático de acordeones repetitivos o carruseles de proyectos redundantes.
   - `/nosotros` (Nosotros): Manifiesto de ingeniería, Misión, Visión, Propósito, Compromisos técnicos (Valores), Método Inmerge y explorador de tecnologías (Stack).
   - `/contacto` (Contacto & TDR): Formulario estructurado con selector de pilares y enlace con mensaje pre-rellenado a WhatsApp.
@@ -49,10 +49,10 @@ Consulte las especificaciones técnicas del entorno en:
   - Oro: `--gold` (`#D8A84E`) — Destacados e indicadores de calidad.
   - Ocre: `--ochre` (`#C68A3D`) — Elementos secundarios.
   - Crema: `--cream2` (`#EBDFC9`) — Fondos de tarjetas y paneles alternos.
-- **Tipografía:**
-  - `Spectral` (Serif): Titulares, logotipo e identidad editorial.
-  - `IBM Plex Sans`: Cuerpo de texto, interfaz de usuario y formularios.
-  - `IBM Plex Mono`: Cifras tabulares, métricas, badges técnicos y código.
+- **Tipografía (Tokens CSS Variables):**
+  - `Space Grotesk` (`--font-display`, `--font-sans`): Titulares, logotipo, cuerpo de texto editorial, interfaz de usuario y formularios.
+  - `Space Mono` (`--font-mono`): Cifras tabulares, métricas, telemetría técnica, coordenadas, badges y código.
+  - **Regla de Tokens:** Toda declaración tipográfica en componentes y estilos debe utilizar variables CSS (`var(--font-display)`, `var(--font-sans)`, `var(--font-mono)`) evitando cadenas tipográficas hardcodeadas para mantener agilidad en futuros cambios de marca.
 - **Micro-interacciones:** Usar clases estándar (`.btn-accent`, `.btn-outline`, `.pillar-card-interactive`, `.card-hover`, `.stack-tool-card`).
 - **Política de Notificaciones (Prohibición de `window.alert`):** Queda terminantemente prohibido el uso de `window.alert()` o diálogos nativos bloqueantes. Toda notificación, alerta o feedback de operación debe canalizarse mediante `ToastNotification.jsx` usando `role="alert"` (errores/RBAC denegado) o `role="status"` (éxito y Supabase Realtime).
 

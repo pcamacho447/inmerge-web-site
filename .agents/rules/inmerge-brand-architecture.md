@@ -55,6 +55,9 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
 ---
 
 ## 3. Micro-interacciones y CSS Tokens
+- **Tokens Tipográficos Centralizados:**
+  - Todo componente debe utilizar `var(--font-display)` para titulares / logotipos, `var(--font-sans)` para textos generales y `var(--font-mono)` para métricas, badges, etiquetas de telemetría y coordenadas.
+  - Las fuentes activas en producción son `Space Grotesk` y `Space Mono`. Toda modificación tipográfica global debe realizarse centralizadamente en los tokens `:root` de `web/app/src/styles/index.css`.
 - **Bordes y Sombras:**
   - Las tarjetas utilizan fondo `var(--cream2)` o `var(--bg)` con borde `1px solid var(--border)`.
   - Al hover se activan sombras suaves: `box-shadow: 0 16px 32px rgba(36, 26, 18, 0.12)` y acento `border-color: var(--terracotta)`.
