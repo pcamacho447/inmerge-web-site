@@ -458,17 +458,15 @@ export default function Nosotros() {
             {stack.METHODOLOGY_STEPS.map((step, idx) => (
               <MochicaCornerFrame
                 key={step.step}
-                cornerSize={14}
+                cornerSize={18}
                 color={idx % 2 === 0 ? 'var(--terracotta)' : 'var(--gold)'}
                 variant={idx % 2 === 0 ? 'stepped' : 'greca'}
               >
                 <div
                   data-reveal=""
                   style={{
-                    background: 'var(--bg)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 2,
-                    padding: 24,
+                    background: 'transparent',
+                    padding: '24px 20px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
@@ -585,17 +583,15 @@ export default function Nosotros() {
             {stack.STACK_CATEGORIES.map((cat, idx) => (
               <MochicaCornerFrame
                 key={cat.id}
-                cornerSize={14}
+                cornerSize={18}
                 color={idx % 2 === 0 ? 'var(--gold)' : 'var(--terracotta)'}
                 variant={idx % 2 === 0 ? 'greca' : 'stepped'}
               >
                 <div
                   data-reveal=""
                   style={{
-                    background: 'var(--bg)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 2,
-                    padding: 24,
+                    background: 'transparent',
+                    padding: '24px 20px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
