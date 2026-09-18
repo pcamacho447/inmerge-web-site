@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
-import StackTabs from '../components/StackTabs.jsx';
 import ManifestoCarousel from '../components/ManifestoCarousel.jsx';
 import DirectorsCarousel from '../components/DirectorsCarousel.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -43,110 +42,133 @@ export default function Nosotros() {
   // Accordion state for Compromisos section
   const [openValue, setOpenValue] = useState(null);
 
-  // Método/Stack tab state
-  const [metodoTab, setMetodoTab] = useState('metodo');
-
   return (
     <>
       {/* =====================================================================
-          1. HERO CINEMÁTICO — Parallax-ready with editorial Spectral statement
+          1. HEADER EDITORIAL — Atelier Portfolio Hero & Architectural Grid
           ===================================================================== */}
-      <div
+      <section
         style={{
+          padding: '100px clamp(24px, 5vw, 64px) 40px',
+          maxWidth: 1440,
+          margin: '0 auto',
           position: 'relative',
-          minHeight: '70vh',
-          display: 'flex',
-          alignItems: 'center',
-          background: 'var(--ink)',
-          color: '#F3EADA',
-          overflow: 'hidden',
-          padding: '140px clamp(20px,5vw,40px) 100px',
         }}
       >
-        {/* Parallax-ready gradient overlay */}
+        {/* Top Studio Meta Strip with Technical Coordinates & Live Status */}
         <div
-          aria-hidden="true"
           style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(180deg, rgba(36,26,18,0.6) 0%, rgba(36,26,18,0.82) 50%, rgba(36,26,18,0.95) 100%)',
-            zIndex: 1,
-            pointerEvents: 'none',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 16,
+            paddingBottom: 20,
+            borderBottom: '1px solid var(--border)',
+            marginBottom: 36,
+            fontFamily: "'Space Mono', monospace",
+            fontSize: 12,
+            letterSpacing: 1.5,
+            color: 'var(--muted)',
           }}
-        />
-
-        {/* Decorative breathe-diamond */}
-        <div
-          className="breathe-diamond"
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            right: 'clamp(16px,6vw,60px)',
-            top: '18%',
-            width: 'clamp(32px,5vw,56px)',
-            height: 'clamp(32px,5vw,56px)',
-            background: 'var(--terracotta)',
-            zIndex: 2,
-          }}
-        />
-
-        {/* Secondary decorative diamond */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            left: '-40px',
-            bottom: '10%',
-            width: 120,
-            height: 120,
-            background: 'var(--gold)',
-            opacity: 0.06,
-            transform: 'rotate(45deg)',
-            zIndex: 0,
-          }}
-        />
-
-        <div style={{ position: 'relative', maxWidth: 1440, margin: '0 auto', width: '100%', zIndex: 2 }}>
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span
+              style={{
+                display: 'inline-block',
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor: 'var(--green)',
+                boxShadow: '0 0 0 3px rgba(74, 156, 106, 0.2)',
+              }}
+            />
+            <span style={{ color: 'var(--ink)', fontWeight: 600 }}>
+              {isEn ? 'LIMA, PE [12°02\'36"S 77°01\'42"W] // AUDIT LAB ACTIVE' : 'LIMA, PE [12°02\'36"S 77°01\'42"W] // ESTUDIO TÉCNICO ACTIVO'}
+            </span>
+          </div>
           <div
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 13,
               letterSpacing: 4,
-              color: 'var(--gold)',
+              color: 'var(--terracotta)',
               fontWeight: 600,
-              marginBottom: 28,
               textTransform: 'uppercase',
             }}
           >
             {isEn ? 'THE FIRM // INMERGE' : 'LA FIRMA // INMERGE'}
           </div>
+        </div>
+
+        {/* Hero Title (Right-Aligned Editorial Headline) */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            textAlign: 'right',
+            marginBottom: 44,
+          }}
+        >
           <h1
             style={{
-              fontFamily: "'Spectral', serif",
+              fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 700,
-              fontSize: 'clamp(44px,7.8vw,104px)',
-              lineHeight: 1.04,
+              fontSize: 'clamp(42px, 7vw, 92px)',
+              lineHeight: 1.05,
               letterSpacing: -1.5,
-              maxWidth: 1120,
-              margin: '0 0 32px 0',
-              color: '#F3EADA',
+              maxWidth: 1100,
+              margin: '0 0 24px 0',
+              color: 'var(--ink)',
             }}
           >
             {isEn
               ? 'Rigorous engineering, strict auditing, and verifiable data.'
               : 'Ingeniería rigurosa, auditoría estricta y datos reproducibles.'}
           </h1>
+        </div>
+
+        {/* Left-Aligned Studio Manifesto Plate with Precision Corner Crosshairs */}
+        <div
+          style={{
+            position: 'relative',
+            maxWidth: 780,
+            background: 'rgba(235, 223, 201, 0.45)',
+            border: '1px solid rgba(36, 26, 18, 0.12)',
+            borderRadius: 4,
+            padding: 'clamp(24px, 3.5vw, 36px)',
+            marginBottom: 20,
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          {/* Corner Crosshair Marks (+) */}
+          <span style={{ position: 'absolute', top: -7, left: -6, fontFamily: "'Space Mono', monospace", fontSize: 13, color: 'var(--terracotta)', lineHeight: 1, fontWeight: 700 }}>+</span>
+          <span style={{ position: 'absolute', top: -7, right: -6, fontFamily: "'Space Mono', monospace", fontSize: 13, color: 'var(--terracotta)', lineHeight: 1, fontWeight: 700 }}>+</span>
+          <span style={{ position: 'absolute', bottom: -7, left: -6, fontFamily: "'Space Mono', monospace", fontSize: 13, color: 'var(--terracotta)', lineHeight: 1, fontWeight: 700 }}>+</span>
+          <span style={{ position: 'absolute', bottom: -7, right: -6, fontFamily: "'Space Mono', monospace", fontSize: 13, color: 'var(--terracotta)', lineHeight: 1, fontWeight: 700 }}>+</span>
+
+          <div
+            style={{
+              fontFamily: "'Space Mono', monospace",
+              fontSize: 11,
+              letterSpacing: 2,
+              color: 'var(--terracotta)',
+              fontWeight: 600,
+              marginBottom: 14,
+              textTransform: 'uppercase',
+            }}
+          >
+            {isEn ? '// BOUTIQUE PRACTICE STATEMENT' : '// DECLARACIÓN DE PRÁCTICA BOUTIQUE'}
+          </div>
+
           <p
             style={{
-              fontFamily: "'Spectral', serif",
-              fontStyle: 'italic',
-              fontSize: 'clamp(18px, 2.1vw, 24px)',
-              color: 'rgba(243,234,218,0.9)',
-              maxWidth: 760,
-              lineHeight: 1.65,
-              margin: '0 0 44px 0',
-              borderLeft: '3px solid var(--terracotta)',
-              paddingLeft: 24,
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 'clamp(17px, 1.8vw, 21px)',
+              color: 'var(--ink)',
+              lineHeight: 1.6,
+              margin: '0 0 20px 0',
+              textAlign: 'left',
+              fontWeight: 400,
             }}
           >
             {isEn
@@ -154,43 +176,49 @@ export default function Nosotros() {
               : 'Somos una firma boutique especializada en auditoría de sistemas, ingeniería de software cloud y ciencia de datos. Diseñamos soluciones donde cada cálculo es citable y cada línea de código es mantenible.'}
           </p>
 
-          {/* Editorial table of contents */}
-          <nav
-            aria-label={isEn ? 'Section index' : 'Índice de secciones'}
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              gap: '10px 24px',
-              paddingTop: 12,
-            }}
-          >
-            {[
-              { href: '#mision', label: isEn ? '# Mission & Purpose' : '# Misión & Propósito' },
-              { href: '#directores', label: isEn ? '# Practice Directors' : '# Directores de Práctica' },
-              { href: '#manifiesto', label: isEn ? '# Engineering Manifesto' : '# Manifiesto de Ingeniería' },
-              { href: '#metodo', label: isEn ? '# The Method' : '# El Método' },
-              { href: '#stack', label: isEn ? '# Tech Stack' : '# Stack Tecnológico' },
-              { href: '#compromisos', label: isEn ? '# Commitments' : '# Compromisos' },
-            ].map((pill) => (
-              <a
-                key={pill.href}
-                href={pill.href}
-                style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 12.5,
-                  color: 'rgba(243,234,218,0.75)',
-                  textDecoration: 'none',
-                  transition: 'color 0.2s ease',
-                }}
-                className="link-hover"
-              >
-                {pill.label}
-              </a>
-            ))}
-          </nav>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <span
+              style={{
+                fontFamily: "'Space Mono', monospace",
+                fontSize: 11,
+                padding: '4px 10px',
+                background: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: 2,
+                color: 'var(--ink)',
+              }}
+            >
+              {isEn ? '01. SYSTEMS AUDIT' : '01. AUDITORÍA DE SISTEMAS'}
+            </span>
+            <span
+              style={{
+                fontFamily: "'Space Mono', monospace",
+                fontSize: 11,
+                padding: '4px 10px',
+                background: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: 2,
+                color: 'var(--ink)',
+              }}
+            >
+              {isEn ? '02. CLOUD INFRASTRUCTURE' : '02. INFRAESTRUCTURA CLOUD'}
+            </span>
+            <span
+              style={{
+                fontFamily: "'Space Mono', monospace",
+                fontSize: 11,
+                padding: '4px 10px',
+                background: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: 2,
+                color: 'var(--ink)',
+              }}
+            >
+              {isEn ? '03. DATA SCIENCE & AI' : '03. CIENCIA DE DATOS & IA'}
+            </span>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* =====================================================================
           2. MANIFIESTO — Propósito, Misión y Visión (Declaraciones de Rigor I, II, III)
@@ -201,7 +229,7 @@ export default function Nosotros() {
         </div>
         <h2
           style={{
-            fontFamily: "'Spectral', serif",
+            fontFamily: 'var(--font-display)',
             fontSize: 'clamp(34px, 5.2vw, 52px)',
             fontWeight: 700,
             color: 'var(--ink)',
@@ -223,7 +251,7 @@ export default function Nosotros() {
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
               <span
                 style={{
-                  fontFamily: "'Spectral', serif",
+                  fontFamily: 'var(--font-display)',
                   fontSize: 34,
                   fontWeight: 700,
                   color: 'var(--terracotta)',
@@ -234,7 +262,7 @@ export default function Nosotros() {
               </span>
               <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   fontSize: 11,
                   letterSpacing: 1.5,
                   color: 'var(--terracotta)',
@@ -244,7 +272,7 @@ export default function Nosotros() {
                 {isEn ? '[PRINCIPLE // PURPOSE]' : '[PRINCIPIO // PROPÓSITO]'}
               </div>
             </div>
-            <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.2 }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.2 }}>
               {isEn ? 'Operational Truth Assurance' : 'Garantía de Verdad Operativa'}
             </h3>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--muted)', margin: 0 }}>
@@ -259,7 +287,7 @@ export default function Nosotros() {
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
               <span
                 style={{
-                  fontFamily: "'Spectral', serif",
+                  fontFamily: 'var(--font-display)',
                   fontSize: 34,
                   fontWeight: 700,
                   color: 'var(--terracotta)',
@@ -270,7 +298,7 @@ export default function Nosotros() {
               </span>
               <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   fontSize: 11,
                   letterSpacing: 1.5,
                   color: 'var(--terracotta)',
@@ -280,7 +308,7 @@ export default function Nosotros() {
                 {isEn ? '[COMMITMENT // MISSION]' : '[COMPROMISO // MISIÓN]'}
               </div>
             </div>
-            <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.2 }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.2 }}>
               {isEn ? 'Engineering Without Black Boxes' : 'Ingeniería sin Cajas Negras'}
             </h3>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--muted)', margin: 0 }}>
@@ -295,7 +323,7 @@ export default function Nosotros() {
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
               <span
                 style={{
-                  fontFamily: "'Spectral', serif",
+                  fontFamily: 'var(--font-display)',
                   fontSize: 34,
                   fontWeight: 700,
                   color: 'var(--terracotta)',
@@ -306,7 +334,7 @@ export default function Nosotros() {
               </span>
               <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   fontSize: 11,
                   letterSpacing: 1.5,
                   color: 'var(--terracotta)',
@@ -316,7 +344,7 @@ export default function Nosotros() {
                 {isEn ? '[HORIZON // VISION]' : '[HORIZONTE // VISIÓN]'}
               </div>
             </div>
-            <h3 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.2 }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 22, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.2 }}>
               {isEn ? 'Regional Technical Benchmark' : 'Referencia Técnica Regional'}
             </h3>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--muted)', margin: 0 }}>
@@ -336,7 +364,7 @@ export default function Nosotros() {
           <div
             data-reveal=""
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: 'var(--font-mono)',
               fontSize: 12,
               letterSpacing: 2,
               color: 'var(--terracotta)',
@@ -350,7 +378,7 @@ export default function Nosotros() {
           <div
             data-reveal=""
             style={{
-              fontFamily: "'Spectral',serif",
+              fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: 'clamp(34px,4.5vw,56px)',
               marginBottom: 16,
@@ -377,7 +405,7 @@ export default function Nosotros() {
       </div>
 
       {/* =====================================================================
-          5. MÉTODO + STACK — Combined tabbed section
+          5. MÉTODO + STACK — Unified Bento Grid (Methodology & Stack)
           ===================================================================== */}
       <section id="metodo" style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
         <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 16 }}>
@@ -385,196 +413,235 @@ export default function Nosotros() {
         </div>
         <h2
           style={{
-            fontFamily: "'Spectral', serif",
+            fontFamily: 'var(--font-display)',
             fontSize: 'clamp(32px, 5vw, 48px)',
             fontWeight: 700,
             color: 'var(--ink)',
-            margin: '0 0 28px 0',
+            margin: '0 0 16px 0',
           }}
         >
           {isEn ? 'How We Build & What We Build With' : 'Cómo Construimos y Con Qué'}
         </h2>
+        <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 760, margin: '0 0 56px 0', lineHeight: 1.65 }}>
+          {isEn
+            ? 'Our end-to-end engineering methodology coupled with production-grade technologies on AWS, ensuring verifiable quality, zero technical debt, and client sovereignty.'
+            : 'Nuestra metodología de ingeniería de punta a punta junto a tecnologías probadas en producción sobre AWS, garantizando calidad verificable, cero deuda técnica y soberanía total del cliente.'}
+        </p>
 
-        {/* Tab switcher */}
-        <div
-          role="tablist"
-          style={{
-            display: 'flex',
-            gap: 8,
-            borderBottom: '1px solid var(--border)',
-            paddingBottom: 16,
-            marginBottom: 40,
-          }}
-        >
-          <button
-            role="tab"
-            type="button"
-            aria-selected={metodoTab === 'metodo'}
-            onClick={() => setMetodoTab('metodo')}
-            style={{
-              background: metodoTab === 'metodo' ? 'var(--terracotta)' : 'transparent',
-              color: metodoTab === 'metodo' ? '#F3EADA' : 'var(--ink)',
-              border: '1px solid',
-              borderColor: metodoTab === 'metodo' ? 'var(--terracotta)' : 'var(--border)',
-              padding: '10px 22px',
-              fontSize: 14,
-              fontFamily: "'IBM Plex Sans', sans-serif",
-              fontWeight: metodoTab === 'metodo' ? 600 : 400,
-              cursor: 'pointer',
-              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-            }}
-          >
-            {isEn ? 'The 4-Phase Method' : 'El Método (4 Etapas)'}
-          </button>
-          <button
-            role="tab"
-            type="button"
-            aria-selected={metodoTab === 'stack'}
-            onClick={() => setMetodoTab('stack')}
-            style={{
-              background: metodoTab === 'stack' ? 'var(--terracotta)' : 'transparent',
-              color: metodoTab === 'stack' ? '#F3EADA' : 'var(--ink)',
-              border: '1px solid',
-              borderColor: metodoTab === 'stack' ? 'var(--terracotta)' : 'var(--border)',
-              padding: '10px 22px',
-              fontSize: 14,
-              fontFamily: "'IBM Plex Sans', sans-serif",
-              fontWeight: metodoTab === 'stack' ? 600 : 400,
-              cursor: 'pointer',
-              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-            }}
-          >
-            {isEn ? 'Technology Stack' : 'Stack Tecnológico'}
-          </button>
-        </div>
-
-        {/* Tab Panel: Methodology */}
-        {metodoTab === 'metodo' && (
-          <div role="tabpanel" id="stack">
-            {/* Horizontal Timeline */}
-            <div
+        {/* Bloque 1: El Método (4 Etapas de Rigor) */}
+        <div style={{ marginBottom: 72 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <span
               style={{
-                display: 'flex',
-                gap: 0,
-                overflowX: 'auto',
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+                letterSpacing: 2,
+                color: 'var(--terracotta)',
+                fontWeight: 700,
               }}
             >
-              {stack.METHODOLOGY_STEPS.map((step, idx) => (
-                <div
-                  key={step.step}
-                  data-reveal=""
-                  style={{
-                    flex: '1 0 260px',
-                    maxWidth: 320,
-                    padding: 28,
-                    borderLeft: idx > 0 ? '1px solid var(--border)' : 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    position: 'relative',
-                  }}
-                >
-                  {/* Timeline connector dot */}
-                  {idx > 0 && (
-                    <div
-                      aria-hidden="true"
-                      style={{
-                        position: 'absolute',
-                        left: -5,
-                        top: 36,
-                        width: 10,
-                        height: 10,
-                        background: 'var(--terracotta)',
-                        borderRadius: '50%',
-                      }}
-                    />
-                  )}
-                  <div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: 16,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontFamily: "'IBM Plex Mono', monospace",
-                          fontSize: 16,
-                          fontWeight: 700,
-                          color: 'var(--terracotta)',
-                        }}
-                      >
-                        {step.step}
-                      </span>
-                      <span
-                        style={{
-                          fontFamily: "'IBM Plex Mono', monospace",
-                          fontSize: 11,
-                          textTransform: 'uppercase',
-                          color: 'var(--muted)',
-                        }}
-                      >
-                        {step.tag}
-                      </span>
-                    </div>
+              {isEn ? '[01 // THE METHOD]' : '[01 // EL MÉTODO]'}
+            </span>
+            <span style={{ fontSize: 18, fontWeight: 700, fontFamily: 'var(--font-display)', color: 'var(--ink)' }}>
+              {isEn ? '4 Phases of Technical Rigor' : '4 Etapas de Rigor Metodológico'}
+            </span>
+          </div>
 
-                    <h3
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 20,
+            }}
+          >
+            {stack.METHODOLOGY_STEPS.map((step) => (
+              <div
+                key={step.step}
+                data-reveal=""
+                className="card-hover"
+                style={{
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 4,
+                  padding: 24,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  transition: 'all 0.25s ease',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
+                    <span
                       style={{
-                        fontFamily: "'Spectral', serif",
+                        fontFamily: 'var(--font-mono)',
                         fontSize: 20,
                         fontWeight: 700,
-                        color: 'var(--ink)',
-                        margin: '0 0 6px 0',
+                        color: 'var(--terracotta)',
                       }}
                     >
-                      {step.phase}
-                    </h3>
-
-                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--terracotta)', marginBottom: 12 }}>{step.title}</div>
-
-                    <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.6, margin: '0 0 20px 0' }}>{step.desc}</p>
-                  </div>
-
-                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
-                    <div
+                      {step.step}
+                    </span>
+                    <span
                       style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        fontSize: 11,
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 10.5,
+                        letterSpacing: 1,
                         textTransform: 'uppercase',
-                        color: 'var(--ink)',
-                        fontWeight: 600,
-                        marginBottom: 8,
+                        color: 'var(--muted)',
+                        background: 'var(--cream2)',
+                        padding: '2px 8px',
+                        borderRadius: 2,
                       }}
                     >
-                      {isEn ? 'Key Deliverables:' : 'Entregables Clave:'}
-                    </div>
-                    <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
-                      {step.deliverables.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
+                      {step.tag}
+                    </span>
+                  </div>
+                  <h3
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 19,
+                      fontWeight: 700,
+                      color: 'var(--ink)',
+                      margin: '0 0 6px 0',
+                      lineHeight: 1.25,
+                    }}
+                  >
+                    {step.phase}
+                  </h3>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--terracotta)', marginBottom: 12 }}>
+                    {step.title}
+                  </div>
+                  <p style={{ fontSize: 13.5, color: 'var(--muted)', lineHeight: 1.6, margin: '0 0 20px 0' }}>
+                    {step.desc}
+                  </p>
+                </div>
+
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 11,
+                      textTransform: 'uppercase',
+                      color: 'var(--ink)',
+                      fontWeight: 700,
+                      marginBottom: 8,
+                    }}
+                  >
+                    {isEn ? 'Key Deliverables:' : 'Entregables Clave:'}
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.6 }}>
+                    {step.deliverables.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bloque 2: Ecosistema & Stack Tecnológico */}
+        <div id="stack">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+                letterSpacing: 2,
+                color: 'var(--terracotta)',
+                fontWeight: 700,
+              }}
+            >
+              {isEn ? '[02 // TECH STACK]' : '[02 // STACK TECNOLÓGICO]'}
+            </span>
+            <span style={{ fontSize: 18, fontWeight: 700, fontFamily: 'var(--font-display)', color: 'var(--ink)' }}>
+              {isEn ? 'Curated Production-Grade Stack' : 'Ecosistema Tecnológico & Estándares Abiertos'}
+            </span>
+          </div>
+
+          <p style={{ fontSize: 15, color: 'var(--muted)', maxWidth: 740, margin: '0 0 28px 0', lineHeight: 1.6 }}>
+            {isEn
+              ? 'We build exclusively on production-proven, open standards and battle-tested cloud backbones (AWS), ensuring the client retains absolute sovereignty over all code and infrastructure.'
+              : 'Utilizamos tecnologías probadas en producción, de código abierto o estándares globales en la nube (AWS), garantizando que el cliente sea dueño absoluto de su infraestructura y código.'}
+          </p>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: 24,
+            }}
+          >
+            {stack.STACK_CATEGORIES.map((cat) => (
+              <div
+                key={cat.id}
+                data-reveal=""
+                className="card-hover"
+                style={{
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 4,
+                  padding: 24,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  transition: 'all 0.25s ease',
+                }}
+              >
+                <div>
+                  <h4
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 20,
+                      fontWeight: 700,
+                      margin: '0 0 6px 0',
+                      color: 'var(--ink)',
+                    }}
+                  >
+                    {cat.name}
+                  </h4>
+                  <p style={{ color: 'var(--muted)', fontSize: 13.5, margin: '0 0 20px 0', lineHeight: 1.5 }}>
+                    {cat.desc}
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {cat.tools.map((tool) => (
+                      <div
+                        key={tool.name}
+                        style={{
+                          borderTop: '1px solid var(--border)',
+                          paddingTop: 10,
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                          <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 600, fontSize: 14.5, color: 'var(--ink)' }}>
+                            {tool.name}
+                          </span>
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: 10,
+                              letterSpacing: 0.5,
+                              textTransform: 'uppercase',
+                              color: 'var(--terracotta)',
+                              fontWeight: 700,
+                            }}
+                          >
+                            {tool.level}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.4 }}>
+                          {tool.role}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
-
-        {/* Tab Panel: Stack */}
-        {metodoTab === 'stack' && (
-          <div role="tabpanel" id="stack">
-            <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 680, margin: '0 0 16px 0' }}>
-              {isEn
-                ? 'We build exclusively on production-proven, open standards and battle-tested cloud backbones (AWS), ensuring the client retains absolute sovereignty over all code and infrastructure.'
-                : 'Utilizamos tecnologías probadas en producción, de código abierto o estándares globales en la nube (AWS), garantizando que el cliente sea dueño absoluto de su infraestructura y código.'}
-            </p>
-            <StackTabs />
-          </div>
-        )}
+        </div>
       </section>
 
       {/* =====================================================================
@@ -585,7 +652,7 @@ export default function Nosotros() {
           <div
             data-reveal=""
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: 'var(--font-mono)',
               fontSize: 12,
               letterSpacing: 2,
               color: 'var(--terracotta)',
@@ -599,7 +666,7 @@ export default function Nosotros() {
           <div
             data-reveal=""
             style={{
-              fontFamily: "'Spectral',serif",
+              fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: 'clamp(28px,3.5vw,44px)',
               marginBottom: 32,
@@ -650,10 +717,10 @@ export default function Nosotros() {
                         flexShrink: 0,
                       }}
                     />
-                    <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 22, flex: 1 }}>{v.name}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 22, flex: 1 }}>{v.name}</div>
                     <span
                       style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: 'var(--font-mono)',
                         fontSize: 14,
                         color: 'var(--terracotta)',
                         transition: 'transform 0.3s ease',
@@ -682,15 +749,16 @@ export default function Nosotros() {
       </div>
 
       {/* =====================================================================
-          7. CTA FINAL CINEMÁTICO
+          7. CTA FINAL EDITORIAL — Unified Canvas
           ===================================================================== */}
       <div
         data-reveal=""
         style={{
           position: 'relative',
-          background: 'var(--ink)',
-          color: 'var(--bg)',
-          padding: 'clamp(120px, 14vh, 180px) clamp(24px, 5vw, 64px)',
+          background: 'var(--bg)',
+          color: 'var(--ink)',
+          borderTop: '1px solid var(--border)',
+          padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)',
           overflow: 'hidden',
         }}
       >
@@ -704,22 +772,23 @@ export default function Nosotros() {
             width: 340,
             height: 340,
             background: 'var(--terracotta)',
-            opacity: 0.15,
+            opacity: 0.06,
           }}
         />
         <div style={{ position: 'relative', maxWidth: 960, margin: '0 auto', textAlign: 'center' }}>
           <h2
             style={{
-              fontFamily: "'Spectral',serif",
+              fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: 'clamp(32px,5vw,56px)',
               marginBottom: 20,
               lineHeight: 1.15,
+              color: 'var(--ink)',
             }}
           >
             {isEn ? 'Ready to evaluate your technical requirements?' : '¿Conversamos sobre tus requerimientos técnicos?'}
           </h2>
-          <p style={{ fontSize: 16, color: 'var(--tan-text)', marginBottom: 36, maxWidth: 560, margin: '0 auto 36px' }}>
+          <p style={{ fontSize: 16, color: 'var(--muted)', marginBottom: 36, maxWidth: 560, margin: '0 auto 36px', lineHeight: 1.65 }}>
             {isEn
               ? 'Preliminary technical audit, cloud architecture, or machine learning models — our engineering leads are ready to review your project directly.'
               : 'Auditoría preliminar, arquitectura cloud o modelos analíticos — estamos listos para revisar tu caso sin intermediarios.'}
@@ -732,7 +801,7 @@ export default function Nosotros() {
             style={{
               background: 'var(--gold)',
               color: 'var(--ink)',
-              borderRadius: 2,
+              borderRadius: 4,
               padding: '18px 40px',
               fontSize: 16,
               fontWeight: 700,

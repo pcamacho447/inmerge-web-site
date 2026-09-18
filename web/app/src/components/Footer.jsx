@@ -19,7 +19,7 @@ export default function Footer({ borderTop = false }) {
         borderTop: borderTop ? '1px solid var(--border)' : undefined,
       }}
     >
-      <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 14, letterSpacing: 1 }}>INMERGE — 2026</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 14, letterSpacing: 1.5 }}>INMERGE — 2026</div>
 
       <div
         style={{

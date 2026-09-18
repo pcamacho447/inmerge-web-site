@@ -31,7 +31,7 @@ export default function NotFound() {
           <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 24 }}>ERROR 404</div>
           <div
             style={{
-              fontFamily: "'Spectral',serif",
+              fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: 'clamp(40px,8vw,96px)',
               lineHeight: 1,

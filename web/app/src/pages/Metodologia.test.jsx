@@ -22,26 +22,17 @@ describe('Metodologia Page', () => {
     expect(screen.getByText('Validación, Certificación & Despliegue')).toBeInTheDocument();
   });
 
-  it('switches to Stack tab and shows StackTabs component', async () => {
-    const user = userEvent.setup();
+  it('renders the technology stack matrix directly in the unified view', () => {
     render(
       <MemoryRouter>
         <Metodologia />
       </MemoryRouter>,
     );
 
-    // Switch to Stack tab
-    const stackTab = screen.getByRole('tab', { name: /Stack Tecnológico/i });
-    await user.click(stackTab);
-
-    // Initial tab is Cloud & DevOps
+    expect(screen.getByText(/Ecosistema Tecnológico & Estándares Abiertos/i)).toBeInTheDocument();
     expect(screen.getByText('Amazon Web Services (AWS)')).toBeInTheDocument();
-
-    // Click on Ciencia de Datos tab
-    const dataTab = screen.getByRole('tab', { name: /Ciencia de Datos & IA/i });
-    await user.click(dataTab);
-
-    expect(screen.getByText('Apache Airflow / Orchestration')).toBeInTheDocument();
+    expect(screen.getByText('Python')).toBeInTheDocument();
+    expect(screen.getByText('PostgreSQL')).toBeInTheDocument();
   });
 
   it('renders the ManifestoCarousel with engineering assurance content', () => {

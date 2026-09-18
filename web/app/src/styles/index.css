@@ -1,4 +1,8 @@
 :root {
+  --font-display: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+  --font-sans: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+  --font-mono: 'Space Mono', 'IBM Plex Mono', monospace;
+  --font-serif: 'Space Grotesk', 'Spectral', serif;
   --bg: #f3eada;
   --ink: #241a12;
   --terracotta: #a8472b;
@@ -29,7 +33,7 @@ body,
 body {
   margin: 0;
   background: var(--bg);
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--font-sans);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
@@ -435,7 +439,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .carousel-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -446,7 +450,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .carousel-main-title {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.6rem, 3vw, 2.2rem);
   font-weight: 600;
   line-height: 1.2;
@@ -666,14 +670,14 @@ details.service-accordion-item > summary::marker {
 }
 
 .card-duration-tag {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--muted);
   font-weight: 600;
 }
 
 .card-project-title {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.3rem, 2.2vw, 1.75rem);
   line-height: 1.25;
   margin: 0 0 8px 0;
@@ -1036,7 +1040,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .manifesto-slide-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -1046,7 +1050,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .manifesto-slide-title {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(2.2rem, 4.6vw, 3.8rem);
   line-height: 1.08;
@@ -1057,7 +1061,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .manifesto-slide-body {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(1.05rem, 1.4vw, 1.25rem);
   line-height: 1.8;
   color: var(--ink);
@@ -1275,14 +1279,14 @@ details.service-accordion-item > summary::marker {
 }
 
 .director-pillar-badge {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--muted);
   font-weight: 600;
 }
 
 .director-role-title {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.6rem, 2.8vw, 2.3rem);
   font-weight: 700;
   color: var(--ink);
@@ -1314,7 +1318,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .director-quote-text {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-display);
   font-style: italic;
   font-size: 1.02rem;
   color: var(--ink);
@@ -1335,7 +1339,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .credentials-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1344,7 +1348,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .credentials-title {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--ink);
@@ -1408,74 +1412,6 @@ details.service-accordion-item > summary::marker {
   opacity: 0.05;
   pointer-events: none;
   z-index: 0;
-}
-
-/* Controls bar */
-.directors-controls-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin-top: 24px;
-}
-
-.directors-arrow {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--ink);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.85rem;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: all 0.2s ease;
-  user-select: none;
-  flex-shrink: 0;
-}
-
-.directors-arrow:hover {
-  border-color: var(--terracotta);
-  color: var(--terracotta);
-  background: var(--cream2);
-  transform: scale(1.08);
-}
-
-.directors-progress-bar {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex: 0 1 240px;
-}
-
-.directors-progress-segment {
-  flex: 1;
-  height: 4px;
-  background: var(--border);
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  border-radius: 2px;
-  transition: background 0.3s ease;
-}
-
-.directors-progress-segment .segment-fill {
-  position: absolute;
-  inset: 0;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s ease;
-  border-radius: 2px;
-}
-
-.directors-progress-segment.is-active .segment-fill {
-  transform: scaleX(1);
 }
 
 /* Mobile responsive for directors */
@@ -1662,7 +1598,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .estimator-badge {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -1676,7 +1612,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .estimator-title {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.8rem, 3.5vw, 2.4rem);
   color: var(--ink);
   font-weight: 700;
@@ -1781,7 +1717,7 @@ details.service-accordion-item > summary::marker {
   margin-bottom: 18px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 12px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.78rem;
 }
 
@@ -1823,7 +1759,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .res-metric-val {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--ink);
@@ -1833,7 +1769,7 @@ details.service-accordion-item > summary::marker {
 .res-metric-val.highlight-val {
   color: var(--terracotta);
   font-size: 1.25rem;
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-display);
 }
 
 .results-deliverables {
@@ -1841,7 +1777,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .deliverables-title {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.06em;
@@ -2289,7 +2225,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .equipo-brand-title {
-  font-family: 'Spectral', serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.25rem;
   color: var(--ink);
@@ -2314,7 +2250,7 @@ details.service-accordion-item > summary::marker {
   border: 1px solid var(--border);
   padding: 4px 10px;
   border-radius: 14px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--ink);
   transition: background 0.15s ease;
@@ -2344,7 +2280,7 @@ details.service-accordion-item > summary::marker {
   padding: 8px 14px;
   font-size: 0.85rem;
   font-weight: 600;
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--font-sans);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -2895,7 +2831,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .equipo-bento-value {
-  font-family: 'Spectral', serif;
+  font-family: var(--font-display);
   font-size: 1.45rem;
   font-weight: 700;
   color: var(--ink);
@@ -2903,7 +2839,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .equipo-bento-label {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.78rem;
   color: var(--muted);
   margin-top: 2px;
@@ -2982,14 +2918,14 @@ details.service-accordion-item > summary::marker {
 }
 
 .equipo-split-master-pillar {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.68rem;
   color: var(--muted);
   text-transform: uppercase;
 }
 
 .equipo-split-master-title {
-  font-family: 'Spectral', serif;
+  font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;
   color: var(--ink);
@@ -3020,7 +2956,7 @@ details.service-accordion-item > summary::marker {
   display: flex;
   justify-content: space-between;
   font-size: 0.7rem;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   color: var(--muted);
 }
 
@@ -3077,7 +3013,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .equipo-kanban-badge {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 700;
   padding: 2px 7px;
@@ -3108,7 +3044,7 @@ details.service-accordion-item > summary::marker {
 }
 
 .equipo-kanban-card-title {
-  font-family: 'Spectral', serif;
+  font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--ink);
@@ -3139,7 +3075,7 @@ details.service-accordion-item > summary::marker {
   font-weight: 600;
   color: var(--ink);
   cursor: pointer;
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: var(--font-sans);
   transition: all 0.15s ease;
 }
 

@@ -29,19 +29,23 @@ describe('DirectorsCarousel Component', () => {
     expect(screen.getByText(/INTEGRIDAD FORENSE & GOBERNANZA/i)).toBeInTheDocument();
   });
 
-  it('allows switching active director via pill tabs and next/prev arrows', async () => {
+  it('allows switching active director via pill tabs directly on click', async () => {
     const user = userEvent.setup();
     renderWithLang(<DirectorsCarousel />, '/nosotros');
 
-    // Click next button
-    const nextBtn = screen.getByRole('button', { name: /Siguiente perfil de director/i });
-    await user.click(nextBtn);
+    // Click Cloud pill tab
+    const tabs = screen.getAllByRole('tab');
+    await user.click(tabs[1]);
 
     expect(screen.getByRole('heading', { name: /Director de Arquitectura Cloud & DevOps/i })).toBeInTheDocument();
 
-    // Click previous button
-    const prevBtn = screen.getByRole('button', { name: /Perfil de director anterior/i });
-    await user.click(prevBtn);
+    // Click Data & AI pill tab
+    await user.click(tabs[2]);
+
+    expect(screen.getByRole('heading', { name: /Director de Ciencia de Datos & Agentes IA/i })).toBeInTheDocument();
+
+    // Click back to first pill tab
+    await user.click(tabs[0]);
 
     expect(screen.getByRole('heading', { name: /Director de Auditoría Técnica & Calidad de Datos/i })).toBeInTheDocument();
   });

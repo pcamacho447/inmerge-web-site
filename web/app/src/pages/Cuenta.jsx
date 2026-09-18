@@ -162,7 +162,7 @@ export default function Cuenta() {
                 </span>
               )}
             </div>
-            <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: 0 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: 0 }}>
               {accountDict.portalTitle || 'Seguimiento Técnico & Facturación'}
             </h1>
           </div>
@@ -173,7 +173,7 @@ export default function Cuenta() {
                 to="/equipo"
                 style={{
                   fontSize: 13,
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   color: 'var(--terracotta)',
                   textDecoration: 'none',
                   borderBottom: '1px dotted var(--terracotta)',
@@ -196,7 +196,7 @@ export default function Cuenta() {
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: 'pointer',
-                fontFamily: "'IBM Plex Sans',sans-serif",
+                fontFamily: 'var(--font-sans)',
               }}
             >
               {accountDict.signOut || 'Cerrar sesión'}
@@ -231,7 +231,7 @@ export default function Cuenta() {
               fontWeight: activeTab === 'projects' ? 700 : 500,
               color: activeTab === 'projects' ? 'var(--terracotta)' : 'var(--muted)',
               cursor: 'pointer',
-              fontFamily: "'IBM Plex Sans', sans-serif",
+              fontFamily: 'var(--font-sans)',
               display: 'flex',
               alignItems: 'center',
               gap: 8,
@@ -240,7 +240,7 @@ export default function Cuenta() {
             <span>{accountDict.tabs?.projects || 'Mis Proyectos & Cronogramas'}</span>
             <span
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: 'var(--font-mono)',
                 fontSize: 11,
                 padding: '2px 6px',
                 borderRadius: 10,
@@ -264,7 +264,7 @@ export default function Cuenta() {
               fontWeight: activeTab === 'billing' ? 700 : 500,
               color: activeTab === 'billing' ? 'var(--terracotta)' : 'var(--muted)',
               cursor: 'pointer',
-              fontFamily: "'IBM Plex Sans', sans-serif",
+              fontFamily: 'var(--font-sans)',
               display: 'flex',
               alignItems: 'center',
               gap: 8,
@@ -273,7 +273,7 @@ export default function Cuenta() {
             <span>{accountDict.tabs?.billing || 'Organización & Facturación'}</span>
             <span
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: 'var(--font-mono)',
                 fontSize: 11,
                 padding: '2px 6px',
                 borderRadius: 10,
@@ -297,7 +297,7 @@ export default function Cuenta() {
               fontWeight: activeTab === 'support' ? 700 : 500,
               color: activeTab === 'support' ? 'var(--terracotta)' : 'var(--muted)',
               cursor: 'pointer',
-              fontFamily: "'IBM Plex Sans', sans-serif",
+              fontFamily: 'var(--font-sans)',
             }}
           >
             {accountDict.tabs?.support || 'Soporte & Tech Lead'}

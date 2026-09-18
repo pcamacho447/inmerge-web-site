@@ -79,7 +79,7 @@ export default function Nav({ mobileMenuOpen, onToggleMenu }) {
         style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, color: textColor, textDecoration: 'none' }}
       >
         <div style={{ width: 12, height: 12, background: 'var(--terracotta)', transform: 'rotate(45deg)' }} />
-        <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 18, letterSpacing: 1.5, color: textColor }}>INMERGE</div>
+        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 2, color: textColor }}>INMERGE</div>
       </Link>
 
       <div

@@ -116,7 +116,7 @@ export default function Inicio() {
 
           <h1
             style={{
-              fontFamily: "'Spectral',serif",
+              fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: 'clamp(44px,7.5vw,108px)',
               lineHeight: 1.04,
@@ -146,8 +146,7 @@ export default function Inicio() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 36 }}>
             <p
               style={{
-                fontFamily: "'Spectral', serif",
-                fontStyle: 'italic',
+                fontFamily: 'var(--font-display)',
                 fontSize: 'clamp(18px, 2.1vw, 24px)',
                 lineHeight: 1.6,
                 color: 'rgba(243, 234, 218, 0.95)',
@@ -202,72 +201,6 @@ export default function Inicio() {
               </Link>
             </div>
           </div>
-
-          {/* High-Impact Certainties Strip */}
-          {content.HERO_CERTAINTIES && (
-            <div
-              style={{
-                marginTop: 64,
-                paddingTop: 36,
-                borderTop: '1px solid rgba(243, 234, 218, 0.15)',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-                gap: 'clamp(24px, 4vw, 48px)',
-              }}
-            >
-              {content.HERO_CERTAINTIES.map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div
-                    style={{
-                      fontFamily: "'Spectral', serif",
-                      fontSize: 'clamp(32px, 4vw, 44px)',
-                      fontWeight: 700,
-                      color: 'var(--gold)',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {item.metric}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      letterSpacing: 1.5,
-                      textTransform: 'uppercase',
-                      color: 'var(--terracotta)',
-                    }}
-                  >
-                    {item.label}
-                  </div>
-                  <div style={{ fontSize: 13.5, color: 'rgba(243, 234, 218, 0.8)', lineHeight: 1.5 }}>
-                    {item.desc}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Marquee Banner */}
-      <div
-        aria-hidden="true"
-        style={{
-          background: 'var(--ink)',
-          overflow: 'hidden',
-          padding: '16px 0',
-          borderTop: '1px solid #4A3826',
-          borderBottom: '1px solid #4A3826',
-        }}
-      >
-        <div className="marquee-track">
-          {content.MARQUEE_ITEMS.map((m, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '0 20px', whiteSpace: 'nowrap' }}>
-              <div style={{ fontFamily: "'Spectral',serif", fontWeight: 600, fontSize: 20, color: 'var(--gold)' }}>{m}</div>
-              <div style={{ width: 8, height: 8, background: 'var(--terracotta)', transform: 'rotate(45deg)', flexShrink: 0 }} />
-            </div>
-          ))}
         </div>
       </div>
 
@@ -280,7 +213,7 @@ export default function Inicio() {
           <div>
             <div
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: 'var(--font-mono)',
                 fontSize: 12,
                 color: 'var(--terracotta)',
                 letterSpacing: 2,
@@ -290,7 +223,7 @@ export default function Inicio() {
             >
               {isEn ? 'STRATEGIC CAPABILITIES' : 'NUESTRA OFERTA ESTRATÉGICA'}
             </div>
-            <h2 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(34px,4.8vw,56px)', margin: 0 }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(34px,4.8vw,56px)', margin: 0 }}>
               {isEn ? 'Three Pillars of Engineering & Assurance' : 'Los Tres Pilares de Inmerge'}
             </h2>
           </div>
@@ -345,7 +278,7 @@ export default function Inicio() {
           <div
             data-reveal=""
             style={{
-              fontFamily: "'Spectral',serif",
+              fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: 'clamp(32px,5vw,56px)',
               marginBottom: 24,

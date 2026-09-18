@@ -1,16 +1,14 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
 /**
- * DirectorsCarousel — Cinematic editorial carousel showcasing the 4 Directors & Senior Specialists.
+ * DirectorsCarousel — Editorial interactive showcase of the 4 Directors & Senior Specialists.
  *
  * Features:
  *   - 4 full-depth director profiles with quotes, credentials badges, and focus areas
  *   - Editorial typography (Spectral + IBM Plex Mono)
- *   - Mouse drag & touch swipe support (horizontal delta threshold)
- *   - Segmented selector tabs & progress indicators
- *   - Fully accessible with keyboard navigation (ArrowLeft / ArrowRight)
- *   - No play button (clean editorial aesthetics)
+ *   - Clean client click-driven tab selector
+ *   - Accessible with keyboard navigation (ArrowLeft / ArrowRight / Home / End)
  */
 export default function DirectorsCarousel() {
   const { lang, content } = useLanguage();
@@ -19,9 +17,6 @@ export default function DirectorsCarousel() {
   const N = directors.length;
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const intervalRef = useRef(null);
 
   const goTo = useCallback(
     (idx) => {
@@ -33,13 +28,6 @@ export default function DirectorsCarousel() {
   const handleNext = useCallback(() => goTo(activeIndex + 1), [activeIndex, goTo]);
   const handlePrev = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo]);
 
-  // Autoplay (7.5s editorial pacing) — pauses on hover/focus/drag
-  useEffect(() => {
-    if (isPaused || isDragging || N <= 1) return;
-    intervalRef.current = setInterval(handleNext, 7500);
-    return () => clearInterval(intervalRef.current);
-  }, [isPaused, isDragging, handleNext, N]);
-
   // Keyboard navigation
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowLeft') {
@@ -48,82 +36,24 @@ export default function DirectorsCarousel() {
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
       handleNext();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      goTo(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      goTo(N - 1);
     }
-  };
-
-  // Mouse drag support
-  const mouseStartX = useRef(0);
-  const isMouseDown = useRef(false);
-
-  const handleMouseDown = (e) => {
-    if (e.button !== 0) return;
-    isMouseDown.current = true;
-    mouseStartX.current = e.clientX;
-    setIsDragging(true);
-  };
-
-  const handleMouseMove = () => {
-    // tracking drag
-  };
-
-  const handleMouseUp = (e) => {
-    if (!isMouseDown.current) return;
-    isMouseDown.current = false;
-    setIsDragging(false);
-    const deltaX = e.clientX - mouseStartX.current;
-    if (deltaX < -45) {
-      handleNext();
-    } else if (deltaX > 45) {
-      handlePrev();
-    }
-  };
-
-  const handleMouseLeave = (e) => {
-    if (isMouseDown.current) {
-      isMouseDown.current = false;
-      setIsDragging(false);
-      const deltaX = e.clientX - mouseStartX.current;
-      if (deltaX < -45) {
-        handleNext();
-      } else if (deltaX > 45) {
-        handlePrev();
-      }
-    }
-    setIsPaused(false);
-  };
-
-  // Touch swipe support
-  const touchStartX = useRef(0);
-  const handleTouchStart = (e) => {
-    if (e.touches.length > 0) touchStartX.current = e.touches[0].clientX;
-  };
-  const handleTouchEnd = (e) => {
-    if (e.changedTouches.length === 0) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    if (deltaX < -45) handleNext();
-    else if (deltaX > 45) handlePrev();
   };
 
   if (!directors.length) return null;
 
   return (
     <section
-      className={`directors-carousel ${isDragging ? 'is-dragging' : ''}`}
+      className="directors-carousel"
       role="region"
-      aria-roledescription="carousel"
       aria-label={isEn ? 'Senior Directors Directory' : 'Directorio de Especialistas Senior y Directores'}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={handleMouseLeave}
-      onFocus={() => setIsPaused(true)}
-      onBlur={() => setIsPaused(false)}
       onKeyDown={handleKeyDown}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
       tabIndex={0}
-      style={{ cursor: isDragging ? 'grabbing' : 'grab', userSelect: isDragging ? 'none' : 'auto' }}
     >
       {/* Quick Director Selector Tabs (Pills) */}
       <div
@@ -164,8 +94,7 @@ export default function DirectorsCarousel() {
             <article
               key={dir.id}
               className={`director-slide-card ${isActive ? 'is-active' : 'is-inactive'}`}
-              role="group"
-              aria-roledescription="slide"
+              role="tabpanel"
               aria-label={`${isEn ? 'Director' : 'Director'} ${dir.number}: ${dir.role}`}
               aria-hidden={!isActive}
             >
@@ -224,43 +153,6 @@ export default function DirectorsCarousel() {
             </article>
           );
         })}
-      </div>
-
-      {/* Footer Controls: Arrows + Segmented Progress Bar */}
-      <div className="directors-controls-bar" aria-label={isEn ? 'Director controls' : 'Controles de directores'}>
-        <button
-          type="button"
-          className="directors-arrow directors-arrow--prev"
-          onClick={handlePrev}
-          aria-label={isEn ? 'Previous director profile' : 'Perfil de director anterior'}
-        >
-          ←
-        </button>
-
-        {/* Segmented progress bar */}
-        <div className="directors-progress-bar" role="group" aria-label={isEn ? 'Director progress' : 'Progreso de directores'}>
-          {directors.map((dir, idx) => (
-            <button
-              key={dir.id}
-              type="button"
-              className={`directors-progress-segment ${idx === activeIndex ? 'is-active' : ''}`}
-              onClick={() => goTo(idx)}
-              aria-label={`${isEn ? 'Go to director' : 'Ir a director'} ${dir.number}`}
-              aria-current={idx === activeIndex ? 'true' : 'false'}
-            >
-              <span className="segment-fill" style={{ background: dir.accent }} />
-            </button>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          className="directors-arrow directors-arrow--next"
-          onClick={handleNext}
-          aria-label={isEn ? 'Next director profile' : 'Siguiente perfil de director'}
-        >
-          →
-        </button>
       </div>
     </section>
   );

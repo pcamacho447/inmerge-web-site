@@ -33,7 +33,7 @@ export default function CookiesPolicy() {
           </div>
           <h1
             style={{
-              fontFamily: "'Spectral', serif",
+              fontFamily: 'var(--font-display)',
               fontSize: 'clamp(32px, 4vw, 48px)',
               fontWeight: 600,
               color: 'var(--ink)',
@@ -74,7 +74,7 @@ export default function CookiesPolicy() {
           }}
         >
           <div>
-            <div style={{ fontFamily: "'Spectral', serif", fontSize: 20, fontWeight: 600, color: 'var(--ink)', marginBottom: 6 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 600, color: 'var(--ink)', marginBottom: 6 }}>
               {isEn ? 'Consent Management Center' : 'Administrador de Consentimiento'}
             </div>
             <div style={{ fontSize: 13, color: 'var(--muted)', maxWidth: 520 }}>
@@ -105,7 +105,7 @@ export default function CookiesPolicy() {
         {/* Secciones de Contenido */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 40, lineHeight: 1.7, fontSize: 15, color: 'var(--ink)' }}>
           <section>
-            <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, fontWeight: 600, marginBottom: 14 }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 600, marginBottom: 14 }}>
               {isEn ? '1. What are cookies and related technologies?' : '1. ¿Qué son las cookies y tecnologías afines?'}
             </h2>
             <p style={{ margin: '0 0 12px' }}>
@@ -131,7 +131,7 @@ export default function CookiesPolicy() {
           </section>
 
           <section>
-            <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, fontWeight: 600, marginBottom: 14 }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 600, marginBottom: 14 }}>
               {isEn ? '2. Categories of storage used' : '2. Categorías de cookies utilizadas'}
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -171,14 +171,14 @@ export default function CookiesPolicy() {
           </section>
 
           <section>
-            <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, fontWeight: 600, marginBottom: 16 }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 600, marginBottom: 16 }}>
               {isEn ? '3. Technical Inventory of Cookies & Storage' : '3. Inventario técnico de cookies y almacenamiento'}
             </h2>
             <div style={{ overflowX: 'auto', border: '1px solid var(--border)', borderRadius: 4 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, textAlign: 'left' }}>
                 <thead>
                   <tr style={{ background: 'var(--cream2)', borderBottom: '1px solid var(--border)' }}>
-                    <th style={{ padding: '12px 16px', fontFamily: "'IBM Plex Mono', monospace" }}>
+                    <th style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)' }}>
                       {isEn ? 'Identifier' : 'Identificador'}
                     </th>
                     <th style={{ padding: '12px 16px' }}>{isEn ? 'Provider' : 'Proveedor'}</th>
@@ -196,12 +196,12 @@ export default function CookiesPolicy() {
                         background: idx % 2 === 0 ? 'transparent' : 'rgba(235, 223, 201, 0.3)',
                       }}
                     >
-                      <td style={{ padding: '12px 16px', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600 }}>{item.name}</td>
+                      <td style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{item.name}</td>
                       <td style={{ padding: '12px 16px', color: 'var(--muted)' }}>{item.provider}</td>
                       <td style={{ padding: '12px 16px' }}>
                         <span
                           style={{
-                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontFamily: 'var(--font-mono)',
                             fontSize: 11,
                             padding: '2px 6px',
                             borderRadius: 2,
@@ -227,7 +227,7 @@ export default function CookiesPolicy() {
           </section>
 
           <section>
-            <h2 style={{ fontFamily: "'Spectral', serif", fontSize: 24, fontWeight: 600, marginBottom: 14 }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 600, marginBottom: 14 }}>
               {isEn ? '4. Regulatory Framework & Data Subject Rights' : '4. Marco Normativo y Derechos ARCO'}
             </h2>
             <p style={{ margin: '0 0 12px' }}>

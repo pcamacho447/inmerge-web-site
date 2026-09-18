@@ -14,10 +14,10 @@ export default function ArchitectureDiagram() {
       }}
     >
       <div style={{ marginBottom: 28, borderBottom: '1px solid rgba(243, 234, 218, 0.15)', paddingBottom: 16 }}>
-        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--gold)', letterSpacing: 2, marginBottom: 6 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--gold)', letterSpacing: 2, marginBottom: 6 }}>
           {isEn ? 'FLOW ARCHITECTURE & AUDIT' : 'ARQUITECTURA DE FLUJO & AUDITORÍA'}
         </div>
-        <h4 style={{ fontFamily: "'Spectral', serif", fontSize: 'clamp(20px, 3vw, 26px)', margin: 0, fontWeight: 700 }}>
+        <h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(20px, 3vw, 26px)', margin: 0, fontWeight: 700 }}>
           {isEn ? 'Engineering, Data Lifecycle & Technical Quality Assurance' : 'Ciclo de Ingeniería, Datos y Aseguramiento Técnico'}
         </h4>
       </div>
@@ -40,10 +40,10 @@ export default function ArchitectureDiagram() {
             flexDirection: 'column',
           }}
         >
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--gold)', marginBottom: 8 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 8 }}>
             {isEn ? '01 / INGESTION & AUDITING' : '01 / INGESTIÓN & AUDITORÍA'}
           </span>
-          <strong style={{ fontSize: 16, marginBottom: 8, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+          <strong style={{ fontSize: 16, marginBottom: 8, fontFamily: 'var(--font-sans)' }}>
             {isEn ? 'Sources & Profiling' : 'Fuentes & Perfilado'}
           </strong>
           <p style={{ fontSize: 13, color: 'rgba(243, 234, 218, 0.75)', margin: 0, lineHeight: 1.5 }}>
@@ -63,10 +63,10 @@ export default function ArchitectureDiagram() {
             flexDirection: 'column',
           }}
         >
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--terracotta)', marginBottom: 8 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--terracotta)', marginBottom: 8 }}>
             {isEn ? '02 / PIPELINES & CLOUD' : '02 / PIPELINES & CLOUD'}
           </span>
-          <strong style={{ fontSize: 16, marginBottom: 8, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+          <strong style={{ fontSize: 16, marginBottom: 8, fontFamily: 'var(--font-sans)' }}>
             {isEn ? 'AWS & Processing' : 'AWS & Procesamiento'}
           </strong>
           <p style={{ fontSize: 13, color: 'rgba(243, 234, 218, 0.75)', margin: 0, lineHeight: 1.5 }}>
@@ -86,10 +86,10 @@ export default function ArchitectureDiagram() {
             flexDirection: 'column',
           }}
         >
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--ochre)', marginBottom: 8 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--ochre)', marginBottom: 8 }}>
             {isEn ? '03 / MACHINE LEARNING & AI' : '03 / MACHINE LEARNING & IA'}
           </span>
-          <strong style={{ fontSize: 16, marginBottom: 8, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+          <strong style={{ fontSize: 16, marginBottom: 8, fontFamily: 'var(--font-sans)' }}>
             {isEn ? 'Models & Inference' : 'Modelos & Inferencia'}
           </strong>
           <p style={{ fontSize: 13, color: 'rgba(243, 234, 218, 0.75)', margin: 0, lineHeight: 1.5 }}>
@@ -109,10 +109,10 @@ export default function ArchitectureDiagram() {
             flexDirection: 'column',
           }}
         >
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#F3EADA', marginBottom: 8 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#F3EADA', marginBottom: 8 }}>
             {isEn ? '04 / LIVE APPLICATIONS' : '04 / APLICACIONES VIVAS'}
           </span>
-          <strong style={{ fontSize: 16, marginBottom: 8, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+          <strong style={{ fontSize: 16, marginBottom: 8, fontFamily: 'var(--font-sans)' }}>
             {isEn ? 'Dashboards & Software' : 'Dashboards & Software'}
           </strong>
           <p style={{ fontSize: 13, color: 'rgba(243, 234, 218, 0.75)', margin: 0, lineHeight: 1.5 }}>

@@ -110,7 +110,7 @@ export default function Login() {
             </span>
           </div>
         )}
-        <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: '0 0 32px' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: '0 0 32px' }}>
           {authDict.loginTitle || 'Iniciar sesión'}
         </h1>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

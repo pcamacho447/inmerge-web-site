@@ -82,7 +82,7 @@ export default function Registro() {
             </span>
           </div>
         )}
-        <h1 style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: '0 0 12px' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(32px,5vw,44px)', margin: '0 0 12px' }}>
           {authDict.registerTitle || 'Crear cuenta'}
         </h1>
         <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 32 }}>
@@ -105,7 +105,7 @@ export default function Registro() {
               borderRadius: 3,
               padding: 16,
               fontSize: 14,
-              fontFamily: "'IBM Plex Sans',sans-serif",
+              fontFamily: 'var(--font-sans)',
             }}
           />
           <input

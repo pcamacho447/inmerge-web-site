@@ -44,7 +44,7 @@ export default function MobileMenu({ onClose }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 12, height: 12, background: 'var(--terracotta)', transform: 'rotate(45deg)' }} />
-          <div style={{ fontFamily: "'Spectral',serif", fontWeight: 700, fontSize: 18, letterSpacing: 1.5 }}>INMERGE</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: 2 }}>INMERGE</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <LanguageSwitcher isLight={true} />
@@ -81,7 +81,7 @@ export default function MobileMenu({ onClose }) {
             onClick={onClose}
             className="row-hover"
             style={{
-              fontFamily: "'Spectral',serif",
+              fontFamily: 'var(--font-display)',
               fontWeight: 600,
               fontSize: 22,
               color: 'var(--ink)',

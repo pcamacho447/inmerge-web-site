@@ -39,33 +39,31 @@ describe('Nosotros Page (Redesigned — Cinematic Hero + ManifestoCarousel + Dir
     expect(screen.getByText(/Código Probado, Infraestructura Infalible/i)).toBeInTheDocument();
   });
 
-  it('renders the 4 methodology stages via the Método tab', () => {
+  it('renders the 4 methodology stages via the unified Bento Grid', () => {
     render(
       <MemoryRouter>
         <Nosotros />
       </MemoryRouter>,
     );
 
-    // The method tab should be active by default
-    expect(screen.getByRole('tab', { name: /El Método \(4 Etapas\)/i })).toBeInTheDocument();
+    expect(screen.getByText(/4 Etapas de Rigor Metodológico/i)).toBeInTheDocument();
     expect(screen.getByText('Auditoría & Diagnóstico Inicial')).toBeInTheDocument();
+    expect(screen.getByText('Arquitectura & Diseño de Solución')).toBeInTheDocument();
+    expect(screen.getByText('Ingeniería, Desarrollo & Modelado')).toBeInTheDocument();
     expect(screen.getByText('Validación, Certificación & Despliegue')).toBeInTheDocument();
   });
 
-  it('switches to Stack tab and shows technology content', async () => {
-    const user = userEvent.setup();
+  it('renders the curated technology stack matrix directly', () => {
     render(
       <MemoryRouter>
         <Nosotros />
       </MemoryRouter>,
     );
 
-    // Switch to Stack tab
-    const stackTab = screen.getByRole('tab', { name: /Stack Tecnológico/i });
-    await user.click(stackTab);
-
-    // StackTabs component should render
+    expect(screen.getByText(/Ecosistema Tecnológico & Estándares Abiertos/i)).toBeInTheDocument();
     expect(screen.getByText('Amazon Web Services (AWS)')).toBeInTheDocument();
+    expect(screen.getByText('PostgreSQL')).toBeInTheDocument();
+    expect(screen.getByText('Python')).toBeInTheDocument();
   });
 
   it('renders the 4 practice directors via DirectorsCarousel', async () => {

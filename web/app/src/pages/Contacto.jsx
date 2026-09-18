@@ -111,7 +111,7 @@ export default function Contacto() {
         </div>
         <h1
           style={{
-            fontFamily: "'Spectral',serif",
+            fontFamily: 'var(--font-display)',
             fontWeight: 700,
             fontSize: 'clamp(42px,7.5vw,96px)',
             lineHeight: 1.05,
@@ -155,7 +155,7 @@ export default function Contacto() {
             <div>
               <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   fontSize: 12,
                   letterSpacing: 2,
                   color: 'var(--terracotta)',
@@ -167,7 +167,7 @@ export default function Contacto() {
               </div>
               <h2
                 style={{
-                  fontFamily: "'Spectral',serif",
+                  fontFamily: 'var(--font-display)',
                   fontWeight: 700,
                   fontSize: 'clamp(26px, 3vw, 36px)',
                   lineHeight: 1.25,
@@ -334,7 +334,7 @@ export default function Contacto() {
           </div>
           <h2
             style={{
-              fontFamily: "'Spectral',serif",
+              fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: 'clamp(26px, 3vw, 36px)',
               margin: '0 0 24px 0',

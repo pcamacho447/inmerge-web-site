@@ -35,7 +35,7 @@ export default function Servicios() {
         </div>
         <h1
           style={{
-            fontFamily: "'Spectral',serif",
+            fontFamily: 'var(--font-display)',
             fontWeight: 700,
             fontSize: 'clamp(42px,7.5vw,96px)',
             lineHeight: 1.05,
@@ -61,14 +61,15 @@ export default function Servicios() {
         />
       </div>
 
-      {/* Bottom CTA Banner */}
+      {/* Bottom CTA Banner — Unified Canvas */}
       <div
         data-reveal=""
         style={{
           position: 'relative',
-          background: 'var(--ink)',
-          color: 'var(--bg)',
-          padding: '140px clamp(20px,5vw,40px)',
+          background: 'var(--bg)',
+          color: 'var(--ink)',
+          borderTop: '1px solid var(--border)',
+          padding: '120px clamp(20px,5vw,40px)',
           overflow: 'hidden',
         }}
       >
@@ -80,23 +81,24 @@ export default function Servicios() {
             width: 340,
             height: 340,
             background: 'var(--terracotta)',
-            opacity: 0.15,
+            opacity: 0.06,
             transform: 'rotate(45deg)',
           }}
         />
         <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
           <h2
             style={{
-              fontFamily: "'Spectral',serif",
+              fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: 'clamp(32px,5vw,56px)',
               marginBottom: 20,
               lineHeight: 1.15,
+              color: 'var(--ink)',
             }}
           >
             {isEn ? 'Need a tailored combination of services?' : '¿Necesitas una combinación de servicios?'}
           </h2>
-          <p style={{ fontSize: 16, color: 'var(--tan-text)', marginBottom: 36, maxWidth: 600, margin: '0 auto 36px' }}>
+          <p style={{ fontSize: 16, color: 'var(--muted)', marginBottom: 36, maxWidth: 600, margin: '0 auto 36px', lineHeight: 1.65 }}>
             {isEn
               ? 'Many enterprise mandates start with a 3-week Technical Audit and transition directly into Cloud Architecture or Predictive AI. We engineer modular proposals aligned with your milestones.'
               : 'Muchos proyectos inician con una Auditoría Técnica de 3 semanas y continúan con el Desarrollo Cloud o la Ciencia de Datos. Estructuramos propuestas modulares adaptadas a tus metas.'}
@@ -121,8 +123,8 @@ export default function Servicios() {
               to={isEn ? '/en/about#metodo' : '/nosotros#metodo'}
               style={{
                 background: 'transparent',
-                color: 'var(--bg)',
-                border: '1px solid var(--bg)',
+                color: 'var(--ink)',
+                border: '1px solid var(--border)',
                 borderRadius: 4,
                 padding: '18px 32px',
                 fontSize: 16,
