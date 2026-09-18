@@ -67,7 +67,7 @@ export default function StackTabs() {
         <div style={{ marginBottom: 28 }}>
           <h3
             style={{
-              fontFamily: "'Spectral', serif",
+              fontFamily: 'var(--font-display)',
               fontSize: 'clamp(24px, 3.5vw, 32px)',
               fontWeight: 700,
               margin: '0 0 8px 0',
@@ -110,7 +110,7 @@ export default function StackTabs() {
                   <h4
                     style={{
                       margin: 0,
-                      fontFamily: "'IBM Plex Sans', sans-serif",
+                      fontFamily: 'var(--font-sans)',
                       fontWeight: 600,
                       fontSize: 16,
                       color: 'var(--ink)',
@@ -120,7 +120,7 @@ export default function StackTabs() {
                   </h4>
                   <span
                     style={{
-                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontFamily: 'var(--font-mono)',
                       fontSize: 11,
                       letterSpacing: 0.5,
                       textTransform: 'uppercase',

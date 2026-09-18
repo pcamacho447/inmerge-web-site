@@ -458,7 +458,6 @@ export default function Nosotros() {
               <div
                 key={step.step}
                 data-reveal=""
-                className="card-hover"
                 style={{
                   background: 'var(--bg)',
                   border: '1px solid var(--border)',
@@ -467,7 +466,6 @@ export default function Nosotros() {
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  transition: 'all 0.25s ease',
                 }}
               >
                 <div>
@@ -577,7 +575,6 @@ export default function Nosotros() {
               <div
                 key={cat.id}
                 data-reveal=""
-                className="card-hover"
                 style={{
                   background: 'var(--bg)',
                   border: '1px solid var(--border)',
@@ -586,7 +583,6 @@ export default function Nosotros() {
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  transition: 'all 0.25s ease',
                 }}
               >
                 <div>
