@@ -6,6 +6,7 @@ import Footer from '../components/Footer.jsx';
 import ServicePillarCard from '../components/ServicePillarCard.jsx';
 import ProjectCarousel from '../components/ProjectCarousel.jsx';
 import LLMAssistantModal from '../components/LLMAssistantModal.jsx';
+import { MochicaDivider } from '../components/MochicaPatterns.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Inicio() {
@@ -204,6 +205,9 @@ export default function Inicio() {
         </div>
       </div>
 
+      {/* Mochica Geometric Pattern Divider */}
+      <MochicaDivider color="rgba(216, 168, 78, 0.45)" height={18} seed="inmerge-hero-pillars" />
+
       {/* 3 Pillars Section */}
       <div style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
         <div
@@ -251,6 +255,9 @@ export default function Inicio() {
       <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 clamp(24px, 5vw, 64px) clamp(100px, 12vh, 150px)' }}>
         <ProjectCarousel onQuoteProject={(proj) => handleOpenAssistant(proj)} />
       </div>
+
+      {/* Mochica Geometric Pattern Divider */}
+      <MochicaDivider color="var(--terracotta)" height={18} seed="inmerge-cta-frieze" opacity={0.65} />
 
       {/* Final CTA */}
       <div

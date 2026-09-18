@@ -5,6 +5,7 @@ import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
 import ManifestoCarousel from '../components/ManifestoCarousel.jsx';
 import DirectorsCarousel from '../components/DirectorsCarousel.jsx';
+import { MochicaDivider, MochicaCornerFrame } from '../components/MochicaPatterns.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Nosotros() {
@@ -454,90 +455,100 @@ export default function Nosotros() {
               gap: 20,
             }}
           >
-            {stack.METHODOLOGY_STEPS.map((step) => (
-              <div
+            {stack.METHODOLOGY_STEPS.map((step, idx) => (
+              <MochicaCornerFrame
                 key={step.step}
-                data-reveal=""
-                style={{
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 4,
-                  padding: 24,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                }}
+                cornerSize={14}
+                color={idx % 2 === 0 ? 'var(--terracotta)' : 'var(--gold)'}
+                variant={idx % 2 === 0 ? 'stepped' : 'greca'}
               >
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
-                    <span
+                <div
+                  data-reveal=""
+                  style={{
+                    background: 'var(--bg)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 2,
+                    padding: 24,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '100%',
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
+                      <span
+                        style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: 20,
+                          fontWeight: 700,
+                          color: 'var(--terracotta)',
+                        }}
+                      >
+                        {step.step}
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: 10.5,
+                          letterSpacing: 1,
+                          textTransform: 'uppercase',
+                          color: 'var(--muted)',
+                          background: 'var(--cream2)',
+                          padding: '2px 8px',
+                          borderRadius: 2,
+                        }}
+                      >
+                        {step.tag}
+                      </span>
+                    </div>
+                    <h3
                       style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: 20,
+                        fontFamily: 'var(--font-display)',
+                        fontSize: 19,
                         fontWeight: 700,
-                        color: 'var(--terracotta)',
+                        color: 'var(--ink)',
+                        margin: '0 0 6px 0',
+                        lineHeight: 1.25,
                       }}
                     >
-                      {step.step}
-                    </span>
-                    <span
+                      {step.phase}
+                    </h3>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--terracotta)', marginBottom: 12 }}>
+                      {step.title}
+                    </div>
+                    <p style={{ fontSize: 13.5, color: 'var(--muted)', lineHeight: 1.6, margin: '0 0 20px 0' }}>
+                      {step.desc}
+                    </p>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
+                    <div
                       style={{
                         fontFamily: 'var(--font-mono)',
-                        fontSize: 10.5,
-                        letterSpacing: 1,
+                        fontSize: 11,
                         textTransform: 'uppercase',
-                        color: 'var(--muted)',
-                        background: 'var(--cream2)',
-                        padding: '2px 8px',
-                        borderRadius: 2,
+                        color: 'var(--ink)',
+                        fontWeight: 700,
+                        marginBottom: 8,
                       }}
                     >
-                      {step.tag}
-                    </span>
+                      {isEn ? 'Key Deliverables:' : 'Entregables Clave:'}
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.6 }}>
+                      {step.deliverables.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
                   </div>
-                  <h3
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: 19,
-                      fontWeight: 700,
-                      color: 'var(--ink)',
-                      margin: '0 0 6px 0',
-                      lineHeight: 1.25,
-                    }}
-                  >
-                    {step.phase}
-                  </h3>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--terracotta)', marginBottom: 12 }}>
-                    {step.title}
-                  </div>
-                  <p style={{ fontSize: 13.5, color: 'var(--muted)', lineHeight: 1.6, margin: '0 0 20px 0' }}>
-                    {step.desc}
-                  </p>
                 </div>
-
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 11,
-                      textTransform: 'uppercase',
-                      color: 'var(--ink)',
-                      fontWeight: 700,
-                      marginBottom: 8,
-                    }}
-                  >
-                    {isEn ? 'Key Deliverables:' : 'Entregables Clave:'}
-                  </div>
-                  <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.6 }}>
-                    {step.deliverables.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              </MochicaCornerFrame>
             ))}
           </div>
         </div>
+
+        {/* Mochica Geometric Pattern Divider between Method and Stack */}
+        <MochicaDivider color="var(--border)" height={16} seed="inmerge-nosotros-stack" style={{ margin: '0 0 64px 0' }} />
 
         {/* Bloque 2: Ecosistema & Stack Tecnológico */}
         <div id="stack">
@@ -571,70 +582,77 @@ export default function Nosotros() {
               gap: 24,
             }}
           >
-            {stack.STACK_CATEGORIES.map((cat) => (
-              <div
+            {stack.STACK_CATEGORIES.map((cat, idx) => (
+              <MochicaCornerFrame
                 key={cat.id}
-                data-reveal=""
-                style={{
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 4,
-                  padding: 24,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                }}
+                cornerSize={14}
+                color={idx % 2 === 0 ? 'var(--gold)' : 'var(--terracotta)'}
+                variant={idx % 2 === 0 ? 'greca' : 'stepped'}
               >
-                <div>
-                  <h4
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: 20,
-                      fontWeight: 700,
-                      margin: '0 0 6px 0',
-                      color: 'var(--ink)',
-                    }}
-                  >
-                    {cat.name}
-                  </h4>
-                  <p style={{ color: 'var(--muted)', fontSize: 13.5, margin: '0 0 20px 0', lineHeight: 1.5 }}>
-                    {cat.desc}
-                  </p>
+                <div
+                  data-reveal=""
+                  style={{
+                    background: 'var(--bg)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 2,
+                    padding: 24,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '100%',
+                  }}
+                >
+                  <div>
+                    <h4
+                      style={{
+                        fontFamily: 'var(--font-display)',
+                        fontSize: 20,
+                        fontWeight: 700,
+                        margin: '0 0 6px 0',
+                        color: 'var(--ink)',
+                      }}
+                    >
+                      {cat.name}
+                    </h4>
+                    <p style={{ color: 'var(--muted)', fontSize: 13.5, margin: '0 0 20px 0', lineHeight: 1.5 }}>
+                      {cat.desc}
+                    </p>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {cat.tools.map((tool) => (
-                      <div
-                        key={tool.name}
-                        style={{
-                          borderTop: '1px solid var(--border)',
-                          paddingTop: 10,
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                          <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 600, fontSize: 14.5, color: 'var(--ink)' }}>
-                            {tool.name}
-                          </span>
-                          <span
-                            style={{
-                              fontFamily: 'var(--font-mono)',
-                              fontSize: 10,
-                              letterSpacing: 0.5,
-                              textTransform: 'uppercase',
-                              color: 'var(--terracotta)',
-                              fontWeight: 700,
-                            }}
-                          >
-                            {tool.level}
-                          </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {cat.tools.map((tool) => (
+                        <div
+                          key={tool.name}
+                          style={{
+                            borderTop: '1px solid var(--border)',
+                            paddingTop: 10,
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                            <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 600, fontSize: 14.5, color: 'var(--ink)' }}>
+                              {tool.name}
+                            </span>
+                            <span
+                              style={{
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: 10,
+                                letterSpacing: 0.5,
+                                textTransform: 'uppercase',
+                                color: 'var(--terracotta)',
+                                fontWeight: 700,
+                              }}
+                            >
+                              {tool.level}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.4 }}>
+                            {tool.role}
+                          </div>
                         </div>
-                        <div style={{ fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.4 }}>
-                          {tool.role}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </MochicaCornerFrame>
             ))}
           </div>
         </div>
