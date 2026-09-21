@@ -48,7 +48,7 @@ export default function Nosotros() {
         id="mision"
         style={{
           background: 'var(--bg)',
-          padding: 'clamp(80px, 10vh, 120px) clamp(24px, 5vw, 64px) 80px',
+          padding: 'clamp(56px, 7vh, 88px) clamp(24px, 5vw, 64px) clamp(32px, 4vh, 48px)',
           maxWidth: 1440,
           margin: '0 auto',
           position: 'relative',
@@ -177,7 +177,10 @@ export default function Nosotros() {
       {/* =====================================================================
           3. DIRECTORES DE PRÁCTICA & ESPECIALISTAS SENIOR (Flujo A: Segundo/Tercer Bloque)
           ===================================================================== */}
-      <section id="directores" style={{ background: 'var(--bg)', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
+      <section
+        id="directores"
+        style={{ background: 'var(--bg)', padding: 'clamp(48px, 6vh, 64px) clamp(24px, 5vw, 64px) clamp(40px, 5vh, 56px)' }}
+      >
         <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div
             data-reveal=""
@@ -213,7 +216,10 @@ export default function Nosotros() {
       {/* =====================================================================
           4. MÉTODO + STACK — Unified Bento Grid (Methodology & Stack)
           ===================================================================== */}
-      <section id="metodo" style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
+      <section
+        id="metodo"
+        style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(48px, 6vh, 64px) clamp(24px, 5vw, 64px) clamp(56px, 7vh, 72px)' }}
+      >
         <div style={{ fontSize: 12, letterSpacing: 2, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 16 }}>
           {isEn ? 'METHODOLOGY & TECHNOLOGY' : 'METODOLOGÍA & TECNOLOGÍA'}
         </div>
@@ -228,14 +234,14 @@ export default function Nosotros() {
         >
           {isEn ? 'How We Build & What We Build With' : 'Cómo Construimos y Con Qué'}
         </h2>
-        <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 760, margin: '0 0 56px 0', lineHeight: 1.65 }}>
+        <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 760, margin: '0 0 40px 0', lineHeight: 1.65 }}>
           {isEn
             ? 'Our end-to-end engineering methodology coupled with production-grade technologies on AWS, ensuring verifiable quality, zero technical debt, and client sovereignty.'
             : 'Nuestra metodología de ingeniería de punta a punta junto a tecnologías probadas en producción sobre AWS, garantizando calidad verificable, cero deuda técnica y soberanía total del cliente.'}
         </p>
 
         {/* Bloque 1: El Método (4 Etapas de Rigor) */}
-        <div style={{ marginBottom: 72 }}>
+        <div style={{ marginBottom: 44 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
             <span
               style={{
@@ -347,7 +353,7 @@ export default function Nosotros() {
         </div>
 
         {/* Mochica Geometric Pattern Divider between Method and Stack */}
-        <MochicaDivider color="var(--border)" height={16} seed="inmerge-nosotros-stack" style={{ margin: '0 0 64px 0' }} />
+        <MochicaDivider color="var(--border)" height={16} seed="inmerge-nosotros-stack" style={{ margin: '0 0 40px 0' }} />
 
         {/* Bloque 2: Ecosistema & Stack Tecnológico */}
         <div id="stack">
@@ -449,7 +455,7 @@ export default function Nosotros() {
           background: 'var(--bg)',
           color: 'var(--ink)',
           borderTop: '1px solid var(--border)',
-          padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)',
+          padding: 'clamp(64px, 8vh, 88px) clamp(24px, 5vw, 64px)',
           overflow: 'hidden',
         }}
       >

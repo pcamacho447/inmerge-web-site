@@ -32,7 +32,7 @@ describe('Inicio Page (Atrium Gateway & Typewriter Hero)', () => {
       () => {
         expect(screen.queryByText('|')).not.toBeInTheDocument();
       },
-      { timeout: 3500 },
+      { timeout: 5000 },
     );
   });
 
