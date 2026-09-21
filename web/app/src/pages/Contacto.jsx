@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
+import { MochicaDivider } from '../components/MochicaPatterns.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { submitLeadTdr } from '../lib/leads.js';
 
@@ -105,38 +106,64 @@ export default function Contacto() {
 
   return (
     <>
-      <div style={{ padding: '120px clamp(24px, 5vw, 64px) 60px', maxWidth: 1440, margin: '0 auto' }}>
-        <div style={{ fontSize: 13, letterSpacing: 4, color: 'var(--terracotta)', fontWeight: 600, marginBottom: 24 }}>
+      {/* =====================================================================
+          1. HEADER EDITORIAL & CONTEXTO MONOGRÁFICO
+          ===================================================================== */}
+      <div
+        style={{
+          padding: 'clamp(56px, 7vh, 88px) clamp(24px, 5vw, 64px) clamp(24px, 3vh, 32px)',
+          maxWidth: 1440,
+          margin: '0 auto',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 12,
+            letterSpacing: 2,
+            color: 'var(--terracotta)',
+            fontWeight: 700,
+            marginBottom: 16,
+            textTransform: 'uppercase',
+          }}
+        >
           {isEn ? 'PROPOSALS & TECHNICAL SCOPE' : 'COTIZACIÓN & TDR'}
         </div>
         <h1
           style={{
             fontFamily: 'var(--font-display)',
             fontWeight: 700,
-            fontSize: 'clamp(42px,7.5vw,96px)',
-            lineHeight: 1.05,
+            fontSize: 'clamp(36px, 6vw, 76px)',
+            lineHeight: 1.1,
             letterSpacing: -1,
             maxWidth: 1100,
-            margin: '0 0 28px 0',
+            margin: '0 0 20px 0',
+            color: 'var(--ink)',
           }}
         >
           {isEn ? 'Technical evaluation and bespoke engineering proposals.' : 'Evaluación técnica y propuestas a medida.'}
         </h1>
-        <p style={{ fontSize: 'clamp(17px, 1.8vw, 20px)', color: 'var(--muted)', maxWidth: 760, lineHeight: 1.7, margin: 0 }}>
+        <p style={{ fontSize: 'clamp(16px, 1.6vw, 19px)', color: 'var(--muted)', maxWidth: 780, lineHeight: 1.65, margin: '0 0 32px 0' }}>
           {isEn
             ? 'We communicate directly through the engineering partners and consultants who build and audit your systems — zero commercial bureaucracy.'
             : 'Respondemos directamente con el equipo de ingeniería y consultoría que ejecutará el proyecto — sin capas comerciales ni demoras.'}
         </p>
+
+        {/* Mochica Architectural Continuous Divider */}
+        <MochicaDivider height={14} segmentWidth={32} color="var(--border)" showBaseline={true} opacity={0.8} seed="inmerge-contacto-top" />
       </div>
 
+      {/* =====================================================================
+          2. WORKSPACE B2B (Canal Inmediato + Formulario de Requerimiento)
+          ===================================================================== */}
       <div
         style={{
           maxWidth: 1440,
           margin: '0 auto',
-          padding: '80px clamp(24px, 5vw, 64px) 140px',
+          padding: 'clamp(32px, 4vh, 48px) clamp(24px, 5vw, 64px) clamp(64px, 8vh, 96px)',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-          gap: 'clamp(48px, 5vw, 84px)',
+          gap: 'clamp(40px, 5vw, 72px)',
         }}
       >
         {/* Left Column: Direct WhatsApp & Info */}
@@ -237,7 +264,7 @@ export default function Contacto() {
           >
             <div
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: 'var(--font-mono)',
                 fontSize: 11,
                 letterSpacing: 1.5,
                 color: 'var(--terracotta)',
@@ -279,7 +306,7 @@ export default function Contacto() {
           >
             <div
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: 'var(--font-mono)',
                 fontSize: 11,
                 letterSpacing: 1.5,
                 color: 'var(--terracotta)',
@@ -321,7 +348,7 @@ export default function Contacto() {
         >
           <div
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: 'var(--font-mono)',
               fontSize: 12,
               letterSpacing: 2,
               color: 'var(--terracotta)',
@@ -363,7 +390,7 @@ export default function Contacto() {
                   border: '1px solid var(--border)',
                   color: 'var(--ink)',
                   fontSize: 14,
-                  fontFamily: "'IBM Plex Sans', sans-serif",
+                  fontFamily: 'var(--font-sans)',
                 }}
               >
                 <option value="auditoria">
@@ -545,7 +572,7 @@ export default function Contacto() {
                   border: '1px solid var(--border)',
                   color: 'var(--ink)',
                   fontSize: 14,
-                  fontFamily: "'IBM Plex Sans', sans-serif",
+                  fontFamily: 'var(--font-sans)',
                   lineHeight: 1.5,
                   boxSizing: 'border-box',
                 }}
@@ -617,7 +644,7 @@ export default function Contacto() {
                       fontSize: 13,
                       fontWeight: 600,
                       textDecoration: 'none',
-                      fontFamily: "'IBM Plex Sans', sans-serif",
+                      fontFamily: 'var(--font-sans)',
                     }}
                   >
                     {isEn ? '💬 Message via WhatsApp Directly' : '💬 Contactar por WhatsApp de Inmediato'}
@@ -665,7 +692,7 @@ export default function Contacto() {
               disabled={isSubmitting}
               style={{
                 background: 'var(--terracotta)',
-                color: '#F3EADA',
+                color: 'var(--bg)',
                 border: 'none',
                 padding: '16px 32px',
                 fontSize: 15,
