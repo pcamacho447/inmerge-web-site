@@ -143,18 +143,14 @@ export default function Inicio() {
           <h1 className="atrium-h1" aria-label={fullHeadline}>
             <span aria-hidden="true">
               {displayedText}
-              <span className={`typewriter-cursor ${isTypingComplete ? 'is-complete' : 'is-typing'}`} aria-hidden="true">
-                |
-              </span>
+              {!isTypingComplete && (
+                <span className="typewriter-cursor is-typing" aria-hidden="true">
+                  |
+                </span>
+              )}
             </span>
             <span className="sr-only">{fullHeadline}</span>
           </h1>
-
-          <p className="atrium-subhead">
-            {isEn
-              ? 'Direct senior engineering advisory in mission-critical systems, cloud architectures, and applied data science.'
-              : 'Consultoría senior directa en sistemas de misión crítica, arquitecturas cloud y ciencia de datos aplicada.'}
-          </p>
         </div>
 
         {/* Bottom Tier: Pure Typographic Portals (No Boxes, No Lines) */}

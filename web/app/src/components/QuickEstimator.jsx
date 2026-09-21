@@ -598,20 +598,70 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
       className="curatorial-placard-section"
       aria-label={isEn ? 'Editorial Estimator & Service Placard' : 'Cotizador Editorial y Cédula de Servicios'}
     >
-      <div className="curatorial-container">
-        {/* Monograph Gallery Header */}
-        <div className="monograph-top-bar">
-          <div className="monograph-identity">
-            <span className="monograph-label">{isEn ? 'ENGINEERING MONOGRAPH' : 'MONOGRAFÍA DE INGENIERÍA'}</span>
-            <span className="monograph-dot" aria-hidden="true" />
-            <span className="monograph-coords" aria-hidden="true">
-              LIMA · 08°06′S 79°01′W
-            </span>
+      {/* 1. Full-Bleed Hero Prototype Viewport (Image First — Ancho y Alto de Sección Completa) */}
+      <div className="curatorial-monumental-viewport" role="figure" aria-label={prototypeCaption}>
+        <div
+          className="monumental-image-container"
+          role="button"
+          tabIndex={0}
+          aria-label={isEn ? `Inspect ${prototypeAlt} at full scale` : `Inspeccionar ${prototypeAlt} a escala completa`}
+          aria-haspopup="dialog"
+          onClick={() => setIsLightboxOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsLightboxOpen(true);
+            }
+          }}
+        >
+          <img
+            key={activeSolution.id}
+            src={activeSolution.prototype.src}
+            alt={prototypeAlt}
+            className="monumental-prototype-img"
+            loading="lazy"
+          />
+          <div className="monumental-zoom-hint" aria-hidden="true">
+            <span className="hint-cross">⤢</span>
+            <span>{isEn ? 'INSPECT 1:1' : 'INSPECCIONAR 1:1'}</span>
           </div>
-          <h1 className="monograph-h1">{lineTitle}</h1>
         </div>
 
-        {/* 1. Disciplines Gallery Bar (Hairline Typographic Index) */}
+        <div className="monumental-caption-bar">
+          <span className="caption-diamond" aria-hidden="true">
+            ◆
+          </span>
+          <span className="caption-text">{prototypeCaption}</span>
+          <span className="caption-coords-inline" aria-hidden="true">
+            [ INMERGE · SALA 0{pillarIndex + 1} · {activeSolution.catNumber} ]
+          </span>
+        </div>
+      </div>
+
+      {/* 2. Monograph Identity & Navigation Band (Directly Below Hero Image) */}
+      <div className="curatorial-header-band">
+        {/* Top Minimal HUD: Identity, Minimal H1 & Coords directly on Arena Canvas */}
+        <div className="monumental-top-hud">
+          <div className="monumental-identity-cluster">
+            <span className="monograph-label">{isEn ? 'ENGINEERING MONOGRAPH' : 'MONOGRAFÍA DE INGENIERÍA'}</span>
+            <span className="monograph-dot" aria-hidden="true" />
+            <h1 className="monumental-h1">{lineTitle}</h1>
+            <span className="monumental-hud-coords" aria-hidden="true">
+              · 08°06′S 79°01′W
+            </span>
+          </div>
+
+          <div className="monumental-badge-overlay">
+            <span className="monumental-dot" aria-hidden="true" />
+            <span className="monumental-badge-text">
+              {isEn
+                ? `SPECIMEN ${specimenIndexFormatted} / 09 — 1:1 PROTOTYPE VIEW`
+                : `ESPECÍMEN ${specimenIndexFormatted} / 09 — VISTA DE PROTOTIPO 1:1`}
+            </span>
+          </div>
+        </div>
+
+        {/* Minimal Disciplines Selector (Tabs) directly on Arena Canvas */}
         <div className="gallery-disciplines-bar" role="tablist" aria-label={isEn ? 'Disciplines' : 'Disciplinas'}>
           {Object.entries(SOLUTIONS_CATALOG).map(([key, item]) => {
             const isSelected = selectedPillarKey === key;
@@ -629,12 +679,13 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
               >
                 <span className="discipline-num">[{item.code}]</span>
                 <span className="discipline-label">{item.name[lang] || item.name.es}</span>
+                {isSelected && <span className="discipline-step-indicator" aria-hidden="true" />}
               </button>
             );
           })}
         </div>
 
-        {/* 2. Specimens Gallery Index (Quiet Typographic Row — No Pills) */}
+        {/* Minimal Specimens Selector (Projects in Room) directly on Arena Canvas */}
         <div className="gallery-specimens-index" aria-label={isEn ? 'Works in room' : 'Obras en sala'}>
           {activePillar.solutions.map((sol, idx) => {
             const isSelected = selectedSolutionIndex === idx;
@@ -646,193 +697,144 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
                 className={`gallery-specimen-item ${isSelected ? 'is-active' : ''}`}
                 onClick={() => setSelectedSolutionIndex(idx)}
               >
+                <span className="item-marker-diamond" aria-hidden="true">
+                  {isSelected ? '◆' : '◇'}
+                </span>
                 <span className="item-marker">{itemNum}</span>
                 <span className="item-title">{sol.title[lang] || sol.title.es}</span>
               </button>
             );
           })}
         </div>
+      </div>
 
-        {/* 3. The Monumental Prototype Window (Horizontal Top Exhibition Tier) */}
-        <div className="curatorial-monumental-viewport" role="figure" aria-label={prototypeCaption}>
-          <div className="monumental-badge-overlay">
-            <span className="monumental-dot" aria-hidden="true" />
-            <span className="monumental-badge-text">
-              {isEn
-                ? `SPECIMEN ${specimenIndexFormatted} / 09 — 1:1 PROTOTYPE VIEW`
-                : `ESPECÍMEN ${specimenIndexFormatted} / 09 — VISTA DE PROTOTIPO 1:1`}
-            </span>
-          </div>
-
-          <div className="monumental-coords-overlay" aria-hidden="true">
-            <span className="coords-cross">+</span>
-            <span>08°06′S · 79°01′W — SALA 0{pillarIndex + 1}</span>
-          </div>
-
-          <div
-            className="monumental-image-container"
-            role="button"
-            tabIndex={0}
-            aria-label={isEn ? `Inspect ${prototypeAlt} at full scale` : `Inspeccionar ${prototypeAlt} a escala completa`}
-            aria-haspopup="dialog"
-            onClick={() => setIsLightboxOpen(true)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setIsLightboxOpen(true);
-              }
-            }}
-          >
-            <img
-              key={activeSolution.id}
-              src={activeSolution.prototype.src}
-              alt={prototypeAlt}
-              className="monumental-prototype-img"
-              loading="lazy"
-            />
-            <div className="monumental-zoom-hint" aria-hidden="true">
-              <span className="hint-cross">⤢</span>
-              <span>{isEn ? 'INSPECT 1:1' : 'INSPECCIONAR 1:1'}</span>
-            </div>
-          </div>
-
-          <div className="monumental-caption-bar">
-            <span className="caption-diamond" aria-hidden="true">
-              ◆
-            </span>
-            <span className="caption-text">{prototypeCaption}</span>
-            <span className="caption-coords-inline" aria-hidden="true">
-              [ INMERGE · SALA 0{pillarIndex + 1} · {activeSolution.catNumber} ]
-            </span>
-          </div>
-        </div>
-
-        {/* 4. The Museum Wall Placard (Horizontal Grand Curatorial Bench) */}
+      {/* 3. The Museum Wall Placard (Editorial Padded Folio on Arena Canvas) */}
+      <div className="curatorial-placard-stage">
         <div className="curatorial-placard-grid curatorial-bench-grid" role="region" aria-label={solutionTitle}>
-          {/* Column 1: Registry, Index & Currency */}
-          <div className="bench-col bench-col-registry">
-            <div className="bench-item">
-              <span className="placard-label">{isEn ? 'CATALOGUE ID' : 'CÓDIGO DE CATÁLOGO'}</span>
+          {/* Header Row: Metadata + Title + Memoir */}
+          <div className="placard-hero-row">
+            <div className="placard-meta-strip">
               <span className="placard-cat-number">{activeSolution.catNumber}</span>
-            </div>
-            <div className="bench-item">
-              <span className="placard-label">{isEn ? 'DISCIPLINE' : 'DISCIPLINA'}</span>
+              <span className="placard-meta-divider" aria-hidden="true">
+                ·
+              </span>
               <span className="placard-discipline-text">{lineTitle}</span>
+              <span className="placard-meta-divider" aria-hidden="true">
+                ·
+              </span>
+              <span className="bench-specimen-id">
+                {isEn ? 'SPECIMEN' : 'ESPÉCIMEN'} {specimenIndexFormatted} / 09
+              </span>
             </div>
-            <div className="bench-item">
-              <span className="placard-label">{isEn ? 'EXHIBITION SPECIMEN' : 'ESPÉCIMEN EN SALA'}</span>
-              <span className="bench-specimen-id">{specimenIndexFormatted} / 09</span>
-            </div>
-            <div className="bench-item bench-currency-item">
-              <span className="placard-label">{isEn ? 'CURRENCY' : 'MONEDA'}</span>
-              <div className="curatorial-currency-switch" role="group" aria-label={isEn ? 'Currency Selector' : 'Selector de Moneda'}>
-                <button
-                  type="button"
-                  className={`currency-btn ${currency === 'PEN' ? 'active' : ''}`}
-                  aria-pressed={currency === 'PEN'}
-                  onClick={() => setCurrency('PEN')}
-                >
-                  PEN
-                </button>
-                <span className="currency-divider">|</span>
-                <button
-                  type="button"
-                  className={`currency-btn ${currency === 'USD' ? 'active' : ''}`}
-                  aria-pressed={currency === 'USD'}
-                  onClick={() => setCurrency('USD')}
-                >
-                  USD
-                </button>
-              </div>
-            </div>
-          </div>
 
-          {/* Column 2: Scope & Technical Abstract */}
-          <div className="bench-col bench-col-scope">
-            <span className="placard-label">{isEn ? 'SOLUTION SCOPE & MEMOIR' : 'ALCANCE & MEMORIA TÉCNICA'}</span>
             <h3 className="placard-solution-title">{solutionTitle}</h3>
             <p className="placard-solution-desc">{activeSolution.description[lang] || activeSolution.description.es}</p>
           </div>
 
-          {/* Column 3: Engineering Deliverables & Conditions */}
-          <div className="bench-col bench-col-specs">
-            <div className="bench-specs-group">
-              <h4 className="detail-section-title">
-                <span className="detail-diamond" aria-hidden="true">
-                  ◆
-                </span>
-                {isEn ? 'TECHNICAL SPECIFICATIONS' : 'ESPECIFICACIONES TÉCNICAS'}
-              </h4>
-              <ul className="curatorial-specs-list">
-                {(activeSolution.specs[lang] || activeSolution.specs.es).map((spec, i) => (
-                  <li key={i}>
-                    <span className="list-marker">—</span>
-                    <span>{spec}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bench-specs-group bench-sla-group">
-              <h4 className="detail-section-title">
-                <span className="detail-diamond" aria-hidden="true">
-                  ◆
-                </span>
-                {isEn ? 'DELIVERY & SLA CONDITIONS' : 'CONDICIONES DE ENTREGA & SLA'}
-              </h4>
-              <ul className="curatorial-specs-list">
-                <li className="highlight-condition">
-                  <span className="list-marker">—</span>
-                  <span>
-                    <strong>{isEn ? 'Estimated Timeline:' : 'Plazo Estimado:'}</strong>{' '}
-                    {activeSolution.timeline[lang] || activeSolution.timeline.es}
+          {/* Main Dual Body: Technical Wing (Left) + Commercial/Investment Wing (Right) */}
+          <div className="placard-body-split">
+            {/* Left Wing: Technical Specifications & Delivery Conditions */}
+            <div className="placard-specs-wing">
+              <div className="bench-specs-group">
+                <h4 className="detail-section-title">
+                  <span className="detail-diamond" aria-hidden="true">
+                    ◆
                   </span>
-                </li>
-                {(activeSolution.conditions[lang] || activeSolution.conditions.es).map((cond, i) => (
-                  <li key={i}>
+                  {isEn ? 'TECHNICAL SPECIFICATIONS' : 'ESPECIFICACIONES TÉCNICAS'}
+                </h4>
+                <ul className="curatorial-specs-list">
+                  {(activeSolution.specs[lang] || activeSolution.specs.es).map((spec, i) => (
+                    <li key={i}>
+                      <span className="list-marker">—</span>
+                      <span>{spec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bench-specs-group bench-sla-group">
+                <h4 className="detail-section-title">
+                  <span className="detail-diamond" aria-hidden="true">
+                    ◆
+                  </span>
+                  {isEn ? 'DELIVERY & SLA CONDITIONS' : 'CONDICIONES DE ENTREGA & SLA'}
+                </h4>
+                <ul className="curatorial-specs-list">
+                  <li className="highlight-condition">
                     <span className="list-marker">—</span>
-                    <span>{cond}</span>
+                    <span>
+                      <strong>{isEn ? 'Estimated Timeline:' : 'Plazo Estimado:'}</strong>{' '}
+                      {activeSolution.timeline[lang] || activeSolution.timeline.es}
+                    </span>
                   </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* Column 4: Baseline Investment & Immediate Action */}
-          <div className="bench-col bench-col-actions">
-            <div className="bench-investment-container">
-              <span className="investment-label">{isEn ? 'BASELINE INVESTMENT:' : 'INVERSIÓN REFERENCIAL:'}</span>
-              <div className="investment-main">{formattedPrice}</div>
-              <span className="investment-note">
-                {isEn ? 'Scope calibrated to milestone deliverables' : 'Alcance calibrado a entregables auditables'}
-              </span>
+                  {(activeSolution.conditions[lang] || activeSolution.conditions.es).map((cond, i) => (
+                    <li key={i}>
+                      <span className="list-marker">—</span>
+                      <span>{cond}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            <div className="bench-actions-buttons">
-              <a href={waLink(whatsAppMsg)} target="_blank" rel="noopener noreferrer" className="btn-accent curatorial-cta-btn">
-                {isEn ? 'Quote this Solution via WhatsApp ↗' : 'Cotizar esta Solución vía WhatsApp ↗'}
-              </a>
+            {/* Right Wing: Investment & Direct Dispatch (Integrated on Arena, No Card) */}
+            <div className="placard-action-wing">
+              <div className="curatorial-investment-block">
+                <div className="investment-header-row">
+                  <span className="investment-label">{isEn ? 'BASELINE INVESTMENT:' : 'INVERSIÓN REFERENCIAL:'}</span>
+                  <div className="curatorial-currency-switch" role="group" aria-label={isEn ? 'Currency Selector' : 'Selector de Moneda'}>
+                    <button
+                      type="button"
+                      className={`currency-btn ${currency === 'PEN' ? 'active' : ''}`}
+                      aria-pressed={currency === 'PEN'}
+                      onClick={() => setCurrency('PEN')}
+                    >
+                      PEN
+                    </button>
+                    <span className="currency-divider">|</span>
+                    <button
+                      type="button"
+                      className={`currency-btn ${currency === 'USD' ? 'active' : ''}`}
+                      aria-pressed={currency === 'USD'}
+                      onClick={() => setCurrency('USD')}
+                    >
+                      USD
+                    </button>
+                  </div>
+                </div>
 
-              {onOpenLLMAssistant && (
-                <button
-                  type="button"
-                  className="btn-outline curatorial-llm-btn"
-                  onClick={() =>
-                    onOpenLLMAssistant({
-                      pillar: selectedPillarKey,
-                      pillarName: lineTitle,
-                      solutionId: activeSolution.id,
-                      solutionTitle,
-                      solutionEstimate: {
-                        timeline: activeSolution.timeline[lang] || activeSolution.timeline.es,
-                        formattedPrice,
-                      },
-                    })
-                  }
-                >
-                  {isEn ? 'Consult with Alaec (AI) →' : 'Consultar con Alaec (IA) →'}
-                </button>
-              )}
+                <div className="investment-main">{formattedPrice}</div>
+                <span className="investment-note">
+                  {isEn ? 'Scope calibrated to milestone deliverables' : 'Alcance calibrado a entregables auditables'}
+                </span>
+              </div>
+
+              <div className="bench-actions-buttons">
+                <a href={waLink(whatsAppMsg)} target="_blank" rel="noopener noreferrer" className="btn-accent curatorial-cta-btn">
+                  {isEn ? 'Quote this Solution via WhatsApp ↗' : 'Cotizar esta Solución vía WhatsApp ↗'}
+                </a>
+
+                {onOpenLLMAssistant && (
+                  <button
+                    type="button"
+                    className="btn-outline curatorial-llm-btn"
+                    onClick={() =>
+                      onOpenLLMAssistant({
+                        pillar: selectedPillarKey,
+                        pillarName: lineTitle,
+                        solutionId: activeSolution.id,
+                        solutionTitle,
+                        solutionEstimate: {
+                          timeline: activeSolution.timeline[lang] || activeSolution.timeline.es,
+                          formattedPrice,
+                        },
+                      })
+                    }
+                  >
+                    {isEn ? 'Consult with Alaec (AI) →' : 'Consultar con Alaec (IA) →'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

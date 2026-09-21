@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Inicio from './Inicio.jsx';
 import { LanguageProvider, STORAGE_KEY } from '../context/LanguageContext.jsx';
@@ -10,7 +10,7 @@ describe('Inicio Page (Atrium Gateway & Typewriter Hero)', () => {
     localStorage.setItem(STORAGE_KEY, 'es');
   });
 
-  it('renders the cinematic atrium hero section with typewriter h1 and coordinates in Spanish', () => {
+  it('renders the cinematic atrium hero section with typewriter h1 and coordinates in Spanish, removing cursor upon completion', async () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <LanguageProvider>
@@ -27,6 +27,13 @@ describe('Inicio Page (Atrium Gateway & Typewriter Hero)', () => {
     ).toBeInTheDocument();
 
     expect(screen.getByText(/08°06′S 79°01′W · LIMA, PERÚ · CONSULTORÍA DE INGENIERÍA/i)).toBeInTheDocument();
+
+    await waitFor(
+      () => {
+        expect(screen.queryByText('|')).not.toBeInTheDocument();
+      },
+      { timeout: 3500 },
+    );
   });
 
   it('renders bilingual hero headline and badge when loaded on /en path', () => {
@@ -62,6 +69,7 @@ describe('Inicio Page (Atrium Gateway & Typewriter Hero)', () => {
     expect(screen.queryByText(/CASOS DE ESTUDIO · ARQUITECTURA FORENSE/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /^Nuestros Pilares$/i, level: 2 })).not.toBeInTheDocument();
     expect(screen.queryByText(/Iniciemos una evaluación técnica de tus sistemas y datos/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Consultoría senior directa/i)).not.toBeInTheDocument();
 
     // Verify the 3 Architectural Portals
     const navPortals = screen.getByRole('navigation', { name: /Salas de Exhibición/i });

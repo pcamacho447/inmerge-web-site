@@ -28,7 +28,7 @@ export default function Servicios() {
   return (
     <>
       {/* Full-Canvas Curatorial Pavilion — Monumental Horizontal Exhibition */}
-      <div style={{ width: '100%', maxWidth: '100%', margin: '0', padding: '54px clamp(20px, 3.5vw, 56px) 80px', boxSizing: 'border-box' }}>
+      <div className="services-curatorial-canvas">
         <QuickEstimator initialPillar="web_pages" onOpenLLMAssistant={(ctx) => handleOpenAssistant(ctx)} />
       </div>
 
