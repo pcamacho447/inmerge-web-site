@@ -22,9 +22,9 @@ tokens:
     navDarkText: "#F3EADA"
     navLightText: "#241A12"
   typography:
-    headlineFamily: "'Spectral', serif"
-    bodyFamily: "'IBM Plex Sans', sans-serif"
-    codeFamily: "'IBM Plex Mono', monospace"
+    headlineFamily: "'Space Grotesk', sans-serif"
+    bodyFamily: "'Space Grotesk', sans-serif"
+    codeFamily: "'Space Mono', monospace"
     weights:
       regular: 400
       medium: 500
@@ -64,9 +64,11 @@ Visual identity and interface design specification for the bilingual expansion (
 ## 1. Brand & Style
 
 ### 1.1 Identity Resonance
+
 Inmerge embodies an **Editorial Tech Premium** aesthetic. Rooted in Lima, Peru, it projects the intellectual rigor and structural authority of a boutique software engineering, technical audit, and applied data science firm.
 
 The international version in English must preserve this exact authority:
+
 - **Never colloquial or generic SaaS-like**: Tone reflects senior technical partnership, not junior hype or startup buzzwords.
 - **Typographic Gravity**: Classical serif headlines (`Spectral`) balanced with rationalist sans-serif body copy (`IBM Plex Sans`) and tabular engineering metrics (`IBM Plex Mono`).
 - **Warm Mineral Substrate**: Built on warm arena (`#F3EADA`) and cream (`#EBDFC9`), rejecting cold clinical whites or generic dark modes.
@@ -77,18 +79,20 @@ The international version in English must preserve this exact authority:
 
 ### 2.1 Palette Definition & Semantic Mapping
 
-| Token Name | Hex / Value | Semantic Role & Contrast |
-| :--- | :--- | :--- |
-| `var(--bg)` | `#F3EADA` | Primary warm ground substrate for page canvases. |
-| `var(--ink)` | `#241A12` | Deep mineral ink for body typography, primary headers, and dark navbars. |
-| `var(--terracotta)` | `#A8472B` | Brand signature accent: primary CTAs, active language pill, diamond insignia. |
-| `var(--gold)` | `#D8A84E` | Excellence badge indicators, hero highlights, active state in dark navbars. |
-| `var(--ochre)` | `#C68A3D` | Secondary technical markers and category badges. |
-| `var(--cream2)` | `#EBDFC9` | Elevated card surfaces and panel containers. |
-| `var(--border)` | `rgba(36, 26, 18, 0.12)` | Subtle hairline structural dividers. |
+| Token Name          | Hex / Value              | Semantic Role & Contrast                                                      |
+| :------------------ | :----------------------- | :---------------------------------------------------------------------------- |
+| `var(--bg)`         | `#F3EADA`                | Primary warm ground substrate for page canvases.                              |
+| `var(--ink)`        | `#241A12`                | Deep mineral ink for body typography, primary headers, and dark navbars.      |
+| `var(--terracotta)` | `#A8472B`                | Brand signature accent: primary CTAs, active language pill, diamond insignia. |
+| `var(--gold)`       | `#D8A84E`                | Excellence badge indicators, hero highlights, active state in dark navbars.   |
+| `var(--ochre)`      | `#C68A3D`                | Secondary technical markers and category badges.                              |
+| `var(--cream2)`     | `#EBDFC9`                | Elevated card surfaces and panel containers.                                  |
+| `var(--border)`     | `rgba(36, 26, 18, 0.12)` | Subtle hairline structural dividers.                                          |
 
 ### 2.2 Color Contrast & States in Navigation
+
 The navigation header has two distinct optical states:
+
 1. **Cinematic Hero State (`pathname === '/'` or `'/en'`, `scrollY <= 30`):**
    - Background: `transparent`.
    - Text color: `#F3EADA` (AAA on dark video overlay).
@@ -105,25 +109,28 @@ The navigation header has two distinct optical states:
 ## 3. Typography
 
 ### 3.1 Font Stack Hierarchy
+
 ```css
---font-headline: 'Spectral', Georgia, serif;
---font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
---font-mono: 'IBM Plex Mono', monospace;
+--font-display: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+--font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+--font-mono: "Space Mono", monospace;
 ```
 
 ### 3.2 Typographic Hierarchy in Bilingual Layouts
-- **Hero Title (`H1`):** `Spectral` 700, `clamp(32px, 5vw, 56px)`, line-height 1.15, letter-spacing -0.02em.
-  - *ES:* "Ingeniería de Software de Precisión, Auditoría de Sistemas y Ciencia de Datos"
-  - *EN:* "High-Density Software Engineering, Systems Auditing & Applied Data Science"
-- **Section Headers (`H2`):** `Spectral` 700, `clamp(26px, 3.5vw, 40px)`.
-- **Navigation Links:** `IBM Plex Sans` 500, `14px`, tracking +0.02em.
-- **Language Switcher Labels:** `IBM Plex Mono` 600, `12px`, uppercase, tracking +0.05em. Tabular layout prevents layout shift when toggling between `ES` and `EN`.
+
+- **Hero Title (`H1`):** `Space Grotesk` 700, `clamp(32px, 5vw, 56px)`, line-height 1.15, letter-spacing -0.02em.
+  - _ES:_ "Ingeniería de software, auditoría de sistemas e inteligencia de datos."
+  - _EN:_ "Software engineering, systems audit and data intelligence."
+- **Section Headers (`H2`):** `Space Grotesk` 700, `clamp(26px, 3.5vw, 40px)`.
+- **Navigation Links:** `Space Grotesk` 500, `14px`, tracking +0.02em.
+- **Language Switcher Labels:** `Space Mono` 700, `11px`, uppercase, tracking +0.05em. Tabular layout prevents layout shift when toggling between `ES` and `EN`.
 
 ---
 
 ## 4. Layout & Spacing
 
 ### 4.1 Header Positioning & Geometry
+
 The Language Switcher is positioned in the desktop navigation bar between the navigation links cluster and the authentication action button:
 
 ```
@@ -141,6 +148,7 @@ The Language Switcher is positioned in the desktop navigation bar between the na
 ### 5.1 Language Switcher Pill (`LanguageSwitcher.jsx`)
 
 #### Visual Specification
+
 - **Container:**
   - Display: `inline-flex`.
   - Border radius: `var(--rounded-pill)` (`9999px`).
@@ -162,6 +170,7 @@ The Language Switcher is positioned in the desktop navigation bar between the na
   - Focus Ring: `2px solid var(--gold)`, offset `2px`.
 
 ### 5.2 Micro-Interactions
+
 - **Hover State:** Inactive button text color shifts from `0.65` opacity to `1.0` with subtle background glow `rgba(168, 71, 43, 0.08)`.
 - **Active Selection Transition:** Smooth sliding pill effect or background cross-fade (`0.2s ease`).
 
@@ -170,12 +179,14 @@ The Language Switcher is positioned in the desktop navigation bar between the na
 ## 6. Do's and Don'ts
 
 ### Do:
+
 - **DO** use clean typographic ISO codes: `ES` and `EN`.
 - **DO** maintain the exact same typographic scale and vertical rhythm in both languages.
 - **DO** provide high-contrast focus rings for keyboard navigation.
-- **DO** translate technical terms into senior engineering parlance (*"Technical & Data Auditing"*, *"Systems Modernization"*, *"Predictive Machine Learning"*).
+- **DO** translate technical terms into senior engineering parlance (_"Technical & Data Auditing"_, _"Systems Modernization"_, _"Predictive Machine Learning"_).
 
 ### Don't:
+
 - **DON'T** use country flags (e.g., 🇪🇸, 🇺🇸, 🇬🇧, 🇵🇪). Flags represent states, not linguistic systems, and reduce perceived B2B maturity.
 - **DON'T** use generic automated translation widgets (Google Translate dropdowns, floating modals).
 - **DON'T** allow untranslated mixed content or orphaned Spanish badges on the `/en/*` routes.

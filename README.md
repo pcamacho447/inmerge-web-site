@@ -25,16 +25,19 @@ Inmerge provee soluciones de ingeniería para organizaciones que requieren rigor
 ```
 
 ### 1. Pilar 01 — Auditoría Técnica y de Datos
+
 - **Integridad & Calidad de Datos:** Análisis forense y validación de bases de datos, detección de inconsistencias, duplicados y normalización de pipelines.
 - **Auditoría Cloud & Seguridad:** Evaluación de postura de seguridad, permisos IAM, configuraciones de red y cumplimiento normativo en AWS y GCP.
 - **Revisión de Código & Rendimiento:** Diagnóstico de cuellos de botella, optimización de consultas SQL complejas y aseguramiento de mejores prácticas de software.
 
 ### 2. Pilar 02 — Desarrollo Tecnológico & Cloud
+
 - **Arquitectura Cloud en AWS:** Diseño e implementación de infraestructura moderna basada en AWS ECS (Fargate), AWS Lambda, Amazon RDS (PostgreSQL/Aurora), Amazon S3 y CloudFront.
 - **Software Empresarial & Microservicios:** Desarrollo de aplicaciones web y plataformas transaccionales a medida con alta disponibilidad y tolerancia a fallos.
 - **APIs & Modernización de Sistemas:** Creación de APIs REST seguras, desacoplamiento de monolitos legados y automatización de procesos operativos.
 
 ### 3. Pilar 03 — Ciencia de Datos & Inteligencia Artificial
+
 - **Machine Learning & Modelos Predictivos:** Modelado estadístico avanzado, forecasting de demanda, scoring de riesgos y algoritmos de optimización.
 - **Integración de IA Generativa & Agentes:** Implementación de asistentes inteligentes, flujos RAG y automatización cognitiva sobre datos corporativos privados.
 - **Dashboards Ejecutivos en Tiempo Real:** Paneles interactivos de control gerencial para visualización continua de KPIs y métricas críticas de negocio.
@@ -52,16 +55,17 @@ Inmerge provee soluciones de ingeniería para organizaciones que requieren rigor
 
 ## 🛠️ Stack Tecnológico
 
-| Capa / Dominio | Tecnologías y Herramientas |
-|---|---|
-| **Frontend** | React 18, Vite 5, React Router DOM v6 |
-| **Arquitectura UI** | Code-Splitting con `React.lazy()` y `<Suspense>`, Skeletons Shimmer, `ErrorBoundary` |
-| **Estilos & UI Tokens** | Vanilla CSS modular, variables CSS nativas, Micro-interacciones Editorial Tech |
-| **Backend & Base de Datos** | Supabase (PostgreSQL 15+, Row Level Security, Supabase Auth, Functions RPC) |
-| **Tiempo Real (Realtime)** | Supabase Realtime WebSockets (`supabase_realtime` publication, Replica Identity Full) |
-| **Almacenamiento** | Supabase Storage (Bucket privado `project-deliverables` con Presigned URLs) |
-| **Cloud Hosting** | AWS S3 + Amazon CloudFront (Distribución SPA con fallback a `index.html` y HTTPS) |
-| **Testing & Calidad** | Vitest, React Testing Library, ESLint 9, Prettier (17 suites, 90+ tests) |
+| Capa / Dominio              | Tecnologías y Herramientas                                                                                           |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Frontend**                | React 18, Vite 5, React Router DOM v6, View Transitions API                                                          |
+| **Arquitectura UI**         | Code-Splitting con `React.lazy()` y `<Suspense>`, Skeletons Shimmer, `ErrorBoundary`                                 |
+| **Estilos & UI Tokens**     | Vanilla CSS modular, variables CSS nativas, Micro-interacciones Editorial Tech                                       |
+| **Iconografía & Motivos**   | Geometría Mochica-Chimú en SVG puro (`MochicaDivider`, `MochicaStepIcon`, `MochicaCornerFrame`, `MochicaPodiumBase`) |
+| **Backend & Base de Datos** | Supabase (PostgreSQL 15+, Row Level Security, Supabase Auth, Functions RPC)                                          |
+| **Tiempo Real (Realtime)**  | Supabase Realtime WebSockets (`supabase_realtime` publication, Replica Identity Full)                                |
+| **Almacenamiento**          | Supabase Storage (Bucket privado `project-deliverables` con Presigned URLs)                                          |
+| **Cloud Hosting**           | AWS S3 + Amazon CloudFront (Distribución SPA con fallback a `index.html` y HTTPS)                                    |
+| **Testing & Calidad**       | Vitest, React Testing Library, ESLint 9, Prettier (38 suites, 209 tests al 100%)                                     |
 
 ---
 
@@ -85,38 +89,41 @@ La plataforma implementa controles estrictos de seguridad tanto en la capa de fr
 
 ## 🎨 Sistema de Diseño (Editorial Tech Premium)
 
-El diseño visual proyecta sofisticación técnica y precisión editorial:
+El diseño visual proyecta sofisticación técnica y precisión editorial sobre el sustrato cálido mineral arena (`--bg: #F3EADA`):
 
 ### Paleta de Colores
-| Token | Variable CSS | Hex | Uso en Plataforma |
-|---|---|---|---|
-| **Arena** | `--bg` | `#F3EADA` | Superficie de fondo principal |
-| **Tinta** | `--ink` | `#241A12` | Tipografía principal y fondos oscuros |
-| **Terracota** | `--terracotta` | `#A8472B` | Acento de marca, botones de acción primaria (`.btn-accent`) |
-| **Oro** | `--gold` | `#D8A84E` | Indicadores de calidad y estados de hito |
-| **Ocre** | `--ochre` | `#C68A3D` | Estados intermedios y acentos secundarios |
-| **Crema** | `--cream2` | `#EBDFC9` | Tarjetas interactivas (`.card-hover`), paneles y tablas |
 
-### Tipografía
-- **`Spectral` (Serif):** Titulares principales, imagotipo e identidad editorial de prestigio.
-- **`IBM Plex Sans` (Sans-serif):** Cuerpo de texto, interfaz de usuario, navegación y formularios.
-- **`IBM Plex Mono` (Monospace):** Cifras tabulares, métricas de ingeniería, estados RAG y logs de auditoría.
+| Token         | Variable CSS   | Hex       | Uso en Plataforma                                           |
+| ------------- | -------------- | --------- | ----------------------------------------------------------- |
+| **Arena**     | `--bg`         | `#F3EADA` | Superficie de fondo principal (Lienzo Continuo)             |
+| **Tinta**     | `--ink`        | `#241A12` | Tipografía principal y fondos oscuros                       |
+| **Terracota** | `--terracotta` | `#A8472B` | Acento de marca, botones de acción primaria (`.btn-accent`) |
+| **Oro**       | `--gold`       | `#D8A84E` | Indicadores de calidad y estados de hito                    |
+| **Ocre**      | `--ochre`      | `#C68A3D` | Estados intermedios y acentos secundarios                   |
+| **Crema**     | `--cream2`     | `#EBDFC9` | Tarjetas interactivas (`.card-hover`), paneles y tablas     |
+
+### Tipografía (Tokens del Sistema)
+
+- **`Space Grotesk` (`var(--font-sans)`, `var(--font-display)`):** Titulares, logotipo, cuerpo de texto editorial, interfaz de usuario y formularios.
+- **`Space Mono` (`var(--font-mono)`):** Cifras tabulares, métricas de ingeniería, estados RAG, coordenadas geográficas, códigos de inventario y logs de auditoría.
 
 ---
 
 ## 🗺️ Mapa de Rutas de la Plataforma
 
-### Rutas Públicas
-- **`/` (Inicio):** Propuesta de valor, pilares interactivos, diagrama de arquitectura en 4 capas y principios de ingeniería.
-- **`/servicios` (Servicios):** Catálogo de servicios filtrable por pilar, alcances técnicos, diagnósticos y cotización directa.
-- **`/metodologia` (Stack & Metodología):** Las 4 fases del Método Inmerge y explorador de tecnologías categorizadas.
-- **`/nosotros` (Nosotros):** Manifiesto de ingeniería, compromisos de calidad y perfiles técnicos senior.
-- **`/contacto` (Contacto & TDR):** Formulario estructurado para requerimientos técnicos y enlace directo a WhatsApp.
+### Rutas Públicas (Bilingües ES / EN)
+
+- **`/` / `/en` (Inicio / Atrio Cinematográfico):** Experiencia inmersiva en viewport 100vh con video de fondo cinemático, máquina de escribir (_typewriter_) accesible, coordenadas Mochica, tríptico de portales arquitectónicos directos y micro-footer integrado.
+- **`/servicios` / `/en/services` (Monografía & Galería de Prototipos 1:1):** Monografía de ingeniería a ancho completo (100vw). Ventana de Exhibición Monumental con fotografía del prototipo real activo, Lightbox de inspección 1:1 con atajos de teclado (`[ ← ]` / `[ → ]` / `[ ESC ]`), selector de las 3 Líneas de Servicio (`01 Páginas Web`, `02 Ingeniería de Software`, `03 Inteligencia de Negocios`), banco de especificaciones técnicas y Estimador Ágil Interactivo (`<QuickEstimator />`) en PEN/USD con enlace directo a WhatsApp y consulta técnica con Alaec IA.
+- **`/nosotros` / `/en/about` (Nosotros & Metodología):** Manifiesto de ingeniería, Podio ceremonial Mochica (Propósito, Misión y Visión con `<MochicaStepIcon />`), Equipo Directivo con navegación fluida y scroll virtual (`<DirectorsCarousel />`), las 4 Etapas del Método Inmerge y matriz tecnológica curada sin badges de falso nivel.
+- **`/contacto` / `/en/contact` (Contacto & TDR):** Formulario B2B estructurado con selector de pilares, honeypot invisible anti-spam, limitador de tasa transaccional, compromisos de nivel de servicio (SLA), metadatos institucionales y enlace con mensaje pre-rellenado a WhatsApp.
+- **`/cookies` / `/en/cookies` (Política de Cookies):** Declaración de cookies técnicas esenciales y panel de configuración de preferencias.
 
 ### Rutas Autenticadas (Portal & Gestión)
-- **`/login` / `/registro`:** Autenticación segura gestionada por Supabase Auth.
-- **`/cuenta` (Portal de Clientes):** Vista exclusiva del cliente para consultar el estado de salud de sus proyectos, cronogramas Gantt y descarga segura de informes técnicos/entregables.
-- **`/equipo` (Panel de Colaboradores & Consultores):** Gestión de prospectos TDR, cálculo de progreso ponderado, control de tareas, matriz de riesgos y bitácora de auditoría (requiere rol `admin`, `auditor` o `engineer`).
+
+- **`/login` / `/en/login` & `/registro` / `/en/register`:** Autenticación segura de clientes y equipo gestionada por Supabase Auth, con formularios accesibles y soporte bilingüe completo.
+- **`/cuenta` / `/en/account` (Portal de Clientes Bilingüe):** Vista exclusiva del cliente corporativo para consultar el estado de salud de sus proyectos, cronogramas Gantt interactivos, facturación dual (RUC 11 dígitos / PEN y transferencias internacionales SWIFT) y descarga segura forense de entregables técnicos mediante enlaces firmados temporales.
+- **`/equipo` (Consola Editorial Full-Canvas & Operaciones):** Panel operacional de pantalla completa (100vw/100vh) exclusivo para el equipo de ingeniería en Lima (español). Resumen Bento KPI, Paleta de Comandos global (`⌘K` / `Ctrl+K`), espacio Maestro-Detalle Split (60/40), Tablero Kanban de Fases Metodológicas y Slide-Over Drawer segmentado (`[🚀 Proyecto]`, `[⚡ Hito]`, `[📦 Entregable]`, `[👥 Staff]`).
 
 ---
 
@@ -160,27 +167,33 @@ inmerge/
 ## 🚀 Guía de Inicio Rápido
 
 ### 1. Requisitos
+
 - **Node.js**: v18.0.0 o superior
 - **npm**: v9.0.0 o superior
 - Instancia o proyecto activo de **Supabase**
 
 ### 2. Instalación
+
 ```bash
 cd web/app
 npm install
 ```
 
 ### 3. Variables de Entorno
+
 Configurar `.env.local` en `web/app/`:
+
 ```env
 VITE_SUPABASE_URL=https://<tu-proyecto>.supabase.co
 VITE_SUPABASE_ANON_KEY=sb_publishable_...
 ```
 
 ### 4. Servidor de Desarrollo
+
 ```bash
 npm run dev
 ```
+
 La aplicación estará disponible en `http://localhost:5173`.
 
 ---
@@ -189,15 +202,15 @@ La aplicación estará disponible en `http://localhost:5173`.
 
 Dentro de `web/app/`:
 
-| Comando | Descripción |
-|---|---|
-| `npm run dev` | Inicia el servidor de desarrollo Vite con Hot Module Replacement (HMR) |
-| `npm run build` | Compila el bundle de producción optimizado con code-splitting en `dist/` |
-| `npm run preview` | Ejecuta un servidor local para inspeccionar la compilación de producción |
-| `npm test` | Ejecuta la suite completa de pruebas unitarias y de integración con Vitest |
-| `npm run test:watch` | Ejecuta pruebas en modo observador interactivo durante desarrollo |
-| `npm run lint` | Valida conformidad estática de código con ESLint 9 |
-| `npm run format` | Aplica formateo consistente en todo el árbol de código con Prettier |
+| Comando              | Descripción                                                                |
+| -------------------- | -------------------------------------------------------------------------- |
+| `npm run dev`        | Inicia el servidor de desarrollo Vite con Hot Module Replacement (HMR)     |
+| `npm run build`      | Compila el bundle de producción optimizado con code-splitting en `dist/`   |
+| `npm run preview`    | Ejecuta un servidor local para inspeccionar la compilación de producción   |
+| `npm test`           | Ejecuta la suite completa de pruebas unitarias y de integración con Vitest |
+| `npm run test:watch` | Ejecuta pruebas en modo observador interactivo durante desarrollo          |
+| `npm run lint`       | Valida conformidad estática de código con ESLint 9                         |
+| `npm run format`     | Aplica formateo consistente en todo el árbol de código con Prettier        |
 
 ---
 

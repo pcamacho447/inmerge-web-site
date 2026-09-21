@@ -3,11 +3,13 @@
 Inmerge es una firma boutique de consultoría en ingeniería de software, auditoría de sistemas y ciencia de datos (Lima, Perú).
 
 Consulte las especificaciones técnicas del entorno en:
+
 - [Guía de Arquitectura, Diseño & Testing](file:///c:/papx/inmerge-website/inmerge/.agents/rules/inmerge-brand-architecture.md)
 
 ---
 
 ## 1. Los Tres Pilares Estratégicos
+
 1. **Pilar 01 — Auditoría Técnica y de Datos:** Calidad e integridad de bases de datos, detección de duplicados/inconsistencias, auditoría de sistemas cloud (AWS/GCP), seguridad y cumplimiento normativo.
 2. **Pilar 02 — Desarrollo Tecnológico & Cloud:** Arquitectura cloud en AWS (ECS, Lambda, RDS, S3), microservicios, software empresarial a medida, APIs y modernización de sistemas.
 3. **Pilar 03 — Ciencia de Datos & Inteligencia Artificial:** Machine Learning, modelos predictivos, forecasting, integración de IA generativa/agentes y dashboards ejecutivos en tiempo real.
@@ -15,17 +17,18 @@ Consulte las especificaciones técnicas del entorno en:
 ---
 
 ## 2. Reglas de Navegación y Rutas
+
 - **Rutas Públicas:**
-  - `/` (Inicio): Hero con video de fondo cinemático, navbar transparente sin bordes sobre el video, pilares interactivos, diagrama de arquitectura y segmentos de mercado directos al CTA. No incluir bloques redundantes del manifiesto, la cuadrícula de "Principios de Ingeniería" (reservada para `/nosotros`) ni franjas intermedias de certezas o marquesinas repetitivas.
-  - `/servicios` (Servicios & Estimación Ágil): Interfaz centrada exclusivamente en el Estimador Interactivo (`<QuickEstimator />`) para proyectar tiempos, costos en PEN/USD, entregables auditables por pilar y cotización directa vía WhatsApp/TDR/Asistente IA. Prohibido reintroducir el catálogo estático de acordeones repetitivos o carruseles de proyectos redundantes.
-  - `/nosotros` (Nosotros): Manifiesto de ingeniería, Podio ceremonial Mochica (Propósito, Misión, Visión con `<MochicaStepIcon />` sin prefijos romanos redundantes), Sección de Equipo Directivo concisa (`Nuestros Directores` sin textos de relleno comercial), Método Inmerge y explorador de tecnologías (Stack sin badges de nivel de competencia).
-  - `/contacto` (Contacto & TDR): Formulario estructurado con selector de pilares y enlace con mensaje pre-rellenado a WhatsApp.
+  - `/` (Inicio): Atrio Cinematográfico (Single Viewport 100vh) con video de fondo cinemático, navbar transparente flotante sin bordes sobre el video, coordenadas Mochica, titular sobrio con máquina de escribir (_typewriter_ accesible con `aria-label` y respeto a `prefers-reduced-motion`), tríptico de portales directos hacia Servicios, Nosotros y Contacto con hairlines de 1px, y micro-footer integrado. Prohibido reintroducir carruseles redundantes, franjas intermedias o bloques de marketing.
+  - `/servicios` (Servicios & Monografía de Ingeniería): Interfaz a ancho completo (100vw) sobre lienzo continuo. Exhibición Monumental del Prototipo 1:1 activo, Lightbox de inspección a pantalla completa con navegación por teclado (`[ ← ]` / `[ → ]` / `[ ESC ]`), selector de las 3 Líneas de Servicio (`01 Páginas Web`, `02 Ingeniería de Software`, `03 Inteligencia de Negocios`), banco curatorial de especificaciones y Estimador Interactivo (`<QuickEstimator />`) para proyectar tiempos, costos en PEN/USD, entregables auditables por solución y cotización directa vía WhatsApp/TDR/Asistente IA. Prohibido reintroducir el catálogo estático de acordeones repetitivos o carruseles de proyectos redundantes.
+  - `/nosotros` (Nosotros & Metodología): Manifiesto de ingeniería, Podio ceremonial Mochica (Propósito, Misión, Visión con `<MochicaStepIcon />` y zócalo de sustentación sin prefijos romanos redundantes), Sección de Equipo Directivo concisa con scroll virtual sincronizado (`<DirectorsCarousel />`), Método Inmerge de 4 etapas en cuadrícula Bento y explorador de tecnologías sobre lienzo continuo Arena (`--bg: #F3EADA`).
+  - `/contacto` (Contacto & TDR): Formulario estructurado B2B con selector de pilares, honeypot invisible anti-spam, limitador de tasa transaccional, compromisos de nivel de servicio (SLA), datos institucionales, anclaje de cabecera con `<MochicaDivider />` y enlace con mensaje pre-rellenado a WhatsApp.
 - **Estructura del Header Público:**
   - 4 enlaces principales: `Inicio`, `Servicios`, `Nosotros`, `Contacto` más botón lateral `Iniciar sesión` (el acceso a WhatsApp se canaliza en los CTAs de pilares, servicios y contacto).
 - **Arquitectura Bilingüe & Rutas en Inglés:**
   - Rutas públicas espejo: `/en` (Home), `/en/services` (Services), `/en/about` (About Us), `/en/contact` (Contact), `/en/cookies` (Cookie Policy), `/en/login` (Sign In), `/en/register` (Create Account), `/en/account` (Client Portal).
   - Selector de idioma: Componente minimalista editorial tipo píldora `ES | EN` en el Header público (desktop y móvil) con accesibilidad WCAG 2.1 AA (`role="group"`, `aria-pressed`).
-  - Enfoque *zero-bloat*: Gestión mediante React Context nativo (`LanguageContext.jsx`) con diccionarios tipados (`content.en.js`, `stack.en.js`). Prohibido introducir librerías pesadas de i18n como `react-i18next`.
+  - Enfoque _zero-bloat_: Gestión mediante React Context nativo (`LanguageContext.jsx`) con diccionarios tipados (`content.en.js`, `stack.en.js`). Prohibido introducir librerías pesadas de i18n como `react-i18next`.
   - Micro-interacciones & View Transitions: Envolver la conmutación de idioma en `document.startViewTransition` con fallback progresivo.
   - SEO Internacional: Inyección dinámica de etiquetas `<link rel="alternate" hreflang="es|en|x-default">`, `og:locale` (`es_PE` / `en_US`), `og:locale:alternate` y atributo `inLanguage` en Schema.org JSON-LD.
   - Autenticación y Portal de Clientes Bilingüe (`/login` <-> `/en/login`, `/registro` <-> `/en/register`, `/cuenta` <-> `/en/account`): Experiencia espejo bilingüe completa para clientes. Formularios accesibles con autocompletado nativo (`autoComplete="username"`, `current-password`, `new-password`), titulares semánticos `<h1>` y gestión fiscal dual (RUC 11 dígitos y transferencias en PEN para clientes peruanos; Tax ID flexible y transferencias internacionales SWIFT/MSA para clientes globales).
@@ -42,6 +45,7 @@ Consulte las especificaciones técnicas del entorno en:
 ---
 
 ## 3. Sistema de Diseño (Editorial Tech Premium)
+
 - **Paleta de Identidad:**
   - Arena: `--bg` (`#F3EADA`) — Superficie principal.
   - Tinta: `--ink` (`#241A12`) — Tipografía y fondos oscuros.
@@ -66,12 +70,13 @@ Consulte las especificaciones técnicas del entorno en:
 ---
 
 ## 4. Patrones de Interacción y Componentes
+
 - **Carruseles Infinitos 360°:** Todo carrusel continuo debe utilizar transformaciones aceleradas por GPU (`transform: translate3d`) con buffer virtual triplicado (`3 * N`) y rebase silencioso a 0ms en `onTransitionEnd`. Prohibido el uso de `scrollLeft` nativo con `scroll-behavior: smooth` para ciclos infinitos.
 
 ---
 
 ## 5. Estándares de Código y Calidad
-1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 34 suites de pruebas (178+ tests) deben pasar al 100%.
+
+1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 38 suites de pruebas (209 tests) deben pasar al 100%.
 2. **Build de Producción:** Verificar que `npm run build` compile limpiamente sin errores de bundling.
 3. **Formato y Linter:** Mantener conformidad con `npm run lint` y `npm run format`.
-
