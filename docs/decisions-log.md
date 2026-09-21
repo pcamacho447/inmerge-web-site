@@ -201,6 +201,37 @@ Bitácora histórica de decisiones arquitectónicas, de producto, de diseño y a
 - Se calibró el `padding-top` del contenedor en `Servicios.jsx` de 100px a **54px**, acoplándolo de manera inmediata y continua con el borde inferior del menú de navegación (~51px de altura).
 - Toda la suite de pruebas y compilación pasando al 100%.
 
+---
+
+## Sesión: 2026-09-21 (Sesión 9) — Rediseño de `/inicio`: Atrio Cinematográfico 100vh & Typewriter Effect
+
+### 1. Modelo Mental de Atrio Cinematográfico (Single Viewport)
+- Se erradicaron de la portada el carrusel redundante de proyectos (`ProjectCarousel`), las franjas intermedias y los bloques comerciales repetitivos.
+- `/inicio` pasa a ser una experiencia inmersiva pura de **100vh exactos (sin scroll vertical en desktop)** con el video de fondo cinematográfico (`/hero_inmerge.mp4`), gradiente oscuro mineral y acento Mochica.
+
+### 2. Tipografía Editorial Contenida & Efecto Máquina de Escribir (*Typewriter*)
+- Reducción del titular a una escala sobria y sofisticada (`clamp(26px, 3.3vw, 44px)`).
+- Efecto de máquina de escribir carácter a carácter (~32ms por glifo) con cursor terracota intermitente (`|`).
+- **Accesibilidad & SEO:** `aria-label` semántico en el `<h1>`, texto estático para motores de búsqueda, y respeto estricto a `prefers-reduced-motion: reduce`.
+
+### 3. Tríptico de Portales Arquitectónicos al Pie
+- Banda horizontal con 3 módulos de navegación integrados con hairline de 1px:
+  - `[ 01 / SERVICIOS ]` → *Monografía & Prototipos 1:1* (`/servicios` / `/en/services`)
+  - `[ 02 / NOSOTROS ]` → *Manifiesto & Directores* (`/nosotros` / `/en/about`)
+  - `[ 03 / CONTACTO ]` → *Términos de Referencia (TDR)* (`/contacto` / `/en/contact`)
+- Micro-footer institucional al pie con copyright, enlaces a política de cookies y coordenadas geográficas.
+
+### 4. Verificación y Rendimiento
+- Reducción del bundle de `Inicio.js` de 25.10 kB a solo **5.32 kB** (gzip 2.31 kB).
+- Pruebas unitarias de `Inicio.test.jsx` actualizadas y pasando (4/4).
+- 38 suites y 209 tests de Vitest pasando al 100%. Build de producción completado en 2.45s.
+
+---
+
+## Sesión: 2026-09-21 (Sesión 10) — Depuración de Portales y Desactivación de Alaec en `/inicio`
+- **Erradicación de Recuadros y Línea Divisoria:** Los 3 portales inferiores pasaron de tarjetas con fondo y borde a pura tipografía editorial flotante (`background: transparent; border: none;`), eliminando la línea divisoria superior para una integración 100% etérea sobre el video cinemático.
+- **Desactivación de Alaec en Inicio:** Se retiró el botón flotante y modal de Alaec AI exclusivamente en `/inicio`, manteniendo una atmósfera limpia y sin distracciones visuales (Alaec permanece activo en `/servicios`, `/contacto`, etc.).
+
 
 
 

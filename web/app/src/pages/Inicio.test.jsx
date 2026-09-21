@@ -4,13 +4,13 @@ import { MemoryRouter } from 'react-router-dom';
 import Inicio from './Inicio.jsx';
 import { LanguageProvider, STORAGE_KEY } from '../context/LanguageContext.jsx';
 
-describe('Inicio Page (Cinematic Hero & Strategic Pillars)', () => {
+describe('Inicio Page (Atrium Gateway & Typewriter Hero)', () => {
   beforeEach(() => {
     localStorage.clear();
     localStorage.setItem(STORAGE_KEY, 'es');
   });
 
-  it('renders the cinematic hero section with h1 and strategic badge in Spanish', () => {
+  it('renders the cinematic atrium hero section with typewriter h1 and coordinates in Spanish', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <LanguageProvider>
@@ -26,7 +26,7 @@ describe('Inicio Page (Cinematic Hero & Strategic Pillars)', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText(/AUDITORÍA · DESARROLLO CLOUD · CIENCIA DE DATOS/i)).toBeInTheDocument();
+    expect(screen.getByText(/08°06′S 79°01′W · LIMA, PERÚ · CONSULTORÍA DE INGENIERÍA/i)).toBeInTheDocument();
   });
 
   it('renders bilingual hero headline and badge when loaded on /en path', () => {
@@ -46,10 +46,10 @@ describe('Inicio Page (Cinematic Hero & Strategic Pillars)', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText(/AUDITING · CLOUD DEVELOPMENT · DATA SCIENCE/i)).toBeInTheDocument();
+    expect(screen.getByText(/08°06′S 79°01′W · LIMA, PERU · ENGINEERING CONSULTANCY/i)).toBeInTheDocument();
   });
 
-  it('renders the case studies showcase directly after the hero without redundant pillar cards', () => {
+  it('renders the 3 architectural exhibition portals without redundant carousels or marketing banners', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <LanguageProvider>
@@ -58,33 +58,54 @@ describe('Inicio Page (Cinematic Hero & Strategic Pillars)', () => {
       </MemoryRouter>,
     );
 
-    // Verify redundant standalone pillars section is removed from Home
-    expect(screen.queryByText(/ESTRATEGIAS/i)).not.toBeInTheDocument();
+    // Verify redundant carousels and marketing CTAs are removed from Home
+    expect(screen.queryByText(/CASOS DE ESTUDIO · ARQUITECTURA FORENSE/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /^Nuestros Pilares$/i, level: 2 })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Iniciemos una evaluación técnica de tus sistemas y datos/i)).not.toBeInTheDocument();
 
-    // Verify Case Studies & Engineering Architecture Showcase is rendered
-    expect(screen.getByText(/CASOS DE ESTUDIO · ARQUITECTURA FORENSE/i)).toBeInTheDocument();
-    expect(screen.getByText(/Ingeniería en Producción: Evidencia técnica y resultados auditables/i)).toBeInTheDocument();
-    expect(screen.getByRole('tablist', { name: /índice de casos de estudio técnicos/i })).toBeInTheDocument();
+    // Verify the 3 Architectural Portals
+    const navPortals = screen.getByRole('navigation', { name: /Salas de Exhibición/i });
+    expect(navPortals).toBeInTheDocument();
+
+    // Portal 01: Servicios
+    const servicesPortal = screen.getByRole('link', { name: /01 \/ SERVICIOS.*Monografía & Prototipos 1:1/i });
+    expect(servicesPortal).toBeInTheDocument();
+    expect(servicesPortal).toHaveAttribute('href', '/servicios');
+
+    // Portal 02: Nosotros
+    const aboutPortal = screen.getByRole('link', { name: /02 \/ NOSOTROS.*Manifiesto & Directores/i });
+    expect(aboutPortal).toBeInTheDocument();
+    expect(aboutPortal).toHaveAttribute('href', '/nosotros');
+
+    // Portal 03: Contacto
+    const contactPortal = screen.getByRole('link', { name: /03 \/ CONTACTO.*Términos de Referencia/i });
+    expect(contactPortal).toBeInTheDocument();
+    expect(contactPortal).toHaveAttribute('href', '/contacto');
   });
 
-  it('renders the final CTA banner with TDR and WhatsApp action buttons', () => {
+  it('renders localized portals when loaded on /en path', () => {
+    localStorage.setItem(STORAGE_KEY, 'en');
     render(
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={['/en']}>
         <LanguageProvider>
           <Inicio />
         </LanguageProvider>
       </MemoryRouter>,
     );
 
-    expect(screen.getByText(/Iniciemos una evaluación técnica de tus sistemas y datos/i)).toBeInTheDocument();
+    const navPortals = screen.getByRole('navigation', { name: /Exhibition Portals/i });
+    expect(navPortals).toBeInTheDocument();
 
-    const tdrLink = screen.getByRole('link', { name: /Solicitar Términos de Referencia \(TDR\)/i });
-    expect(tdrLink).toBeInTheDocument();
-    expect(tdrLink).toHaveAttribute('href', '/contacto');
+    const servicesPortal = screen.getByRole('link', { name: /01 \/ SERVICES.*Monograph & 1:1 Prototypes/i });
+    expect(servicesPortal).toBeInTheDocument();
+    expect(servicesPortal).toHaveAttribute('href', '/en/services');
 
-    const waLink = screen.getByRole('link', { name: /Escribir a WhatsApp/i });
-    expect(waLink).toBeInTheDocument();
-    expect(waLink).toHaveAttribute('target', '_blank');
+    const aboutPortal = screen.getByRole('link', { name: /02 \/ ABOUT.*Manifesto & Directors/i });
+    expect(aboutPortal).toBeInTheDocument();
+    expect(aboutPortal).toHaveAttribute('href', '/en/about');
+
+    const contactPortal = screen.getByRole('link', { name: /03 \/ CONTACT.*Proposals & Technical Scope/i });
+    expect(contactPortal).toBeInTheDocument();
+    expect(contactPortal).toHaveAttribute('href', '/en/contact');
   });
 });

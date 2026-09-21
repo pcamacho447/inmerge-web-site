@@ -1,23 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import useReveal from '../hooks/useReveal.js';
+import useReducedMotion from '../hooks/useReducedMotion.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
-import Footer from '../components/Footer.jsx';
-import ProjectCarousel from '../components/ProjectCarousel.jsx';
-import LLMAssistantModal from '../components/LLMAssistantModal.jsx';
-import { MochicaDivider } from '../components/MochicaPatterns.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { openCookiePreferences } from '../lib/cookies.js';
 
 export default function Inicio() {
-  useReveal();
-  const { isEn, content } = useLanguage();
-  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
-  const [assistantContext, setAssistantContext] = useState(null);
-
-  const handleOpenAssistant = (ctx = null) => {
-    setAssistantContext(ctx);
-    setIsAssistantOpen(true);
-  };
+  const { isEn } = useLanguage();
+  const prefersReducedMotion = useReducedMotion();
 
   useDocumentHead({
     title: isEn
@@ -29,230 +19,177 @@ export default function Inicio() {
     path: isEn ? '/en' : '/',
   });
 
-  const heroWa = content.waLink(
-    isEn
-      ? 'Hello Inmerge team, I would like to speak with a technical specialist regarding an audit, cloud development, or data science project.'
-      : 'Hola Inmerge, deseo conversar con un especialista técnico sobre un proyecto de auditoría, desarrollo o ciencia de datos.',
-  );
+  const fullHeadline = isEn
+    ? 'Software engineering, systems auditing & data intelligence.'
+    : 'Ingeniería de software, auditoría de sistemas e inteligencia de datos.';
+
+  const [typedLength, setTypedLength] = useState(() => (prefersReducedMotion ? fullHeadline.length : 0));
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setTypedLength(fullHeadline.length);
+      return;
+    }
+    setTypedLength(0);
+    let currentIndex = 0;
+    const timer = setInterval(() => {
+      currentIndex += 1;
+      setTypedLength(currentIndex);
+      if (currentIndex >= fullHeadline.length) {
+        clearInterval(timer);
+      }
+    }, 32);
+
+    return () => clearInterval(timer);
+  }, [fullHeadline, prefersReducedMotion]);
+
+  const displayedText = fullHeadline.slice(0, typedLength);
+  const isTypingComplete = typedLength >= fullHeadline.length;
+
+  const portals = [
+    {
+      code: '01',
+      tag: isEn ? 'SERVICES' : 'SERVICIOS',
+      title: isEn ? 'Monograph & 1:1 Prototypes' : 'Monografía & Prototipos 1:1',
+      desc: isEn
+        ? 'Curatorial pavilion with technical specifications, timelines, and auditable deliverables.'
+        : 'Cédula curatorial con especificaciones técnicas, plazos y entregables auditables.',
+      action: isEn ? 'Explore room ↗' : 'Explorar sala ↗',
+      to: isEn ? '/en/services' : '/servicios',
+    },
+    {
+      code: '02',
+      tag: isEn ? 'ABOUT' : 'NOSOTROS',
+      title: isEn ? 'Manifesto & Directors' : 'Manifiesto & Directores',
+      desc: isEn
+        ? 'Engineering principles, Mochica Method of 4 phases, and senior directorial team.'
+        : 'Principios de ingeniería, Método Mochica de 4 fases y equipo directivo senior.',
+      action: isEn ? 'Discover the firm ↗' : 'Conocer la firma ↗',
+      to: isEn ? '/en/about' : '/nosotros',
+    },
+    {
+      code: '03',
+      tag: isEn ? 'CONTACT' : 'CONTACTO',
+      title: isEn ? 'Proposals & Technical Scope' : 'Términos de Referencia (TDR)',
+      desc: isEn
+        ? 'Direct technical discussion with senior partners, WhatsApp channel, and project scope.'
+        : 'Evaluación técnica directa con consultores senior, canal WhatsApp y alcance a medida.',
+      action: isEn ? 'Initiate consultation ↗' : 'Iniciar consulta ↗',
+      to: isEn ? '/en/contact' : '/contacto',
+    },
+  ];
 
   return (
-    <>
-      {/* Hero Section with Cinematic Video Background */}
-      <div
-        id="hero-section"
+    <div id="hero-section" className="atrium-hero-section">
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
         style={{
-          position: 'relative',
-          padding: 'clamp(140px, 16vh, 180px) clamp(24px, 5vw, 64px) clamp(90px, 12vh, 130px)',
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          overflow: 'hidden',
-          background: 'var(--ink)',
-          color: '#F3EADA',
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          zIndex: 0,
+          opacity: 0.42,
         }}
       >
-        {/* Background Video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            zIndex: 0,
-            opacity: 0.45,
-          }}
-        >
-          <source src="/hero_inmerge.mp4" type="video/mp4" />
-        </video>
+        <source src="/hero_inmerge.mp4" type="video/mp4" />
+      </video>
 
-        {/* Cinematic Gradient Overlay */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(180deg, rgba(36,26,18,0.72) 0%, rgba(36,26,18,0.85) 60%, rgba(36,26,18,0.96) 100%)',
-            zIndex: 1,
-            pointerEvents: 'none',
-          }}
-        />
+      {/* Cinematic Gradient Overlay */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, rgba(36,26,18,0.72) 0%, rgba(36,26,18,0.85) 50%, rgba(36,26,18,0.97) 100%)',
+          zIndex: 1,
+          pointerEvents: 'none',
+        }}
+      />
 
-        {/* Decorative Brand Accent */}
-        <div
-          className="breathe-diamond"
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            right: 'clamp(16px,6vw,60px)',
-            top: '16%',
-            width: 'clamp(32px,5vw,56px)',
-            height: 'clamp(32px,5vw,56px)',
-            background: 'var(--terracotta)',
-            zIndex: 2,
-          }}
-        />
+      {/* Decorative Mochica Diamond Accent */}
+      <div
+        className="breathe-diamond"
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          right: 'clamp(16px, 6vw, 60px)',
+          top: '14%',
+          width: 'clamp(28px, 4vw, 48px)',
+          height: 'clamp(28px, 4vw, 48px)',
+          background: 'var(--terracotta)',
+          zIndex: 2,
+          opacity: 0.85,
+        }}
+      />
 
-        <div style={{ position: 'relative', maxWidth: 1440, margin: '0 auto', width: '100%', zIndex: 2 }}>
-          <div
-            style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 13,
-              letterSpacing: 3,
-              color: 'var(--gold)',
-              fontWeight: 600,
-              marginBottom: 24,
-              textTransform: 'uppercase',
-            }}
-          >
-            {isEn ? 'AUDITING · CLOUD DEVELOPMENT · DATA SCIENCE' : 'AUDITORÍA · DESARROLLO CLOUD · CIENCIA DE DATOS'}
+      <div className="atrium-inner-container">
+        {/* Middle Body with Typewriter Heading */}
+        <div className="atrium-center-body">
+          <div className="atrium-coords-tag">
+            <span className="atrium-coords-dot" aria-hidden="true" />
+            <span>
+              {isEn ? '08°06′S 79°01′W · LIMA, PERU · ENGINEERING CONSULTANCY' : '08°06′S 79°01′W · LIMA, PERÚ · CONSULTORÍA DE INGENIERÍA'}
+            </span>
           </div>
 
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontWeight: 700,
-              fontSize: 'clamp(44px,7.5vw,108px)',
-              lineHeight: 1.04,
-              letterSpacing: -1.5,
-              margin: '0 0 32px',
-              color: '#F3EADA',
-              maxWidth: 1180,
-            }}
-          >
-            {isEn ? (
-              <>
-                Software engineering,
-                <br />
-                <span style={{ color: 'var(--gold)' }}>systems auditing</span>
-                <br />& data intelligence.
-              </>
-            ) : (
-              <>
-                Ingeniería de software,
-                <br />
-                <span style={{ color: 'var(--gold)' }}>auditoría de sistemas</span>
-                <br />e inteligencia de datos.
-              </>
-            )}
+          <h1 className="atrium-h1" aria-label={fullHeadline}>
+            <span aria-hidden="true">
+              {displayedText}
+              <span className={`typewriter-cursor ${isTypingComplete ? 'is-complete' : 'is-typing'}`} aria-hidden="true">
+                |
+              </span>
+            </span>
+            <span className="sr-only">{fullHeadline}</span>
           </h1>
+
+          <p className="atrium-subhead">
+            {isEn
+              ? 'Direct senior engineering advisory in mission-critical systems, cloud architectures, and applied data science.'
+              : 'Consultoría senior directa en sistemas de misión crítica, arquitecturas cloud y ciencia de datos aplicada.'}
+          </p>
         </div>
-      </div>
 
-      {/* Mochica Geometric Pattern Divider */}
-      <MochicaDivider color="rgba(216, 168, 78, 0.45)" height={18} seed="inmerge-hero-pillars" />
+        {/* Bottom Tier: Pure Typographic Portals (No Boxes, No Lines) */}
+        <div className="atrium-portals-wrapper">
+          <nav className="atrium-portals-grid" aria-label={isEn ? 'Exhibition Portals' : 'Salas de Exhibición'}>
+            {portals.map((portal) => (
+              <Link key={portal.code} to={portal.to} className="atrium-portal-card">
+                <div>
+                  <div className="atrium-portal-tag">
+                    [ {portal.code} / {portal.tag} ]
+                  </div>
+                  <h2 className="atrium-portal-title">{portal.title}</h2>
+                  <p className="atrium-portal-desc">{portal.desc}</p>
+                </div>
+                <div className="atrium-portal-action">
+                  <span>{portal.action}</span>
+                </div>
+              </Link>
+            ))}
+          </nav>
 
-      {/* Case Studies & Engineering Architecture Showcase */}
-      <div style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(60px, 8vh, 100px) clamp(24px, 5vw, 64px) clamp(80px, 10vh, 120px)' }}>
-        <ProjectCarousel onQuoteProject={(proj) => handleOpenAssistant(proj)} />
-      </div>
-
-      {/* Mochica Geometric Pattern Divider */}
-      <MochicaDivider color="var(--terracotta)" height={18} seed="inmerge-cta-frieze" opacity={0.65} />
-
-      {/* Final CTA */}
-      <div
-        style={{
-          position: 'relative',
-          background: 'var(--ink)',
-          color: 'var(--bg)',
-          padding: 'clamp(120px, 14vh, 180px) clamp(24px, 5vw, 64px)',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            left: -100,
-            bottom: -100,
-            width: 340,
-            height: 340,
-            background: 'var(--terracotta)',
-            opacity: 0.15,
-            transform: 'rotate(45deg)',
-          }}
-        />
-        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
-          <div
-            data-reveal=""
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontWeight: 700,
-              fontSize: 'clamp(32px,5vw,56px)',
-              marginBottom: 24,
-              lineHeight: 1.15,
-            }}
-          >
-            {isEn
-              ? 'Initiate a technical assessment of your systems and data.'
-              : 'Iniciemos una evaluación técnica de tus sistemas y datos.'}
-          </div>
-          <div data-reveal="" style={{ fontSize: 16, color: 'var(--tan-text)', marginBottom: 40, maxWidth: 560, margin: '0 auto 40px' }}>
-            {isEn
-              ? 'Senior consultants and engineering leads working directly on your architecture, without intermediaries.'
-              : 'Consultores e ingenieros senior trabajando directamente en tu arquitectura, sin intermediarios ni demoras.'}
-          </div>
-          <div data-reveal="" style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <Link
-              to={isEn ? '/en/contact' : '/contacto'}
-              style={{
-                background: 'var(--gold)',
-                color: 'var(--ink)',
-                borderRadius: 2,
-                padding: '18px 36px',
-                fontSize: 16,
-                fontWeight: 700,
-                textDecoration: 'none',
-              }}
-              className="btn-hover"
-            >
-              {isEn ? 'Request Scope & Terms (TDR)' : 'Solicitar Términos de Referencia (TDR)'}
-            </Link>
-            <a
-              href={heroWa}
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                background: 'transparent',
-                color: 'var(--bg)',
-                border: '1px solid var(--bg)',
-                borderRadius: 2,
-                padding: '18px 32px',
-                fontSize: 16,
-                fontWeight: 600,
-                textDecoration: 'none',
-              }}
-              className="btn-outline"
-            >
-              {isEn ? 'Contact via WhatsApp' : 'Escribir a WhatsApp'}
-            </a>
+          {/* Micro Institutional Footer Bar */}
+          <div className="atrium-micro-footer">
+            <div>INMERGE S.A.C. · 2026</div>
+            <div>
+              <Link to={isEn ? '/en/cookies' : '/cookies'}>{isEn ? 'Cookie Policy' : 'Política de Cookies'}</Link>
+              {' · '}
+              <button type="button" onClick={openCookiePreferences}>
+                {isEn ? 'Cookie Settings' : 'Configurar Cookies'}
+              </button>
+            </div>
+            <div>inmerge3@gmail.com · Lima, Perú</div>
           </div>
         </div>
       </div>
-
-      {/* Floating AI Assistant Trigger Button — Alaec */}
-      <button
-        type="button"
-        className="floating-assistant-btn"
-        onClick={() => handleOpenAssistant()}
-        aria-label={isEn ? 'Open Alaec AI Assistant' : 'Abrir Asistente IA Alaec'}
-      >
-        <span className="alaec-pulse-dot" aria-hidden="true" />
-        <span className="alaec-trigger-name">Alaec</span>
-        <span className="alaec-trigger-badge">AI</span>
-      </button>
-
-      {/* Interactive LLM Assistant Modal */}
-      <LLMAssistantModal isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} initialContext={assistantContext} />
-
-      <Footer />
-    </>
+    </div>
   );
 }
