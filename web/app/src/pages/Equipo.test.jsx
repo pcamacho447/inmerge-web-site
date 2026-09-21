@@ -93,22 +93,16 @@ describe('Equipo Console Component', () => {
         pillar: 'auditoria',
         status: 'EN_AUDITORIA',
         health_status: 'ON_TRACK',
-        milestones: [
-          { id: 'm-1', title: 'Fase 01 — Diagnóstico', status: 'COMPLETADO', progress: 100 },
-        ],
+        milestones: [{ id: 'm-1', title: 'Fase 01 — Diagnóstico', status: 'COMPLETADO', progress: 100 }],
         tasks: [],
         risks: [],
         deliverables: [],
       },
     ]);
 
-    teamLib.fetchRegisteredClients.mockResolvedValue([
-      { id: 'client-1', email: 'cmendoza@fintechlatam.pe', fullName: 'Carlos Mendoza' },
-    ]);
+    teamLib.fetchRegisteredClients.mockResolvedValue([{ id: 'client-1', email: 'cmendoza@fintechlatam.pe', fullName: 'Carlos Mendoza' }]);
 
-    teamLib.fetchStaffMembers.mockResolvedValue([
-      { id: 'staff-1', full_name: 'Elena Ramos', email: 'elena@inmerge.pe', role: 'auditor' },
-    ]);
+    teamLib.fetchStaffMembers.mockResolvedValue([{ id: 'staff-1', full_name: 'Elena Ramos', email: 'elena@inmerge.pe', role: 'auditor' }]);
 
     teamLib.fetchTeamActivityLogs.mockResolvedValue([
       {

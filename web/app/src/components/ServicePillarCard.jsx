@@ -1,20 +1,10 @@
-import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
-/**
- * Formas de relieve de pared Mochica (Huaca de la Luna / Chan Chan / Moche Friezes)
- */
 function MocheWallRelief({ pillarId, color = 'var(--terracotta)' }) {
   if (pillarId === 'auditoria') {
     // Relieve de pared escalonada con diamantes concéntricos de Chan Chan
     return (
-      <svg
-        viewBox="0 0 240 120"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-        className="moche-frieze-svg"
-      >
+      <svg viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="moche-frieze-svg">
         <g stroke={color} strokeWidth="1.75" opacity="0.85">
           {/* Fila base de grecas escalonadas */}
           <path d="M10 110 H40 V90 H25 V75 H55 V55 H40 V40 H70 V60 H85 V75 H70 V90 H100 V110" fill={color} fillOpacity="0.05" />
@@ -33,27 +23,11 @@ function MocheWallRelief({ pillarId, color = 'var(--terracotta)' }) {
   if (pillarId === 'desarrollo') {
     // Relieve de pared con grecas entrelazadas y canales estructurales de Huaca del Sol
     return (
-      <svg
-        viewBox="0 0 240 120"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-        className="moche-frieze-svg"
-      >
+      <svg viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="moche-frieze-svg">
         <g stroke={color} strokeWidth="1.75" opacity="0.85">
           {/* Doble greca laberíntica continua */}
-          <path
-            d="M15 105 H65 V70 H40 V45 H90 V20 H115 V45 H90 V70 H115 V95 H65"
-            strokeWidth="2"
-            fill={color}
-            fillOpacity="0.06"
-          />
-          <path
-            d="M225 105 H175 V70 H200 V45 H150 V20 H125 V45 H150 V70 H125 V95 H175"
-            strokeWidth="2"
-            fill={color}
-            fillOpacity="0.06"
-          />
+          <path d="M15 105 H65 V70 H40 V45 H90 V20 H115 V45 H90 V70 H115 V95 H65" strokeWidth="2" fill={color} fillOpacity="0.06" />
+          <path d="M225 105 H175 V70 H200 V45 H150 V20 H125 V45 H150 V70 H125 V95 H175" strokeWidth="2" fill={color} fillOpacity="0.06" />
           {/* Medallones esquineros de adobe */}
           <rect x="18" y="22" width="10" height="10" fill={color} opacity="0.5" transform="rotate(45 23 27)" />
           <rect x="212" y="22" width="10" height="10" fill={color} opacity="0.5" transform="rotate(45 217 27)" />
@@ -65,13 +39,7 @@ function MocheWallRelief({ pillarId, color = 'var(--terracotta)' }) {
 
   // Pilar 03: Datos & IA — Relieve de pared con celosía triangular y Chakana de Huaca de la Luna
   return (
-    <svg
-      viewBox="0 0 240 120"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-      className="moche-frieze-svg"
-    >
+    <svg viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="moche-frieze-svg">
       <g stroke={color} strokeWidth="1.75" opacity="0.85">
         {/* Celosía triangular rítmica */}
         <path d="M15 105 L45 40 L75 105 M75 105 L105 40 L135 105 M135 105 L165 40 L195 105 M195 105 L225 40" strokeWidth="2" />
@@ -87,14 +55,7 @@ function MocheWallRelief({ pillarId, color = 'var(--terracotta)' }) {
 }
 
 export default function ServicePillarCard({ pillar }) {
-  const { isEn, content } = useLanguage();
-
-  const waText = isEn
-    ? `Hello Inmerge team, I am interested in consulting regarding ${pillar.title}. Can we schedule a technical call?`
-    : `Hola Inmerge, me interesa consultar sobre el pilar de ${pillar.title}. ¿Podemos agendar una reunión preliminar?`;
-
-  const whatsappUrl = content.waLink(waText);
-  const targetServicesPath = isEn ? `/en/services#${pillar.id}` : `/servicios#${pillar.id}`;
+  const { isEn } = useLanguage();
 
   const pillarColor = pillar.id === 'auditoria' ? 'var(--terracotta)' : pillar.id === 'desarrollo' ? 'var(--gold)' : 'var(--ochre)';
 
@@ -175,61 +136,6 @@ export default function ServicePillarCard({ pillar }) {
 
         {/* Formas de pared Mochica */}
         <MocheWallRelief pillarId={pillar.id} color={pillarColor} />
-      </div>
-
-      {/* Action CTA */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 12,
-          alignItems: 'center',
-          marginTop: 12,
-          borderTop: '1px solid var(--border)',
-          paddingTop: 18,
-        }}
-      >
-        <Link
-          to={targetServicesPath}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 14,
-            fontWeight: 600,
-            color: 'var(--ink)',
-            textDecoration: 'none',
-            borderBottom: '1px solid var(--ink)',
-            paddingBottom: 2,
-            transition: 'color 0.2s ease, border-color 0.2s ease',
-          }}
-          className="hover-underline-link"
-        >
-          <span>{isEn ? 'View detailed services' : 'Ver servicios detallados'}</span>
-          <span aria-hidden="true">→</span>
-        </Link>
-
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            marginLeft: 'auto',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            background: pillarColor,
-            color: pillar.id === 'desarrollo' ? 'var(--ink)' : '#F3EADA',
-            fontSize: 13,
-            fontWeight: 600,
-            padding: '8px 14px',
-            textDecoration: 'none',
-            transition: 'opacity 0.2s ease',
-          }}
-          className="btn-accent"
-        >
-          <span>{isEn ? 'Inquire' : 'Consultar'}</span>
-        </a>
       </div>
     </div>
   );

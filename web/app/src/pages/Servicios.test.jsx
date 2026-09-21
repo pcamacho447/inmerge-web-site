@@ -19,41 +19,54 @@ describe('Servicios.jsx Page — Interactive Estimator & Technical Scope', () =>
       </MemoryRouter>,
     );
 
-  it('renders services & estimation header in Spanish', () => {
+  it('renders purified curatorial gallery page in Spanish without redundant banners', () => {
     renderComponent('/servicios');
 
-    expect(screen.getByText(/SERVICIOS & ESTIMACIÓN ÁGIL/i)).toBeInTheDocument();
-    expect(screen.getByText(/Tres pilares, máxima exigencia técnica/i)).toBeInTheDocument();
+    // Verifies Monograph Gallery Header is present as primary hero
+    expect(screen.getByText(/MONOGRAFÍA DE INGENIERÍA/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Páginas Web' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /01 \/ Páginas Web/i })).toBeInTheDocument();
 
-    // Verifies QuickEstimator is present
-    expect(screen.getByText(/PRECIOS Y TIEMPOS TRANSPARENTES/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/1. Pilar Estratégico:/i)).toBeInTheDocument();
+    // Verifies Monumental Prototype Viewport is rendered
+    expect(screen.getByRole('figure')).toBeInTheDocument();
+    expect(screen.getByText(/ESPECÍMEN \d\d \/ 09 — VISTA DE PROTOTIPO 1:1/i)).toBeInTheDocument();
+
+    // Verifies noisy and redundant banners/labels have been eliminated
+    expect(screen.queryByText(/CATÁLOGO & ESTIMACIÓN CURATORIAL/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Cédula Curatorial de Ingeniería/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/ALCANCE & TIPO DE SOLUCIÓN/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Tres pilares, máxima exigencia técnica/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/¿Necesitas una combinación de servicios\?/i)).not.toBeInTheDocument();
   });
 
-  it('allows interacting with pillar selector in the estimator', () => {
+  it('allows interacting with pillar tabs in the estimator', () => {
     renderComponent('/servicios');
 
-    const pillarSelect = screen.getByLabelText(/1. Pilar Estratégico:/i);
-    fireEvent.change(pillarSelect, { target: { value: 'desarrollo' } });
+    const softwareTab = screen.getByRole('tab', { name: /02 \/ Ingeniería de Software/i });
+    fireEvent.click(softwareTab);
 
-    expect(screen.getByText('Desarrollo Tecnológico & Cloud')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Arquitectura Cloud & Microservicios' })).toBeInTheDocument();
   });
 
-  it('renders in English when accessed from /en/services with localized headers', () => {
+  it('renders in English when accessed from /en/services with localized curatorial placard', () => {
     renderComponent('/en/services');
 
-    expect(screen.getByText(/SERVICES & ESTIMATION/i)).toBeInTheDocument();
-    expect(screen.getByText(/Three strategic pillars, zero technical compromise/i)).toBeInTheDocument();
-    expect(screen.getByText(/TRANSPARENT & FAST PRICING/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/1. Strategic Pillar:/i)).toBeInTheDocument();
+    expect(screen.getByText(/ENGINEERING MONOGRAPH/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Web Development' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /01 \/ Web Development/i })).toBeInTheDocument();
+    expect(screen.getByText(/SPECIMEN \d\d \/ 09 — 1:1 PROTOTYPE VIEW/i)).toBeInTheDocument();
+
+    expect(screen.queryByText(/Three strategic pillars, zero technical compromise/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Need a tailored combination of services\?/i)).not.toBeInTheDocument();
   });
 
-  it('contains bottom CTA banner and TDR links', () => {
+  it('renders floating Alaec AI trigger button and opens assistant', () => {
     renderComponent('/servicios');
 
-    expect(screen.getByText(/¿Necesitas una combinación de servicios\?/i)).toBeInTheDocument();
-    const tdrBtn = screen.getByText(/Completar Formulario de TDR/i);
-    expect(tdrBtn).toBeInTheDocument();
-    expect(tdrBtn.closest('a')).toHaveAttribute('href', '/contacto');
+    const assistantBtn = screen.getByRole('button', { name: /Abrir Asistente IA Alaec/i });
+    expect(assistantBtn).toBeInTheDocument();
+    fireEvent.click(assistantBtn);
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 });

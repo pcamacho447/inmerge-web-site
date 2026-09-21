@@ -199,7 +199,7 @@ export default function Equipo() {
       showTemporaryMsg('Lead actualizado y registrado en la bitácora de auditoría.');
       fetchTeamActivityLogs({ limit: 50 })
         .then(setActivityLogs)
-        .catch(() => { });
+        .catch(() => {});
     } catch (err) {
       showToast({
         type: 'error',
@@ -220,7 +220,7 @@ export default function Equipo() {
       showTemporaryMsg(`Estado del proyecto actualizado a "${newStatus}" y notificación despachada al cliente.`);
       fetchTeamActivityLogs({ limit: 50 })
         .then(setActivityLogs)
-        .catch(() => { });
+        .catch(() => {});
     } catch (err) {
       showToast({
         type: 'error',
@@ -813,9 +813,7 @@ export default function Equipo() {
                 >
                   <span className="equipo-nav-icon">{tab.icon}</span>
                   {!isSidebarCollapsed && <span className="equipo-nav-label">{tab.label}</span>}
-                  {!isSidebarCollapsed && tab.count !== undefined && (
-                    <span className="equipo-nav-badge">{tab.count}</span>
-                  )}
+                  {!isSidebarCollapsed && tab.count !== undefined && <span className="equipo-nav-badge">{tab.count}</span>}
                 </button>
               );
             })}
@@ -1082,7 +1080,8 @@ export default function Equipo() {
 
         <div className="equipo-drawer-body">
           <p style={{ fontSize: 13, color: 'var(--muted)', margin: '0 0 20px' }}>
-            Acceso rápido para registrar proyectos, añadir hitos a la metodología Inmerge, subir entregables forenses y registrar staff sin perder tu vista de trabajo.
+            Acceso rápido para registrar proyectos, añadir hitos a la metodología Inmerge, subir entregables forenses y registrar staff sin
+            perder tu vista de trabajo.
           </p>
 
           <NewProjectModal
@@ -1155,4 +1154,3 @@ export default function Equipo() {
     </div>
   );
 }
-

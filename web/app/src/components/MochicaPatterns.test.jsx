@@ -4,6 +4,10 @@ import {
   MochicaDivider,
   MochicaCornerFrame,
   MochicaWatermark,
+  MochicaStepIcon,
+  MochicaSteppedWall,
+  MochicaSteppedRiser,
+  MochicaPodiumBase,
   renderSteppedSegment,
   renderGrecaSegment,
   renderWaveSegment,
@@ -59,5 +63,35 @@ describe('MochicaPatterns Component Suite', () => {
 
     const { container: medallion } = render(<MochicaWatermark variant="rhombus-medallion" color="var(--terracotta)" />);
     expect(medallion.querySelector('svg')).toBeInTheDocument();
+  });
+
+  it('renders MochicaStepIcon across tiers 1, 2, and 3', () => {
+    const { container: t1 } = render(<MochicaStepIcon level={1} color="var(--terracotta)" />);
+    expect(t1.querySelector('svg')).toBeInTheDocument();
+
+    const { container: t2 } = render(<MochicaStepIcon level={2} color="var(--ochre)" />);
+    expect(t2.querySelector('svg')).toBeInTheDocument();
+
+    const { container: t3 } = render(<MochicaStepIcon level={3} color="var(--gold)" />);
+    expect(t3.querySelector('svg')).toBeInTheDocument();
+    expect(t3.querySelector('rect')).toBeInTheDocument(); // Apex rhombus
+  });
+
+  it('renders MochicaSteppedWall backdrop SVG with stepped profile', () => {
+    const { container } = render(<MochicaSteppedWall color="var(--border)" accentColor="var(--gold)" />);
+    expect(container.querySelector('svg')).toBeInTheDocument();
+    expect(container.firstChild).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('renders MochicaSteppedRiser with stepped vertical riser SVG', () => {
+    const { container } = render(<MochicaSteppedRiser height={48} color="var(--border)" />);
+    expect(container.querySelector('svg')).toBeInTheDocument();
+    expect(container.firstChild).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('renders MochicaPodiumBase as clean grounding foundation plinth', () => {
+    const { container } = render(<MochicaPodiumBase color="var(--border)" height={18} />);
+    expect(container.querySelector('.mochica-podium-base')).toBeInTheDocument();
+    expect(container.querySelector('svg')).toBeInTheDocument();
   });
 });

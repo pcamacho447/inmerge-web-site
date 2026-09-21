@@ -9,9 +9,7 @@ describe('CommandPaletteModal', () => {
     { id: 'p2', title: 'Pipeline Machine Learning', status: 'PLANIFICADO', client: { full_name: 'Rímac Seguros' } },
   ];
 
-  const mockLeads = [
-    { id: 'l1', full_name: 'Carlos Mendoza', company: 'Fintech Perú', pillar: 'auditoria', status: 'NUEVO' },
-  ];
+  const mockLeads = [{ id: 'l1', full_name: 'Carlos Mendoza', company: 'Fintech Perú', pillar: 'auditoria', status: 'NUEVO' }];
 
   it('renders search input and options when isOpen is true', () => {
     render(
@@ -33,15 +31,7 @@ describe('CommandPaletteModal', () => {
 
   it('filters results dynamically based on typed query', async () => {
     const user = userEvent.setup();
-    render(
-      <CommandPaletteModal
-        isOpen={true}
-        onClose={vi.fn()}
-        projects={mockProjects}
-        leads={mockLeads}
-        isAdmin={true}
-      />,
-    );
+    render(<CommandPaletteModal isOpen={true} onClose={vi.fn()} projects={mockProjects} leads={mockLeads} isAdmin={true} />);
 
     const input = screen.getByPlaceholderText(/Buscar proyectos, leads TDR/i);
     await user.type(input, 'Machine Learning');

@@ -300,8 +300,7 @@ export default function Contacto() {
                 <strong>{isEn ? 'Location:' : 'Ubicación:'}</strong> Lima, Perú
               </div>
               <div>
-                <strong>{isEn ? 'Timezone:' : 'Huso horario:'}</strong>{' '}
-                {isEn ? 'GMT-5 / UTC-5 (Lima Time)' : 'GMT-5 (UTC-5 · Lima)'}
+                <strong>{isEn ? 'Timezone:' : 'Huso horario:'}</strong> {isEn ? 'GMT-5 / UTC-5 (Lima Time)' : 'GMT-5 (UTC-5 · Lima)'}
               </div>
               <div>
                 <strong>{isEn ? 'Fiscal Status:' : 'Régimen:'}</strong>{' '}

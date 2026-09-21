@@ -34,11 +34,11 @@ export default function LLMAssistantModal({ isOpen, onClose, initialContext = nu
     if (isOpen) {
       const initialGreeting = initialContext
         ? isEn
-          ? `Hello! I see you are looking into "${initialContext.pillarName || initialContext.title?.en || 'a project'}". I can clarify our technical architecture, deliverable milestones, sprint costs, or provide our direct contact channels. How can I help you?`
-          : `¡Hola! Veo que estás consultando sobre "${initialContext.pillarName || initialContext.title?.es || 'un proyecto'}". Puedo detallarte la arquitectura técnica, los entregables auditables, tiempos/costos o brindarte nuestros canales directos de contacto. ¿Qué duda técnica tienes?`
+          ? `Hello! I am Alaec. I see you are looking into "${initialContext.pillarName || initialContext.title?.en || 'a project'}". I can clarify our technical architecture, deliverable milestones, sprint costs, or provide our direct contact channels. How can I help you?`
+          : `¡Hola! Soy Alaec. Veo que estás consultando sobre "${initialContext.pillarName || initialContext.title?.es || 'un proyecto'}". Puedo detallarte la arquitectura técnica, los entregables auditables, tiempos/costos o brindarte nuestros canales directos de contacto. ¿Qué duda técnica tienes?`
         : isEn
-        ? 'Hello! I am the Inmerge Engineering Assistant. Ask me about our 3 pillars (Technical Audit, AWS Cloud Dev, Data Science & AI), our rapid sprint pricing, or direct contact channels.'
-        : '¡Hola! Soy el Asistente Técnico de Inmerge. Pregúntame sobre nuestros 3 pilares (Auditoría Técnica, Desarrollo Cloud en AWS, Ciencia de Datos e IA), cotizaciones rápidas o canales directos de contacto.';
+          ? 'Hello! I am Alaec, the Inmerge Engineering Assistant. Ask me about our 3 pillars (Technical Audit, AWS Cloud Dev, Data Science & AI), rapid sprint pricing, or direct contact channels.'
+          : '¡Hola! Soy Alaec, el Asistente Técnico de Inmerge. Pregúntame sobre nuestros 3 pilares (Auditoría Técnica, Desarrollo Cloud en AWS, Ciencia de Datos e IA), cotizaciones rápidas o canales directos de contacto.';
 
       setMessages([{ id: 1, role: 'assistant', text: initialGreeting }]);
       setTimeout(() => {
@@ -213,17 +213,11 @@ export default function LLMAssistantModal({ isOpen, onClose, initialContext = nu
     const interval = setInterval(() => {
       currentIdx += 4;
       if (currentIdx >= fullResponse.length) {
-        setMessages((prev) =>
-          prev.map((msg) => (msg.id === botMsgId ? { ...msg, text: fullResponse } : msg))
-        );
+        setMessages((prev) => prev.map((msg) => (msg.id === botMsgId ? { ...msg, text: fullResponse } : msg)));
         setIsStreaming(false);
         clearInterval(interval);
       } else {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === botMsgId ? { ...msg, text: fullResponse.slice(0, currentIdx) } : msg
-          )
-        );
+        setMessages((prev) => prev.map((msg) => (msg.id === botMsgId ? { ...msg, text: fullResponse.slice(0, currentIdx) } : msg)));
       }
     }, 20);
   };
@@ -235,16 +229,12 @@ export default function LLMAssistantModal({ isOpen, onClose, initialContext = nu
   const getWhatsAppHandoffMsg = () => {
     const lastUserQuery = [...messages].reverse().find((m) => m.role === 'user')?.text || 'Consulta técnica';
     return isEn
-      ? `Hello Inmerge, I was consulting with your AI Assistant about: "${lastUserQuery}". I would like to speak directly with an engineer.`
-      : `Hola Inmerge, estuve conversando con su asistente en la web sobre: "${lastUserQuery}". Deseo hablar directamente con un ingeniero.`;
+      ? `Hello Inmerge, I was consulting with Alaec on your website about: "${lastUserQuery}". I would like to speak directly with an engineer.`
+      : `Hola Inmerge, estuve conversando con Alaec en la web sobre: "${lastUserQuery}". Deseo hablar directamente con un ingeniero.`;
   };
 
   return (
-    <div
-      className="llm-modal-backdrop"
-      onClick={onClose}
-      role="presentation"
-    >
+    <div className="llm-modal-backdrop" onClick={onClose} role="presentation">
       <div
         className="llm-modal-dialog"
         role="dialog"
@@ -255,16 +245,16 @@ export default function LLMAssistantModal({ isOpen, onClose, initialContext = nu
         {/* Modal Header */}
         <div className="llm-modal-header">
           <div className="llm-modal-header-titles">
-            <span className="llm-status-dot" aria-hidden="true" />
+            <span className="alaec-status-dot" aria-hidden="true" />
             <h2 id="llm-modal-title" className="llm-title">
-              {isEn ? 'Inmerge Engineering Assistant' : 'Asistente Técnico Inmerge'}
+              Alaec <span className="llm-title-tag">{isEn ? 'AI Assistant' : 'Asistente IA'}</span>
             </h2>
           </div>
           <button
             type="button"
             className="llm-close-btn"
             onClick={onClose}
-            aria-label={isEn ? 'Close assistant' : 'Cerrar asistente'}
+            aria-label={isEn ? 'Close Alaec assistant' : 'Cerrar asistente Alaec'}
           >
             ✕
           </button>
@@ -274,9 +264,7 @@ export default function LLMAssistantModal({ isOpen, onClose, initialContext = nu
         <div className="llm-chat-body" tabIndex={0} aria-label={isEn ? 'Chat history' : 'Historial de conversación'}>
           {messages.map((m) => (
             <div key={m.id} className={`llm-msg-bubble ${m.role === 'user' ? 'is-user' : 'is-assistant'}`}>
-              <span className="msg-sender-tag">
-                {m.role === 'user' ? (isEn ? 'You' : 'Tú') : 'Inmerge AI'}
-              </span>
+              <span className="msg-sender-tag">{m.role === 'user' ? (isEn ? 'You' : 'Tú') : 'Alaec'}</span>
               <p className="msg-text">{m.text}</p>
             </div>
           ))}
@@ -294,12 +282,7 @@ export default function LLMAssistantModal({ isOpen, onClose, initialContext = nu
         {messages.length <= 2 && (
           <div className="llm-suggestions-row" aria-label={isEn ? 'Suggested questions' : 'Preguntas sugeridas'}>
             {suggestions.map((sug, idx) => (
-              <button
-                key={idx}
-                type="button"
-                className="llm-sug-chip"
-                onClick={() => handleSuggestionClick(sug)}
-              >
+              <button key={idx} type="button" className="llm-sug-chip" onClick={() => handleSuggestionClick(sug)}>
                 {sug}
               </button>
             ))}
@@ -336,12 +319,7 @@ export default function LLMAssistantModal({ isOpen, onClose, initialContext = nu
         {/* Failover / WhatsApp Handoff Footer */}
         <div className="llm-handoff-footer">
           <span>{isEn ? 'Need direct human discussion?' : '¿Prefieres trato directo con un ingeniero?'}</span>
-          <a
-            href={waLink(getWhatsAppHandoffMsg())}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-handoff-wa"
-          >
+          <a href={waLink(getWhatsAppHandoffMsg())} target="_blank" rel="noopener noreferrer" className="btn-handoff-wa">
             {isEn ? 'Chat via WhatsApp →' : 'Hablar por WhatsApp →'}
           </a>
         </div>

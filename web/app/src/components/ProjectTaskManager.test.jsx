@@ -82,9 +82,7 @@ describe('PM Components - ProjectTaskManager & ProjectRiskManager', () => {
 
     it('allows assigning a staff member directly via inline selector', async () => {
       const onTaskUpdated = vi.fn();
-      const mockStaffList = [
-        { id: 's-1', full_name: 'Ana Auditora', email: 'ana@inmerge.pe', role: 'auditor' },
-      ];
+      const mockStaffList = [{ id: 's-1', full_name: 'Ana Auditora', email: 'ana@inmerge.pe', role: 'auditor' }];
       render(
         <ProjectTaskManager
           projectId="p-1"

@@ -94,8 +94,7 @@ export default function ProjectsManagementView({
     const totalMilestones = proj.milestones?.length || 0;
     const completedMilestones = proj.milestones?.filter((m) => m.status === 'COMPLETADO').length || 0;
     const weightedProgress = calculateProjectProgress(proj.milestones, proj.tasks || []);
-    const progressPct =
-      proj.progress !== undefined && proj.progress !== null && proj.progress > 0 ? proj.progress : weightedProgress;
+    const progressPct = proj.progress !== undefined && proj.progress !== null && proj.progress > 0 ? proj.progress : weightedProgress;
     const hoursInfo = calculateProjectHours(proj.tasks || []);
     const activeRisksCount = (proj.risks || []).filter((r) => r.status !== 'RESUELTO').length;
     const currentSubTab = projectSubTabs[proj.id] || 'PM_GANTT';
@@ -114,1404 +113,1390 @@ export default function ProjectsManagementView({
           boxShadow: isSplitDetail ? '0 4px 16px rgba(36,26,18,0.06)' : 'none',
         }}
       >
-                {/* Project Header */}
-                <div
+        {/* Project Header */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            flexWrap: 'wrap',
+            gap: 12,
+            marginBottom: 16,
+            borderBottom: '1px solid var(--border)',
+            paddingBottom: 14,
+          }}
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+              {isAdmin ? (
+                <select
+                  value={proj.status}
+                  onChange={(e) => onUpdateProjectStatus(proj.id, e.target.value)}
+                  title="Cambiar estado del proyecto y notificar al cliente"
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    flexWrap: 'wrap',
-                    gap: 12,
-                    marginBottom: 16,
-                    borderBottom: '1px solid var(--border)',
-                    paddingBottom: 14,
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
-                      {isAdmin ? (
-                        <select
-                          value={proj.status}
-                          onChange={(e) => onUpdateProjectStatus(proj.id, e.target.value)}
-                          title="Cambiar estado del proyecto y notificar al cliente"
-                          style={{
-                            fontFamily: "'IBM Plex Mono', monospace",
-                            fontSize: 11,
-                            padding: '3px 8px',
-                            borderRadius: 4,
-                            background: pColor.bg,
-                            color: pColor.text,
-                            border: `1px solid ${pColor.border}`,
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <option value="EN_PLANIFICACION">EN_PLANIFICACION</option>
-                          <option value="EN_AUDITORIA">EN_AUDITORIA</option>
-                          <option value="EN_DESARROLLO">EN_DESARROLLO</option>
-                          <option value="EN_VALIDACION">EN_VALIDACION</option>
-                          <option value="ENTREGADO">ENTREGADO</option>
-                          <option value="FINALIZADO">FINALIZADO</option>
-                        </select>
-                      ) : (
-                        <span
-                          title="Solo administradores pueden modificar el estado del proyecto"
-                          style={{
-                            fontFamily: "'IBM Plex Mono', monospace",
-                            fontSize: 11,
-                            padding: '3px 8px',
-                            borderRadius: 4,
-                            background: pColor.bg,
-                            color: pColor.text,
-                            border: `1px solid ${pColor.border}`,
-                            fontWeight: 700,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4,
-                          }}
-                        >
-                          🔒 {proj.status}
-                        </span>
-                      )}
-
-                      {isAdmin ? (
-                        <select
-                          value={proj.health_status || 'ON_TRACK'}
-                          onChange={(e) => onProjectHealthChange(proj.id, e.target.value)}
-                          title="Indicador de Salud RAG del Proyecto"
-                          style={{
-                            fontFamily: "'IBM Plex Mono', monospace",
-                            fontSize: 11,
-                            padding: '3px 8px',
-                            borderRadius: 4,
-                            background: healthCfg.badgeBg,
-                            color: healthCfg.color,
-                            border: `1px solid ${healthCfg.color}`,
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {Object.values(HEALTH_STATUS_CONFIG).map((h) => (
-                            <option key={h.key} value={h.key}>
-                              {h.icon} Salud: {h.label}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span
-                          title="Indicador de Salud RAG (Solo lectura)"
-                          style={{
-                            fontFamily: "'IBM Plex Mono', monospace",
-                            fontSize: 11,
-                            padding: '3px 8px',
-                            borderRadius: 4,
-                            background: healthCfg.badgeBg,
-                            color: healthCfg.color,
-                            border: `1px solid ${healthCfg.color}`,
-                            fontWeight: 700,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4,
-                          }}
-                        >
-                          🔒 {healthCfg.icon} Salud: {healthCfg.label}
-                        </span>
-                      )}
-
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
-                        Pilar: <strong>{PILLAR_LABELS[proj.pillar] || proj.pillar}</strong>
-                      </span>
-                    </div>
-
-                    <h3 style={{ margin: '4px 0', fontSize: 22, fontFamily: "'Spectral', serif", fontWeight: 700 }}>{proj.title}</h3>
-                    <div style={{ fontSize: 13, color: 'var(--muted)' }}>
-                      Cliente:{' '}
-                      <strong style={{ color: 'var(--ink)' }}>
-                        {proj.client?.full_name ? `${proj.client.full_name} (${proj.client.email})` : proj.client?.email || proj.client_id}
-                      </strong>
-                      {proj.client?.company && ` — ${proj.client.company}`}
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      textAlign: 'right',
-                      fontSize: 12,
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      color: 'var(--muted)',
-                    }}
-                  >
-                    <div>Inicio: {proj.start_date || 'N/A'}</div>
-                    {proj.target_completion_date && <div>Meta: {proj.target_completion_date}</div>}
-                  </div>
-                </div>
-
-                {/* Sección de Equipo Técnico Asignado & Designación */}
-                <div
-                  style={{
-                    background: 'var(--bg)',
-                    border: '1px solid var(--border)',
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 11,
+                    padding: '3px 8px',
                     borderRadius: 4,
-                    padding: '12px 16px',
-                    marginBottom: 16,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: 12,
+                    background: pColor.bg,
+                    color: pColor.text,
+                    border: `1px solid ${pColor.border}`,
+                    fontWeight: 700,
+                    cursor: 'pointer',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-                    <div>
-                      <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', display: 'block' }}>
-                        LEAD TÉCNICO / AUDITOR RESPONSABLE
-                      </span>
-                      <strong style={{ fontSize: 13, color: 'var(--ink)' }}>👤 {proj.tech_lead_name || 'Inmerge Technical Lead'}</strong>{' '}
-                      <span style={{ fontSize: 12, color: 'var(--muted)' }}>({proj.tech_lead_contact || 'inmerge3@gmail.com'})</span>
-                    </div>
-
-                    {/* Miembros del equipo interno participantes */}
-                    {Array.from(new Set((proj.milestones || []).filter((m) => m.assigned_to_name).map((m) => m.assigned_to_name))).map(
-                      (name) => (
-                        <span
-                          key={name}
-                          style={{
-                            fontSize: 11,
-                            fontFamily: "'IBM Plex Mono', monospace",
-                            padding: '2px 8px',
-                            borderRadius: 12,
-                            background: 'var(--cream2)',
-                            border: '1px solid var(--border)',
-                            color: 'var(--ink)',
-                          }}
-                        >
-                          🛠️ {name}
-                        </span>
-                      ),
-                    )}
-                  </div>
-
-                  {isAdmin && onUpdateProjectStaff && (
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (editingStaffProjId === proj.id) {
-                            setEditingStaffProjId(null);
-                          } else {
-                            setEditingStaffProjId(proj.id);
-                            setStaffFormData({
-                              techLeadName: proj.tech_lead_name || '',
-                              techLeadContact: proj.tech_lead_contact || '',
-                            });
-                          }
-                        }}
-                        style={{
-                          background: 'none',
-                          border: '1px dotted var(--terracotta)',
-                          color: 'var(--terracotta)',
-                          padding: '4px 10px',
-                          borderRadius: 4,
-                          fontSize: 12,
-                          cursor: 'pointer',
-                          fontFamily: "'IBM Plex Mono', monospace",
-                        }}
-                      >
-                        {editingStaffProjId === proj.id ? 'Cancelar' : '⚙️ Designar / Cambiar Lead'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Formulario Inline de Designación de Lead (Admin) */}
-                {editingStaffProjId === proj.id && isAdmin && (
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (onUpdateProjectStaff) {
-                        await onUpdateProjectStaff(proj.id, staffFormData);
-                        setEditingStaffProjId(null);
-                      }
-                    }}
-                    style={{
-                      background: 'var(--cream2)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 4,
-                      padding: '14px 16px',
-                      marginBottom: 16,
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr)) auto',
-                      gap: 12,
-                      alignItems: 'flex-end',
-                    }}
-                  >
-                    <div>
-                      <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                        Seleccionar Consultor / Ingeniero
-                      </label>
-                      <select
-                        onChange={(e) => {
-                          const selected = staffList.find((s) => s.id === e.target.value);
-                          if (selected) {
-                            setStaffFormData({
-                              techLeadName: selected.full_name || selected.email,
-                              techLeadContact: selected.email,
-                            });
-                          }
-                        }}
-                        style={{
-                          width: '100%',
-                          padding: '6px 8px',
-                          borderRadius: 4,
-                          border: '1px solid var(--border)',
-                          fontSize: 12,
-                          background: '#fff',
-                        }}
-                      >
-                        <option value="">-- Seleccionar de la lista de consultores --</option>
-                        {staffList.map((s) => (
-                          <option key={s.id} value={s.id}>
-                            {s.full_name || s.email} ({s.role ? s.role.toUpperCase() : 'STAFF'})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                        Nombre del Lead Técnico *
-                      </label>
-                      <input
-                        type="text"
-                        value={staffFormData.techLeadName}
-                        onChange={(e) => setStaffFormData({ ...staffFormData, techLeadName: e.target.value })}
-                        required
-                        style={{ width: '100%', padding: '6px 8px', borderRadius: 4, border: '1px solid var(--border)', fontSize: 12 }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                        Email de Contacto *
-                      </label>
-                      <input
-                        type="email"
-                        value={staffFormData.techLeadContact}
-                        onChange={(e) => setStaffFormData({ ...staffFormData, techLeadContact: e.target.value })}
-                        required
-                        style={{ width: '100%', padding: '6px 8px', borderRadius: 4, border: '1px solid var(--border)', fontSize: 12 }}
-                      />
-                    </div>
-
-                    <div>
-                      <button
-                        type="submit"
-                        className="btn-accent"
-                        style={{
-                          background: 'var(--terracotta)',
-                          color: '#fff',
-                          border: 'none',
-                          padding: '8px 16px',
-                          borderRadius: 4,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Guardar Designación
-                      </button>
-                    </div>
-                  </form>
-                )}
-
-                {proj.description && (
-                  <p style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 16, whiteSpace: 'pre-line' }}>{proj.description}</p>
-                )}
-
-                {/* PM KPI Bar */}
-                <div
+                  <option value="EN_PLANIFICACION">EN_PLANIFICACION</option>
+                  <option value="EN_AUDITORIA">EN_AUDITORIA</option>
+                  <option value="EN_DESARROLLO">EN_DESARROLLO</option>
+                  <option value="EN_VALIDACION">EN_VALIDACION</option>
+                  <option value="ENTREGADO">ENTREGADO</option>
+                  <option value="FINALIZADO">FINALIZADO</option>
+                </select>
+              ) : (
+                <span
+                  title="Solo administradores pueden modificar el estado del proyecto"
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                    gap: 12,
-                    marginBottom: 20,
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 11,
+                    padding: '3px 8px',
+                    borderRadius: 4,
+                    background: pColor.bg,
+                    color: pColor.text,
+                    border: `1px solid ${pColor.border}`,
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
                   }}
                 >
-                  {/* Progreso Ponderado */}
-                  <div
-                    style={{
-                      background: 'var(--bg)',
-                      padding: '12px 14px',
-                      border: '1px solid var(--border)',
-                      borderRadius: 4,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 11,
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        color: 'var(--muted)',
-                        marginBottom: 4,
+                  🔒 {proj.status}
+                </span>
+              )}
+
+              {isAdmin ? (
+                <select
+                  value={proj.health_status || 'ON_TRACK'}
+                  onChange={(e) => onProjectHealthChange(proj.id, e.target.value)}
+                  title="Indicador de Salud RAG del Proyecto"
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 11,
+                    padding: '3px 8px',
+                    borderRadius: 4,
+                    background: healthCfg.badgeBg,
+                    color: healthCfg.color,
+                    border: `1px solid ${healthCfg.color}`,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {Object.values(HEALTH_STATUS_CONFIG).map((h) => (
+                    <option key={h.key} value={h.key}>
+                      {h.icon} Salud: {h.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span
+                  title="Indicador de Salud RAG (Solo lectura)"
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 11,
+                    padding: '3px 8px',
+                    borderRadius: 4,
+                    background: healthCfg.badgeBg,
+                    color: healthCfg.color,
+                    border: `1px solid ${healthCfg.color}`,
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  🔒 {healthCfg.icon} Salud: {healthCfg.label}
+                </span>
+              )}
+
+              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--muted)' }}>
+                Pilar: <strong>{PILLAR_LABELS[proj.pillar] || proj.pillar}</strong>
+              </span>
+            </div>
+
+            <h3 style={{ margin: '4px 0', fontSize: 22, fontFamily: "'Spectral', serif", fontWeight: 700 }}>{proj.title}</h3>
+            <div style={{ fontSize: 13, color: 'var(--muted)' }}>
+              Cliente:{' '}
+              <strong style={{ color: 'var(--ink)' }}>
+                {proj.client?.full_name ? `${proj.client.full_name} (${proj.client.email})` : proj.client?.email || proj.client_id}
+              </strong>
+              {proj.client?.company && ` — ${proj.client.company}`}
+            </div>
+          </div>
+
+          <div
+            style={{
+              textAlign: 'right',
+              fontSize: 12,
+              fontFamily: "'IBM Plex Mono', monospace",
+              color: 'var(--muted)',
+            }}
+          >
+            <div>Inicio: {proj.start_date || 'N/A'}</div>
+            {proj.target_completion_date && <div>Meta: {proj.target_completion_date}</div>}
+          </div>
+        </div>
+
+        {/* Sección de Equipo Técnico Asignado & Designación */}
+        <div
+          style={{
+            background: 'var(--bg)',
+            border: '1px solid var(--border)',
+            borderRadius: 4,
+            padding: '12px 16px',
+            marginBottom: 16,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 12,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+            <div>
+              <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', display: 'block' }}>
+                LEAD TÉCNICO / AUDITOR RESPONSABLE
+              </span>
+              <strong style={{ fontSize: 13, color: 'var(--ink)' }}>👤 {proj.tech_lead_name || 'Inmerge Technical Lead'}</strong>{' '}
+              <span style={{ fontSize: 12, color: 'var(--muted)' }}>({proj.tech_lead_contact || 'inmerge3@gmail.com'})</span>
+            </div>
+
+            {/* Miembros del equipo interno participantes */}
+            {Array.from(new Set((proj.milestones || []).filter((m) => m.assigned_to_name).map((m) => m.assigned_to_name))).map((name) => (
+              <span
+                key={name}
+                style={{
+                  fontSize: 11,
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  background: 'var(--cream2)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--ink)',
+                }}
+              >
+                🛠️ {name}
+              </span>
+            ))}
+          </div>
+
+          {isAdmin && onUpdateProjectStaff && (
+            <div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (editingStaffProjId === proj.id) {
+                    setEditingStaffProjId(null);
+                  } else {
+                    setEditingStaffProjId(proj.id);
+                    setStaffFormData({
+                      techLeadName: proj.tech_lead_name || '',
+                      techLeadContact: proj.tech_lead_contact || '',
+                    });
+                  }
+                }}
+                style={{
+                  background: 'none',
+                  border: '1px dotted var(--terracotta)',
+                  color: 'var(--terracotta)',
+                  padding: '4px 10px',
+                  borderRadius: 4,
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  fontFamily: "'IBM Plex Mono', monospace",
+                }}
+              >
+                {editingStaffProjId === proj.id ? 'Cancelar' : '⚙️ Designar / Cambiar Lead'}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Formulario Inline de Designación de Lead (Admin) */}
+        {editingStaffProjId === proj.id && isAdmin && (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (onUpdateProjectStaff) {
+                await onUpdateProjectStaff(proj.id, staffFormData);
+                setEditingStaffProjId(null);
+              }
+            }}
+            style={{
+              background: 'var(--cream2)',
+              border: '1px solid var(--border)',
+              borderRadius: 4,
+              padding: '14px 16px',
+              marginBottom: 16,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr)) auto',
+              gap: 12,
+              alignItems: 'flex-end',
+            }}
+          >
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                Seleccionar Consultor / Ingeniero
+              </label>
+              <select
+                onChange={(e) => {
+                  const selected = staffList.find((s) => s.id === e.target.value);
+                  if (selected) {
+                    setStaffFormData({
+                      techLeadName: selected.full_name || selected.email,
+                      techLeadContact: selected.email,
+                    });
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '6px 8px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                  fontSize: 12,
+                  background: '#fff',
+                }}
+              >
+                <option value="">-- Seleccionar de la lista de consultores --</option>
+                {staffList.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.full_name || s.email} ({s.role ? s.role.toUpperCase() : 'STAFF'})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                Nombre del Lead Técnico *
+              </label>
+              <input
+                type="text"
+                value={staffFormData.techLeadName}
+                onChange={(e) => setStaffFormData({ ...staffFormData, techLeadName: e.target.value })}
+                required
+                style={{ width: '100%', padding: '6px 8px', borderRadius: 4, border: '1px solid var(--border)', fontSize: 12 }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                Email de Contacto *
+              </label>
+              <input
+                type="email"
+                value={staffFormData.techLeadContact}
+                onChange={(e) => setStaffFormData({ ...staffFormData, techLeadContact: e.target.value })}
+                required
+                style={{ width: '100%', padding: '6px 8px', borderRadius: 4, border: '1px solid var(--border)', fontSize: 12 }}
+              />
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="btn-accent"
+                style={{
+                  background: 'var(--terracotta)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: 4,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Guardar Designación
+              </button>
+            </div>
+          </form>
+        )}
+
+        {proj.description && (
+          <p style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 16, whiteSpace: 'pre-line' }}>{proj.description}</p>
+        )}
+
+        {/* PM KPI Bar */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: 12,
+            marginBottom: 20,
+          }}
+        >
+          {/* Progreso Ponderado */}
+          <div
+            style={{
+              background: 'var(--bg)',
+              padding: '12px 14px',
+              border: '1px solid var(--border)',
+              borderRadius: 4,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontFamily: "'IBM Plex Mono', monospace",
+                color: 'var(--muted)',
+                marginBottom: 4,
+              }}
+            >
+              PROGRESO PONDERADO
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <strong
+                style={{
+                  fontSize: 18,
+                  color: 'var(--terracotta)',
+                  fontFamily: "'IBM Plex Mono', monospace",
+                }}
+              >
+                {progressPct}%
+              </strong>
+              <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: "'IBM Plex Mono', monospace" }}>
+                {completedMilestones}/{totalMilestones} Hitos
+              </span>
+            </div>
+            <div
+              style={{
+                width: '100%',
+                height: 4,
+                background: 'var(--cream2)',
+                marginTop: 6,
+                borderRadius: 2,
+                overflow: 'hidden',
+              }}
+            >
+              <div style={{ width: `${progressPct}%`, height: '100%', background: 'var(--terracotta)' }} />
+            </div>
+          </div>
+
+          {/* Horas de Consultoría */}
+          <div
+            style={{
+              background: 'var(--bg)',
+              padding: '12px 14px',
+              border: '1px solid var(--border)',
+              borderRadius: 4,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontFamily: "'IBM Plex Mono', monospace",
+                color: 'var(--muted)',
+                marginBottom: 4,
+              }}
+            >
+              HORAS TÉCNICAS (REAL / EST.)
+            </div>
+            <div
+              style={{
+                fontSize: 16,
+                fontWeight: 700,
+                fontFamily: "'IBM Plex Mono', monospace",
+                color: 'var(--ink)',
+              }}
+            >
+              {hoursInfo.actualHours}h / {hoursInfo.estimatedHours}h
+            </div>
+            <div
+              style={{
+                fontSize: 11,
+                color: hoursInfo.varianceHours > 0 ? 'var(--terracotta)' : 'var(--green)',
+                marginTop: 4,
+              }}
+            >
+              Desviación: {hoursInfo.varianceHours > 0 ? `+${hoursInfo.varianceHours}h` : `${hoursInfo.varianceHours}h`}
+            </div>
+          </div>
+
+          {/* Bloqueos Activos */}
+          <div
+            style={{
+              background: 'var(--bg)',
+              padding: '12px 14px',
+              border: '1px solid var(--border)',
+              borderRadius: 4,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontFamily: "'IBM Plex Mono', monospace",
+                color: 'var(--muted)',
+                marginBottom: 4,
+              }}
+            >
+              BLOQUEOS / RIESGOS
+            </div>
+            <div
+              style={{
+                fontSize: 16,
+                fontWeight: 700,
+                fontFamily: "'IBM Plex Mono', monospace",
+                color: activeRisksCount > 0 ? 'var(--terracotta)' : 'var(--green)',
+              }}
+            >
+              {activeRisksCount > 0 ? `⚠️ ${activeRisksCount} Activo(s)` : '✓ 0 Bloqueos'}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>{proj.tasks?.length || 0} tareas técnicas registradas</div>
+          </div>
+        </div>
+
+        {/* Sub-Tabs de Gestión PM */}
+        <div
+          style={{
+            display: 'flex',
+            gap: 6,
+            borderBottom: '1px solid var(--border)',
+            marginBottom: 16,
+            overflowX: 'auto',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setProjSubTab(proj.id, 'PM_GANTT')}
+            style={{
+              padding: '8px 14px',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 12,
+              fontWeight: currentSubTab === 'PM_GANTT' ? 700 : 500,
+              background: currentSubTab === 'PM_GANTT' ? 'var(--bg)' : 'transparent',
+              color: currentSubTab === 'PM_GANTT' ? 'var(--terracotta)' : 'var(--muted)',
+              border: '1px solid var(--border)',
+              borderBottom: currentSubTab === 'PM_GANTT' ? '1px solid var(--bg)' : '1px solid var(--border)',
+              cursor: 'pointer',
+            }}
+          >
+            📊 Cronograma Gantt
+          </button>
+          <button
+            type="button"
+            onClick={() => setProjSubTab(proj.id, 'PM_TASKS')}
+            style={{
+              padding: '8px 14px',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 12,
+              fontWeight: currentSubTab === 'PM_TASKS' ? 700 : 500,
+              background: currentSubTab === 'PM_TASKS' ? 'var(--bg)' : 'transparent',
+              color: currentSubTab === 'PM_TASKS' ? 'var(--terracotta)' : 'var(--muted)',
+              border: '1px solid var(--border)',
+              borderBottom: currentSubTab === 'PM_TASKS' ? '1px solid var(--bg)' : '1px solid var(--border)',
+              cursor: 'pointer',
+            }}
+          >
+            📋 Tareas Técnicas ({proj.tasks?.length || 0})
+          </button>
+          <button
+            type="button"
+            onClick={() => setProjSubTab(proj.id, 'PM_RISKS')}
+            style={{
+              padding: '8px 14px',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 12,
+              fontWeight: currentSubTab === 'PM_RISKS' ? 700 : 500,
+              background: currentSubTab === 'PM_RISKS' ? 'var(--bg)' : 'transparent',
+              color: currentSubTab === 'PM_RISKS' ? 'var(--terracotta)' : 'var(--muted)',
+              border: '1px solid var(--border)',
+              borderBottom: currentSubTab === 'PM_RISKS' ? '1px solid var(--bg)' : '1px solid var(--border)',
+              cursor: 'pointer',
+            }}
+          >
+            ⚠️ Riesgos & Bloqueos ({proj.risks?.length || 0})
+          </button>
+          <button
+            type="button"
+            onClick={() => setProjSubTab(proj.id, 'PM_MILESTONES')}
+            style={{
+              padding: '8px 14px',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 12,
+              fontWeight: currentSubTab === 'PM_MILESTONES' ? 700 : 500,
+              background: currentSubTab === 'PM_MILESTONES' ? 'var(--bg)' : 'transparent',
+              color: currentSubTab === 'PM_MILESTONES' ? 'var(--terracotta)' : 'var(--muted)',
+              border: '1px solid var(--border)',
+              borderBottom: currentSubTab === 'PM_MILESTONES' ? '1px solid var(--bg)' : '1px solid var(--border)',
+              cursor: 'pointer',
+            }}
+          >
+            📌 Fases & Hitos ({totalMilestones})
+          </button>
+          <button
+            type="button"
+            onClick={() => setProjSubTab(proj.id, 'PM_DELIVERABLES')}
+            style={{
+              padding: '8px 14px',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 12,
+              fontWeight: currentSubTab === 'PM_DELIVERABLES' ? 700 : 500,
+              background: currentSubTab === 'PM_DELIVERABLES' ? 'var(--bg)' : 'transparent',
+              color: currentSubTab === 'PM_DELIVERABLES' ? 'var(--terracotta)' : 'var(--muted)',
+              border: '1px solid var(--border)',
+              borderBottom: currentSubTab === 'PM_DELIVERABLES' ? '1px solid var(--bg)' : '1px solid var(--border)',
+              cursor: 'pointer',
+            }}
+          >
+            📦 Entregables ({proj.deliverables?.length || 0})
+          </button>
+        </div>
+
+        {/* Render Sub-Tab Active */}
+        {currentSubTab === 'PM_GANTT' && (
+          <ProjectGantt project={proj} milestones={proj.milestones || []} tasks={proj.tasks || []} showTasks={true} isExecutive={false} />
+        )}
+
+        {currentSubTab === 'PM_TASKS' && (
+          <ProjectTaskManager
+            projectId={proj.id}
+            milestones={proj.milestones || []}
+            tasks={proj.tasks || []}
+            staffList={staffList}
+            onTaskCreated={onTaskCreated}
+            onTaskUpdated={onTaskUpdated}
+            onTaskDeleted={onTaskDeleted}
+          />
+        )}
+
+        {currentSubTab === 'PM_RISKS' && (
+          <ProjectRiskManager
+            projectId={proj.id}
+            milestones={proj.milestones || []}
+            risks={proj.risks || []}
+            onRiskCreated={onRiskCreated}
+            onRiskUpdated={onRiskUpdated}
+          />
+        )}
+
+        {currentSubTab === 'PM_MILESTONES' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <span style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                Fases & Hitos del Proyecto ({proj.milestones?.length || 0})
+              </span>
+              {isAdmin && onAddMilestone ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (addingMilestoneProjId === proj.id) {
+                      setAddingMilestoneProjId(null);
+                    } else {
+                      setAddingMilestoneProjId(proj.id);
+                      setInlineMilestone({
+                        title: 'Fase 01 — Auditoría & Diagnóstico Inicial',
+                        orderIndex: (proj.milestones?.length || 0) + 1,
+                        phasePreset: '01',
+                        dueDate: '',
+                        assignedToId: '',
+                        assignedToName: '',
+                        assignedToEmail: '',
+                      });
+                    }
+                  }}
+                  className="btn-accent"
+                  style={{
+                    background: addingMilestoneProjId === proj.id ? 'var(--muted)' : 'var(--terracotta)',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: 16,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {addingMilestoneProjId === proj.id ? 'Cancelar' : '+ Agregar Hito a Proyecto'}
+                </button>
+              ) : (
+                <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                  🔒 Solo Admin gestiona hitos
+                </span>
+              )}
+            </div>
+
+            {/* Inline Add Milestone Form (Admin Only) */}
+            {isAdmin && addingMilestoneProjId === proj.id && (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (onAddMilestone) {
+                    await onAddMilestone(e, {
+                      projectId: proj.id,
+                      title: inlineMilestone.title,
+                      orderIndex: parseInt(inlineMilestone.orderIndex, 10) || 1,
+                      dueDate: inlineMilestone.dueDate || null,
+                      assignedToId: inlineMilestone.assignedToId || null,
+                      assignedToName: inlineMilestone.assignedToName || null,
+                      assignedToEmail: inlineMilestone.assignedToEmail || null,
+                    });
+                    setAddingMilestoneProjId(null);
+                  }
+                }}
+                style={{
+                  background: 'var(--cream2)',
+                  padding: '16px',
+                  borderRadius: 6,
+                  border: '1px solid var(--border)',
+                  marginBottom: 16,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                }}
+              >
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                      Fase del Proyecto (Método Inmerge)
+                    </label>
+                    <select
+                      value={inlineMilestone.phasePreset}
+                      onChange={(e) => {
+                        const presetId = e.target.value;
+                        const found = METHODOLOGY_PHASE_PRESETS.find((p) => p.id === presetId);
+                        if (found) {
+                          if (presetId === 'custom') {
+                            setInlineMilestone({ ...inlineMilestone, phasePreset: 'custom' });
+                          } else {
+                            setInlineMilestone({
+                              ...inlineMilestone,
+                              phasePreset: found.id,
+                              orderIndex: found.order,
+                              title: found.template,
+                            });
+                          }
+                        }
                       }}
-                    >
-                      PROGRESO PONDERADO
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <strong
-                        style={{
-                          fontSize: 18,
-                          color: 'var(--terracotta)',
-                          fontFamily: "'IBM Plex Mono', monospace",
-                        }}
-                      >
-                        {progressPct}%
-                      </strong>
-                      <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {completedMilestones}/{totalMilestones} Hitos
-                      </span>
-                    </div>
-                    <div
                       style={{
                         width: '100%',
-                        height: 4,
-                        background: 'var(--cream2)',
-                        marginTop: 6,
-                        borderRadius: 2,
-                        overflow: 'hidden',
+                        padding: '6px 10px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        fontSize: 12,
+                        background: '#fff',
                       }}
                     >
-                      <div style={{ width: `${progressPct}%`, height: '100%', background: 'var(--terracotta)' }} />
-                    </div>
+                      {METHODOLOGY_PHASE_PRESETS.map((ph) => (
+                        <option key={ph.id} value={ph.id}>
+                          {ph.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
-                  {/* Horas de Consultoría */}
-                  <div
-                    style={{
-                      background: 'var(--bg)',
-                      padding: '12px 14px',
-                      border: '1px solid var(--border)',
-                      borderRadius: 4,
-                    }}
-                  >
-                    <div
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                      Nº de Fase (Orden) *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={inlineMilestone.orderIndex}
+                      onChange={(e) => setInlineMilestone({ ...inlineMilestone, orderIndex: parseInt(e.target.value, 10) || 1 })}
+                      required
                       style={{
-                        fontSize: 11,
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        fontSize: 12,
                         fontFamily: "'IBM Plex Mono', monospace",
-                        color: 'var(--muted)',
-                        marginBottom: 4,
                       }}
-                    >
-                      HORAS TÉCNICAS (REAL / EST.)
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 700,
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        color: 'var(--ink)',
-                      }}
-                    >
-                      {hoursInfo.actualHours}h / {hoursInfo.estimatedHours}h
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: hoursInfo.varianceHours > 0 ? 'var(--terracotta)' : 'var(--green)',
-                        marginTop: 4,
-                      }}
-                    >
-                      Desviación: {hoursInfo.varianceHours > 0 ? `+${hoursInfo.varianceHours}h` : `${hoursInfo.varianceHours}h`}
-                    </div>
+                    />
                   </div>
 
-                  {/* Bloqueos Activos */}
-                  <div
-                    style={{
-                      background: 'var(--bg)',
-                      padding: '12px 14px',
-                      border: '1px solid var(--border)',
-                      borderRadius: 4,
-                    }}
-                  >
-                    <div
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                      Fecha Límite
+                    </label>
+                    <input
+                      type="date"
+                      value={inlineMilestone.dueDate}
+                      onChange={(e) => setInlineMilestone({ ...inlineMilestone, dueDate: e.target.value })}
                       style={{
-                        fontSize: 11,
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        color: 'var(--muted)',
-                        marginBottom: 4,
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        fontSize: 12,
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                      Encargado (Equipo Interno)
+                    </label>
+                    <select
+                      value={inlineMilestone.assignedToId || ''}
+                      onChange={(e) => {
+                        const memberId = e.target.value;
+                        if (!memberId) {
+                          setInlineMilestone({
+                            ...inlineMilestone,
+                            assignedToId: '',
+                            assignedToName: '',
+                            assignedToEmail: '',
+                          });
+                        } else {
+                          const member = staffList.find((s) => s.id === memberId);
+                          setInlineMilestone({
+                            ...inlineMilestone,
+                            assignedToId: member?.id || memberId,
+                            assignedToName: member?.full_name || member?.email || '',
+                            assignedToEmail: member?.email || '',
+                          });
+                        }
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        fontSize: 12,
+                        background: '#fff',
                       }}
                     >
-                      BLOQUEOS / RIESGOS
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 700,
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        color: activeRisksCount > 0 ? 'var(--terracotta)' : 'var(--green)',
-                      }}
-                    >
-                      {activeRisksCount > 0 ? `⚠️ ${activeRisksCount} Activo(s)` : '✓ 0 Bloqueos'}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>
-                      {proj.tasks?.length || 0} tareas técnicas registradas
-                    </div>
+                      <option value="">-- Sin asignar / General --</option>
+                      {staffList.map((member) => (
+                        <option key={member.id} value={member.id}>
+                          {member.full_name || member.email} ({member.role ? member.role.toUpperCase() : 'STAFF'})
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
-                {/* Sub-Tabs de Gestión PM */}
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: 6,
-                    borderBottom: '1px solid var(--border)',
-                    marginBottom: 16,
-                    overflowX: 'auto',
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setProjSubTab(proj.id, 'PM_GANTT')}
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                    Título del Hito *
+                  </label>
+                  <input
+                    type="text"
+                    value={inlineMilestone.title}
+                    onChange={(e) => setInlineMilestone({ ...inlineMilestone, title: e.target.value })}
+                    required
+                    placeholder="e.g. Fase 02 — Arquitectura Cloud & Especificación Técnica"
                     style={{
-                      padding: '8px 14px',
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 12,
-                      fontWeight: currentSubTab === 'PM_GANTT' ? 700 : 500,
-                      background: currentSubTab === 'PM_GANTT' ? 'var(--bg)' : 'transparent',
-                      color: currentSubTab === 'PM_GANTT' ? 'var(--terracotta)' : 'var(--muted)',
+                      width: '100%',
+                      padding: '6px 10px',
+                      borderRadius: 4,
                       border: '1px solid var(--border)',
-                      borderBottom: currentSubTab === 'PM_GANTT' ? '1px solid var(--bg)' : '1px solid var(--border)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    📊 Cronograma Gantt
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setProjSubTab(proj.id, 'PM_TASKS')}
-                    style={{
-                      padding: '8px 14px',
-                      fontFamily: "'IBM Plex Mono', monospace",
                       fontSize: 12,
-                      fontWeight: currentSubTab === 'PM_TASKS' ? 700 : 500,
-                      background: currentSubTab === 'PM_TASKS' ? 'var(--bg)' : 'transparent',
-                      color: currentSubTab === 'PM_TASKS' ? 'var(--terracotta)' : 'var(--muted)',
-                      border: '1px solid var(--border)',
-                      borderBottom: currentSubTab === 'PM_TASKS' ? '1px solid var(--bg)' : '1px solid var(--border)',
-                      cursor: 'pointer',
+                      boxSizing: 'border-box',
                     }}
-                  >
-                    📋 Tareas Técnicas ({proj.tasks?.length || 0})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setProjSubTab(proj.id, 'PM_RISKS')}
-                    style={{
-                      padding: '8px 14px',
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 12,
-                      fontWeight: currentSubTab === 'PM_RISKS' ? 700 : 500,
-                      background: currentSubTab === 'PM_RISKS' ? 'var(--bg)' : 'transparent',
-                      color: currentSubTab === 'PM_RISKS' ? 'var(--terracotta)' : 'var(--muted)',
-                      border: '1px solid var(--border)',
-                      borderBottom: currentSubTab === 'PM_RISKS' ? '1px solid var(--bg)' : '1px solid var(--border)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    ⚠️ Riesgos & Bloqueos ({proj.risks?.length || 0})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setProjSubTab(proj.id, 'PM_MILESTONES')}
-                    style={{
-                      padding: '8px 14px',
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 12,
-                      fontWeight: currentSubTab === 'PM_MILESTONES' ? 700 : 500,
-                      background: currentSubTab === 'PM_MILESTONES' ? 'var(--bg)' : 'transparent',
-                      color: currentSubTab === 'PM_MILESTONES' ? 'var(--terracotta)' : 'var(--muted)',
-                      border: '1px solid var(--border)',
-                      borderBottom: currentSubTab === 'PM_MILESTONES' ? '1px solid var(--bg)' : '1px solid var(--border)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    📌 Fases & Hitos ({totalMilestones})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setProjSubTab(proj.id, 'PM_DELIVERABLES')}
-                    style={{
-                      padding: '8px 14px',
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 12,
-                      fontWeight: currentSubTab === 'PM_DELIVERABLES' ? 700 : 500,
-                      background: currentSubTab === 'PM_DELIVERABLES' ? 'var(--bg)' : 'transparent',
-                      color: currentSubTab === 'PM_DELIVERABLES' ? 'var(--terracotta)' : 'var(--muted)',
-                      border: '1px solid var(--border)',
-                      borderBottom: currentSubTab === 'PM_DELIVERABLES' ? '1px solid var(--bg)' : '1px solid var(--border)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    📦 Entregables ({proj.deliverables?.length || 0})
-                  </button>
+                  />
                 </div>
 
-                {/* Render Sub-Tab Active */}
-                {currentSubTab === 'PM_GANTT' && (
-                  <ProjectGantt
-                    project={proj}
-                    milestones={proj.milestones || []}
-                    tasks={proj.tasks || []}
-                    showTasks={true}
-                    isExecutive={false}
-                  />
-                )}
+                <div>
+                  <button
+                    type="submit"
+                    style={{
+                      background: 'var(--ink)',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '7px 16px',
+                      borderRadius: 16,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Guardar Hito
+                  </button>
+                </div>
+              </form>
+            )}
 
-                {currentSubTab === 'PM_TASKS' && (
-                  <ProjectTaskManager
-                    projectId={proj.id}
-                    milestones={proj.milestones || []}
-                    tasks={proj.tasks || []}
-                    staffList={staffList}
-                    onTaskCreated={onTaskCreated}
-                    onTaskUpdated={onTaskUpdated}
-                    onTaskDeleted={onTaskDeleted}
-                  />
-                )}
-
-                {currentSubTab === 'PM_RISKS' && (
-                  <ProjectRiskManager
-                    projectId={proj.id}
-                    milestones={proj.milestones || []}
-                    risks={proj.risks || []}
-                    onRiskCreated={onRiskCreated}
-                    onRiskUpdated={onRiskUpdated}
-                  />
-                )}
-
-                {currentSubTab === 'PM_MILESTONES' && (
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                      <span style={{ fontSize: 12, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
-                        Fases & Hitos del Proyecto ({proj.milestones?.length || 0})
-                      </span>
-                      {isAdmin && onAddMilestone ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (addingMilestoneProjId === proj.id) {
-                              setAddingMilestoneProjId(null);
-                            } else {
-                              setAddingMilestoneProjId(proj.id);
-                              setInlineMilestone({
-                                title: 'Fase 01 — Auditoría & Diagnóstico Inicial',
-                                orderIndex: (proj.milestones?.length || 0) + 1,
-                                phasePreset: '01',
-                                dueDate: '',
-                                assignedToId: '',
-                                assignedToName: '',
-                                assignedToEmail: '',
-                              });
-                            }
-                          }}
-                          className="btn-accent"
-                          style={{
-                            background: addingMilestoneProjId === proj.id ? 'var(--muted)' : 'var(--terracotta)',
-                            color: '#fff',
-                            border: 'none',
-                            padding: '6px 14px',
-                            borderRadius: 16,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {addingMilestoneProjId === proj.id ? 'Cancelar' : '+ Agregar Hito a Proyecto'}
-                        </button>
-                      ) : (
-                        <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
-                          🔒 Solo Admin gestiona hitos
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Inline Add Milestone Form (Admin Only) */}
-                    {isAdmin && addingMilestoneProjId === proj.id && (
-                      <form
-                        onSubmit={async (e) => {
-                          e.preventDefault();
-                          if (onAddMilestone) {
-                            await onAddMilestone(e, {
-                              projectId: proj.id,
-                              title: inlineMilestone.title,
-                              orderIndex: parseInt(inlineMilestone.orderIndex, 10) || 1,
-                              dueDate: inlineMilestone.dueDate || null,
-                              assignedToId: inlineMilestone.assignedToId || null,
-                              assignedToName: inlineMilestone.assignedToName || null,
-                              assignedToEmail: inlineMilestone.assignedToEmail || null,
-                            });
-                            setAddingMilestoneProjId(null);
-                          }
-                        }}
-                        style={{
-                          background: 'var(--cream2)',
-                          padding: '16px',
-                          borderRadius: 6,
-                          border: '1px solid var(--border)',
-                          marginBottom: 16,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 10,
-                        }}
-                      >
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
-                          <div>
-                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                              Fase del Proyecto (Método Inmerge)
-                            </label>
-                            <select
-                              value={inlineMilestone.phasePreset}
-                              onChange={(e) => {
-                                const presetId = e.target.value;
-                                const found = METHODOLOGY_PHASE_PRESETS.find((p) => p.id === presetId);
-                                if (found) {
-                                  if (presetId === 'custom') {
-                                    setInlineMilestone({ ...inlineMilestone, phasePreset: 'custom' });
-                                  } else {
-                                    setInlineMilestone({
-                                      ...inlineMilestone,
-                                      phasePreset: found.id,
-                                      orderIndex: found.order,
-                                      title: found.template,
-                                    });
-                                  }
-                                }
-                              }}
-                              style={{
-                                width: '100%',
-                                padding: '6px 10px',
-                                borderRadius: 4,
-                                border: '1px solid var(--border)',
-                                fontSize: 12,
-                                background: '#fff',
-                              }}
-                            >
-                              {METHODOLOGY_PHASE_PRESETS.map((ph) => (
-                                <option key={ph.id} value={ph.id}>
-                                  {ph.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div>
-                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                              Nº de Fase (Orden) *
-                            </label>
-                            <input
-                              type="number"
-                              min="1"
-                              max="20"
-                              value={inlineMilestone.orderIndex}
-                              onChange={(e) => setInlineMilestone({ ...inlineMilestone, orderIndex: parseInt(e.target.value, 10) || 1 })}
-                              required
-                              style={{
-                                width: '100%',
-                                padding: '6px 10px',
-                                borderRadius: 4,
-                                border: '1px solid var(--border)',
-                                fontSize: 12,
-                                fontFamily: "'IBM Plex Mono', monospace",
-                              }}
-                            />
-                          </div>
-
-                          <div>
-                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                              Fecha Límite
-                            </label>
-                            <input
-                              type="date"
-                              value={inlineMilestone.dueDate}
-                              onChange={(e) => setInlineMilestone({ ...inlineMilestone, dueDate: e.target.value })}
-                              style={{
-                                width: '100%',
-                                padding: '6px 10px',
-                                borderRadius: 4,
-                                border: '1px solid var(--border)',
-                                fontSize: 12,
-                              }}
-                            />
-                          </div>
-
-                          <div>
-                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                              Encargado (Equipo Interno)
-                            </label>
-                            <select
-                              value={inlineMilestone.assignedToId || ''}
-                              onChange={(e) => {
-                                const memberId = e.target.value;
-                                if (!memberId) {
-                                  setInlineMilestone({
-                                    ...inlineMilestone,
-                                    assignedToId: '',
-                                    assignedToName: '',
-                                    assignedToEmail: '',
-                                  });
-                                } else {
-                                  const member = staffList.find((s) => s.id === memberId);
-                                  setInlineMilestone({
-                                    ...inlineMilestone,
-                                    assignedToId: member?.id || memberId,
-                                    assignedToName: member?.full_name || member?.email || '',
-                                    assignedToEmail: member?.email || '',
-                                  });
-                                }
-                              }}
-                              style={{
-                                width: '100%',
-                                padding: '6px 10px',
-                                borderRadius: 4,
-                                border: '1px solid var(--border)',
-                                fontSize: 12,
-                                background: '#fff',
-                              }}
-                            >
-                              <option value="">-- Sin asignar / General --</option>
-                              {staffList.map((member) => (
-                                <option key={member.id} value={member.id}>
-                                  {member.full_name || member.email} ({member.role ? member.role.toUpperCase() : 'STAFF'})
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                            Título del Hito *
-                          </label>
-                          <input
-                            type="text"
-                            value={inlineMilestone.title}
-                            onChange={(e) => setInlineMilestone({ ...inlineMilestone, title: e.target.value })}
-                            required
-                            placeholder="e.g. Fase 02 — Arquitectura Cloud & Especificación Técnica"
-                            style={{
-                              width: '100%',
-                              padding: '6px 10px',
-                              borderRadius: 4,
-                              border: '1px solid var(--border)',
-                              fontSize: 12,
-                              boxSizing: 'border-box',
-                            }}
-                          />
-                        </div>
-
-                        <div>
-                          <button
-                            type="submit"
-                            style={{
-                              background: 'var(--ink)',
-                              color: '#fff',
-                              border: 'none',
-                              padding: '7px 16px',
-                              borderRadius: 16,
-                              fontSize: 12,
-                              fontWeight: 600,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            Guardar Hito
-                          </button>
-                        </div>
-                      </form>
-                    )}
-
-                    {proj.milestones && proj.milestones.length > 0 ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-                        {proj.milestones.map((m) => {
-                          const mColor = MILESTONE_STATUS_COLORS[m.status] || MILESTONE_STATUS_COLORS.PENDIENTE;
-                          const phaseNumberStr = String(m.order_index || 1).padStart(2, '0');
-                          return (
-                            <div
-                              key={m.id}
-                              style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                background: '#fff',
-                                padding: '10px 14px',
-                                borderRadius: 4,
-                                border: '1px solid var(--border)',
-                                fontSize: 13,
-                                flexWrap: 'wrap',
-                                gap: 8,
-                              }}
-                            >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span
-                                  style={{
-                                    fontFamily: "'IBM Plex Mono', monospace",
-                                    fontSize: 11,
-                                    fontWeight: 700,
-                                    background: 'var(--cream2)',
-                                    color: 'var(--terracotta)',
-                                    padding: '2px 8px',
-                                    borderRadius: 4,
-                                    border: '1px solid var(--border)',
-                                  }}
-                                >
-                                  Fase {phaseNumberStr}
-                                </span>
-                                <strong>{m.title}</strong>
-                                {m.due_date && (
-                                  <span
-                                    style={{
-                                      marginLeft: 4,
-                                      color: 'var(--muted)',
-                                      fontSize: 11,
-                                      fontFamily: "'IBM Plex Mono', monospace",
-                                    }}
-                                  >
-                                    (Fecha: {m.due_date})
-                                  </span>
-                                )}
-                                {m.assigned_to_name && (
-                                  <span
-                                    style={{
-                                      fontFamily: "'IBM Plex Mono', monospace",
-                                      fontSize: 11,
-                                      background: 'rgba(36, 26, 18, 0.05)',
-                                      color: 'var(--ink)',
-                                      padding: '2px 8px',
-                                      borderRadius: 4,
-                                      border: '1px solid var(--border)',
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: 4,
-                                    }}
-                                  >
-                                    👤 {m.assigned_to_name}
-                                  </span>
-                                )}
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                                {isAdmin ? (
-                                  <>
-                                    {staffList.length > 0 && (
-                                      <select
-                                        value={m.assigned_to_id || ''}
-                                        onChange={(e) => {
-                                          const memberId = e.target.value;
-                                          const member = staffList.find((s) => s.id === memberId);
-                                          onUpdateMilestone(m.id, {
-                                            assignedToId: member?.id || null,
-                                            assignedToName: member?.full_name || member?.email || null,
-                                            assignedToEmail: member?.email || null,
-                                          });
-                                        }}
-                                        style={{
-                                          padding: '4px 8px',
-                                          borderRadius: 4,
-                                          border: '1px solid var(--border)',
-                                          background: '#fff',
-                                          color: 'var(--ink)',
-                                          fontSize: 11,
-                                          fontFamily: "'IBM Plex Mono', monospace",
-                                        }}
-                                        title="Designar auditor/ingeniero encargado del hito"
-                                      >
-                                        <option value="">👤 Sin asignar</option>
-                                        {staffList.map((member) => (
-                                          <option key={member.id} value={member.id}>
-                                            👤 {member.full_name || member.email} ({member.role ? member.role.toUpperCase() : 'STAFF'})
-                                          </option>
-                                        ))}
-                                      </select>
-                                    )}
-                                    <select
-                                      value={m.status}
-                                      onChange={(e) => onUpdateMilestone(m.id, e.target.value)}
-                                      style={{
-                                        padding: '4px 8px',
-                                        borderRadius: 4,
-                                        border: `1px solid ${mColor.border}`,
-                                        background: mColor.bg,
-                                        color: mColor.text,
-                                        fontSize: 11,
-                                        fontFamily: "'IBM Plex Mono', monospace",
-                                        fontWeight: 700,
-                                      }}
-                                      title="Cambiar estado del hito"
-                                    >
-                                      <option value="PENDIENTE">PENDIENTE</option>
-                                      <option value="EN_PROGRESO">EN_PROGRESO</option>
-                                      <option value="EN_PROCESO">EN_PROCESO</option>
-                                      <option value="COMPLETADO">COMPLETADO</option>
-                                      <option value="BLOQUEADO">BLOQUEADO</option>
-                                    </select>
-                                  </>
-                                ) : (
-                                  <>
-                                    <span
-                                      style={{
-                                        padding: '4px 8px',
-                                        borderRadius: 4,
-                                        border: `1px solid ${mColor.border}`,
-                                        background: mColor.bg,
-                                        color: mColor.text,
-                                        fontSize: 11,
-                                        fontFamily: "'IBM Plex Mono', monospace",
-                                        fontWeight: 700,
-                                      }}
-                                      title="Estado del hito (Solo editable por Admin)"
-                                    >
-                                      🔒 {m.status}
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div style={{ padding: 16, color: 'var(--muted)', fontSize: 13 }}>No hay hitos registrados en este proyecto.</div>
-                    )}
-                  </div>
-                )}
-
-                {/* Subtab PM_DELIVERABLES: Gestión in-situ de entregables y descargas firmadas */}
-                {currentSubTab === 'PM_DELIVERABLES' && (
-                  <div>
+            {proj.milestones && proj.milestones.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+                {proj.milestones.map((m) => {
+                  const mColor = MILESTONE_STATUS_COLORS[m.status] || MILESTONE_STATUS_COLORS.PENDIENTE;
+                  const phaseNumberStr = String(m.order_index || 1).padStart(2, '0');
+                  return (
                     <div
+                      key={m.id}
                       style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: 16,
+                        background: '#fff',
+                        padding: '10px 14px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        fontSize: 13,
+                        flexWrap: 'wrap',
+                        gap: 8,
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span
+                          style={{
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontSize: 11,
+                            fontWeight: 700,
+                            background: 'var(--cream2)',
+                            color: 'var(--terracotta)',
+                            padding: '2px 8px',
+                            borderRadius: 4,
+                            border: '1px solid var(--border)',
+                          }}
+                        >
+                          Fase {phaseNumberStr}
+                        </span>
+                        <strong>{m.title}</strong>
+                        {m.due_date && (
+                          <span
+                            style={{
+                              marginLeft: 4,
+                              color: 'var(--muted)',
+                              fontSize: 11,
+                              fontFamily: "'IBM Plex Mono', monospace",
+                            }}
+                          >
+                            (Fecha: {m.due_date})
+                          </span>
+                        )}
+                        {m.assigned_to_name && (
+                          <span
+                            style={{
+                              fontFamily: "'IBM Plex Mono', monospace",
+                              fontSize: 11,
+                              background: 'rgba(36, 26, 18, 0.05)',
+                              color: 'var(--ink)',
+                              padding: '2px 8px',
+                              borderRadius: 4,
+                              border: '1px solid var(--border)',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                            }}
+                          >
+                            👤 {m.assigned_to_name}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        {isAdmin ? (
+                          <>
+                            {staffList.length > 0 && (
+                              <select
+                                value={m.assigned_to_id || ''}
+                                onChange={(e) => {
+                                  const memberId = e.target.value;
+                                  const member = staffList.find((s) => s.id === memberId);
+                                  onUpdateMilestone(m.id, {
+                                    assignedToId: member?.id || null,
+                                    assignedToName: member?.full_name || member?.email || null,
+                                    assignedToEmail: member?.email || null,
+                                  });
+                                }}
+                                style={{
+                                  padding: '4px 8px',
+                                  borderRadius: 4,
+                                  border: '1px solid var(--border)',
+                                  background: '#fff',
+                                  color: 'var(--ink)',
+                                  fontSize: 11,
+                                  fontFamily: "'IBM Plex Mono', monospace",
+                                }}
+                                title="Designar auditor/ingeniero encargado del hito"
+                              >
+                                <option value="">👤 Sin asignar</option>
+                                {staffList.map((member) => (
+                                  <option key={member.id} value={member.id}>
+                                    👤 {member.full_name || member.email} ({member.role ? member.role.toUpperCase() : 'STAFF'})
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+                            <select
+                              value={m.status}
+                              onChange={(e) => onUpdateMilestone(m.id, e.target.value)}
+                              style={{
+                                padding: '4px 8px',
+                                borderRadius: 4,
+                                border: `1px solid ${mColor.border}`,
+                                background: mColor.bg,
+                                color: mColor.text,
+                                fontSize: 11,
+                                fontFamily: "'IBM Plex Mono', monospace",
+                                fontWeight: 700,
+                              }}
+                              title="Cambiar estado del hito"
+                            >
+                              <option value="PENDIENTE">PENDIENTE</option>
+                              <option value="EN_PROGRESO">EN_PROGRESO</option>
+                              <option value="EN_PROCESO">EN_PROCESO</option>
+                              <option value="COMPLETADO">COMPLETADO</option>
+                              <option value="BLOQUEADO">BLOQUEADO</option>
+                            </select>
+                          </>
+                        ) : (
+                          <>
+                            <span
+                              style={{
+                                padding: '4px 8px',
+                                borderRadius: 4,
+                                border: `1px solid ${mColor.border}`,
+                                background: mColor.bg,
+                                color: mColor.text,
+                                fontSize: 11,
+                                fontFamily: "'IBM Plex Mono', monospace",
+                                fontWeight: 700,
+                              }}
+                              title="Estado del hito (Solo editable por Admin)"
+                            >
+                              🔒 {m.status}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{ padding: 16, color: 'var(--muted)', fontSize: 13 }}>No hay hitos registrados en este proyecto.</div>
+            )}
+          </div>
+        )}
+
+        {/* Subtab PM_DELIVERABLES: Gestión in-situ de entregables y descargas firmadas */}
+        {currentSubTab === 'PM_DELIVERABLES' && (
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 16,
+                flexWrap: 'wrap',
+                gap: 10,
+              }}
+            >
+              <div>
+                <span style={{ fontSize: 13, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
+                  Documentos y Entregables del Proyecto ({proj.deliverables?.length || 0})
+                </span>
+                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>
+                  Entregables confidenciales auditados y accesibles para el cliente mediante enlaces firmados.
+                </div>
+              </div>
+
+              {isAdmin && onUploadDeliverable && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (uploadingDeliverableProjId === proj.id) {
+                      setUploadingDeliverableProjId(null);
+                    } else {
+                      setUploadingDeliverableProjId(proj.id);
+                      setInlineDeliverable({
+                        milestoneId: '',
+                        title: '',
+                        fileType: 'PDF',
+                        externalUrl: '',
+                        version: 'v1.0',
+                        notes: '',
+                      });
+                      setInlineDelivFile(null);
+                    }
+                  }}
+                  className="btn-accent"
+                  style={{
+                    background: uploadingDeliverableProjId === proj.id ? 'var(--muted)' : 'var(--terracotta)',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: 16,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {uploadingDeliverableProjId === proj.id ? 'Cancelar' : '+ Subir Entregable Técnico'}
+                </button>
+              )}
+            </div>
+
+            {/* Formulario In-Situ para Subir Entregable (Admin Only) */}
+            {isAdmin && uploadingDeliverableProjId === proj.id && (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!inlineDeliverable.title.trim()) {
+                    showToast?.({
+                      type: 'error',
+                      title: 'Campo Requerido',
+                      message: 'El título del entregable es obligatorio.',
+                    });
+                    return;
+                  }
+                  setIsUploadingDeliv(true);
+                  try {
+                    const success = await onUploadDeliverable(
+                      e,
+                      {
+                        projectId: proj.id,
+                        milestoneId: inlineDeliverable.milestoneId || null,
+                        title: inlineDeliverable.title,
+                        fileType: inlineDeliverable.fileType,
+                        externalUrl: inlineDeliverable.externalUrl || null,
+                        version: inlineDeliverable.version || 'v1.0',
+                        notes: inlineDeliverable.notes || '',
+                      },
+                      inlineDelivFile,
+                    );
+
+                    if (success !== false) {
+                      setUploadingDeliverableProjId(null);
+                      setInlineDeliverable({
+                        milestoneId: '',
+                        title: '',
+                        fileType: 'PDF',
+                        externalUrl: '',
+                        version: 'v1.0',
+                        notes: '',
+                      });
+                      setInlineDelivFile(null);
+                    }
+                  } finally {
+                    setIsUploadingDeliv(false);
+                  }
+                }}
+                style={{
+                  background: 'var(--cream2)',
+                  padding: '16px',
+                  borderRadius: 6,
+                  border: '1px solid var(--border)',
+                  marginBottom: 16,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 12,
+                }}
+              >
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                      Vincular a Hito / Fase
+                    </label>
+                    <select
+                      value={inlineDeliverable.milestoneId}
+                      onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, milestoneId: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        fontSize: 12,
+                        background: '#fff',
+                      }}
+                    >
+                      <option value="">-- Entrega General / Sin Hito --</option>
+                      {(proj.milestones || []).map((m) => (
+                        <option key={m.id} value={m.id}>
+                          Fase {m.order_index}: {m.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                      Tipo de Entregable *
+                    </label>
+                    <select
+                      value={inlineDeliverable.fileType}
+                      onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, fileType: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        fontSize: 12,
+                        background: '#fff',
+                      }}
+                    >
+                      <option value="PDF">Informe Técnico (PDF)</option>
+                      <option value="ZIP">Paquete de Código / Artefactos (ZIP)</option>
+                      <option value="DOCX">Documento de Especificación (DOCX)</option>
+                      <option value="XLSX">Matriz de Datos / Auditoría (XLSX)</option>
+                      <option value="URL">Enlace a Repositorio / Dashboard (URL)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                      Versión de Entrega *
+                    </label>
+                    <input
+                      type="text"
+                      value={inlineDeliverable.version}
+                      onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, version: e.target.value })}
+                      placeholder="e.g. v1.0, v1.2-rev"
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        fontSize: 12,
+                        fontFamily: "'IBM Plex Mono', monospace",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                    Título del Entregable *
+                  </label>
+                  <input
+                    type="text"
+                    value={inlineDeliverable.title}
+                    onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, title: e.target.value })}
+                    placeholder="e.g. Informe Forense de Rendimiento PostgreSQL & AWS ECS"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '6px 10px',
+                      borderRadius: 4,
+                      border: '1px solid var(--border)',
+                      fontSize: 12,
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                      Archivo Adjunto (Storage Privado)
+                    </label>
+                    <input
+                      type="file"
+                      onChange={(e) => setInlineDelivFile(e.target.files?.[0] || null)}
+                      accept=".pdf,.zip,.docx,.xlsx,.png,.jpg,.webp"
+                      style={{ width: '100%', fontSize: 12 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                      O Enlace Externo (Figma, GitHub, S3, etc.)
+                    </label>
+                    <input
+                      type="url"
+                      value={inlineDeliverable.externalUrl}
+                      onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, externalUrl: e.target.value })}
+                      placeholder="https://..."
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        fontSize: 12,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                    Notas Técnicas / Resumen de Cambios
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={inlineDeliverable.notes}
+                    onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, notes: e.target.value })}
+                    placeholder="Alcance cubierto en este entregable..."
+                    style={{
+                      width: '100%',
+                      padding: '6px 10px',
+                      borderRadius: 4,
+                      border: '1px solid var(--border)',
+                      fontSize: 12,
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <button
+                    type="submit"
+                    disabled={isUploadingDeliv}
+                    style={{
+                      background: 'var(--ink)',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '8px 18px',
+                      borderRadius: 16,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: isUploadingDeliv ? 'wait' : 'pointer',
+                      opacity: isUploadingDeliv ? 0.7 : 1,
+                    }}
+                  >
+                    {isUploadingDeliv ? 'Subiendo y notificando...' : 'Publicar Entregable'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Deliverables List */}
+            {proj.deliverables && proj.deliverables.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {proj.deliverables.map((deliv) => {
+                  const isDownloading = downloadingDelivId === deliv.id;
+                  return (
+                    <div
+                      key={deliv.id}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        background: '#fff',
+                        padding: '12px 16px',
+                        borderRadius: 6,
+                        border: '1px solid var(--border)',
+                        fontSize: 13,
                         flexWrap: 'wrap',
                         gap: 10,
                       }}
                     >
-                      <div>
-                        <span style={{ fontSize: 13, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>
-                          Documentos y Entregables del Proyecto ({proj.deliverables?.length || 0})
-                        </span>
-                        <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>
-                          Entregables confidenciales auditados y accesibles para el cliente mediante enlaces firmados.
-                        </div>
-                      </div>
-
-                      {isAdmin && onUploadDeliverable && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (uploadingDeliverableProjId === proj.id) {
-                              setUploadingDeliverableProjId(null);
-                            } else {
-                              setUploadingDeliverableProjId(proj.id);
-                              setInlineDeliverable({
-                                milestoneId: '',
-                                title: '',
-                                fileType: 'PDF',
-                                externalUrl: '',
-                                version: 'v1.0',
-                                notes: '',
-                              });
-                              setInlineDelivFile(null);
-                            }
-                          }}
-                          className="btn-accent"
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                        <span
                           style={{
-                            background: uploadingDeliverableProjId === proj.id ? 'var(--muted)' : 'var(--terracotta)',
-                            color: '#fff',
-                            border: 'none',
-                            padding: '6px 14px',
-                            borderRadius: 16,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            cursor: 'pointer',
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontSize: 10,
+                            fontWeight: 700,
+                            background: 'var(--cream2)',
+                            color: 'var(--terracotta)',
+                            padding: '4px 8px',
+                            borderRadius: 4,
+                            border: '1px solid var(--border)',
+                            marginTop: 2,
                           }}
                         >
-                          {uploadingDeliverableProjId === proj.id ? 'Cancelar' : '+ Subir Entregable Técnico'}
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Formulario In-Situ para Subir Entregable (Admin Only) */}
-                    {isAdmin && uploadingDeliverableProjId === proj.id && (
-                      <form
-                        onSubmit={async (e) => {
-                          e.preventDefault();
-                          if (!inlineDeliverable.title.trim()) {
-                            showToast?.({
-                              type: 'error',
-                              title: 'Campo Requerido',
-                              message: 'El título del entregable es obligatorio.',
-                            });
-                            return;
-                          }
-                          setIsUploadingDeliv(true);
-                          try {
-                            const success = await onUploadDeliverable(
-                              e,
-                              {
-                                projectId: proj.id,
-                                milestoneId: inlineDeliverable.milestoneId || null,
-                                title: inlineDeliverable.title,
-                                fileType: inlineDeliverable.fileType,
-                                externalUrl: inlineDeliverable.externalUrl || null,
-                                version: inlineDeliverable.version || 'v1.0',
-                                notes: inlineDeliverable.notes || '',
-                              },
-                              inlineDelivFile,
-                            );
-
-                            if (success !== false) {
-                              setUploadingDeliverableProjId(null);
-                              setInlineDeliverable({
-                                milestoneId: '',
-                                title: '',
-                                fileType: 'PDF',
-                                externalUrl: '',
-                                version: 'v1.0',
-                                notes: '',
-                              });
-                              setInlineDelivFile(null);
-                            }
-                          } finally {
-                            setIsUploadingDeliv(false);
-                          }
-                        }}
-                        style={{
-                          background: 'var(--cream2)',
-                          padding: '16px',
-                          borderRadius: 6,
-                          border: '1px solid var(--border)',
-                          marginBottom: 16,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 12,
-                        }}
-                      >
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
-                          <div>
-                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                              Vincular a Hito / Fase
-                            </label>
-                            <select
-                              value={inlineDeliverable.milestoneId}
-                              onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, milestoneId: e.target.value })}
+                          {deliv.file_type || 'DOC'}
+                        </span>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <strong style={{ color: 'var(--ink)' }}>{deliv.title}</strong>
+                            <span
                               style={{
-                                width: '100%',
-                                padding: '6px 10px',
-                                borderRadius: 4,
-                                border: '1px solid var(--border)',
-                                fontSize: 12,
-                                background: '#fff',
-                              }}
-                            >
-                              <option value="">-- Entrega General / Sin Hito --</option>
-                              {(proj.milestones || []).map((m) => (
-                                <option key={m.id} value={m.id}>
-                                  Fase {m.order_index}: {m.title}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div>
-                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                              Tipo de Entregable *
-                            </label>
-                            <select
-                              value={inlineDeliverable.fileType}
-                              onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, fileType: e.target.value })}
-                              style={{
-                                width: '100%',
-                                padding: '6px 10px',
-                                borderRadius: 4,
-                                border: '1px solid var(--border)',
-                                fontSize: 12,
-                                background: '#fff',
-                              }}
-                            >
-                              <option value="PDF">Informe Técnico (PDF)</option>
-                              <option value="ZIP">Paquete de Código / Artefactos (ZIP)</option>
-                              <option value="DOCX">Documento de Especificación (DOCX)</option>
-                              <option value="XLSX">Matriz de Datos / Auditoría (XLSX)</option>
-                              <option value="URL">Enlace a Repositorio / Dashboard (URL)</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                              Versión de Entrega *
-                            </label>
-                            <input
-                              type="text"
-                              value={inlineDeliverable.version}
-                              onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, version: e.target.value })}
-                              placeholder="e.g. v1.0, v1.2-rev"
-                              required
-                              style={{
-                                width: '100%',
-                                padding: '6px 10px',
-                                borderRadius: 4,
-                                border: '1px solid var(--border)',
-                                fontSize: 12,
                                 fontFamily: "'IBM Plex Mono', monospace",
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                            Título del Entregable *
-                          </label>
-                          <input
-                            type="text"
-                            value={inlineDeliverable.title}
-                            onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, title: e.target.value })}
-                            placeholder="e.g. Informe Forense de Rendimiento PostgreSQL & AWS ECS"
-                            required
-                            style={{
-                              width: '100%',
-                              padding: '6px 10px',
-                              borderRadius: 4,
-                              border: '1px solid var(--border)',
-                              fontSize: 12,
-                              boxSizing: 'border-box',
-                            }}
-                          />
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
-                          <div>
-                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                              Archivo Adjunto (Storage Privado)
-                            </label>
-                            <input
-                              type="file"
-                              onChange={(e) => setInlineDelivFile(e.target.files?.[0] || null)}
-                              accept=".pdf,.zip,.docx,.xlsx,.png,.jpg,.webp"
-                              style={{ width: '100%', fontSize: 12 }}
-                            />
-                          </div>
-                          <div>
-                            <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                              O Enlace Externo (Figma, GitHub, S3, etc.)
-                            </label>
-                            <input
-                              type="url"
-                              value={inlineDeliverable.externalUrl}
-                              onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, externalUrl: e.target.value })}
-                              placeholder="https://..."
-                              style={{
-                                width: '100%',
-                                padding: '6px 10px',
-                                borderRadius: 4,
-                                border: '1px solid var(--border)',
-                                fontSize: 12,
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
-                            Notas Técnicas / Resumen de Cambios
-                          </label>
-                          <textarea
-                            rows={2}
-                            value={inlineDeliverable.notes}
-                            onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, notes: e.target.value })}
-                            placeholder="Alcance cubierto en este entregable..."
-                            style={{
-                              width: '100%',
-                              padding: '6px 10px',
-                              borderRadius: 4,
-                              border: '1px solid var(--border)',
-                              fontSize: 12,
-                              boxSizing: 'border-box',
-                            }}
-                          />
-                        </div>
-
-                        <div>
-                          <button
-                            type="submit"
-                            disabled={isUploadingDeliv}
-                            style={{
-                              background: 'var(--ink)',
-                              color: '#fff',
-                              border: 'none',
-                              padding: '8px 18px',
-                              borderRadius: 16,
-                              fontSize: 12,
-                              fontWeight: 600,
-                              cursor: isUploadingDeliv ? 'wait' : 'pointer',
-                              opacity: isUploadingDeliv ? 0.7 : 1,
-                            }}
-                          >
-                            {isUploadingDeliv ? 'Subiendo y notificando...' : 'Publicar Entregable'}
-                          </button>
-                        </div>
-                      </form>
-                    )}
-
-                    {/* Deliverables List */}
-                    {proj.deliverables && proj.deliverables.length > 0 ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {proj.deliverables.map((deliv) => {
-                          const isDownloading = downloadingDelivId === deliv.id;
-                          return (
-                            <div
-                              key={deliv.id}
-                              style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                background: '#fff',
-                                padding: '12px 16px',
-                                borderRadius: 6,
-                                border: '1px solid var(--border)',
-                                fontSize: 13,
-                                flexWrap: 'wrap',
-                                gap: 10,
+                                fontSize: 11,
+                                color: 'var(--muted)',
+                                background: 'rgba(36, 26, 18, 0.05)',
+                                padding: '1px 6px',
+                                borderRadius: 3,
                               }}
                             >
-                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                                <span
-                                  style={{
-                                    fontFamily: "'IBM Plex Mono', monospace",
-                                    fontSize: 10,
-                                    fontWeight: 700,
-                                    background: 'var(--cream2)',
-                                    color: 'var(--terracotta)',
-                                    padding: '4px 8px',
-                                    borderRadius: 4,
-                                    border: '1px solid var(--border)',
-                                    marginTop: 2,
-                                  }}
-                                >
-                                  {deliv.file_type || 'DOC'}
-                                </span>
-                                <div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <strong style={{ color: 'var(--ink)' }}>{deliv.title}</strong>
-                                    <span
-                                      style={{
-                                        fontFamily: "'IBM Plex Mono', monospace",
-                                        fontSize: 11,
-                                        color: 'var(--muted)',
-                                        background: 'rgba(36, 26, 18, 0.05)',
-                                        padding: '1px 6px',
-                                        borderRadius: 3,
-                                      }}
-                                    >
-                                      {deliv.version || 'v1.0'}
-                                    </span>
-                                  </div>
-                                  {deliv.notes && <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3 }}>{deliv.notes}</div>}
-                                  <div
-                                    style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginTop: 4 }}
-                                  >
-                                    {deliv.created_at
-                                      ? new Date(deliv.created_at).toLocaleDateString('es-PE', {
-                                          year: 'numeric',
-                                          month: 'short',
-                                          day: 'numeric',
-                                          hour: '2-digit',
-                                          minute: '2-digit',
-                                        })
-                                      : ''}
-                                  </div>
-                                </div>
-                              </div>
+                              {deliv.version || 'v1.0'}
+                            </span>
+                          </div>
+                          {deliv.notes && <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3 }}>{deliv.notes}</div>}
+                          <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginTop: 4 }}>
+                            {deliv.created_at
+                              ? new Date(deliv.created_at).toLocaleDateString('es-PE', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })
+                              : ''}
+                          </div>
+                        </div>
+                      </div>
 
-                              <div>
-                                <button
-                                  type="button"
-                                  disabled={isDownloading}
-                                  onClick={async () => {
-                                    if (deliv.external_url) {
-                                      window.open(deliv.external_url, '_blank', 'noopener,noreferrer');
-                                      return;
-                                    }
-                                    if (!deliv.file_path) {
-                                      showToast?.({ type: 'warning', title: 'Archivo no disponible', message: 'No hay archivo adjunto.' });
-                                      return;
-                                    }
-                                    setDownloadingDelivId(deliv.id);
-                                    try {
-                                      const signedUrl = await getSignedDeliverableUrl(deliv.file_path, deliv.id);
-                                      if (signedUrl) {
-                                        window.open(signedUrl, '_blank', 'noopener,noreferrer');
-                                        showToast?.({
-                                          type: 'info',
-                                          title: 'Descarga Autorizada',
-                                          message: `Descarga segura de "${deliv.title}" (15 min).`,
-                                        });
-                                      } else {
-                                        showToast?.({
-                                          type: 'error',
-                                          title: 'Error de Descarga',
-                                          message: 'No se pudo generar la URL firmada.',
-                                        });
-                                      }
-                                    } catch (err) {
-                                      showToast?.({ type: 'error', title: 'Error', message: err.message });
-                                    } finally {
-                                      setDownloadingDelivId(null);
-                                    }
-                                  }}
-                                  className="btn-outline-hover"
-                                  style={{
-                                    background: 'none',
-                                    border: '1px solid var(--border)',
-                                    color: 'var(--ink)',
-                                    borderRadius: 16,
-                                    padding: '6px 14px',
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    cursor: isDownloading ? 'wait' : 'pointer',
-                                    fontFamily: "'IBM Plex Sans', sans-serif",
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: 6,
-                                  }}
-                                >
-                                  <span>
-                                    {isDownloading ? 'Firmando URL...' : deliv.external_url ? '🔗 Abrir Enlace' : '⬇ Descargar Auditado'}
-                                  </span>
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
+                      <div>
+                        <button
+                          type="button"
+                          disabled={isDownloading}
+                          onClick={async () => {
+                            if (deliv.external_url) {
+                              window.open(deliv.external_url, '_blank', 'noopener,noreferrer');
+                              return;
+                            }
+                            if (!deliv.file_path) {
+                              showToast?.({ type: 'warning', title: 'Archivo no disponible', message: 'No hay archivo adjunto.' });
+                              return;
+                            }
+                            setDownloadingDelivId(deliv.id);
+                            try {
+                              const signedUrl = await getSignedDeliverableUrl(deliv.file_path, deliv.id);
+                              if (signedUrl) {
+                                window.open(signedUrl, '_blank', 'noopener,noreferrer');
+                                showToast?.({
+                                  type: 'info',
+                                  title: 'Descarga Autorizada',
+                                  message: `Descarga segura de "${deliv.title}" (15 min).`,
+                                });
+                              } else {
+                                showToast?.({
+                                  type: 'error',
+                                  title: 'Error de Descarga',
+                                  message: 'No se pudo generar la URL firmada.',
+                                });
+                              }
+                            } catch (err) {
+                              showToast?.({ type: 'error', title: 'Error', message: err.message });
+                            } finally {
+                              setDownloadingDelivId(null);
+                            }
+                          }}
+                          className="btn-outline-hover"
+                          style={{
+                            background: 'none',
+                            border: '1px solid var(--border)',
+                            color: 'var(--ink)',
+                            borderRadius: 16,
+                            padding: '6px 14px',
+                            fontSize: 12,
+                            fontWeight: 600,
+                            cursor: isDownloading ? 'wait' : 'pointer',
+                            fontFamily: "'IBM Plex Sans', sans-serif",
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                          }}
+                        >
+                          <span>{isDownloading ? 'Firmando URL...' : deliv.external_url ? '🔗 Abrir Enlace' : '⬇ Descargar Auditado'}</span>
+                        </button>
                       </div>
-                    ) : (
-                      <div
-                        style={{
-                          padding: 20,
-                          textAlign: 'center',
-                          color: 'var(--muted)',
-                          background: 'var(--cream2)',
-                          borderRadius: 6,
-                          border: '1px dashed var(--border)',
-                          fontSize: 13,
-                        }}
-                      >
-                        No se han subido entregables para este proyecto aún.
-                      </div>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div
+                style={{
+                  padding: 20,
+                  textAlign: 'center',
+                  color: 'var(--muted)',
+                  background: 'var(--cream2)',
+                  borderRadius: 6,
+                  border: '1px dashed var(--border)',
+                  fontSize: 13,
+                }}
+              >
+                No se han subido entregables para este proyecto aún.
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Footer Info */}
         <div
@@ -1542,9 +1527,7 @@ export default function ProjectsManagementView({
       title: 'Fase 01 — Diagnóstico',
       subtitle: 'Auditoría inicial & esquema',
       badgeColor: 'var(--terracotta)',
-      projects: projects.filter(
-        (p) => p.status === 'EN_AUDITORIA' || (p.status === 'EN_PLANIFICACION' && p.pillar === 'auditoria'),
-      ),
+      projects: projects.filter((p) => p.status === 'EN_AUDITORIA' || (p.status === 'EN_PLANIFICACION' && p.pillar === 'auditoria')),
     },
     {
       id: 'phase-02',
@@ -1750,9 +1733,7 @@ export default function ProjectsManagementView({
                 const totalMilestones = proj.milestones?.length || 0;
                 const weightedProgress = calculateProjectProgress(proj.milestones, proj.tasks || []);
                 const progressPct =
-                  proj.progress !== undefined && proj.progress !== null && proj.progress > 0
-                    ? proj.progress
-                    : weightedProgress;
+                  proj.progress !== undefined && proj.progress !== null && proj.progress > 0 ? proj.progress : weightedProgress;
                 const pColor = PROJECT_STATUS_COLORS[proj.status] || PROJECT_STATUS_COLORS.EN_PLANIFICACION;
 
                 return (
@@ -1850,9 +1831,7 @@ export default function ProjectsManagementView({
                   col.projects.map((proj) => {
                     const weightedProgress = calculateProjectProgress(proj.milestones, proj.tasks || []);
                     const progressPct =
-                      proj.progress !== undefined && proj.progress !== null && proj.progress > 0
-                        ? proj.progress
-                        : weightedProgress;
+                      proj.progress !== undefined && proj.progress !== null && proj.progress > 0 ? proj.progress : weightedProgress;
                     const pColor = PROJECT_STATUS_COLORS[proj.status] || PROJECT_STATUS_COLORS.EN_PLANIFICACION;
 
                     return (
@@ -1883,12 +1862,18 @@ export default function ProjectsManagementView({
                         </div>
 
                         <h5 className="equipo-kanban-card-title">{proj.title}</h5>
-                        <div className="equipo-kanban-card-client">
-                          {proj.client?.full_name || proj.client?.email || 'Inmerge Client'}
-                        </div>
+                        <div className="equipo-kanban-card-client">{proj.client?.full_name || proj.client?.email || 'Inmerge Client'}</div>
 
                         <div style={{ margin: '10px 0 6px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--muted)', marginBottom: 4 }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              fontSize: 10,
+                              color: 'var(--muted)',
+                              marginBottom: 4,
+                            }}
+                          >
                             <span>Progreso</span>
                             <span>{progressPct}%</span>
                           </div>

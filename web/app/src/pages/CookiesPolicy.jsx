@@ -178,9 +178,7 @@ export default function CookiesPolicy() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, textAlign: 'left' }}>
                 <thead>
                   <tr style={{ background: 'var(--cream2)', borderBottom: '1px solid var(--border)' }}>
-                    <th style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)' }}>
-                      {isEn ? 'Identifier' : 'Identificador'}
-                    </th>
+                    <th style={{ padding: '12px 16px', fontFamily: 'var(--font-mono)' }}>{isEn ? 'Identifier' : 'Identificador'}</th>
                     <th style={{ padding: '12px 16px' }}>{isEn ? 'Provider' : 'Proveedor'}</th>
                     <th style={{ padding: '12px 16px' }}>{isEn ? 'Category' : 'Categoría'}</th>
                     <th style={{ padding: '12px 16px' }}>{isEn ? 'Expiry' : 'Caducidad'}</th>

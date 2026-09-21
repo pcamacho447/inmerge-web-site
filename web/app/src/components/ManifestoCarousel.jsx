@@ -175,14 +175,6 @@ const SLIDES_ES = [
     ],
     inmerge: 'Auditoría rigurosa, ingeniería de software en la nube y ciencia de datos avanzada ejecutadas por el mismo equipo senior.',
   },
-  {
-    id: 'manifesto',
-    eyebrow: 'DECLARACIÓN INSTITUCIONAL',
-    title: 'Manifiesto de Aseguramiento',
-    body: 'Las decisiones operativas y estratégicas de alto nivel no pueden depender de hojas de cálculo aisladas ni de sistemas opacos: requieren arquitectura sólida, datos auditables y código verificable.',
-    accent: 'var(--terracotta)',
-    tag: 'NUESTRO COMPROMISO',
-  },
 ];
 
 const SLIDES_EN = [
@@ -232,14 +224,6 @@ const SLIDES_EN = [
       },
     ],
     inmerge: 'Rigorous auditing, cloud engineering, and advanced data science executed directly by the same senior technical partners.',
-  },
-  {
-    id: 'manifesto',
-    eyebrow: 'INSTITUTIONAL STATEMENT',
-    title: 'Engineering Assurance Manifesto',
-    body: 'Executive operational and strategic decisions cannot rely on isolated spreadsheets or opaque systems: they require solid architecture, auditable data, and verifiable code.',
-    accent: 'var(--terracotta)',
-    tag: 'OUR COMMITMENT',
   },
 ];
 
@@ -426,6 +410,67 @@ export default function ManifestoCarousel() {
             </article>
           );
         })}
+      </div>
+
+      {/* Editorial Stepped Slide Indicator & Progress Bar */}
+      <div className="manifesto-progress-wrapper">
+        <div className="manifesto-telemetry">
+          <span>{isEn ? 'ASSURANCE' : 'PRINCIPIO'}</span>
+          <span className="manifesto-counter">
+            <span className="manifesto-counter-active">{String(activeIndex + 1).padStart(2, '0')}</span> / {String(N).padStart(2, '0')}
+          </span>
+        </div>
+
+        {/* Stepped progress bars (clickable) */}
+        <div
+          className="manifesto-stepped-track"
+          role="tablist"
+          aria-label={isEn ? 'Slide progression indicator' : 'Indicador de avance de diapositivas'}
+        >
+          {slides.map((s, idx) => {
+            const isCurrent = idx === activeIndex;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={isCurrent}
+                aria-label={`${isEn ? 'Go to slide' : 'Ir a diapositiva'} ${idx + 1}: ${s.title}`}
+                className={`manifesto-step-segment ${isCurrent ? 'is-active' : ''} ${isPaused ? 'is-paused' : ''}`}
+                onClick={() => goTo(idx)}
+              >
+                {isCurrent && <span className="manifesto-step-fill" key={`fill-${activeIndex}`} />}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="manifesto-controls">
+          <button
+            type="button"
+            className="manifesto-control-btn"
+            onClick={handlePrev}
+            aria-label={isEn ? 'Previous slide' : 'Diapositiva anterior'}
+          >
+            ← {isEn ? 'PREV' : 'ANT'}
+          </button>
+          <button
+            type="button"
+            className="manifesto-control-btn"
+            onClick={() => setIsPaused((prev) => !prev)}
+            aria-label={isPaused ? (isEn ? 'Play auto rotation' : 'Reanudar rotación') : isEn ? 'Pause auto rotation' : 'Pausar rotación'}
+          >
+            {isPaused ? (isEn ? 'PLAY ▶' : 'REANUDAR ▶') : isEn ? 'PAUSE ❚❚' : 'PAUSAR ❚❚'}
+          </button>
+          <button
+            type="button"
+            className="manifesto-control-btn"
+            onClick={handleNext}
+            aria-label={isEn ? 'Next slide' : 'Siguiente diapositiva'}
+          >
+            {isEn ? 'NEXT' : 'SIG'} →
+          </button>
+        </div>
       </div>
     </section>
   );

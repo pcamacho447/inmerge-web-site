@@ -8,6 +8,7 @@ export const PROJECTS_DATA = [
   {
     id: 'audit-fintech-db',
     pillarId: 'auditoria',
+    image: '/projects/fintech-audit.jpg',
     title: {
       es: 'Saneamiento y Auditoría Forense de Base de Datos de 18M Registros',
       en: 'Forensic Audit & Data Cleansing for 18M Record PostgreSQL Database',
@@ -51,6 +52,7 @@ export const PROJECTS_DATA = [
   {
     id: 'audit-aws-security-cost',
     pillarId: 'auditoria',
+    image: '/projects/aws-cloud.jpg',
     title: {
       es: 'Auditoría de Seguridad, IAM y Optimización de Costos en AWS Cloud',
       en: 'AWS Cloud Security, IAM Governance & Cost Optimization Audit',
@@ -94,6 +96,7 @@ export const PROJECTS_DATA = [
   {
     id: 'dev-microservices-logistics',
     pillarId: 'desarrollo',
+    image: '/projects/logistics-microservices.jpg',
     title: {
       es: 'Modernización de Plataforma de Microservicios & API Gateway',
       en: 'Microservices Modernization & High-Throughput API Gateway',
@@ -137,6 +140,7 @@ export const PROJECTS_DATA = [
   {
     id: 'dev-b2b-portal-billing',
     pillarId: 'desarrollo',
+    image: '/projects/b2b-portal.jpg',
     title: {
       es: 'Portal Web B2B Corporativo con Facturación y Conciliación Directa',
       en: 'B2B Corporate Client Portal with Invoicing & Reconciliation',
@@ -180,6 +184,7 @@ export const PROJECTS_DATA = [
   {
     id: 'ai-rag-legal-finance',
     pillarId: 'datos',
+    image: '/projects/ai-rag.jpg',
     title: {
       es: 'Asistente RAG & Búsqueda Semántica sobre 50,000 Documentos',
       en: 'Enterprise RAG Agent & Semantic Search over 50,000 Documents',
@@ -216,13 +221,18 @@ export const PROJECTS_DATA = [
       ],
     },
     deliverables: {
-      es: ['Pipeline ETL de vectorización automatizada', 'API REST de consulta semántica', 'Interfaz conversacional con trazabilidad de citas'],
+      es: [
+        'Pipeline ETL de vectorización automatizada',
+        'API REST de consulta semántica',
+        'Interfaz conversacional con trazabilidad de citas',
+      ],
       en: ['Automated vectorization ETL pipeline', 'Semantic query REST API', 'Chat UI with strict source verification'],
     },
   },
   {
     id: 'ai-demand-forecasting',
     pillarId: 'datos',
+    image: '/projects/demand-forecasting.jpg',
     title: {
       es: 'Modelo Predictivo de Demanda & Dashboard Ejecutivo en Tiempo Real',
       en: 'Demand Forecasting ML Model & Realtime Executive Dashboard',
@@ -259,7 +269,11 @@ export const PROJECTS_DATA = [
       ],
     },
     deliverables: {
-      es: ['Modelo ML entrenado con métricas de validación', 'Pipeline cron de inferencia diaria', 'Dashboard interactivo de decisiones en tiempo real'],
+      es: [
+        'Modelo ML entrenado con métricas de validación',
+        'Pipeline cron de inferencia diaria',
+        'Dashboard interactivo de decisiones en tiempo real',
+      ],
       en: ['Trained ML model with cross-validation', 'Daily inference batch cron pipeline', 'Interactive realtime executive dashboard'],
     },
   },

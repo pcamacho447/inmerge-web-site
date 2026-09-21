@@ -14,29 +14,13 @@ describe('Nosotros Page (Redesigned — Cinematic Hero + ManifestoCarousel + Dir
 
     expect(
       screen.getByRole('heading', {
-        name: /Ingeniería rigurosa, auditoría estricta y datos reproducibles/i,
+        name: /Somos una firma boutique especializada en ingeniería de software/i,
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('LA FIRMA // INMERGE')).toBeInTheDocument();
-    expect(screen.getByText(/Garantía de Verdad Operativa/i)).toBeInTheDocument();
-    expect(screen.getByText(/Ingeniería sin Cajas Negras/i)).toBeInTheDocument();
-    expect(screen.getByText(/Referencia Técnica Regional/i)).toBeInTheDocument();
-  });
-
-  it('renders the ManifestoCarousel with engineering assurance content', () => {
-    render(
-      <MemoryRouter>
-        <Nosotros />
-      </MemoryRouter>,
-    );
-
-    // ManifestoCarousel renders as region with carousel role
-    const carousel = screen.getByRole('region', { name: /Manifiesto de Ingeniería Inmerge/i });
-    expect(carousel).toBeInTheDocument();
-
-    // First slide content should be visible
-    expect(screen.getByText(/Código Probado, Infraestructura Infalible/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^Propósito$/i, level: 3 })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^Misión$/i, level: 3 })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^Visión$/i, level: 3 })).toBeInTheDocument();
   });
 
   it('renders the 4 methodology stages via the unified Bento Grid', () => {
@@ -92,20 +76,5 @@ describe('Nosotros Page (Redesigned — Cinematic Hero + ManifestoCarousel + Dir
 
     expect(screen.getByRole('heading', { name: /Director de Arquitectura Cloud & DevOps/i })).toBeInTheDocument();
     expect(screen.getByText(/Una plataforma empresarial resiliente no depende de la suerte/i)).toBeInTheDocument();
-  });
-
-  it('expands a commitment accordion item on click', async () => {
-    const user = userEvent.setup();
-    render(
-      <MemoryRouter>
-        <Nosotros />
-      </MemoryRouter>,
-    );
-
-    // Click on "Rigor y Trazabilidad" to expand
-    const rigorItem = screen.getByText('Rigor y Trazabilidad').closest('[role="button"]');
-    await user.click(rigorItem);
-
-    expect(rigorItem).toHaveAttribute('aria-expanded', 'true');
   });
 });

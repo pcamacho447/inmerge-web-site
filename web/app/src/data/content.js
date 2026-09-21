@@ -202,6 +202,7 @@ export const DIRECTORS = [
     ],
     quote: 'La integridad de la información no es un supuesto de fe: se audita y se demuestra matemáticamente en cada tabla y transacción.',
     accent: 'var(--terracotta)',
+    photo: '/directors/director-auditoria.jpg',
   },
   {
     id: 'cloud-director',
@@ -219,6 +220,7 @@ export const DIRECTORS = [
     ],
     quote: 'Una plataforma empresarial resiliente no depende de la suerte, sino de infraestructura reproducible e inmutable.',
     accent: 'var(--gold)',
+    photo: '/directors/director-cloud.jpg',
   },
   {
     id: 'data-science-director',
@@ -236,6 +238,7 @@ export const DIRECTORS = [
     ],
     quote: 'La IA en producción solo tiene valor si genera impacto operativo medible y trazabilidad algorítmica total.',
     accent: 'var(--ochre)',
+    photo: '/directors/director-datascience.jpg',
   },
   {
     id: 'software-director',
@@ -253,6 +256,7 @@ export const DIRECTORS = [
     ],
     quote: 'El software de calidad se mide por su mantenibilidad, velocidad de respuesta y absoluta ausencia de cajas negras.',
     accent: 'var(--terracotta)',
+    photo: '/directors/director-software.jpg',
   },
 ];
 

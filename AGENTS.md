@@ -18,7 +18,7 @@ Consulte las especificaciones técnicas del entorno en:
 - **Rutas Públicas:**
   - `/` (Inicio): Hero con video de fondo cinemático, navbar transparente sin bordes sobre el video, pilares interactivos, diagrama de arquitectura y segmentos de mercado directos al CTA. No incluir bloques redundantes del manifiesto, la cuadrícula de "Principios de Ingeniería" (reservada para `/nosotros`) ni franjas intermedias de certezas o marquesinas repetitivas.
   - `/servicios` (Servicios & Estimación Ágil): Interfaz centrada exclusivamente en el Estimador Interactivo (`<QuickEstimator />`) para proyectar tiempos, costos en PEN/USD, entregables auditables por pilar y cotización directa vía WhatsApp/TDR/Asistente IA. Prohibido reintroducir el catálogo estático de acordeones repetitivos o carruseles de proyectos redundantes.
-  - `/nosotros` (Nosotros): Manifiesto de ingeniería, Misión, Visión, Propósito, Compromisos técnicos (Valores), Método Inmerge y explorador de tecnologías (Stack).
+  - `/nosotros` (Nosotros): Manifiesto de ingeniería, Podio ceremonial Mochica (Propósito, Misión, Visión con `<MochicaStepIcon />` sin prefijos romanos redundantes), Sección de Equipo Directivo concisa (`Nuestros Directores` sin textos de relleno comercial), Método Inmerge y explorador de tecnologías (Stack sin badges de nivel de competencia).
   - `/contacto` (Contacto & TDR): Formulario estructurado con selector de pilares y enlace con mensaje pre-rellenado a WhatsApp.
 - **Estructura del Header Público:**
   - 4 enlaces principales: `Inicio`, `Servicios`, `Nosotros`, `Contacto` más botón lateral `Iniciar sesión` (el acceso a WhatsApp se canaliza en los CTAs de pilares, servicios y contacto).

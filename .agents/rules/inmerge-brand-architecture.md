@@ -51,6 +51,17 @@ Esta guía detalla las convenciones de desarrollo de componentes, tokens del sis
     - **Centro de Opciones & Creación Segmentado ([`NewProjectModal.jsx`](file:///c:/papx/inmerge-website/inmerge/web/app/src/components/team/NewProjectModal.jsx)):** Pestañas independientes (`[🚀 Proyecto]`, `[⚡ Hito]`, `[📦 Entregable]`, `[👥 Staff]`) en el Slide-Over Drawer (`.equipo-drawer-panel`) para flujos in-situ sin perder el contexto de trabajo.
 12. **Diseño y Propósito de la Ruta `/servicios`:**
     - La página `/servicios` concentra toda la exploración de soluciones mediante el componente **`<QuickEstimator />`**. No debe incluir listados estáticos redundantes de servicios ni duplicar el carrusel de casos de estudio (el cual pertenece exclusivamente a `/` Inicio).
+13. **Pautas Editoriales y Minimalismo en `/nosotros`:**
+    - **Podio Ceremonial Mochica (Propósito, Misión, Visión):**
+      - Renderizado con la iconografía geométrica escalonada (`<MochicaStepIcon level={1|2|3} />`).
+      - Prohibido anteponer numeración romana o prefijos (`I.`, `II.`, `III.`); la jerarquía visual del podio escalonado ya transmite el orden y la fundamentación.
+    - **Cabecera de Equipo Directivo (`#directores`):**
+      - Sobre-título técnico: `EQUIPO DIRECTIVO` (o `LEADERSHIP`).
+      - Titular editorial: `Nuestros Directores` (o `Our Directors`).
+      - Mantener la cabecera limpia y directa hacia el carrusel interactivo, sin párrafos de marketing redundantes ni sobre-títulos excesivos (`& PRÁCTICAS`).
+    - **Matriz de Stack Tecnológico (`#metodo`):**
+      - Mostrar únicamente el nombre de la tecnología (`tool.name`) y su rol/propósito técnico (`tool.role`).
+      - Prohibido renderizar etiquetas o badges de nivel de especialidad (`tool.level` como "Especialidad Principal", "Core", "Estándar") para preservar un diseño visual uniforme, sobrio y libre de saturación.
 
 ---
 

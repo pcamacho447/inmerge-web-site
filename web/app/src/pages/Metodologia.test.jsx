@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import Metodologia from './Metodologia.jsx';
 
@@ -14,7 +13,7 @@ describe('Metodologia Page', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /Ingeniería rigurosa, auditoría estricta y datos reproducibles/i,
+        name: /Somos una firma boutique especializada en ingeniería de software/i,
       }),
     ).toBeInTheDocument();
 
@@ -33,17 +32,5 @@ describe('Metodologia Page', () => {
     expect(screen.getByText('Amazon Web Services (AWS)')).toBeInTheDocument();
     expect(screen.getByText('Python')).toBeInTheDocument();
     expect(screen.getByText('PostgreSQL')).toBeInTheDocument();
-  });
-
-  it('renders the ManifestoCarousel with engineering assurance content', () => {
-    render(
-      <MemoryRouter>
-        <Metodologia />
-      </MemoryRouter>,
-    );
-
-    // ManifestoCarousel renders as carousel region
-    const carousel = screen.getByRole('region', { name: /Manifiesto de Ingeniería Inmerge/i });
-    expect(carousel).toBeInTheDocument();
   });
 });

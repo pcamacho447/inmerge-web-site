@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
-import ServicePillarCard from '../components/ServicePillarCard.jsx';
 import ProjectCarousel from '../components/ProjectCarousel.jsx';
 import LLMAssistantModal from '../components/LLMAssistantModal.jsx';
 import { MochicaDivider } from '../components/MochicaPatterns.jsx';
@@ -40,10 +39,11 @@ export default function Inicio() {
     <>
       {/* Hero Section with Cinematic Video Background */}
       <div
+        id="hero-section"
         style={{
           position: 'relative',
-          padding: '160px clamp(24px,5vw,64px) 110px',
-          minHeight: '90vh',
+          padding: 'clamp(140px, 16vh, 180px) clamp(24px, 5vw, 64px) clamp(90px, 12vh, 130px)',
+          minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -143,116 +143,14 @@ export default function Inicio() {
               </>
             )}
           </h1>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 36 }}>
-            <p
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(18px, 2.1vw, 24px)',
-                lineHeight: 1.6,
-                color: 'rgba(243, 234, 218, 0.95)',
-                maxWidth: 720,
-                margin: 0,
-                borderLeft: '3px solid var(--terracotta)',
-                paddingLeft: 24,
-              }}
-            >
-              {isEn
-                ? '“Executive operational and strategic decisions cannot rely on isolated spreadsheets or opaque systems: they require solid architecture, auditable data, and verifiable code.”'
-                : '“Las decisiones operativas y estratégicas de alto nivel no pueden depender de hojas de cálculo aisladas ni de sistemas opacos: requieren arquitectura sólida, datos auditables y código verificable.”'}
-            </p>
-            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-              <Link
-                to={isEn ? '/en/contact' : '/contacto'}
-                style={{
-                  background: 'var(--terracotta)',
-                  color: 'var(--bg)',
-                  padding: '16px 30px',
-                  fontSize: 15,
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  borderRadius: 2,
-                }}
-                className="btn-accent"
-              >
-                <span>{isEn ? 'Request TDR Scope' : 'Solicitar Cotización TDR'}</span>
-                <span aria-hidden="true">→</span>
-              </Link>
-              <Link
-                to={isEn ? '/en/services' : '/servicios'}
-                style={{
-                  background: 'transparent',
-                  color: 'var(--bg)',
-                  border: '1px solid var(--bg)',
-                  padding: '16px 26px',
-                  fontSize: 15,
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  borderRadius: 2,
-                }}
-                className="btn-outline"
-              >
-                <span>{isEn ? 'Explore Services' : 'Explorar Servicios'}</span>
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
 
       {/* Mochica Geometric Pattern Divider */}
       <MochicaDivider color="rgba(216, 168, 78, 0.45)" height={18} seed="inmerge-hero-pillars" />
 
-      {/* 3 Pillars Section */}
-      <div style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(100px, 12vh, 150px) clamp(24px, 5vw, 64px)' }}>
-        <div
-          data-reveal=""
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 64, flexWrap: 'wrap', gap: 20 }}
-        >
-          <div>
-            <div
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 12,
-                color: 'var(--terracotta)',
-                letterSpacing: 2,
-                fontWeight: 600,
-                marginBottom: 10,
-              }}
-            >
-              {isEn ? 'STRATEGIC CAPABILITIES' : 'NUESTRA OFERTA ESTRATÉGICA'}
-            </div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(34px,4.8vw,56px)', margin: 0 }}>
-              {isEn ? 'Three Pillars of Engineering & Assurance' : 'Los Tres Pilares de Inmerge'}
-            </h2>
-          </div>
-          <Link to={isEn ? '/en/services' : '/servicios'} className="link-hover" style={{ fontSize: 15, fontWeight: 600 }}>
-            {isEn ? 'View service breakdown →' : 'Ver desglose de servicios →'}
-          </Link>
-        </div>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-            gap: 'clamp(36px, 4vw, 64px)',
-          }}
-        >
-          {content.PILLARS.map((pillar) => (
-            <div key={pillar.id} data-reveal="">
-              <ServicePillarCard pillar={pillar} />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Case Studies Section */}
-      <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 clamp(24px, 5vw, 64px) clamp(100px, 12vh, 150px)' }}>
+      {/* Case Studies & Engineering Architecture Showcase */}
+      <div style={{ maxWidth: 1440, margin: '0 auto', padding: 'clamp(60px, 8vh, 100px) clamp(24px, 5vw, 64px) clamp(80px, 10vh, 120px)' }}>
         <ProjectCarousel onQuoteProject={(proj) => handleOpenAssistant(proj)} />
       </div>
 
@@ -339,23 +237,20 @@ export default function Inicio() {
         </div>
       </div>
 
-      {/* Floating AI Assistant Trigger Button */}
+      {/* Floating AI Assistant Trigger Button — Alaec */}
       <button
         type="button"
         className="floating-assistant-btn"
         onClick={() => handleOpenAssistant()}
-        aria-label={isEn ? 'Open AI Engineering Assistant' : 'Abrir Asistente Técnico de IA'}
+        aria-label={isEn ? 'Open Alaec AI Assistant' : 'Abrir Asistente IA Alaec'}
       >
-        <span aria-hidden="true">💬</span>
-        <span>{isEn ? 'AI Assistant' : 'Asistente IA'}</span>
+        <span className="alaec-pulse-dot" aria-hidden="true" />
+        <span className="alaec-trigger-name">Alaec</span>
+        <span className="alaec-trigger-badge">AI</span>
       </button>
 
       {/* Interactive LLM Assistant Modal */}
-      <LLMAssistantModal
-        isOpen={isAssistantOpen}
-        onClose={() => setIsAssistantOpen(false)}
-        initialContext={assistantContext}
-      />
+      <LLMAssistantModal isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} initialContext={assistantContext} />
 
       <Footer />
     </>

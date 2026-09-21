@@ -199,6 +199,7 @@ export const DIRECTORS = [
     ],
     quote: 'Data integrity is never an assumption of faith: it is audited and proven mathematically across every table and transaction.',
     accent: 'var(--terracotta)',
+    photo: '/directors/director-auditoria.jpg',
   },
   {
     id: 'cloud-director',
@@ -216,6 +217,7 @@ export const DIRECTORS = [
     ],
     quote: 'A resilient enterprise cloud does not depend on luck, but on reproducible, immutable infrastructure.',
     accent: 'var(--gold)',
+    photo: '/directors/director-cloud.jpg',
   },
   {
     id: 'data-science-director',
@@ -233,6 +235,7 @@ export const DIRECTORS = [
     ],
     quote: 'Applied AI only holds value when delivering measurable operational impact and zero black-box opacity.',
     accent: 'var(--ochre)',
+    photo: '/directors/director-datascience.jpg',
   },
   {
     id: 'software-director',
@@ -246,6 +249,7 @@ export const DIRECTORS = [
     credentials: ['Distributed Systems Architecture', 'React, Node.js, TypeScript & Next.js', 'AppSec Hardening & WCAG 2.1 AA Standards'],
     quote: 'Clean, well-engineered code accelerates today’s velocity while guaranteeing technological sovereignty tomorrow.',
     accent: 'var(--terracotta)',
+    photo: '/directors/director-software.jpg',
   },
 ];
 
