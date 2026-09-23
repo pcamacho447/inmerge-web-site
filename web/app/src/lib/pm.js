@@ -66,6 +66,52 @@ export const RISK_STATUS_CONFIG = {
   RESUELTO: { key: 'RESUELTO', label: 'Resuelto', color: 'var(--green, #4A9C6A)' },
 };
 
+export const DELIVERABLE_STATUS_CONFIG = {
+  BORRADOR_INTERNO: {
+    key: 'BORRADOR_INTERNO',
+    label: 'Borrador Interno',
+    color: 'var(--muted, #7A6B58)',
+    bg: 'rgba(122, 107, 88, 0.12)',
+    description: 'En elaboración por el auditor o ingeniero. No visible para el cliente.',
+  },
+  EN_REVISION: {
+    key: 'EN_REVISION',
+    label: 'En Revisión Lead',
+    color: 'var(--gold, #D8A84E)',
+    bg: 'rgba(216, 168, 78, 0.15)',
+    description: 'Listo para revisión técnica del Tech Lead o Administrador.',
+  },
+  PUBLICADO_CLIENTE: {
+    key: 'PUBLICADO_CLIENTE',
+    label: 'Publicado al Cliente',
+    color: 'var(--green, #4A9C6A)',
+    bg: 'rgba(74, 156, 106, 0.15)',
+    description: 'Aprobado y disponible para descarga en el portal del cliente.',
+  },
+};
+
+export const FINDING_SEVERITY_CONFIG = {
+  CRITICA: { key: 'CRITICA', label: 'Crítica', color: 'var(--terracotta, #A8472B)', bg: 'rgba(168, 71, 43, 0.15)', badge: 'CRIT' },
+  ALTA: { key: 'ALTA', label: 'Alta', color: 'var(--ochre, #C68A3D)', bg: 'rgba(198, 138, 61, 0.15)', badge: 'HIGH' },
+  MEDIA: { key: 'MEDIA', label: 'Media', color: 'var(--gold, #D8A84E)', bg: 'rgba(216, 168, 78, 0.15)', badge: 'MED' },
+  BAJA: { key: 'BAJA', label: 'Baja', color: 'var(--muted, #7A6B58)', bg: 'rgba(122, 107, 88, 0.12)', badge: 'LOW' },
+  INFORMATIVA: { key: 'INFORMATIVA', label: 'Informativa', color: '#3182CE', bg: 'rgba(49, 130, 206, 0.12)', badge: 'INFO' },
+};
+
+export const FINDING_CATEGORY_CONFIG = {
+  CORE_WEB_VITALS: { key: 'CORE_WEB_VITALS', label: '01. Core Web Vitals & Web Perf', icon: '⚡' },
+  DATOS_CLOUD: { key: 'DATOS_CLOUD', label: '02. Datos & BigQuery / SQL', icon: '📊' },
+  SEGURIDAD_OWASP: { key: 'SEGURIDAD_OWASP', label: '03. Seguridad Cloud & OWASP', icon: '🔒' },
+  ARQUITECTURA_CLOUD: { key: 'ARQUITECTURA_CLOUD', label: '04. Arquitectura & Infra', icon: '☁️' },
+  CALIDAD_CODIGO: { key: 'CALIDAD_CODIGO', label: '05. Calidad de Código & Testing', icon: '🛠️' },
+};
+
+export const FINDING_STATUS_CONFIG = {
+  DETECTADO: { key: 'DETECTADO', label: 'Detectado', color: 'var(--terracotta, #A8472B)', bg: 'rgba(168, 71, 43, 0.12)' },
+  EN_CORRECCION: { key: 'EN_CORRECCION', label: 'En Corrección', color: 'var(--gold, #D8A84E)', bg: 'rgba(216, 168, 78, 0.15)' },
+  VERIFICADO: { key: 'VERIFICADO', label: 'Verificado / Resuelto', color: 'var(--green, #4A9C6A)', bg: 'rgba(74, 156, 106, 0.15)' },
+};
+
 /**
  * Calcula el progreso de un hito individual basado en sus tareas o en su estado directo.
  * @param {Object} milestone
@@ -242,6 +288,59 @@ export function sanitizeRiskPayload(payload) {
     impact: payload.impact ? String(payload.impact).trim() : null,
     mitigation_plan: payload.mitigation_plan ? String(payload.mitigation_plan).trim() : null,
     resolved_at: payload.status === 'RESUELTO' ? payload.resolved_at || new Date().toISOString() : null,
+  };
+}
+
+/**
+ * Sanitiza el payload para crear o actualizar un entregable técnico
+ */
+export function sanitizeDeliverablePayload(payload) {
+  if (!payload || typeof payload !== 'object') throw new Error('Payload de entregable inválido');
+  if (!payload.title || !String(payload.title).trim()) throw new Error('El título del entregable es obligatorio.');
+
+  const validStatuses = ['BORRADOR_INTERNO', 'EN_REVISION', 'PUBLICADO_CLIENTE'];
+  const validFileTypes = ['PDF', 'DASHBOARD_URL', 'REPO', 'DATASET', 'DOCUMENTO', 'XLSX', 'ZIP'];
+
+  return {
+    project_id: payload.projectId || payload.project_id,
+    milestone_id: payload.milestoneId || payload.milestone_id || null,
+    title: String(payload.title).trim(),
+    file_type: validFileTypes.includes(payload.fileType || payload.file_type) ? payload.fileType || payload.file_type : 'PDF',
+    file_path: payload.filePath || payload.file_path || null,
+    external_url: payload.externalUrl || payload.external_url || null,
+    version: payload.version ? String(payload.version).trim() : 'v1.0',
+    notes: payload.notes ? String(payload.notes).trim() : '',
+    status: validStatuses.includes(payload.status) ? payload.status : 'BORRADOR_INTERNO',
+    author_name: payload.authorName || payload.author_name || null,
+    author_email: payload.authorEmail || payload.author_email || null,
+  };
+}
+
+/**
+ * Sanitiza el payload para registrar o actualizar un hallazgo técnico de auditoría
+ */
+export function sanitizeFindingPayload(payload) {
+  if (!payload || typeof payload !== 'object') throw new Error('Payload de hallazgo inválido');
+  if (!payload.title || !String(payload.title).trim()) throw new Error('El título del hallazgo es obligatorio.');
+
+  const validSeverities = ['CRITICA', 'ALTA', 'MEDIA', 'BAJA', 'INFORMATIVA'];
+  const validCategories = ['CORE_WEB_VITALS', 'DATOS_CLOUD', 'SEGURIDAD_OWASP', 'ARQUITECTURA_CLOUD', 'CALIDAD_CODIGO'];
+  const validStatuses = ['DETECTADO', 'EN_CORRECCION', 'VERIFICADO'];
+
+  return {
+    project_id: payload.project_id || payload.projectId,
+    milestone_id: payload.milestone_id || payload.milestoneId || null,
+    finding_code: payload.finding_code
+      ? String(payload.finding_code).trim().toUpperCase()
+      : `FIND-${Date.now().toString(36).toUpperCase()}`,
+    title: String(payload.title).trim(),
+    category: validCategories.includes(payload.category) ? payload.category : 'CORE_WEB_VITALS',
+    severity: validSeverities.includes(payload.severity) ? payload.severity : 'MEDIA',
+    status: validStatuses.includes(payload.status) ? payload.status : 'DETECTADO',
+    evidence_notes: payload.evidence_notes ? String(payload.evidence_notes).trim() : null,
+    recommendation: payload.recommendation ? String(payload.recommendation).trim() : null,
+    created_by_name: payload.created_by_name || null,
+    created_by_email: payload.created_by_email || null,
   };
 }
 

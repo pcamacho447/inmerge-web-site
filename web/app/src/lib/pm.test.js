@@ -9,6 +9,12 @@ import {
   HEALTH_STATUS_CONFIG,
   TASK_STATUS_CONFIG,
   TASK_PRIORITY_CONFIG,
+  DELIVERABLE_STATUS_CONFIG,
+  FINDING_SEVERITY_CONFIG,
+  FINDING_CATEGORY_CONFIG,
+  FINDING_STATUS_CONFIG,
+  sanitizeDeliverablePayload,
+  sanitizeFindingPayload,
 } from './pm.js';
 
 describe('pm.js - Project Management Engine', () => {
@@ -17,6 +23,11 @@ describe('pm.js - Project Management Engine', () => {
       expect(HEALTH_STATUS_CONFIG.ON_TRACK.label).toBe('En Tiempo');
       expect(TASK_STATUS_CONFIG.DONE.label).toBe('Completada');
       expect(TASK_PRIORITY_CONFIG.CRITICA.label).toBe('Crítica');
+      expect(DELIVERABLE_STATUS_CONFIG.BORRADOR_INTERNO).toBeDefined();
+      expect(DELIVERABLE_STATUS_CONFIG.PUBLICADO_CLIENTE).toBeDefined();
+      expect(FINDING_SEVERITY_CONFIG.CRITICA).toBeDefined();
+      expect(FINDING_CATEGORY_CONFIG.CORE_WEB_VITALS).toBeDefined();
+      expect(FINDING_STATUS_CONFIG.DETECTADO).toBeDefined();
     });
   });
 
@@ -120,6 +131,49 @@ describe('pm.js - Project Management Engine', () => {
       expect(clean.title).toBe('Credenciales de BigQuery expiradas');
       expect(clean.severity).toBe('CRITICA');
       expect(clean.status).toBe('ABIERTO');
+    });
+
+    it('valida estados de entregables y asigna BORRADOR_INTERNO por defecto si no es válido', () => {
+      expect(DELIVERABLE_STATUS_CONFIG.BORRADOR_INTERNO).toBeDefined();
+      expect(DELIVERABLE_STATUS_CONFIG.PUBLICADO_CLIENTE).toBeDefined();
+
+      expect(() => sanitizeDeliverablePayload(null)).toThrow('Payload de entregable inválido');
+      expect(() => sanitizeDeliverablePayload({})).toThrow('El título del entregable es obligatorio.');
+
+      const sanitized = sanitizeDeliverablePayload({
+        title: 'Reporte de Auditoría Cloud',
+        fileType: 'PDF',
+        status: 'INVALID_STATUS',
+      });
+
+      expect(sanitized.title).toBe('Reporte de Auditoría Cloud');
+      expect(sanitized.status).toBe('BORRADOR_INTERNO');
+      expect(sanitized.version).toBe('v1.0');
+      expect(sanitized.file_type).toBe('PDF');
+    });
+
+    it('valida campos obligatorios y sanitiza payload de hallazgo forense', () => {
+      expect(() => sanitizeFindingPayload(null)).toThrow('Payload de hallazgo inválido');
+      expect(() => sanitizeFindingPayload({})).toThrow('El título del hallazgo es obligatorio');
+
+      const sanitized = sanitizeFindingPayload({
+        project_id: 'proj-123',
+        title: 'Vulnerabilidad CSRF en endpoint de órdenes',
+        category: 'SEGURIDAD_OWASP',
+        severity: 'CRITICA',
+        status: 'DETECTADO',
+        finding_code: 'FIND-SEC-01',
+        evidence_notes: 'Token no validado en POST /orders',
+        recommendation: 'Implementar SameSite y double-submit cookie token.',
+      });
+
+      expect(sanitized.title).toBe('Vulnerabilidad CSRF en endpoint de órdenes');
+      expect(sanitized.category).toBe('SEGURIDAD_OWASP');
+      expect(sanitized.severity).toBe('CRITICA');
+      expect(sanitized.finding_code).toBe('FIND-SEC-01');
+      expect(sanitized.status).toBe('DETECTADO');
+      expect(sanitized.evidence_notes).toBe('Token no validado en POST /orders');
+      expect(sanitized.recommendation).toBe('Implementar SameSite y double-submit cookie token.');
     });
   });
 

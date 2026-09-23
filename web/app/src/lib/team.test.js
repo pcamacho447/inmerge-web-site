@@ -16,6 +16,11 @@ import {
   fetchProjectTasks,
   createProjectTask,
   updateProjectHealth,
+  updateDeliverableStatus,
+  fetchProjectFindings,
+  createProjectFinding,
+  updateProjectFinding,
+  deleteProjectFinding,
 } from './team.js';
 import { supabase } from './supabaseClient.js';
 
@@ -375,6 +380,120 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       expect(supabase.from).toHaveBeenCalledWith('client_projects');
       expect(updateMock).toHaveBeenCalledWith({ health_status: 'ON_TRACK' });
       expect(res).toEqual(mockUpdated);
+    });
+  });
+
+  describe('Deliverable Status & Project Findings', () => {
+    it('updateDeliverableStatus actualiza el estado del entregable y audita la actividad', async () => {
+      await expect(updateDeliverableStatus('', 'PUBLICADO_CLIENTE')).rejects.toThrow('ID y nuevo estado son obligatorios.');
+      await expect(updateDeliverableStatus('del-1', 'INVALID_STATUS')).rejects.toThrow('Estado de entregable inválido.');
+
+      const mockUpdated = { id: 'del-1', status: 'PUBLICADO_CLIENTE', title: 'Informe Final' };
+      const singleMock = vi.fn().mockResolvedValue({ data: mockUpdated, error: null });
+      const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+      const eqMock = vi.fn().mockReturnValue({ select: selectMock });
+      const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
+      const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      supabase.from.mockImplementation((table) => {
+        if (table === 'project_deliverables') return { update: updateMock };
+        if (table === 'team_activity_logs') return { insert: logInsertMock };
+        return {};
+      });
+
+      const res = await updateDeliverableStatus('del-1', 'PUBLICADO_CLIENTE', { projectId: 'p-1', title: 'Informe Final' });
+      expect(supabase.from).toHaveBeenCalledWith('project_deliverables');
+      expect(updateMock).toHaveBeenCalledWith(expect.objectContaining({ status: 'PUBLICADO_CLIENTE' }));
+      expect(eqMock).toHaveBeenCalledWith('id', 'del-1');
+      expect(res).toEqual(mockUpdated);
+    });
+
+    it('fetchProjectFindings consulta los hallazgos del proyecto ordenados por fecha', async () => {
+      expect(await fetchProjectFindings(null)).toEqual([]);
+
+      const mockFindings = [{ id: 'f-1', project_id: 'p-1', title: 'Finding 1' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockFindings, error: null });
+      const eqMock = vi.fn().mockReturnValue({ order: orderMock });
+      const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      const res = await fetchProjectFindings('p-1');
+      expect(supabase.from).toHaveBeenCalledWith('project_findings');
+      expect(eqMock).toHaveBeenCalledWith('project_id', 'p-1');
+      expect(orderMock).toHaveBeenCalledWith('created_at', { ascending: false });
+      expect(res).toEqual(mockFindings);
+    });
+
+    it('createProjectFinding sanitiza e inserta un hallazgo técnico', async () => {
+      const mockFinding = { id: 'f-1', title: 'XSS en search', severity: 'ALTA', category: 'SEGURIDAD_OWASP' };
+      const singleMock = vi.fn().mockResolvedValue({ data: mockFinding, error: null });
+      const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+      const insertMock = vi.fn().mockReturnValue({ select: selectMock });
+      const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      supabase.from.mockImplementation((table) => {
+        if (table === 'project_findings') return { insert: insertMock };
+        if (table === 'team_activity_logs') return { insert: logInsertMock };
+        return {};
+      });
+
+      const res = await createProjectFinding({
+        projectId: 'p-1',
+        title: 'XSS en search',
+        severity: 'ALTA',
+        category: 'SEGURIDAD_OWASP',
+      });
+
+      expect(supabase.from).toHaveBeenCalledWith('project_findings');
+      expect(insertMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'XSS en search',
+          severity: 'ALTA',
+          category: 'SEGURIDAD_OWASP',
+          status: 'DETECTADO',
+        }),
+      );
+      expect(res).toEqual(mockFinding);
+    });
+
+    it('updateProjectFinding actualiza los campos de un hallazgo técnico', async () => {
+      await expect(updateProjectFinding(null, {})).rejects.toThrow('ID de hallazgo obligatorio.');
+
+      const mockUpdated = { id: 'f-1', title: 'XSS corregido', status: 'VERIFICADO' };
+      const singleMock = vi.fn().mockResolvedValue({ data: mockUpdated, error: null });
+      const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+      const eqMock = vi.fn().mockReturnValue({ select: selectMock });
+      const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
+      const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      supabase.from.mockImplementation((table) => {
+        if (table === 'project_findings') return { update: updateMock };
+        if (table === 'team_activity_logs') return { insert: logInsertMock };
+        return {};
+      });
+
+      const res = await updateProjectFinding('f-1', { status: 'VERIFICADO' });
+      expect(supabase.from).toHaveBeenCalledWith('project_findings');
+      expect(updateMock).toHaveBeenCalledWith(expect.objectContaining({ status: 'VERIFICADO' }));
+      expect(eqMock).toHaveBeenCalledWith('id', 'f-1');
+      expect(res).toEqual(mockUpdated);
+    });
+
+    it('deleteProjectFinding elimina el hallazgo', async () => {
+      await expect(deleteProjectFinding(null)).rejects.toThrow('ID de hallazgo obligatorio.');
+
+      const eqMock = vi.fn().mockResolvedValue({ error: null });
+      const deleteMock = vi.fn().mockReturnValue({ eq: eqMock });
+      supabase.from.mockImplementation((table) => {
+        if (table === 'project_findings') return { delete: deleteMock };
+        return {};
+      });
+
+      const res = await deleteProjectFinding('f-1');
+      expect(supabase.from).toHaveBeenCalledWith('project_findings');
+      expect(deleteMock).toHaveBeenCalled();
+      expect(eqMock).toHaveBeenCalledWith('id', 'f-1');
+      expect(res).toBe(true);
     });
   });
 });

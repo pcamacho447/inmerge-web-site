@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient.js';
+import { sanitizeDeliverablePayload, sanitizeFindingPayload } from './pm.js';
 
 /**
  * Consulta la lista de clientes registrados en la plataforma.
@@ -455,6 +456,11 @@ export async function createDeliverableRecord({
   externalUrl = null,
   version = 'v1.0',
   notes = '',
+  status = 'BORRADOR_INTERNO',
+  authorName = null,
+  authorEmail = null,
+  author_name = null,
+  author_email = null,
   project = null,
   clientEmail = null,
   clientName = null,
@@ -463,20 +469,21 @@ export async function createDeliverableRecord({
     throw new Error('Proyecto, título y tipo de archivo son obligatorios.');
   }
 
-  const { data, error } = await supabase
-    .from('project_deliverables')
-    .insert({
-      project_id: projectId,
-      milestone_id: milestoneId,
-      title,
-      file_type: fileType,
-      file_path: filePath,
-      external_url: externalUrl,
-      version,
-      notes,
-    })
-    .select()
-    .single();
+  const sanitized = sanitizeDeliverablePayload({
+    projectId,
+    milestoneId,
+    title,
+    fileType,
+    filePath,
+    externalUrl,
+    version,
+    notes,
+    status,
+    authorName: authorName || author_name,
+    authorEmail: authorEmail || author_email,
+  });
+
+  const { data, error } = await supabase.from('project_deliverables').insert(sanitized).select().single();
 
   if (error) {
     console.error('Error al registrar entregable:', error);
@@ -488,7 +495,13 @@ export async function createDeliverableRecord({
     action: 'DELIVERABLE_PUBLISHED',
     entityType: 'deliverable',
     entityId: data.id,
-    details: { project_id: projectId, title, file_type: fileType, version },
+    details: {
+      project_id: projectId,
+      title: sanitized.title,
+      file_type: sanitized.file_type,
+      version: sanitized.version,
+      status: sanitized.status,
+    },
   });
 
   // Disparar Edge Function notify-deliverable de forma asíncrona no-bloqueante
@@ -504,6 +517,36 @@ export async function createDeliverableRecord({
       })
       .catch((fnErr) => console.warn('Deliverable notification warning:', fnErr));
   }
+
+  return data;
+}
+
+/**
+ * Actualiza el estado de publicación de un entregable técnico (Borrador -> En Revisión -> Publicado).
+ */
+export async function updateDeliverableStatus(deliverableId, newStatus, { projectId, title, notes = '' } = {}) {
+  if (!deliverableId || !newStatus) throw new Error('ID y nuevo estado son obligatorios.');
+  const validStatuses = ['BORRADOR_INTERNO', 'EN_REVISION', 'PUBLICADO_CLIENTE'];
+  if (!validStatuses.includes(newStatus)) throw new Error('Estado de entregable inválido.');
+
+  const { data, error } = await supabase
+    .from('project_deliverables')
+    .update({ status: newStatus, notes: notes || undefined, updated_at: new Date().toISOString() })
+    .eq('id', deliverableId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error al actualizar estado de entregable:', error);
+    throw new Error(error.message || 'No se pudo actualizar el estado del entregable.');
+  }
+
+  logTeamActivity({
+    action: 'DELIVERABLE_STATUS_UPDATED',
+    entityType: 'deliverable',
+    entityId: deliverableId,
+    details: { new_status: newStatus, title: title || data?.title, project_id: projectId || data?.project_id },
+  });
 
   return data;
 }
@@ -746,4 +789,84 @@ export async function updateProjectHealth(projectId, { healthStatus, startDate, 
   });
 
   return data;
+}
+
+/**
+ * Consulta la lista de hallazgos forenses técnicos vinculados a un proyecto.
+ */
+export async function fetchProjectFindings(projectId) {
+  if (!projectId) return [];
+  const { data, error } = await supabase
+    .from('project_findings')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.warn('project_findings query notice:', error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/**
+ * Registra un nuevo hallazgo técnico en la auditoría del proyecto.
+ */
+export async function createProjectFinding(payload) {
+  const sanitized = sanitizeFindingPayload(payload);
+  const { data, error } = await supabase.from('project_findings').insert(sanitized).select().single();
+
+  if (error) {
+    console.error('Error al registrar hallazgo:', error);
+    throw new Error(error.message || 'No se pudo registrar el hallazgo técnico.');
+  }
+
+  logTeamActivity({
+    action: 'FINDING_CREATED',
+    entityType: 'finding',
+    entityId: data.id,
+    details: { code: sanitized.finding_code, title: sanitized.title, severity: sanitized.severity, project_id: sanitized.project_id },
+  });
+
+  return data;
+}
+
+/**
+ * Actualiza el estado o detalles de un hallazgo técnico.
+ */
+export async function updateProjectFinding(findingId, updates) {
+  if (!findingId) throw new Error('ID de hallazgo obligatorio.');
+  const { data, error } = await supabase
+    .from('project_findings')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', findingId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error al actualizar hallazgo:', error);
+    throw new Error(error.message || 'No se pudo actualizar el hallazgo.');
+  }
+
+  logTeamActivity({
+    action: 'FINDING_UPDATED',
+    entityType: 'finding',
+    entityId: findingId,
+    details: { updates, title: data?.title, project_id: data?.project_id },
+  });
+
+  return data;
+}
+
+/**
+ * Elimina un hallazgo técnico de la base de datos.
+ */
+export async function deleteProjectFinding(findingId) {
+  if (!findingId) throw new Error('ID de hallazgo obligatorio.');
+  const { error } = await supabase.from('project_findings').delete().eq('id', findingId);
+  if (error) {
+    console.error('Error al eliminar hallazgo:', error);
+    throw new Error(error.message || 'No se pudo eliminar el hallazgo.');
+  }
+  return true;
 }
