@@ -270,4 +270,46 @@ describe('Equipo Console Component', () => {
     expect(screen.getByText('Vulnerabilidad SQL Injection mitigada')).toBeInTheDocument();
     expect(screen.getByText(/Matriz Forense de Hallazgos Técnicos/i)).toBeInTheDocument();
   });
+
+  it('fija activeTab en cockpit y viewScope en ASSIGNED para usuarios no administradores', async () => {
+    authLib.useAuth.mockReturnValue({
+      user: {
+        id: 'auditor-1',
+        email: 'auditor.lead@inmerge.pe',
+        fullName: 'Elena Ramos',
+        role: 'auditor',
+        isStaff: true,
+        isAdmin: false,
+      },
+      logout: mockLogout,
+    });
+
+    render(
+      <MemoryRouter>
+        <Equipo />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(screen.queryByText(/Cargando consola/i)).not.toBeInTheDocument());
+
+    expect(screen.getByRole('tab', { name: /Mi Estación de Trabajo/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Elena Ramos' })).toBeInTheDocument();
+    expect(screen.getByText(/ESTACIÓN DE TRABAJO TÉCNICA/i)).toBeInTheDocument();
+  });
+
+  it('permite alternar hacia la estación de trabajo desde las pestañas', async () => {
+    render(
+      <MemoryRouter>
+        <Equipo />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(screen.queryByText(/Cargando consola/i)).not.toBeInTheDocument());
+
+    const cockpitTab = screen.getByRole('tab', { name: /Mi Estación de Trabajo/i });
+    fireEvent.click(cockpitTab);
+
+    expect(await screen.findByText(/ESTACIÓN DE TRABAJO TÉCNICA/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Principal Architect' })).toBeInTheDocument();
+  });
 });

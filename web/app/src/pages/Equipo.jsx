@@ -38,14 +38,15 @@ import NewProjectModal from '../components/team/NewProjectModal.jsx';
 import TeamActivityFeed from '../components/team/TeamActivityFeed.jsx';
 import StaffManagementView from '../components/team/StaffManagementView.jsx';
 import CommandPaletteModal from '../components/team/CommandPaletteModal.jsx';
+import WorkerCockpitView from '../components/team/WorkerCockpitView.jsx';
 
 export default function Equipo() {
   useDocumentHead({ title: 'Panel de Equipo & Consultores — Inmerge', path: '/equipo', noIndex: true });
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('projects'); // 'leads' | 'projects' | 'new_project' | 'activity' | 'team'
-  const [viewScope, setViewScope] = useState('ALL'); // 'ALL' | 'ASSIGNED'
+  const [activeTab, setActiveTab] = useState(() => (!user?.isAdmin ? 'cockpit' : 'projects')); // 'cockpit' | 'leads' | 'projects' | 'new_project' | 'activity' | 'team'
+  const [viewScope, setViewScope] = useState(() => (!user?.isAdmin ? 'ASSIGNED' : 'ALL')); // 'ALL' | 'ASSIGNED'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -109,6 +110,13 @@ export default function Equipo() {
   useEffect(() => {
     loadData(true);
   }, []);
+
+  useEffect(() => {
+    if (user && !user.isAdmin) {
+      setActiveTab((prev) => (prev === 'projects' || prev === 'new_project' || prev === 'team' ? 'cockpit' : prev));
+      setViewScope('ASSIGNED');
+    }
+  }, [user]);
 
   async function loadData(showSkeleton = false) {
     if (showSkeleton) {
@@ -694,8 +702,9 @@ export default function Equipo() {
       : projects;
 
   const tabs = [
+    { id: 'cockpit', label: 'Mi Estación de Trabajo', icon: '⚡' },
     { id: 'leads', label: 'Bandeja de Leads & TDR', icon: '📥', count: leads.length },
-    { id: 'projects', label: 'Proyectos & Auditorías', icon: '⚡', count: projects.length },
+    { id: 'projects', label: 'Proyectos & Auditorías', icon: '📂', count: projects.length },
     ...(user?.isAdmin ? [{ id: 'new_project', label: 'Crear Proyecto / Entregables', icon: '➕' }] : []),
     { id: 'activity', label: 'Bitácora & Auditoría', icon: '📜', count: activityLogs.length },
     ...(user?.isAdmin ? [{ id: 'team', label: 'Gestión de Colaboradores', icon: '👥', count: staffList.length }] : []),
@@ -1007,6 +1016,7 @@ export default function Equipo() {
             <div>
               <h2 className="equipo-workspace-title">{activeTabMeta.label}</h2>
               <p className="equipo-workspace-subtitle">
+                {activeTab === 'cockpit' && 'Consola personal del consultor: tareas asignadas, entregables en curso y telemetría.'}
                 {activeTab === 'leads' && 'Gestión y triaje de solicitudes TDR enviadas por clientes y empresas.'}
                 {activeTab === 'projects' && 'Supervisión integral de proyectos, hitos Gantt, entregables y matriz de riesgos.'}
                 {activeTab === 'new_project' && 'Centro de operaciones para creación de proyectos, hitos técnicos y subida de entregables.'}
@@ -1107,6 +1117,18 @@ export default function Equipo() {
             </div>
           ) : (
             <div id={`panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`} tabIndex={0} style={{ outline: 'none' }}>
+              {activeTab === 'cockpit' && (
+                <WorkerCockpitView
+                  user={user}
+                  projects={projects}
+                  onTaskUpdated={handleTaskUpdated}
+                  onSelectProject={(proj) => {
+                    setActiveTab('projects');
+                    showTemporaryMsg(`Navegando al proyecto: ${proj.title}`);
+                  }}
+                />
+              )}
+
               {activeTab === 'leads' && (
                 <LeadsInboxTable
                   leads={leads}
@@ -1274,6 +1296,18 @@ export default function Equipo() {
         projects={projects}
         leads={leads}
         isAdmin={Boolean(user?.isAdmin)}
+        onNavigateToCockpit={() => {
+          setActiveTab('cockpit');
+          showTemporaryMsg('Navegando a Mi Estación de Trabajo');
+        }}
+        onNavigateToTasks={() => {
+          setActiveTab('cockpit');
+          showTemporaryMsg('Visualizando tareas asignadas en Estación de Trabajo');
+        }}
+        onNavigateToDeliverables={() => {
+          setActiveTab('cockpit');
+          showTemporaryMsg('Visualizando entregables en Estación de Trabajo');
+        }}
         onSelectProject={(proj) => {
           setActiveTab('projects');
           showTemporaryMsg(`Navegando al proyecto: ${proj.title}`);

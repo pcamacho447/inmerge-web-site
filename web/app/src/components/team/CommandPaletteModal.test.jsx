@@ -84,4 +84,24 @@ describe('CommandPaletteModal', () => {
     expect(handleSelectAction).toHaveBeenCalled();
     expect(handleClose).toHaveBeenCalled();
   });
+
+  it('permite ejecutar atajos rápidos hacia la Estación de Trabajo del especialista', async () => {
+    const user = userEvent.setup();
+    const handleCockpit = vi.fn();
+    const handleClose = vi.fn();
+
+    render(
+      <CommandPaletteModal isOpen={true} onClose={handleClose} projects={mockProjects} leads={[]} onNavigateToCockpit={handleCockpit} />,
+    );
+
+    expect(screen.getByText('⚡ Ir a Mi Estación de Trabajo')).toBeInTheDocument();
+    expect(screen.getByText('📋 Ver Mis Tareas Asignadas')).toBeInTheDocument();
+    expect(screen.getByText('📦 Ver Mis Entregables')).toBeInTheDocument();
+
+    const cockpitOption = screen.getByText('⚡ Ir a Mi Estación de Trabajo');
+    await user.click(cockpitOption);
+
+    expect(handleCockpit).toHaveBeenCalled();
+    expect(handleClose).toHaveBeenCalled();
+  });
 });

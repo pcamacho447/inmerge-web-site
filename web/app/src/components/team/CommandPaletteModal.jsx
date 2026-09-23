@@ -11,6 +11,9 @@ export default function CommandPaletteModal({
   onOpenNewMilestone,
   onOpenNewDeliverable,
   onOpenNewStaff,
+  onNavigateToCockpit,
+  onNavigateToTasks,
+  onNavigateToDeliverables,
   isAdmin = false,
 }) {
   const [query, setQuery] = useState('');
@@ -72,6 +75,38 @@ export default function CommandPaletteModal({
         action: onOpenNewStaff,
       });
     }
+  }
+
+  // Specialist Cockpit Navigation Actions
+  if (onNavigateToCockpit) {
+    actionItems.push({
+      type: 'action',
+      id: 'action-cockpit',
+      title: '⚡ Ir a Mi Estación de Trabajo',
+      category: 'Estación de Trabajo',
+      icon: '⚡',
+      action: onNavigateToCockpit,
+    });
+  }
+  if (onNavigateToTasks || onNavigateToCockpit) {
+    actionItems.push({
+      type: 'action',
+      id: 'action-my-tasks',
+      title: '📋 Ver Mis Tareas Asignadas',
+      category: 'Estación de Trabajo',
+      icon: '📋',
+      action: onNavigateToTasks || onNavigateToCockpit,
+    });
+  }
+  if (onNavigateToDeliverables || onNavigateToCockpit) {
+    actionItems.push({
+      type: 'action',
+      id: 'action-my-deliverables',
+      title: '📦 Ver Mis Entregables',
+      category: 'Estación de Trabajo',
+      icon: '📦',
+      action: onNavigateToDeliverables || onNavigateToCockpit,
+    });
   }
 
   // Project items
