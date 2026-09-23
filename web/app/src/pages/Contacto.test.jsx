@@ -23,7 +23,7 @@ describe('Contacto.jsx Page - Anti-Spam & Rate Limiting UI', () => {
   it('renders the form with required fields and invisible honeypot', () => {
     renderComponent();
 
-    expect(screen.getByText(/COTIZACIÓN & TDR/i)).toBeInTheDocument();
+    expect(screen.getByText(/FORMULARIO DE REQUERIMIENTO/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Correo Electrónico \*/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Descripción del Requerimiento \/ Alcance \*/i)).toBeInTheDocument();
 
@@ -73,14 +73,5 @@ describe('Contacto.jsx Page - Anti-Spam & Rate Limiting UI', () => {
     const alert = await screen.findByText(/Límite de solicitudes de cotización alcanzado/i);
     expect(alert).toBeInTheDocument();
     expect(screen.getByText(/Contactar por WhatsApp de Inmediato/i)).toBeInTheDocument();
-  });
-
-  it('renders formal email link and assurance SLA badges', () => {
-    renderComponent();
-
-    expect(screen.getByText(/Correo Formal/i)).toBeInTheDocument();
-    expect(screen.getByText(/COMPROMISOS DE SERVICIO/i)).toBeInTheDocument();
-    expect(screen.getByText(/Compromiso de Respuesta/i)).toBeInTheDocument();
-    expect(screen.getByText(/Protocolo de Confidencialidad/i)).toBeInTheDocument();
   });
 });

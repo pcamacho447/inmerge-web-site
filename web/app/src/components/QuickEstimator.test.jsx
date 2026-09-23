@@ -22,13 +22,11 @@ describe('QuickEstimator Component (Cédula Curatorial)', () => {
 
     // Header & Section
     expect(screen.getByRole('region', { name: /cotizador editorial y cédula de servicios/i })).toBeInTheDocument();
-    expect(screen.getByText('MONOGRAFÍA DE INGENIERÍA')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 1, name: 'Páginas Web' })).toBeInTheDocument();
 
     // The 3 canonical lines in the line selector
-    expect(screen.getByRole('tab', { name: /01 \/ Páginas Web/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /02 \/ Ingeniería de Software/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /03 \/ Inteligencia de Negocios/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Páginas Web/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Ingeniería de Software/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Inteligencia de Negocios/i })).toBeInTheDocument();
 
     // Default line is web_pages, default solution is Landing de Alto Impacto
     expect(screen.getByText('INM-CAT-2026.01')).toBeInTheDocument();
@@ -41,7 +39,7 @@ describe('QuickEstimator Component (Cédula Curatorial)', () => {
     renderWithLang(<QuickEstimator onOpenLLMAssistant={vi.fn()} />);
 
     // Switch to Software Engineering (tab 02)
-    const softwareTab = screen.getByRole('tab', { name: /02 \/ Ingeniería de Software/i });
+    const softwareTab = screen.getByRole('tab', { name: /Ingeniería de Software/i });
     fireEvent.click(softwareTab);
 
     // Verify solutions for Software Engineering appear
@@ -50,7 +48,7 @@ describe('QuickEstimator Component (Cédula Curatorial)', () => {
     expect(screen.getByText(/S\/ 6,500 PEN/i)).toBeInTheDocument();
 
     // Switch to Business Intelligence (tab 03)
-    const biTab = screen.getByRole('tab', { name: /03 \/ Inteligencia de Negocios/i });
+    const biTab = screen.getByRole('tab', { name: /Inteligencia de Negocios/i });
     fireEvent.click(biTab);
 
     expect(screen.getByText('INM-CAT-2026.07')).toBeInTheDocument();
@@ -87,11 +85,9 @@ describe('QuickEstimator Component (Cédula Curatorial)', () => {
   it('renders properly in English when on /en path', () => {
     renderWithLang(<QuickEstimator onOpenLLMAssistant={vi.fn()} />, '/en');
 
-    expect(screen.getByText('ENGINEERING MONOGRAPH')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 1, name: 'Web Development' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /01 \/ Web Development/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /02 \/ Software Engineering/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /03 \/ Business Intelligence/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Web Development/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Software Engineering/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Business Intelligence/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'High-Impact Landing Page' })).toBeInTheDocument();
     expect(screen.getByText(/~1 to 2 weeks/i)).toBeInTheDocument();
   });
@@ -119,7 +115,6 @@ describe('QuickEstimator Component (Cédula Curatorial)', () => {
     // Check figure and specimen badge
     const figure = screen.getByRole('figure');
     expect(figure).toBeInTheDocument();
-    expect(screen.getByText(/ESPECÍMEN \d\d \/ 09 — VISTA DE PROTOTIPO 1:1/i)).toBeInTheDocument();
 
     // Default image for web_pages -> landing_alto_impacto is b2b-portal.jpg
     const img = screen.getByRole('img');
@@ -127,7 +122,7 @@ describe('QuickEstimator Component (Cédula Curatorial)', () => {
     expect(img).toHaveAttribute('alt', 'Prototipo visual de Landing Page de Alto Impacto');
 
     // Switch to Software Engineering (tab 02)
-    const softwareTab = screen.getByRole('tab', { name: /02 \/ Ingeniería de Software/i });
+    const softwareTab = screen.getByRole('tab', { name: /Ingeniería de Software/i });
     fireEvent.click(softwareTab);
 
     // Image updates to aws-cloud.jpg

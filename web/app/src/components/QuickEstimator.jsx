@@ -639,29 +639,8 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
       </div>
 
       {/* 2. Monograph Identity & Navigation Band (Directly Below Hero Image) */}
-      <div className="curatorial-header-band">
-        {/* Top Minimal HUD: Identity, Minimal H1 & Coords directly on Arena Canvas */}
-        <div className="monumental-top-hud">
-          <div className="monumental-identity-cluster">
-            <span className="monograph-label">{isEn ? 'ENGINEERING MONOGRAPH' : 'MONOGRAFÍA DE INGENIERÍA'}</span>
-            <span className="monograph-dot" aria-hidden="true" />
-            <h1 className="monumental-h1">{lineTitle}</h1>
-            <span className="monumental-hud-coords" aria-hidden="true">
-              · 08°06′S 79°01′W
-            </span>
-          </div>
-
-          <div className="monumental-badge-overlay">
-            <span className="monumental-dot" aria-hidden="true" />
-            <span className="monumental-badge-text">
-              {isEn
-                ? `SPECIMEN ${specimenIndexFormatted} / 09 — 1:1 PROTOTYPE VIEW`
-                : `ESPECÍMEN ${specimenIndexFormatted} / 09 — VISTA DE PROTOTIPO 1:1`}
-            </span>
-          </div>
-        </div>
-
-        {/* Minimal Disciplines Selector (Tabs) directly on Arena Canvas */}
+      <div className="curatorial-filter-band">
+        {/* Nivel 1: Selector de Disciplinas (Pills) */}
         <div className="gallery-disciplines-bar" role="tablist" aria-label={isEn ? 'Disciplines' : 'Disciplinas'}>
           {Object.entries(SOLUTIONS_CATALOG).map(([key, item]) => {
             const isSelected = selectedPillarKey === key;
@@ -671,25 +650,22 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
                 role="tab"
                 type="button"
                 id={`tab-${key}`}
-                aria-label={`${item.code} / ${item.name[lang] || item.name.es}`}
+                aria-label={item.name[lang] || item.name.es}
                 aria-selected={isSelected}
                 aria-controls={`panel-${key}`}
                 className={`gallery-discipline-btn ${isSelected ? 'is-active' : ''}`}
                 onClick={() => handleSelectPillar(key)}
               >
-                <span className="discipline-num">[{item.code}]</span>
                 <span className="discipline-label">{item.name[lang] || item.name.es}</span>
-                {isSelected && <span className="discipline-step-indicator" aria-hidden="true" />}
               </button>
             );
           })}
         </div>
 
-        {/* Minimal Specimens Selector (Projects in Room) directly on Arena Canvas */}
-        <div className="gallery-specimens-index" aria-label={isEn ? 'Works in room' : 'Obras en sala'}>
+        {/* Nivel 2: Selector de Soluciones (Pills secundarias) */}
+        <div className="gallery-specimens-index" aria-label={isEn ? 'Solutions' : 'Soluciones'}>
           {activePillar.solutions.map((sol, idx) => {
             const isSelected = selectedSolutionIndex === idx;
-            const itemNum = String(pillarIndex * 3 + idx + 1).padStart(2, '0');
             return (
               <button
                 key={sol.id}
@@ -697,10 +673,6 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
                 className={`gallery-specimen-item ${isSelected ? 'is-active' : ''}`}
                 onClick={() => setSelectedSolutionIndex(idx)}
               >
-                <span className="item-marker-diamond" aria-hidden="true">
-                  {isSelected ? '◆' : '◇'}
-                </span>
-                <span className="item-marker">{itemNum}</span>
                 <span className="item-title">{sol.title[lang] || sol.title.es}</span>
               </button>
             );

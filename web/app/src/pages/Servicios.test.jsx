@@ -23,13 +23,10 @@ describe('Servicios.jsx Page — Interactive Estimator & Technical Scope', () =>
     renderComponent('/servicios');
 
     // Verifies Monograph Gallery Header is present as primary hero
-    expect(screen.getByText(/MONOGRAFÍA DE INGENIERÍA/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 1, name: 'Páginas Web' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /01 \/ Páginas Web/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Páginas Web/i })).toBeInTheDocument();
 
     // Verifies Monumental Prototype Viewport is rendered
     expect(screen.getByRole('figure')).toBeInTheDocument();
-    expect(screen.getByText(/ESPECÍMEN \d\d \/ 09 — VISTA DE PROTOTIPO 1:1/i)).toBeInTheDocument();
 
     // Verifies noisy and redundant banners/labels have been eliminated
     expect(screen.queryByText(/CATÁLOGO & ESTIMACIÓN CURATORIAL/i)).not.toBeInTheDocument();
@@ -42,7 +39,7 @@ describe('Servicios.jsx Page — Interactive Estimator & Technical Scope', () =>
   it('allows interacting with pillar tabs in the estimator', () => {
     renderComponent('/servicios');
 
-    const softwareTab = screen.getByRole('tab', { name: /02 \/ Ingeniería de Software/i });
+    const softwareTab = screen.getByRole('tab', { name: /Ingeniería de Software/i });
     fireEvent.click(softwareTab);
 
     expect(screen.getByRole('heading', { level: 3, name: 'Arquitectura Cloud & Microservicios' })).toBeInTheDocument();
@@ -51,10 +48,7 @@ describe('Servicios.jsx Page — Interactive Estimator & Technical Scope', () =>
   it('renders in English when accessed from /en/services with localized curatorial placard', () => {
     renderComponent('/en/services');
 
-    expect(screen.getByText(/ENGINEERING MONOGRAPH/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 1, name: 'Web Development' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /01 \/ Web Development/i })).toBeInTheDocument();
-    expect(screen.getByText(/SPECIMEN \d\d \/ 09 — 1:1 PROTOTYPE VIEW/i)).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Web Development/i })).toBeInTheDocument();
 
     expect(screen.queryByText(/Three strategic pillars, zero technical compromise/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Need a tailored combination of services\?/i)).not.toBeInTheDocument();

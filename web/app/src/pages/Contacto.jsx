@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
-import { MochicaDivider } from '../components/MochicaPatterns.jsx';
+
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { submitLeadTdr } from '../lib/leads.js';
 
@@ -106,238 +106,13 @@ export default function Contacto() {
 
   return (
     <>
-      {/* =====================================================================
-          1. HEADER EDITORIAL & CONTEXTO MONOGRÁFICO
-          ===================================================================== */}
       <div
         style={{
-          padding: 'clamp(56px, 7vh, 88px) clamp(24px, 5vw, 64px) clamp(24px, 3vh, 32px)',
-          maxWidth: 1440,
+          maxWidth: 800,
           margin: '0 auto',
+          padding: 'clamp(48px, 6vh, 64px) clamp(24px, 5vw, 64px)',
         }}
       >
-        <div
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 12,
-            letterSpacing: 2,
-            color: 'var(--terracotta)',
-            fontWeight: 700,
-            marginBottom: 16,
-            textTransform: 'uppercase',
-          }}
-        >
-          {isEn ? 'PROPOSALS & TECHNICAL SCOPE' : 'COTIZACIÓN & TDR'}
-        </div>
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontWeight: 700,
-            fontSize: 'clamp(36px, 6vw, 76px)',
-            lineHeight: 1.1,
-            letterSpacing: -1,
-            maxWidth: 1100,
-            margin: '0 0 20px 0',
-            color: 'var(--ink)',
-          }}
-        >
-          {isEn ? 'Technical evaluation and bespoke engineering proposals.' : 'Evaluación técnica y propuestas a medida.'}
-        </h1>
-        <p style={{ fontSize: 'clamp(16px, 1.6vw, 19px)', color: 'var(--muted)', maxWidth: 780, lineHeight: 1.65, margin: '0 0 32px 0' }}>
-          {isEn
-            ? 'We communicate directly through the engineering partners and consultants who build and audit your systems — zero commercial bureaucracy.'
-            : 'Respondemos directamente con el equipo de ingeniería y consultoría que ejecutará el proyecto — sin capas comerciales ni demoras.'}
-        </p>
-
-        {/* Mochica Architectural Continuous Divider */}
-        <MochicaDivider height={14} segmentWidth={32} color="var(--border)" showBaseline={true} opacity={0.8} seed="inmerge-contacto-top" />
-      </div>
-
-      {/* =====================================================================
-          2. WORKSPACE B2B (Canal Inmediato + Formulario de Requerimiento)
-          ===================================================================== */}
-      <div
-        style={{
-          maxWidth: 1440,
-          margin: '0 auto',
-          padding: 'clamp(32px, 4vh, 48px) clamp(24px, 5vw, 64px) clamp(64px, 8vh, 96px)',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-          gap: 'clamp(40px, 5vw, 72px)',
-        }}
-      >
-        {/* Left Column: Direct WhatsApp & Info */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-          <div
-            data-reveal=""
-            style={{
-              background: 'transparent',
-              borderLeft: '3px solid var(--terracotta)',
-              padding: '0 0 0 clamp(20px, 3vw, 28px)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 12,
-                  letterSpacing: 2,
-                  color: 'var(--terracotta)',
-                  fontWeight: 600,
-                  marginBottom: 16,
-                }}
-              >
-                {isEn ? 'DIRECT CHANNEL' : 'CANAL INMEDIATO'}
-              </div>
-              <h2
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 700,
-                  fontSize: 'clamp(26px, 3vw, 36px)',
-                  lineHeight: 1.25,
-                  marginBottom: 16,
-                  color: 'var(--ink)',
-                }}
-              >
-                {isEn ? 'Direct Conversation via WhatsApp' : 'Conversación directa por WhatsApp'}
-              </h2>
-              <p style={{ fontSize: 15, color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>
-                {isEn
-                  ? 'Exploratory discovery sessions, Terms of Reference (TDR) review, or preliminary feasibility diagnostics.'
-                  : 'Reuniones exploratorias, revisión de alcances de TDR o diagnóstico preliminar de factibilidad técnica.'}
-              </p>
-            </div>
-
-            <div style={{ marginTop: 28, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <a
-                href={customWaUrl}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  background: 'var(--gold)',
-                  color: 'var(--ink)',
-                  padding: '14px 26px',
-                  fontSize: 14.5,
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-                className="btn-hover"
-              >
-                <span>{isEn ? 'Message via WhatsApp' : 'Escribir por WhatsApp'}</span>
-                <span aria-hidden="true">→</span>
-              </a>
-              <a
-                href={`mailto:inmerge3@gmail.com?subject=${encodeURIComponent(isEn ? 'Inmerge — Technical Scope Consultation' : 'Inmerge — Consulta Técnica y TDR')}`}
-                style={{
-                  background: 'transparent',
-                  color: 'var(--ink)',
-                  border: '1px solid var(--border)',
-                  padding: '14px 20px',
-                  fontSize: 14.5,
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-                className="btn-outline"
-              >
-                <span>{isEn ? 'Formal Email' : 'Correo Formal'}</span>
-                <span aria-hidden="true">✉</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Trust & SLA Badges — Continuous Editorial List */}
-          <div
-            data-reveal=""
-            style={{
-              background: 'transparent',
-              padding: 0,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                letterSpacing: 1.5,
-                color: 'var(--terracotta)',
-                fontWeight: 600,
-                marginBottom: 16,
-              }}
-            >
-              {isEn ? 'ASSURANCE & ENGAGEMENT SLA' : 'COMPROMISOS DE SERVICIO'}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {(content.TRUST_BADGES || []).map((badge, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <span
-                    style={{
-                      fontSize: 18,
-                      color: 'var(--terracotta)',
-                      lineHeight: 1.2,
-                      flexShrink: 0,
-                    }}
-                    aria-hidden="true"
-                  >
-                    {badge.icon}
-                  </span>
-                  <div>
-                    <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--ink)' }}>{badge.title}</div>
-                    <div style={{ fontSize: 12.5, color: 'var(--muted)', marginTop: 2, lineHeight: 1.4 }}>{badge.detail}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div
-            data-reveal=""
-            style={{
-              background: 'transparent',
-              padding: 0,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                letterSpacing: 1.5,
-                color: 'var(--terracotta)',
-                fontWeight: 600,
-                marginBottom: 12,
-              }}
-            >
-              {isEn ? 'INSTITUTIONAL METADATA' : 'DATOS INSTITUCIONALES'}
-            </div>
-            <div style={{ fontSize: 13.5, lineHeight: 1.8, color: 'var(--ink)' }}>
-              <div>
-                <strong>{isEn ? 'Firm:' : 'Firma:'}</strong> Inmerge Consultoría y Tecnología
-              </div>
-              <div>
-                <strong>{isEn ? 'Email:' : 'Correo:'}</strong> inmerge3@gmail.com
-              </div>
-              <div>
-                <strong>{isEn ? 'Location:' : 'Ubicación:'}</strong> Lima, Perú
-              </div>
-              <div>
-                <strong>{isEn ? 'Timezone:' : 'Huso horario:'}</strong> {isEn ? 'GMT-5 / UTC-5 (Lima Time)' : 'GMT-5 (UTC-5 · Lima)'}
-              </div>
-              <div>
-                <strong>{isEn ? 'Fiscal Status:' : 'Régimen:'}</strong>{' '}
-                {isEn ? 'Electronic Invoicing (RUC Active & Verified)' : 'Facturación electrónica con RUC activo y habido'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Structured B2B Quote Form — Open Continuous Layout */}
         <div
           data-reveal=""
           style={{
@@ -713,6 +488,50 @@ export default function Contacto() {
                   : 'Enviar Solicitud de Cotización (TDR)'}
             </button>
           </form>
+
+          {/* Botones de Redes Sociales y WhatsApp */}
+          <div style={{ display: 'flex', gap: 16, marginTop: 40, justifyContent: 'center' }}>
+            <a
+              href={customWaUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                background: 'transparent',
+                color: 'var(--ink)',
+                border: '1px solid var(--border)',
+                padding: '12px 24px',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: 14.5,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+              className="btn-outline"
+            >
+              <span>💬 {isEn ? 'WhatsApp' : 'WhatsApp'}</span>
+            </a>
+            <a
+              href="https://linkedin.com/company/inmerge"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                background: 'transparent',
+                color: 'var(--ink)',
+                border: '1px solid var(--border)',
+                padding: '12px 24px',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: 14.5,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+              className="btn-outline"
+            >
+              <span>💼 {isEn ? 'LinkedIn' : 'LinkedIn'}</span>
+            </a>
+          </div>
         </div>
       </div>
 
