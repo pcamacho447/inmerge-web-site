@@ -48,4 +48,90 @@ describe('ProjectDocumentHub', () => {
       }),
     );
   });
+
+  it('renders upload button for all staff when onUploadClick is provided even if isAdmin is false', () => {
+    const onUploadClick = vi.fn();
+    render(<ProjectDocumentHub project={mockProject} deliverables={mockDeliverables} isAdmin={false} onUploadClick={onUploadClick} />);
+
+    const uploadBtn = screen.getByRole('button', { name: /\+ Subir Entregable \/ Documento/i });
+    expect(uploadBtn).toBeInTheDocument();
+    fireEvent.click(uploadBtn);
+    expect(onUploadClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('displays status badge and handles [ 🚀 Solicitar Revisión ] for BORRADOR_INTERNO', () => {
+    const onUpdateDeliverableStatus = vi.fn();
+    const deliverables = [
+      {
+        id: 'deliv-draft',
+        title: 'Borrador Técnico de Red',
+        status: 'BORRADOR_INTERNO',
+      },
+    ];
+
+    render(
+      <ProjectDocumentHub
+        project={mockProject}
+        deliverables={deliverables}
+        isAdmin={false}
+        onUpdateDeliverableStatus={onUpdateDeliverableStatus}
+      />,
+    );
+
+    expect(screen.getByText('Borrador Interno')).toBeInTheDocument();
+    const requestReviewBtn = screen.getByRole('button', { name: /🚀 Solicitar Revisión/i });
+    expect(requestReviewBtn).toBeInTheDocument();
+
+    fireEvent.click(requestReviewBtn);
+    expect(onUpdateDeliverableStatus).toHaveBeenCalledWith(
+      'deliv-draft',
+      'EN_REVISION',
+      expect.objectContaining({ projectId: 'proj-101', title: 'Borrador Técnico de Red' }),
+    );
+  });
+
+  it('displays [ ✓ Aprobar y Publicar al Cliente ] for isAdmin when deliverable is not published', () => {
+    const onUpdateDeliverableStatus = vi.fn();
+    const deliverables = [
+      {
+        id: 'deliv-review',
+        title: 'Auditoría Pendiente de Aprobación',
+        status: 'EN_REVISION',
+      },
+    ];
+
+    render(
+      <ProjectDocumentHub
+        project={mockProject}
+        deliverables={deliverables}
+        isAdmin={true}
+        onUpdateDeliverableStatus={onUpdateDeliverableStatus}
+      />,
+    );
+
+    expect(screen.getByText('En Revisión Lead')).toBeInTheDocument();
+    const approveBtn = screen.getByRole('button', { name: /✓ Aprobar y Publicar al Cliente/i });
+    expect(approveBtn).toBeInTheDocument();
+
+    fireEvent.click(approveBtn);
+    expect(onUpdateDeliverableStatus).toHaveBeenCalledWith(
+      'deliv-review',
+      'PUBLICADO_CLIENTE',
+      expect.objectContaining({ projectId: 'proj-101', title: 'Auditoría Pendiente de Aprobación' }),
+    );
+  });
+
+  it('does not display [ ✓ Aprobar y Publicar al Cliente ] when isAdmin is false', () => {
+    const deliverables = [
+      {
+        id: 'deliv-review',
+        title: 'Auditoría Pendiente de Aprobación',
+        status: 'EN_REVISION',
+      },
+    ];
+
+    render(<ProjectDocumentHub project={mockProject} deliverables={deliverables} isAdmin={false} onUpdateDeliverableStatus={vi.fn()} />);
+
+    expect(screen.queryByRole('button', { name: /✓ Aprobar y Publicar al Cliente/i })).not.toBeInTheDocument();
+  });
 });

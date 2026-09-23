@@ -1,10 +1,18 @@
 import React from 'react';
+import { DELIVERABLE_STATUS_CONFIG } from '../../lib/pm.js';
 
 /**
  * ProjectDocumentHub — Hub Documental y de Especificaciones del Proyecto
  * Proporciona acceso a TDRs, Arquitectura, Sandbox y Entregables en un solo espacio limpio.
  */
-export default function ProjectDocumentHub({ project, deliverables = [], isAdmin = false, onOpenPreview, onUploadClick }) {
+export default function ProjectDocumentHub({
+  project,
+  deliverables = [],
+  isAdmin = false,
+  onOpenPreview,
+  onUploadClick,
+  onUpdateDeliverableStatus,
+}) {
   if (!project) return null;
 
   // Extraer TDR / Descripción del proyecto
@@ -63,7 +71,7 @@ export default function ProjectDocumentHub({ project, deliverables = [], isAdmin
           </p>
         </div>
 
-        {isAdmin && onUploadClick && (
+        {onUploadClick && (
           <button
             type="button"
             onClick={onUploadClick}
@@ -332,49 +340,125 @@ export default function ProjectDocumentHub({ project, deliverables = [], isAdmin
 
           <div style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
             {projectDeliverables.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {projectDeliverables.slice(0, 3).map((deliv) => (
-                  <div
-                    key={deliv.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      fontSize: 12,
-                      background: 'var(--bg)',
-                      padding: '4px 8px',
-                      borderRadius: 4,
-                      border: '1px solid var(--border)',
-                    }}
-                  >
-                    <span
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {projectDeliverables.map((deliv) => {
+                  const statusCfg =
+                    DELIVERABLE_STATUS_CONFIG[deliv.status || 'PUBLICADO_CLIENTE'] || DELIVERABLE_STATUS_CONFIG.PUBLICADO_CLIENTE;
+                  return (
+                    <div
+                      key={deliv.id}
                       style={{
-                        fontWeight: 600,
-                        color: 'var(--ink)',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        maxWidth: 220,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: 12,
+                        background: 'var(--bg)',
+                        padding: '6px 10px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                        flexWrap: 'wrap',
+                        gap: 8,
                       }}
                     >
-                      📄 {deliv.title}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handlePreviewDeliverable(deliv)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--terracotta)',
-                        cursor: 'pointer',
-                        fontSize: 11,
-                        fontWeight: 600,
-                      }}
-                    >
-                      👁️ Ver
-                    </button>
-                  </div>
-                ))}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            color: 'var(--ink)',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: 200,
+                          }}
+                        >
+                          📄 {deliv.title}
+                        </span>
+                        <span
+                          style={{
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontSize: 10,
+                            fontWeight: 700,
+                            color: statusCfg.color,
+                            background: statusCfg.bg,
+                            padding: '1px 6px',
+                            borderRadius: 4,
+                            border: `1px solid ${statusCfg.color}`,
+                          }}
+                          title={statusCfg.description}
+                        >
+                          {statusCfg.label}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        {deliv.status === 'BORRADOR_INTERNO' && onUpdateDeliverableStatus && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onUpdateDeliverableStatus(deliv.id, 'EN_REVISION', {
+                                projectId: project.id,
+                                title: deliv.title,
+                              })
+                            }
+                            style={{
+                              background: 'rgba(216, 168, 78, 0.15)',
+                              color: '#9B7322',
+                              border: '1px solid var(--gold)',
+                              borderRadius: 12,
+                              padding: '2px 8px',
+                              fontSize: 11,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              fontFamily: "'IBM Plex Sans', sans-serif",
+                            }}
+                          >
+                            🚀 Solicitar Revisión
+                          </button>
+                        )}
+
+                        {isAdmin && deliv.status && deliv.status !== 'PUBLICADO_CLIENTE' && onUpdateDeliverableStatus && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onUpdateDeliverableStatus(deliv.id, 'PUBLICADO_CLIENTE', {
+                                projectId: project.id,
+                                title: deliv.title,
+                              })
+                            }
+                            style={{
+                              background: 'rgba(74, 156, 106, 0.15)',
+                              color: 'var(--green, #2E7559)',
+                              border: '1px solid var(--green, #2E7559)',
+                              borderRadius: 12,
+                              padding: '2px 8px',
+                              fontSize: 11,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              fontFamily: "'IBM Plex Sans', sans-serif",
+                            }}
+                          >
+                            ✓ Aprobar y Publicar al Cliente
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => handlePreviewDeliverable(deliv)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--terracotta)',
+                            cursor: 'pointer',
+                            fontSize: 11,
+                            fontWeight: 600,
+                          }}
+                        >
+                          👁️ Ver
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic', textAlign: 'center' }}>

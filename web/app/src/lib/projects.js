@@ -43,6 +43,7 @@ export async function fetchClientProjects(userId) {
         version,
         sha256_checksum,
         file_size_bytes,
+        status,
         created_at
       ),
       project_tasks (
@@ -85,7 +86,7 @@ export async function fetchClientProjects(userId) {
   return (projects || []).map((p) => ({
     ...p,
     milestones: (p.project_milestones || []).sort((a, b) => (a.order_index || 0) - (b.order_index || 0)),
-    deliverables: p.project_deliverables || [],
+    deliverables: (p.project_deliverables || []).filter((d) => !d.status || d.status === 'PUBLICADO_CLIENTE'),
     tasks: (p.project_tasks || []).sort((a, b) => new Date(a.due_date || a.created_at || 0) - new Date(b.due_date || b.created_at || 0)),
     risks: p.project_risks || [],
   }));

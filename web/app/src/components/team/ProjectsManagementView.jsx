@@ -6,7 +6,7 @@ import ProjectDocumentHub from './ProjectDocumentHub.jsx';
 import DocumentPreviewDrawer from './DocumentPreviewDrawer.jsx';
 import { METHODOLOGY_PHASE_PRESETS } from './NewProjectModal.jsx';
 
-import { calculateProjectProgress, calculateProjectHours, HEALTH_STATUS_CONFIG } from '../../lib/pm.js';
+import { calculateProjectProgress, calculateProjectHours, HEALTH_STATUS_CONFIG, DELIVERABLE_STATUS_CONFIG } from '../../lib/pm.js';
 import { getSignedDeliverableUrl } from '../../lib/projects.js';
 
 export const PILLAR_LABELS = {
@@ -48,6 +48,7 @@ export default function ProjectsManagementView({
   onRiskCreated,
   onRiskUpdated,
   onUploadDeliverable,
+  onUpdateDeliverableStatus,
   onOpenNewProject,
   showToast,
 }) {
@@ -660,6 +661,7 @@ export default function ProjectsManagementView({
               setProjSubTab(proj.id, 'PM_DELIVERABLES');
               setUploadingDeliverableProjId(proj.id);
             }}
+            onUpdateDeliverableStatus={onUpdateDeliverableStatus}
           />
         )}
 
@@ -1106,7 +1108,7 @@ export default function ProjectsManagementView({
                 </div>
               </div>
 
-              {isAdmin && onUploadDeliverable && (
+              {onUploadDeliverable && (
                 <button
                   type="button"
                   onClick={() => {
@@ -1121,6 +1123,7 @@ export default function ProjectsManagementView({
                         externalUrl: '',
                         version: 'v1.0',
                         notes: '',
+                        status: isAdmin ? 'PUBLICADO_CLIENTE' : 'BORRADOR_INTERNO',
                       });
                       setInlineDelivFile(null);
                     }
@@ -1142,8 +1145,8 @@ export default function ProjectsManagementView({
               )}
             </div>
 
-            {/* Formulario In-Situ para Subir Entregable (Admin Only) */}
-            {isAdmin && uploadingDeliverableProjId === proj.id && (
+            {/* Formulario In-Situ para Subir Entregable (Staff) */}
+            {uploadingDeliverableProjId === proj.id && (
               <form
                 onSubmit={async (e) => {
                   e.preventDefault();
@@ -1167,6 +1170,7 @@ export default function ProjectsManagementView({
                         externalUrl: inlineDeliverable.externalUrl || null,
                         version: inlineDeliverable.version || 'v1.0',
                         notes: inlineDeliverable.notes || '',
+                        status: inlineDeliverable.status || (isAdmin ? 'PUBLICADO_CLIENTE' : 'BORRADOR_INTERNO'),
                       },
                       inlineDelivFile,
                     );
@@ -1180,6 +1184,7 @@ export default function ProjectsManagementView({
                         externalUrl: '',
                         version: 'v1.0',
                         notes: '',
+                        status: isAdmin ? 'PUBLICADO_CLIENTE' : 'BORRADOR_INTERNO',
                       });
                       setInlineDelivFile(null);
                     }
@@ -1268,6 +1273,30 @@ export default function ProjectsManagementView({
                       }}
                     />
                   </div>
+
+                  {isAdmin && (
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 3 }}>
+                        Estado de Publicación
+                      </label>
+                      <select
+                        value={inlineDeliverable.status || 'PUBLICADO_CLIENTE'}
+                        onChange={(e) => setInlineDeliverable({ ...inlineDeliverable, status: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '6px 10px',
+                          borderRadius: 4,
+                          border: '1px solid var(--border)',
+                          fontSize: 12,
+                          background: '#fff',
+                        }}
+                      >
+                        <option value="PUBLICADO_CLIENTE">Publicado al Cliente</option>
+                        <option value="EN_REVISION">En Revisión Lead</option>
+                        <option value="BORRADOR_INTERNO">Borrador Interno</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -1403,7 +1432,7 @@ export default function ProjectsManagementView({
                           {deliv.file_type || 'DOC'}
                         </span>
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                             <strong style={{ color: 'var(--ink)' }}>{deliv.title}</strong>
                             <span
                               style={{
@@ -1417,6 +1446,28 @@ export default function ProjectsManagementView({
                             >
                               {deliv.version || 'v1.0'}
                             </span>
+                            {(() => {
+                              const statusCfg =
+                                DELIVERABLE_STATUS_CONFIG[deliv.status || 'PUBLICADO_CLIENTE'] ||
+                                DELIVERABLE_STATUS_CONFIG.PUBLICADO_CLIENTE;
+                              return (
+                                <span
+                                  style={{
+                                    fontFamily: "'IBM Plex Mono', monospace",
+                                    fontSize: 10,
+                                    fontWeight: 700,
+                                    color: statusCfg.color,
+                                    background: statusCfg.bg,
+                                    padding: '2px 8px',
+                                    borderRadius: 4,
+                                    border: `1px solid ${statusCfg.color}`,
+                                  }}
+                                  title={statusCfg.description}
+                                >
+                                  {statusCfg.label}
+                                </span>
+                              );
+                            })()}
                           </div>
                           {deliv.notes && <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3 }}>{deliv.notes}</div>}
                           <div style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)', marginTop: 4 }}>
@@ -1433,7 +1484,57 @@ export default function ProjectsManagementView({
                         </div>
                       </div>
 
-                      <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        {deliv.status === 'BORRADOR_INTERNO' && onUpdateDeliverableStatus && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onUpdateDeliverableStatus(deliv.id, 'EN_REVISION', {
+                                projectId: proj.id,
+                                title: deliv.title,
+                              })
+                            }
+                            style={{
+                              background: 'rgba(216, 168, 78, 0.15)',
+                              color: '#9B7322',
+                              border: '1px solid var(--gold)',
+                              borderRadius: 16,
+                              padding: '5px 12px',
+                              fontSize: 11,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              fontFamily: "'IBM Plex Sans', sans-serif",
+                            }}
+                          >
+                            🚀 Solicitar Revisión
+                          </button>
+                        )}
+
+                        {isAdmin && deliv.status && deliv.status !== 'PUBLICADO_CLIENTE' && onUpdateDeliverableStatus && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onUpdateDeliverableStatus(deliv.id, 'PUBLICADO_CLIENTE', {
+                                projectId: proj.id,
+                                title: deliv.title,
+                              })
+                            }
+                            style={{
+                              background: 'rgba(74, 156, 106, 0.15)',
+                              color: 'var(--green, #2E7559)',
+                              border: '1px solid var(--green, #2E7559)',
+                              borderRadius: 16,
+                              padding: '5px 12px',
+                              fontSize: 11,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              fontFamily: "'IBM Plex Sans', sans-serif",
+                            }}
+                          >
+                            ✓ Aprobar y Publicar al Cliente
+                          </button>
+                        )}
+
                         <button
                           type="button"
                           disabled={isDownloading}

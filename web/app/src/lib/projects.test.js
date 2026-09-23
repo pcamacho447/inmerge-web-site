@@ -65,6 +65,38 @@ describe('projects.js', () => {
     expect(projects[0].deliverables).toHaveLength(1);
   });
 
+  it('filtra entregables de cliente para excluir borradores internos o en revisión', async () => {
+    const mockSelect = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        order: vi.fn().mockResolvedValue({
+          data: [
+            {
+              id: 'proj-1',
+              title: 'Auditoría Cloud AWS',
+              client_id: 'user-123',
+              project_milestones: [],
+              project_deliverables: [
+                { id: 'deliv-1', title: 'Dictamen Oficial', status: 'PUBLICADO_CLIENTE' },
+                { id: 'deliv-2', title: 'Borrador Técnico', status: 'BORRADOR_INTERNO' },
+                { id: 'deliv-3', title: 'Informe en Revisión', status: 'EN_REVISION' },
+                { id: 'deliv-4', title: 'Entregable Antiguo Sin Estado' },
+              ],
+            },
+          ],
+          error: null,
+        }),
+      }),
+    });
+
+    supabase.from.mockReturnValue({
+      select: mockSelect,
+    });
+
+    const projects = await fetchClientProjects('user-123');
+    expect(projects[0].deliverables).toHaveLength(2);
+    expect(projects[0].deliverables.map((d) => d.id)).toEqual(['deliv-1', 'deliv-4']);
+  });
+
   it('invoca la Edge Function secure-download para obtener la URL firmada con auditoría', async () => {
     supabase.functions.invoke.mockResolvedValue({
       data: {

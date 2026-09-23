@@ -22,6 +22,7 @@ vi.mock('../lib/team.js', () => ({
   updateMilestoneStatus: vi.fn(),
   uploadDeliverableFile: vi.fn(),
   createDeliverableRecord: vi.fn(),
+  updateDeliverableStatus: vi.fn(),
   fetchStaffMembers: vi.fn(),
   createStaffMember: vi.fn(),
   fetchTeamActivityLogs: vi.fn(),
@@ -96,7 +97,15 @@ describe('Equipo Console Component', () => {
         milestones: [{ id: 'm-1', title: 'Fase 01 — Diagnóstico', status: 'COMPLETADO', progress: 100 }],
         tasks: [],
         risks: [],
-        deliverables: [],
+        deliverables: [
+          {
+            id: 'deliv-1',
+            title: 'Informe Forense Inicial',
+            status: 'EN_REVISION',
+            version: 'v1.0',
+            file_type: 'PDF',
+          },
+        ],
       },
     ]);
 
@@ -193,5 +202,35 @@ describe('Equipo Console Component', () => {
     fireEvent.click(activityTab);
 
     expect(await screen.findByText('Registro cronológico forense y eventos de auditoría en tiempo real.')).toBeInTheDocument();
+  });
+
+  it('allows admin to approve deliverable directly from project hub', async () => {
+    teamLib.updateDeliverableStatus.mockResolvedValue({ id: 'deliv-1', status: 'PUBLICADO_CLIENTE' });
+
+    render(
+      <MemoryRouter>
+        <Equipo />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(screen.queryByText(/Cargando consola/i)).not.toBeInTheDocument());
+
+    // Switch to projects tab
+    const projectsTab = screen.getByRole('tab', { name: /Proyectos & Auditorías/i });
+    fireEvent.click(projectsTab);
+
+    expect(await screen.findByText(/Informe Forense Inicial/i)).toBeInTheDocument();
+    expect(screen.getByText('En Revisión Lead')).toBeInTheDocument();
+
+    const approveBtn = screen.getByRole('button', { name: /✓ Aprobar y Publicar al Cliente/i });
+    fireEvent.click(approveBtn);
+
+    await waitFor(() => {
+      expect(teamLib.updateDeliverableStatus).toHaveBeenCalledWith(
+        'deliv-1',
+        'PUBLICADO_CLIENTE',
+        expect.objectContaining({ projectId: 'proj-1', title: 'Informe Forense Inicial' }),
+      );
+    });
   });
 });

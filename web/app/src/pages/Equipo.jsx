@@ -14,6 +14,7 @@ import {
   updateMilestoneStatus,
   uploadDeliverableFile,
   createDeliverableRecord,
+  updateDeliverableStatus,
   fetchStaffMembers,
   createStaffMember,
   fetchTeamActivityLogs,
@@ -407,6 +408,7 @@ export default function Equipo() {
       }
 
       const targetProject = projects.find((p) => p.id === payload.projectId);
+      const deliverableStatus = payload.status || (user?.isAdmin ? 'PUBLICADO_CLIENTE' : 'BORRADOR_INTERNO');
 
       await createDeliverableRecord({
         projectId: payload.projectId,
@@ -417,12 +419,17 @@ export default function Equipo() {
         externalUrl: payload.externalUrl || null,
         version: payload.version || 'v1.0',
         notes: payload.notes || '',
+        status: deliverableStatus,
         project: targetProject,
         clientEmail: targetProject?.client?.email,
         clientName: targetProject?.client?.full_name,
       });
 
-      showTemporaryMsg('Entregable publicado, notificado al cliente y registrado en auditoría.');
+      const successNotice =
+        deliverableStatus === 'PUBLICADO_CLIENTE'
+          ? 'Entregable publicado, notificado al cliente y registrado en auditoría.'
+          : 'Borrador interno de entregable registrado correctamente.';
+      showTemporaryMsg(successNotice);
       if (!customPayload) {
         setNewDeliv({
           projectId: '',
@@ -446,6 +453,28 @@ export default function Equipo() {
       return false;
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleUpdateDeliverableStatus(deliverableId, newStatus, context = {}) {
+    try {
+      await updateDeliverableStatus(deliverableId, newStatus, context);
+      const actionMsg =
+        newStatus === 'PUBLICADO_CLIENTE'
+          ? 'Entregable aprobado y publicado al cliente.'
+          : newStatus === 'EN_REVISION'
+            ? 'Revisión solicitada para el entregable.'
+            : 'Estado de entregable actualizado.';
+      showTemporaryMsg(actionMsg);
+      await loadData(false);
+      return true;
+    } catch (err) {
+      showToast({
+        type: 'error',
+        title: 'Error al actualizar entregable',
+        message: err.message,
+      });
+      return false;
     }
   }
 
@@ -1062,6 +1091,7 @@ export default function Equipo() {
                   onRiskCreated={handleRiskCreated}
                   onRiskUpdated={handleRiskUpdated}
                   onUploadDeliverable={handleUploadDeliverable}
+                  onUpdateDeliverableStatus={handleUpdateDeliverableStatus}
                   onOpenNewProject={() => {
                     setIsDrawerOpen(true);
                   }}
