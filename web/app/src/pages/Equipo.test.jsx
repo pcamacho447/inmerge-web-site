@@ -33,6 +33,10 @@ vi.mock('../lib/team.js', () => ({
   updateProjectRisk: vi.fn(),
   updateProjectHealth: vi.fn(),
   updateProjectStaff: vi.fn(),
+  createProjectFinding: vi.fn(),
+  updateProjectFinding: vi.fn(),
+  deleteProjectFinding: vi.fn(),
+  fetchProjectFindings: vi.fn(),
 }));
 
 vi.mock('../hooks/useRealtimeTeam.js', () => ({
@@ -232,5 +236,38 @@ describe('Equipo Console Component', () => {
         expect.objectContaining({ projectId: 'proj-1', title: 'Informe Forense Inicial' }),
       );
     });
+  });
+
+  it('permite acceder a la matriz de hallazgos PM_FINDINGS desde el panel', async () => {
+    teamLib.fetchProjectFindings.mockResolvedValue([
+      {
+        id: 'f-101',
+        finding_code: 'FIND-INT-101',
+        title: 'Vulnerabilidad SQL Injection mitigada',
+        category: 'SEGURIDAD_OWASP',
+        severity: 'ALTA',
+        status: 'VERIFICADO',
+      },
+    ]);
+
+    render(
+      <MemoryRouter>
+        <Equipo />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(screen.queryByText(/Cargando consola/i)).not.toBeInTheDocument());
+
+    // Switch to projects tab
+    const projectsTab = screen.getByRole('tab', { name: /Proyectos & Auditorías/i });
+    fireEvent.click(projectsTab);
+
+    // Select PM_FINDINGS tool
+    const toolSelect = screen.getByLabelText(/Seleccionar herramienta avanzada de proyecto/i);
+    fireEvent.change(toolSelect, { target: { value: 'PM_FINDINGS' } });
+
+    expect(await screen.findByText('FIND-INT-101')).toBeInTheDocument();
+    expect(screen.getByText('Vulnerabilidad SQL Injection mitigada')).toBeInTheDocument();
+    expect(screen.getByText(/Matriz Forense de Hallazgos Técnicos/i)).toBeInTheDocument();
   });
 });

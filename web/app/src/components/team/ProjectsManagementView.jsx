@@ -3,6 +3,7 @@ import ProjectGantt from '../ProjectGantt.jsx';
 import ProjectTaskManager from '../ProjectTaskManager.jsx';
 import ProjectRiskManager from '../ProjectRiskManager.jsx';
 import ProjectDocumentHub from './ProjectDocumentHub.jsx';
+import ProjectAuditFindings from './ProjectAuditFindings.jsx';
 import DocumentPreviewDrawer from './DocumentPreviewDrawer.jsx';
 import { METHODOLOGY_PHASE_PRESETS } from './NewProjectModal.jsx';
 
@@ -49,6 +50,9 @@ export default function ProjectsManagementView({
   onRiskUpdated,
   onUploadDeliverable,
   onUpdateDeliverableStatus,
+  onFindingCreated,
+  onFindingUpdated,
+  onFindingDeleted,
   onOpenNewProject,
   showToast,
 }) {
@@ -622,7 +626,9 @@ export default function ProjectsManagementView({
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>Herramientas PM:</span>
             <select
-              value={['PM_GANTT', 'PM_RISKS', 'PM_MILESTONES', 'PM_DELIVERABLES'].includes(currentSubTab) ? currentSubTab : ''}
+              value={
+                ['PM_GANTT', 'PM_RISKS', 'PM_MILESTONES', 'PM_DELIVERABLES', 'PM_FINDINGS'].includes(currentSubTab) ? currentSubTab : ''
+              }
               onChange={(e) => {
                 if (e.target.value) {
                   setProjSubTab(proj.id, e.target.value);
@@ -634,7 +640,9 @@ export default function ProjectsManagementView({
                 padding: '5px 10px',
                 borderRadius: 4,
                 border: '1px solid var(--border)',
-                background: ['PM_GANTT', 'PM_RISKS', 'PM_MILESTONES', 'PM_DELIVERABLES'].includes(currentSubTab) ? 'var(--cream2)' : '#fff',
+                background: ['PM_GANTT', 'PM_RISKS', 'PM_MILESTONES', 'PM_DELIVERABLES', 'PM_FINDINGS'].includes(currentSubTab)
+                  ? 'var(--cream2)'
+                  : '#fff',
                 color: 'var(--ink)',
                 cursor: 'pointer',
                 fontWeight: 600,
@@ -646,6 +654,7 @@ export default function ProjectsManagementView({
               <option value="PM_RISKS">⚠️ Riesgos & Bloqueos ({proj.risks?.length || 0})</option>
               <option value="PM_MILESTONES">📌 Fases & Hitos ({totalMilestones})</option>
               <option value="PM_DELIVERABLES">📦 Entregables Auditados ({proj.deliverables?.length || 0})</option>
+              <option value="PM_FINDINGS">🔍 Hallazgos de Auditoría ({proj.findings?.length || 0})</option>
             </select>
           </div>
         </div>
@@ -1611,6 +1620,20 @@ export default function ProjectsManagementView({
           </div>
         )}
 
+        {/* Subtab PM_FINDINGS: Matriz forense de hallazgos técnicos */}
+        {currentSubTab === 'PM_FINDINGS' && (
+          <ProjectAuditFindings
+            projectId={proj.id}
+            projectTitle={proj.title}
+            milestones={proj.milestones || []}
+            findings={proj.findings}
+            onFindingCreated={onFindingCreated}
+            onFindingUpdated={onFindingUpdated}
+            onFindingDeleted={onFindingDeleted}
+            showToast={showToast}
+          />
+        )}
+
         {/* Footer Info */}
         <div
           style={{
@@ -1629,6 +1652,7 @@ export default function ProjectsManagementView({
           <div>📋 {proj.tasks?.length || 0} Tareas</div>
           <div>📦 {proj.deliverables?.length || 0} Entregables</div>
           <div>⚠️ {activeRisksCount} Bloqueos activos</div>
+          <div>🔍 {proj.findings?.length || 0} Hallazgos</div>
         </div>
       </div>
     );

@@ -25,6 +25,9 @@ import {
   updateProjectRisk,
   updateProjectHealth,
   updateProjectStaff,
+  createProjectFinding,
+  updateProjectFinding,
+  deleteProjectFinding,
 } from '../lib/team.js';
 import useRealtimeTeam from '../hooks/useRealtimeTeam.js';
 import ToastNotification from '../components/ToastNotification.jsx';
@@ -611,6 +614,48 @@ export default function Equipo() {
     }
   }
 
+  async function handleFindingCreated(findingPayload) {
+    try {
+      await createProjectFinding(findingPayload);
+      showTemporaryMsg('Hallazgo técnico registrado en la matriz forense.');
+      await loadData(false);
+    } catch (err) {
+      showToast({
+        type: 'error',
+        title: 'Error al registrar hallazgo',
+        message: err.message,
+      });
+    }
+  }
+
+  async function handleFindingUpdated(findingId, updates) {
+    try {
+      await updateProjectFinding(findingId, updates);
+      showTemporaryMsg('Estado del hallazgo técnico actualizado.');
+      await loadData(false);
+    } catch (err) {
+      showToast({
+        type: 'error',
+        title: 'Error al actualizar hallazgo',
+        message: err.message,
+      });
+    }
+  }
+
+  async function handleFindingDeleted(findingId) {
+    try {
+      await deleteProjectFinding(findingId);
+      showTemporaryMsg('Hallazgo técnico eliminado de la matriz.');
+      await loadData(false);
+    } catch (err) {
+      showToast({
+        type: 'error',
+        title: 'Error al eliminar hallazgo',
+        message: err.message,
+      });
+    }
+  }
+
   async function handleLogout() {
     await logout();
     navigate('/');
@@ -1092,6 +1137,9 @@ export default function Equipo() {
                   onRiskUpdated={handleRiskUpdated}
                   onUploadDeliverable={handleUploadDeliverable}
                   onUpdateDeliverableStatus={handleUpdateDeliverableStatus}
+                  onFindingCreated={handleFindingCreated}
+                  onFindingUpdated={handleFindingUpdated}
+                  onFindingDeleted={handleFindingDeleted}
                   onOpenNewProject={() => {
                     setIsDrawerOpen(true);
                   }}
