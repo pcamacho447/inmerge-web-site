@@ -28,6 +28,7 @@ export default function Cuenta() {
 
   const [activeTab, setActiveTab] = useState('projects'); // 'projects' | 'billing' | 'support'
   const [downloadingId, setDownloadingId] = useState(null);
+  const [downloadErrorToast, setDownloadErrorToast] = useState(null);
 
   const {
     projects,
@@ -80,14 +81,21 @@ export default function Cuenta() {
         window.open(url, '_blank');
       }
     } catch (err) {
-      alert(isEn ? `Could not download file: ${err.message}` : `No se pudo descargar el archivo: ${err.message}`);
+      setDownloadErrorToast({
+        type: 'error',
+        message: isEn ? `Could not download file: ${err.message}` : `No se pudo descargar el archivo: ${err.message}`,
+      });
     } finally {
       setDownloadingId(null);
     }
   }
 
-  const activeToast = projectsToast || billingToast;
-  const dismissActiveToast = projectsToast ? dismissProjectsToast : dismissBillingToast;
+  const activeToast = downloadErrorToast || projectsToast || billingToast;
+  const dismissActiveToast = downloadErrorToast
+    ? () => setDownloadErrorToast(null)
+    : projectsToast
+      ? dismissProjectsToast
+      : dismissBillingToast;
 
   return (
     <>

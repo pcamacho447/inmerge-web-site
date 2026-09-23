@@ -30,6 +30,7 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'no-alert': 'error',
       // No PropTypes usage anywhere in this codebase — turning this rule on
       // would flag every component prop; adopt PropTypes/TS deliberately
       // instead of half-enforcing it via a lint rule.

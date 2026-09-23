@@ -84,7 +84,7 @@ describe('useReveal', () => {
   it('observes elements already in the DOM on first paint', async () => {
     await act(async () => {
       root.render(
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <CatalogPage items={[]} />
         </MemoryRouter>,
       );
@@ -96,7 +96,7 @@ describe('useReveal', () => {
   it('observes elements that mount later, once async data arrives', async () => {
     await act(async () => {
       root.render(
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <CatalogPage items={[]} />
         </MemoryRouter>,
       );
@@ -105,7 +105,7 @@ describe('useReveal', () => {
     // The fetch resolves and the catalog renders.
     await act(async () => {
       root.render(
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <CatalogPage items={['Seguimiento trimestral', 'Radiografía de contratistas']} />
         </MemoryRouter>,
       );
@@ -118,14 +118,14 @@ describe('useReveal', () => {
   it('reveals a late-mounting card when it scrolls into view', async () => {
     await act(async () => {
       root.render(
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <CatalogPage items={[]} />
         </MemoryRouter>,
       );
     });
     await act(async () => {
       root.render(
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <CatalogPage items={['Seguimiento trimestral']} />
         </MemoryRouter>,
       );

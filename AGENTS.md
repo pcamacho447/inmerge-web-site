@@ -8,11 +8,11 @@ Consulte las especificaciones técnicas del entorno en:
 
 ---
 
-## 1. Los Tres Pilares Estratégicos
+## 1. Las Tres Líneas de Servicio & Pilares Estratégicos
 
-1. **Pilar 01 — Auditoría Técnica y de Datos:** Calidad e integridad de bases de datos, detección de duplicados/inconsistencias, auditoría de sistemas cloud (AWS/GCP), seguridad y cumplimiento normativo.
-2. **Pilar 02 — Desarrollo Tecnológico & Cloud:** Arquitectura cloud en AWS (ECS, Lambda, RDS, S3), microservicios, software empresarial a medida, APIs y modernización de sistemas.
-3. **Pilar 03 — Ciencia de Datos & Inteligencia Artificial:** Machine Learning, modelos predictivos, forecasting, integración de IA generativa/agentes y dashboards ejecutivos en tiempo real.
+1. **01 Páginas Web (Auditoría Técnica y de Datos):** Sitios corporativos y plataformas web de alto impacto, rendimiento extremo (Core Web Vitals), calidad e integridad de datos y diseño editorial contemporáneo.
+2. **02 Ingeniería de Software (Desarrollo Tecnológico & Cloud):** Arquitecturas cloud en AWS/GCP, microservicios, software empresarial a medida, modernización de sistemas y APIs de alta densidad.
+3. **03 Inteligencia de Negocios (Ciencia de Datos & IA):** Analítica avanzada, machine learning, modelos predictivos, integración de IA generativa/agentes y dashboards ejecutivos en tiempo real con fuentes auditables.
 
 ---
 
@@ -77,6 +77,6 @@ Consulte las especificaciones técnicas del entorno en:
 
 ## 5. Estándares de Código y Calidad
 
-1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Las 38 suites de pruebas (209 tests) deben pasar al 100%.
+1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Toda la suite de pruebas unitarias y de integración debe pasar al 100% de éxito (0 tests fallidos).
 2. **Build de Producción:** Verificar que `npm run build` compile limpiamente sin errores de bundling.
 3. **Formato y Linter:** Mantener conformidad con `npm run lint` y `npm run format`.
