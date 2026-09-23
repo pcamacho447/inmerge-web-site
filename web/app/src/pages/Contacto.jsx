@@ -490,7 +490,7 @@ export default function Contacto() {
           </form>
 
           {/* Botones de Redes Sociales y WhatsApp */}
-          <div style={{ display: 'flex', gap: 16, marginTop: 40, justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: 16, marginTop: 40, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a
               href={customWaUrl}
               target="_blank"
@@ -530,6 +530,26 @@ export default function Contacto() {
               className="btn-outline"
             >
               <span>💼 {isEn ? 'LinkedIn' : 'LinkedIn'}</span>
+            </a>
+            <a
+              href="/libro-de-reclamaciones"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                background: 'transparent',
+                color: 'var(--ink)',
+                border: '1px solid var(--border)',
+                padding: '12px 24px',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: 14.5,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+              className="btn-outline"
+            >
+              <span>📖 {isEn ? 'Complaints Book' : 'Libro de Reclamaciones'}</span>
             </a>
           </div>
         </div>

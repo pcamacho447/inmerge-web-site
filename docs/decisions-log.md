@@ -300,3 +300,63 @@ Bitácora histórica de decisiones arquitectónicas, de producto, de diseño y a
 - **Hito Culminado:** Frontend corporativo de Inmerge 100% finalizado, accesible (WCAG 2.1 AA), responsive y con diseño editorial tech premium consistente en todas las rutas públicas (`/`, `/servicios`, `/nosotros`, `/contacto`, `/cookies`, `/en/*`).
 - **Actualización Documental:** Sincronización completa de `README.md`, `AGENTS.md`, `docs/tasks.md`, `docs/architecture.md`, `docs/ux/DESIGN.md`, `docs/ux/EXPERIENCE.md` y `docs/decisions-log.md`.
 - **Próximo Paso Estratégico:** Inicio de la Épica 5 para revisión, auditoría de migraciones PostgreSQL en Supabase, políticas RLS, Edge Functions Deno, Realtime y paridad con el frontend.
+
+---
+
+## Sesión: 2026-09-23 — Refactorización UX & Hub Documental para el Panel del Trabajador (`/equipo`)
+
+### Tarea 1: Corrección de Cumplimiento Normativo en Tareas Técnicas (`ProjectTaskManager.jsx`)
+- **Agente Ejecutor:** Sally 🎨 & Amelia 💻
+- **Archivos Modificados:** `web/app/src/components/ProjectTaskManager.jsx`, `web/app/src/components/ProjectTaskManager.test.jsx`
+- **Resumen del Cambio:** Se eliminó la instrucción nativa bloqueante `window.confirm()` en la eliminación de tareas técnicas para cumplir con la directriz del proyecto (AGENTS.md). Se implementó un estado de confirmación en dos pasos (`confirmDeleteTaskId`) con reseteo automático a los 4 segundos y feedback visual accesible.
+- **Verificación:** Pruebas unitarias de `ProjectTaskManager.test.jsx` pasando al 100% (6/6 tests).
+- **Estado:** APROBADO.
+
+### Tarea 2: Hub de Especificaciones & Documentación Compartida (`ProjectDocumentHub.jsx`)
+- **Agente Ejecutor:** Sally 🎨 & Winston 🏛️
+- **Archivos Creados:** `web/app/src/components/team/ProjectDocumentHub.jsx`, `web/app/src/components/team/ProjectDocumentHub.test.jsx`
+- **Resumen del Cambio:** Se creó el espacio de documentación compartida para el desarrollador, organizando los requerimientos en 4 categorías: Briefing TDR, Arquitectura, Sandbox/APIs y Entregables Auditados. Incorpora disparadores de previsualización sin requerir descarga inmediata de archivos.
+- **Verificación:** Pruebas unitarias en `ProjectDocumentHub.test.jsx` pasando al 100% (2/2 tests).
+- **Estado:** APROBADO.
+
+### Tarea 3: Visor de Previsualización In-App (`DocumentPreviewDrawer.jsx`)
+- **Agente Ejecutor:** Sally 🎨 & Amelia 💻
+- **Archivos Creados:** `web/app/src/components/team/DocumentPreviewDrawer.jsx`, `web/app/src/components/team/DocumentPreviewDrawer.test.jsx`
+- **Resumen del Cambio:** Se implementó un panel deslizante lateral (*Slide-Over Drawer*) con accesibilidad completa (tecla `Escape`, overlay y atributos ARIA). Soporta renderizado de texto/markdown estructurado, incrustación de PDFs/enlaces iframe y acciones de descarga firmada.
+- **Verificación:** Pruebas unitarias en `DocumentPreviewDrawer.test.jsx` pasando al 100% (2/2 tests).
+- **Estado:** APROBADO.
+
+### Tarea 4: Descongestión de Botones & Divulgación Progresiva en `ProjectsManagementView.jsx`
+- **Agente Ejecutor:** Sally 🎨 & Amelia 💻
+- **Archivos Modificados:** `web/app/src/components/team/ProjectsManagementView.jsx`
+- **Resumen del Cambio:** Se refactorizaron las subpestañas por tarjeta de proyecto, reemplazando la franja saturada de 5 botones por un esquema limpio de 3 grupos de divulgación progresiva (`[ 📖 Especificaciones & Docs ]`, `[ 📋 Tareas Técnicas ]`, y un selector desplegable para herramientas avanzadas PM). Se conectó `ProjectDocumentHub` y `DocumentPreviewDrawer`.
+- **Verificación:** Pruebas de integración de `Equipo.test.jsx` pasando al 100% (4/4 tests).
+- **Estado:** APROBADO.
+
+### Tarea 5: Filtro de Enfoque "Mis Asignaciones" en la Consola (`Equipo.jsx`)
+- **Agente Ejecutor:** Sally 🎨 & John 📋
+- **Archivos Modificados:** `web/app/src/pages/Equipo.jsx`
+- **Resumen del Cambio:** Se introdujo el selector de alcance reactivo `viewScope` (`Todos los Proyectos` vs `★ Mis Asignaciones`). Permite a cualquier consultor, desarrollador o auditor aislar instantáneamente únicamente los proyectos donde figura como Lead Técnico o donde tiene hitos o tareas técnicas asignadas a su email.
+- **Verificación:** Pruebas de integración en `Equipo.test.jsx` pasando al 100% (4/4 tests).
+- **Estado:** APROBADO.
+
+### Tarea 6: Trazabilidad Automática Lead TDR -> Cédula Técnica de Proyecto (`Equipo.jsx`)
+- **Agente Ejecutor:** Mary 📊 & Amelia 💻
+- **Archivos Modificados:** `web/app/src/pages/Equipo.jsx`
+- **Resumen del Cambio:** Se actualizó la conversión de Leads a Proyectos (`handleConvertLeadToProject`) para generar automáticamente la descripción en formato de Cédula Técnica Markdown (`# CÉDULA DE ALCANCE INICIAL`, `## 1. Requerimiento`, `## 2. Contacto`, `## 3. Plazo y Pilar`). Esto permite su lectura estructurada inmediata en `ProjectDocumentHub`.
+- **Verificación:** Pruebas de integración en `Equipo.test.jsx` pasando al 100% (4/4 tests).
+- **Estado:** APROBADO.
+
+### Tarea 7: Verificación Global de Calidad, Build y Cierre de Sesión (`/equipo`)
+- **Agente Ejecutor:** Sally 🎨 & Amelia 💻
+- **Archivos Creados:** `docs/brainstorming/brainstorm-ux-panel-trabajador-2026-09-23/cambios-implementados.md`
+- **Resumen del Cambio:** Se completó la refactorización integral del panel de operaciones del trabajador. Se verificó el 100% de la suite de pruebas unitarias e integración (40 suites, 210 pruebas pasando en verde). Se realizó la compilación de producción con Vite (`npm run build`) en 2.58s sin advertencias ni errores. Se redactó la documentación final de cambios y la guía de uso.
+- **Verificación:** `npm test -- --run` (210/210 tests pasados), `npm run build` exitoso (0 errores).
+- **Estado:** COMPLETADO Y CERRADO.
+
+
+
+
+
+
+

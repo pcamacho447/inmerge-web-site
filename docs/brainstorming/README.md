@@ -23,4 +23,6 @@ Archivos estándar por sesión:
 | `2026-09-16` | [brainstorm-mejorar-cerrar-brechas-web-2026-09-16](file:///c:/papx/inmerge-website/inmerge/docs/brainstorming/brainstorm-mejorar-cerrar-brechas-web-2026-09-16) | Cierre de brechas comerciales, cotizador ágil y carrusel de casos de éxito | Completado |
 | `2026-09-21` | [brainstorm-ux-cotizador-galeria-arte-2026-09-21](file:///c:/papx/inmerge-website/inmerge/docs/brainstorming/brainstorm-ux-cotizador-galeria-arte-2026-09-21) | Elevación UX: Cotizador interactivo plano con estética de galería de arte contemporáneo | Completado |
 | `2026-09-21` | [brainstorm-servicios-enfoque-puro-cedula-2026-09-21](file:///c:/papx/inmerge-website/inmerge/docs/brainstorming/brainstorm-servicios-enfoque-puro-cedula-2026-09-21) | Purificación de /servicios: La Cédula Curatorial como protagonista absoluta sin ruidos periféricos | **En curso** |
+| `2026-09-23` | [brainstorm-ux-panel-trabajador-2026-09-23](file:///c:/papx/inmerge-website/inmerge/docs/brainstorming/brainstorm-ux-panel-trabajador-2026-09-23/brainstorm-summary.md) | Auditoría UX y Brainstorming de mejoras para el panel de operaciones del trabajador (/equipo): Descongestión de botones y Hub Documental para desarrolladores | **Completado** |
+
 

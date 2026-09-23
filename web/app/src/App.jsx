@@ -21,6 +21,7 @@ const Registro = lazy(() => import('./pages/Registro.jsx'));
 const Cuenta = lazy(() => import('./pages/Cuenta.jsx'));
 const Equipo = lazy(() => import('./pages/Equipo.jsx'));
 const NotFound = lazy(() => import('./pages/NotFound.jsx'));
+const Reclamaciones = lazy(() => import('./pages/Reclamaciones.jsx'));
 
 export default function App() {
   return (
@@ -39,6 +40,8 @@ export default function App() {
                 <Route path="/contacto" element={<Contacto />} />
                 <Route path="/cookies" element={<CookiesPolicy />} />
                 <Route path="/politica-cookies" element={<CookiesPolicy />} />
+                <Route path="/libro-de-reclamaciones" element={<Reclamaciones />} />
+                <Route path="/reclamaciones" element={<Reclamaciones />} />
 
                 {/* Rutas en Inglés (English Routes) */}
                 <Route path="/en" element={<Inicio />} />
@@ -46,6 +49,7 @@ export default function App() {
                 <Route path="/en/about" element={<Nosotros />} />
                 <Route path="/en/contact" element={<Contacto />} />
                 <Route path="/en/cookies" element={<CookiesPolicy />} />
+                <Route path="/en/claims" element={<Reclamaciones />} />
                 <Route path="/en/login" element={<Login />} />
                 <Route path="/en/register" element={<Registro />} />
                 <Route

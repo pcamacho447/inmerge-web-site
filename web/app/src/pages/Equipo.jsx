@@ -41,12 +41,14 @@ export default function Equipo() {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('projects'); // 'leads' | 'projects' | 'new_project' | 'activity' | 'team'
+  const [viewScope, setViewScope] = useState('ALL'); // 'ALL' | 'ASSIGNED'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [activityFilter, setActivityFilter] = useState('ALL'); // 'ALL' | 'LEADS' | 'PROJECTS' | 'DELIVERABLES' | 'STAFF'
   const [leads, setLeads] = useState([]);
   const [projects, setProjects] = useState([]);
+
   const [clients, setClients] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
@@ -246,7 +248,7 @@ export default function Equipo() {
       clientId: matchedClient ? matchedClient.id : clients[0]?.id || '',
       title: `${PILLAR_LABELS[lead.pillar] || 'Proyecto'} — ${lead.company || lead.full_name || 'Cliente'}`,
       pillar: ['auditoria', 'desarrollo', 'datos', 'integral'].includes(lead.pillar) ? lead.pillar : 'auditoria',
-      description: `Requerimiento TDR: ${lead.message || 'Sin descripción'}\n\nContacto: ${lead.full_name || 'N/A'} (${lead.email || 'N/A'}${lead.phone ? `, Tel: ${lead.phone}` : ''})\nPlazo estimado: ${lead.timeline || 'A coordinar'}`,
+      description: `# CÉDULA DE ALCANCE INICIAL (TDR)\n\n## 1. Requerimiento del Cliente\n${lead.message || 'Sin descripción detallada'}\n\n## 2. Información de Contacto & Empresa\n- Contacto: ${lead.full_name || 'N/A'}\n- Correo: ${lead.email || 'N/A'}${lead.phone ? `\n- Teléfono: ${lead.phone}` : ''}${lead.company ? `\n- Empresa: ${lead.company}` : ''}\n\n## 3. Plazo Estimado & Pilar\n- Pilar Inmerge: ${PILLAR_LABELS[lead.pillar] || lead.pillar}\n- Cronograma proyectado: ${lead.timeline || 'A coordinar'}`,
       targetCompletionDate: '',
       techLeadName: user?.fullName || 'Inmerge Tech Lead',
       techLeadContact: user?.email || 'inmerge3@gmail.com',
@@ -605,6 +607,18 @@ export default function Equipo() {
     return true;
   });
 
+  const displayedProjects =
+    viewScope === 'ASSIGNED'
+      ? projects.filter((p) => {
+          const userEmail = user?.email?.toLowerCase();
+          if (!userEmail) return true;
+          const isTechLead = p.tech_lead_contact?.toLowerCase() === userEmail;
+          const isAssignedMilestone = (p.milestones || []).some((m) => m.assigned_to_email?.toLowerCase() === userEmail);
+          const isAssignedTask = (p.tasks || []).some((t) => t.assigned_to_email?.toLowerCase() === userEmail);
+          return isTechLead || isAssignedMilestone || isAssignedTask;
+        })
+      : projects;
+
   const tabs = [
     { id: 'leads', label: 'Bandeja de Leads & TDR', icon: '📥', count: leads.length },
     { id: 'projects', label: 'Proyectos & Auditorías', icon: '⚡', count: projects.length },
@@ -912,7 +926,10 @@ export default function Equipo() {
           </div>
 
           {/* Workspace Subheader */}
-          <div className="equipo-workspace-header">
+          <div
+            className="equipo-workspace-header"
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}
+          >
             <div>
               <h2 className="equipo-workspace-title">{activeTabMeta.label}</h2>
               <p className="equipo-workspace-subtitle">
@@ -923,6 +940,57 @@ export default function Equipo() {
                 {activeTab === 'team' && 'Directorio técnico y gestión de roles para ingenieros y auditores.'}
               </p>
             </div>
+
+            {activeTab === 'projects' && (
+              <div
+                role="group"
+                aria-label="Filtro de alcance de proyectos"
+                style={{
+                  display: 'inline-flex',
+                  background: 'var(--cream2)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 6,
+                  padding: 2,
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setViewScope('ALL')}
+                  aria-pressed={viewScope === 'ALL'}
+                  style={{
+                    background: viewScope === 'ALL' ? 'var(--ink)' : 'transparent',
+                    color: viewScope === 'ALL' ? 'var(--gold)' : 'var(--muted)',
+                    border: 'none',
+                    borderRadius: 4,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    fontFamily: "'IBM Plex Sans', sans-serif",
+                    cursor: 'pointer',
+                  }}
+                >
+                  Todos los Proyectos ({projects.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewScope('ASSIGNED')}
+                  aria-pressed={viewScope === 'ASSIGNED'}
+                  style={{
+                    background: viewScope === 'ASSIGNED' ? 'var(--ink)' : 'transparent',
+                    color: viewScope === 'ASSIGNED' ? 'var(--gold)' : 'var(--muted)',
+                    border: 'none',
+                    borderRadius: 4,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    fontFamily: "'IBM Plex Sans', sans-serif",
+                    cursor: 'pointer',
+                  }}
+                >
+                  ★ Mis Asignaciones ({displayedProjects.length})
+                </button>
+              </div>
+            )}
           </div>
 
           {error && (
@@ -979,7 +1047,8 @@ export default function Equipo() {
 
               {activeTab === 'projects' && (
                 <ProjectsManagementView
-                  projects={projects}
+                  projects={displayedProjects}
+
                   staffList={staffList}
                   isAdmin={Boolean(user?.isAdmin)}
                   onUpdateProjectStatus={handleUpdateProjectStatus}

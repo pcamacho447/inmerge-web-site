@@ -103,6 +103,23 @@ describe('PM Components - ProjectTaskManager & ProjectRiskManager', () => {
         assigned_to_email: 'ana@inmerge.pe',
       });
     });
+
+    it('requires two clicks to confirm deletion of a task without window.confirm', async () => {
+      const onTaskDeleted = vi.fn();
+      render(<ProjectTaskManager projectId="p-1" milestones={mockMilestones} tasks={mockTasks} onTaskDeleted={onTaskDeleted} />);
+
+      const deleteBtn = screen.getByTitle('Eliminar tarea');
+      expect(deleteBtn).toBeInTheDocument();
+
+      // First click: enters confirmation mode
+      fireEvent.click(deleteBtn);
+      expect(onTaskDeleted).not.toHaveBeenCalled();
+      expect(screen.getByText('Confirmar')).toBeInTheDocument();
+
+      // Second click: triggers deletion
+      fireEvent.click(screen.getByText('Confirmar'));
+      expect(onTaskDeleted).toHaveBeenCalledWith('t-1', 'p-1');
+    });
   });
 
   describe('ProjectRiskManager', () => {

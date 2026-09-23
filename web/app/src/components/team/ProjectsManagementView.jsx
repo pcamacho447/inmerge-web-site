@@ -2,7 +2,10 @@ import { useState } from 'react';
 import ProjectGantt from '../ProjectGantt.jsx';
 import ProjectTaskManager from '../ProjectTaskManager.jsx';
 import ProjectRiskManager from '../ProjectRiskManager.jsx';
+import ProjectDocumentHub from './ProjectDocumentHub.jsx';
+import DocumentPreviewDrawer from './DocumentPreviewDrawer.jsx';
 import { METHODOLOGY_PHASE_PRESETS } from './NewProjectModal.jsx';
+
 import { calculateProjectProgress, calculateProjectHours, HEALTH_STATUS_CONFIG } from '../../lib/pm.js';
 import { getSignedDeliverableUrl } from '../../lib/projects.js';
 
@@ -79,6 +82,14 @@ export default function ProjectsManagementView({
   const [viewLayout, setViewLayout] = useState('LIST'); // 'LIST' | 'GRID' | 'SPLIT' | 'KANBAN'
   const [selectedProjId, setSelectedProjId] = useState(projects[0]?.id || null);
 
+  const [activePreviewDoc, setActivePreviewDoc] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  const handleOpenPreview = (doc) => {
+    setActivePreviewDoc(doc);
+    setIsPreviewOpen(true);
+  };
+
   const setProjSubTab = (projId, tab) => {
     setProjectSubTabs((prev) => ({
       ...prev,
@@ -97,7 +108,7 @@ export default function ProjectsManagementView({
     const progressPct = proj.progress !== undefined && proj.progress !== null && proj.progress > 0 ? proj.progress : weightedProgress;
     const hoursInfo = calculateProjectHours(proj.tasks || []);
     const activeRisksCount = (proj.risks || []).filter((r) => r.status !== 'RESUELTO').length;
-    const currentSubTab = projectSubTabs[proj.id] || 'PM_GANTT';
+    const currentSubTab = projectSubTabs[proj.id] || 'PM_DOCS';
 
     const healthCfg = HEALTH_STATUS_CONFIG[proj.health_status || 'ON_TRACK'] || HEALTH_STATUS_CONFIG.ON_TRACK;
     const pColor = PROJECT_STATUS_COLORS[proj.status] || PROJECT_STATUS_COLORS.EN_PLANIFICACION;
@@ -554,33 +565,39 @@ export default function ProjectsManagementView({
           </div>
         </div>
 
-        {/* Sub-Tabs de Gestión PM */}
+        {/* Sub-Tabs de Gestión PM con Divulgación Progresiva */}
         <div
           style={{
             display: 'flex',
-            gap: 6,
+            alignItems: 'center',
+            gap: 8,
             borderBottom: '1px solid var(--border)',
             marginBottom: 16,
             overflowX: 'auto',
+            paddingBottom: 2,
           }}
         >
+          {/* 1. Especificaciones & Docs */}
           <button
             type="button"
-            onClick={() => setProjSubTab(proj.id, 'PM_GANTT')}
+            onClick={() => setProjSubTab(proj.id, 'PM_DOCS')}
             style={{
               padding: '8px 14px',
               fontFamily: "'IBM Plex Mono', monospace",
               fontSize: 12,
-              fontWeight: currentSubTab === 'PM_GANTT' ? 700 : 500,
-              background: currentSubTab === 'PM_GANTT' ? 'var(--bg)' : 'transparent',
-              color: currentSubTab === 'PM_GANTT' ? 'var(--terracotta)' : 'var(--muted)',
+              fontWeight: currentSubTab === 'PM_DOCS' ? 700 : 500,
+              background: currentSubTab === 'PM_DOCS' ? 'var(--bg)' : 'transparent',
+              color: currentSubTab === 'PM_DOCS' ? 'var(--terracotta)' : 'var(--muted)',
               border: '1px solid var(--border)',
-              borderBottom: currentSubTab === 'PM_GANTT' ? '1px solid var(--bg)' : '1px solid var(--border)',
+              borderBottom: currentSubTab === 'PM_DOCS' ? '1px solid var(--bg)' : '1px solid var(--border)',
               cursor: 'pointer',
+              borderRadius: '4px 4px 0 0',
             }}
           >
-            📊 Cronograma Gantt
+            📖 Especificaciones & Docs
           </button>
+
+          {/* 2. Tareas Técnicas */}
           <button
             type="button"
             onClick={() => setProjSubTab(proj.id, 'PM_TASKS')}
@@ -594,62 +611,57 @@ export default function ProjectsManagementView({
               border: '1px solid var(--border)',
               borderBottom: currentSubTab === 'PM_TASKS' ? '1px solid var(--bg)' : '1px solid var(--border)',
               cursor: 'pointer',
+              borderRadius: '4px 4px 0 0',
             }}
           >
             📋 Tareas Técnicas ({proj.tasks?.length || 0})
           </button>
-          <button
-            type="button"
-            onClick={() => setProjSubTab(proj.id, 'PM_RISKS')}
-            style={{
-              padding: '8px 14px',
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              fontWeight: currentSubTab === 'PM_RISKS' ? 700 : 500,
-              background: currentSubTab === 'PM_RISKS' ? 'var(--bg)' : 'transparent',
-              color: currentSubTab === 'PM_RISKS' ? 'var(--terracotta)' : 'var(--muted)',
-              border: '1px solid var(--border)',
-              borderBottom: currentSubTab === 'PM_RISKS' ? '1px solid var(--bg)' : '1px solid var(--border)',
-              cursor: 'pointer',
-            }}
-          >
-            ⚠️ Riesgos & Bloqueos ({proj.risks?.length || 0})
-          </button>
-          <button
-            type="button"
-            onClick={() => setProjSubTab(proj.id, 'PM_MILESTONES')}
-            style={{
-              padding: '8px 14px',
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              fontWeight: currentSubTab === 'PM_MILESTONES' ? 700 : 500,
-              background: currentSubTab === 'PM_MILESTONES' ? 'var(--bg)' : 'transparent',
-              color: currentSubTab === 'PM_MILESTONES' ? 'var(--terracotta)' : 'var(--muted)',
-              border: '1px solid var(--border)',
-              borderBottom: currentSubTab === 'PM_MILESTONES' ? '1px solid var(--bg)' : '1px solid var(--border)',
-              cursor: 'pointer',
-            }}
-          >
-            📌 Fases & Hitos ({totalMilestones})
-          </button>
-          <button
-            type="button"
-            onClick={() => setProjSubTab(proj.id, 'PM_DELIVERABLES')}
-            style={{
-              padding: '8px 14px',
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              fontWeight: currentSubTab === 'PM_DELIVERABLES' ? 700 : 500,
-              background: currentSubTab === 'PM_DELIVERABLES' ? 'var(--bg)' : 'transparent',
-              color: currentSubTab === 'PM_DELIVERABLES' ? 'var(--terracotta)' : 'var(--muted)',
-              border: '1px solid var(--border)',
-              borderBottom: currentSubTab === 'PM_DELIVERABLES' ? '1px solid var(--bg)' : '1px solid var(--border)',
-              cursor: 'pointer',
-            }}
-          >
-            📦 Entregables ({proj.deliverables?.length || 0})
-          </button>
+
+          {/* 3. Menú Desplegable de Herramientas Avanzadas */}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", color: 'var(--muted)' }}>Herramientas PM:</span>
+            <select
+              value={['PM_GANTT', 'PM_RISKS', 'PM_MILESTONES', 'PM_DELIVERABLES'].includes(currentSubTab) ? currentSubTab : ''}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setProjSubTab(proj.id, e.target.value);
+                }
+              }}
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: 11,
+                padding: '5px 10px',
+                borderRadius: 4,
+                border: '1px solid var(--border)',
+                background: ['PM_GANTT', 'PM_RISKS', 'PM_MILESTONES', 'PM_DELIVERABLES'].includes(currentSubTab) ? 'var(--cream2)' : '#fff',
+                color: 'var(--ink)',
+                cursor: 'pointer',
+                fontWeight: 600,
+              }}
+              aria-label="Seleccionar herramienta avanzada de proyecto"
+            >
+              <option value="">⋯ Seleccionar Vista / Gestión ▾</option>
+              <option value="PM_GANTT">📊 Cronograma Gantt</option>
+              <option value="PM_RISKS">⚠️ Riesgos & Bloqueos ({proj.risks?.length || 0})</option>
+              <option value="PM_MILESTONES">📌 Fases & Hitos ({totalMilestones})</option>
+              <option value="PM_DELIVERABLES">📦 Entregables Auditados ({proj.deliverables?.length || 0})</option>
+            </select>
+          </div>
         </div>
+
+        {/* Render Sub-Tab Active */}
+        {currentSubTab === 'PM_DOCS' && (
+          <ProjectDocumentHub
+            project={proj}
+            deliverables={proj.deliverables || []}
+            isAdmin={isAdmin}
+            onOpenPreview={handleOpenPreview}
+            onUploadClick={() => {
+              setProjSubTab(proj.id, 'PM_DELIVERABLES');
+              setUploadingDeliverableProjId(proj.id);
+            }}
+          />
+        )}
 
         {/* Render Sub-Tab Active */}
         {currentSubTab === 'PM_GANTT' && (
@@ -1935,6 +1947,13 @@ export default function ProjectsManagementView({
           {projects.map((proj) => renderProjectCard(proj, false))}
         </div>
       )}
+
+      <DocumentPreviewDrawer
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        document={activePreviewDoc}
+        showToast={showToast}
+      />
     </div>
   );
 }

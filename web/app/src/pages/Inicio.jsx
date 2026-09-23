@@ -172,9 +172,8 @@ export default function Inicio() {
             ))}
           </nav>
 
-          {/* Micro Institutional Footer Bar */}
-          <div className="atrium-micro-footer">
-            <div>INMERGE S.A.C. · 2026</div>
+          {/* Micro Institutional Footer Bar (Cookies Only, Bottom Right) */}
+          <div className="atrium-micro-footer" style={{ position: 'absolute', bottom: 24, right: 24, textAlign: 'right', display: 'flex' }}>
             <div>
               <Link to={isEn ? '/en/cookies' : '/cookies'}>{isEn ? 'Cookie Policy' : 'Política de Cookies'}</Link>
               {' · '}
@@ -182,7 +181,6 @@ export default function Inicio() {
                 {isEn ? 'Cookie Settings' : 'Configurar Cookies'}
               </button>
             </div>
-            <div>inmerge3@gmail.com · Lima, Perú</div>
           </div>
         </div>
       </div>

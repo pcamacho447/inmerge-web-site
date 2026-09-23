@@ -95,14 +95,23 @@ export default function ProjectTaskManager({
     }
   };
 
+  const [confirmDeleteTaskId, setConfirmDeleteTaskId] = useState(null);
+
   const handleDelete = async (taskId) => {
-    if (!window.confirm('¿Seguro que deseas eliminar esta tarea técnica?')) return;
-    try {
-      if (onTaskDeleted) {
-        await onTaskDeleted(taskId, projectId);
+    if (confirmDeleteTaskId === taskId) {
+      setConfirmDeleteTaskId(null);
+      try {
+        if (onTaskDeleted) {
+          await onTaskDeleted(taskId, projectId);
+        }
+      } catch (err) {
+        console.error('Error al eliminar tarea:', err);
       }
-    } catch (err) {
-      console.error('Error al eliminar tarea:', err);
+    } else {
+      setConfirmDeleteTaskId(taskId);
+      setTimeout(() => {
+        setConfirmDeleteTaskId((prev) => (prev === taskId ? null : prev));
+      }, 4000);
     }
   };
 
@@ -612,16 +621,19 @@ export default function ProjectTaskManager({
                     type="button"
                     onClick={() => handleDelete(task.id)}
                     style={{
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--muted)',
+                      background: confirmDeleteTaskId === task.id ? 'var(--terracotta)' : 'none',
+                      color: confirmDeleteTaskId === task.id ? '#fff' : 'var(--muted)',
+                      border: confirmDeleteTaskId === task.id ? 'none' : 'none',
+                      borderRadius: 4,
                       cursor: 'pointer',
-                      fontSize: 14,
-                      padding: 4,
+                      fontSize: confirmDeleteTaskId === task.id ? 11 : 14,
+                      padding: confirmDeleteTaskId === task.id ? '3px 8px' : 4,
+                      fontFamily: confirmDeleteTaskId === task.id ? "'IBM Plex Mono', monospace" : 'inherit',
+                      fontWeight: confirmDeleteTaskId === task.id ? 600 : 'normal',
                     }}
-                    title="Eliminar tarea"
+                    title={confirmDeleteTaskId === task.id ? 'Haz clic nuevamente para confirmar eliminación' : 'Eliminar tarea'}
                   >
-                    🗑️
+                    {confirmDeleteTaskId === task.id ? 'Confirmar' : '🗑️'}
                   </button>
                 </div>
               </div>
