@@ -1,5 +1,37 @@
-import React from 'react';
+import { useState } from 'react';
 import { DELIVERABLE_STATUS_CONFIG } from '../../lib/pm.js';
+
+const PILLAR_TECH_FALLBACKS = {
+  auditoria: {
+    cloud_provider: 'AWS Cloud / GCP (Multi-tenant)',
+    stack_tags: ['Lighthouse CI', 'PostgreSQL', 'Docker', 'OWASP ZAP', 'Core Web Vitals'],
+    repo_url_suffix: '-audit',
+    staging_url: 'https://audit-staging.inmerge.dev',
+    runbook_instructions: 'npm install && npm run audit:local\nConfigurar credenciales de lectura en .env.sandbox para réplicas.',
+  },
+  desarrollo: {
+    cloud_provider: 'Amazon Web Services (us-east-1)',
+    stack_tags: ['React', 'Node.js', 'PostgreSQL', 'Docker', 'AWS ECS'],
+    repo_url_suffix: '-core',
+    staging_url: 'https://staging.inmerge.dev',
+    runbook_instructions: 'git clone && docker compose up -d\nEjecutar npm test antes de enviar PR a main.',
+  },
+  datos: {
+    cloud_provider: 'Google Cloud Platform (us-central1)',
+    stack_tags: ['BigQuery', 'Dataform', 'Python', 'FastAPI'],
+    repo_url_suffix: '-data-pipeline',
+    staging_url: 'https://staging.pipeline.inmerge.dev',
+    runbook_instructions: 'Usar gcloud auth application-default login antes de correr el test local.',
+  },
+};
+
+const DEFAULT_FALLBACK = {
+  cloud_provider: 'Inmerge Private Cloud / AWS',
+  stack_tags: ['React', 'TypeScript', 'Node.js', 'PostgreSQL'],
+  repo_url_suffix: '-repo',
+  staging_url: 'https://staging.inmerge.dev',
+  runbook_instructions: 'npm install && npm test\nConsultar variables de entorno en el panel del equipo.',
+};
 
 /**
  * ProjectDocumentHub — Hub Documental y de Especificaciones del Proyecto
@@ -13,10 +45,72 @@ export default function ProjectDocumentHub({
   onUploadClick,
   onUpdateDeliverableStatus,
 }) {
+  const [copiedRepo, setCopiedRepo] = useState(false);
+  const [copiedRunbook, setCopiedRunbook] = useState(false);
+
   if (!project) return null;
 
   // Extraer TDR / Descripción del proyecto
   const tdrContent = project.description || 'Sin descripción técnica registrada para este proyecto.';
+
+  // Extraer ficha técnica y fallbacks según el pilar
+  const pillar = project.pillar || 'integral';
+  const fallback = PILLAR_TECH_FALLBACKS[pillar] || DEFAULT_FALLBACK;
+
+  const repoUrl =
+    project.repo_url ||
+    project.tech_specs?.repo_url ||
+    project.metadata?.repo_url ||
+    `https://github.com/inmerge-org/${project.id || 'project'}${fallback.repo_url_suffix || ''}`;
+
+  const stagingUrl = project.staging_url || project.tech_specs?.staging_url || project.metadata?.staging_url || fallback.staging_url;
+
+  const cloudProvider =
+    project.cloud_provider ||
+    project.tech_specs?.cloud_provider ||
+    project.metadata?.cloud_provider ||
+    (project.region ? `${fallback.cloud_provider} (${project.region})` : fallback.cloud_provider);
+
+  const rawTags = project.stack_tags || project.tech_specs?.stack_tags || project.metadata?.stack_tags || fallback.stack_tags;
+
+  const stackTags = Array.isArray(rawTags)
+    ? rawTags
+    : typeof rawTags === 'string'
+      ? rawTags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : fallback.stack_tags;
+
+  const runbookInstructions =
+    project.runbook_instructions ||
+    project.tech_specs?.runbook_instructions ||
+    project.metadata?.runbook_instructions ||
+    fallback.runbook_instructions;
+
+  const handleCopyRepo = async () => {
+    if (navigator?.clipboard?.writeText && repoUrl) {
+      try {
+        await navigator.clipboard.writeText(repoUrl);
+        setCopiedRepo(true);
+        setTimeout(() => setCopiedRepo(false), 2000);
+      } catch (err) {
+        console.warn('Error al copiar repositorio:', err);
+      }
+    }
+  };
+
+  const handleCopyRunbook = async () => {
+    if (navigator?.clipboard?.writeText && runbookInstructions) {
+      try {
+        await navigator.clipboard.writeText(runbookInstructions);
+        setCopiedRunbook(true);
+        setTimeout(() => setCopiedRunbook(false), 2000);
+      } catch (err) {
+        console.warn('Error al copiar runbook:', err);
+      }
+    }
+  };
 
   // Lista unificada de entregables
   const projectDeliverables = deliverables && deliverables.length > 0 ? deliverables : project.deliverables || [];
@@ -244,6 +338,7 @@ export default function ProjectDocumentHub({
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
+            gap: 14,
           }}
         >
           <div>
@@ -262,12 +357,290 @@ export default function ProjectDocumentHub({
               >
                 03. SANDBOX & APIS
               </span>
-              <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: "'IBM Plex Mono', monospace" }}>Desarrollo</span>
+              <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: "'IBM Plex Mono', monospace" }}>Desarrollo & Runbook</span>
             </div>
-            <h4 style={{ margin: '0 0 8px', fontSize: 15, color: 'var(--ink)' }}>Guía de Conexión & Entorno Sandbox</h4>
-            <p style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5, margin: 0 }}>
-              Variables de entorno sin secretos sensibles, convenciones de git, endpoints y reglas de desarrollo.
+            <h4 style={{ margin: '0 0 4px', fontSize: 15, color: 'var(--ink)' }}>Guía de Conexión & Entorno Sandbox</h4>
+            <p style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5, margin: '0 0 12px' }}>
+              Variables de entorno, repositorios git, endpoints y reglas de desarrollo.
             </p>
+
+            {/* Bento Grid de Especificaciones Técnicas */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {/* Repositorio Git */}
+              <div
+                style={{
+                  background: 'var(--cream2)',
+                  padding: '10px 12px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: 8,
+                }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 200, flex: 1 }}>
+                  <span
+                    style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: 'var(--muted)',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Repositorio Git
+                  </span>
+                  <a
+                    href={repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 11,
+                      color: 'var(--terracotta)',
+                      textDecoration: 'none',
+                      wordBreak: 'break-all',
+                    }}
+                    title={repoUrl}
+                  >
+                    {repoUrl} ↗
+                  </a>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyRepo}
+                  style={{
+                    background: copiedRepo ? 'rgba(46, 117, 89, 0.15)' : '#fff',
+                    color: copiedRepo ? '#2E7559' : 'var(--ink)',
+                    border: copiedRepo ? '1px solid #2E7559' : '1px solid var(--border)',
+                    borderRadius: 4,
+                    padding: '4px 10px',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontFamily: "'IBM Plex Sans', sans-serif",
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {copiedRepo ? '✓ ¡Copiado!' : '📋 Copiar URL Repositorio'}
+                </button>
+              </div>
+
+              {/* Cloud Provider & Staging URL */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: 8,
+                }}
+              >
+                {/* Cloud & Región */}
+                <div
+                  style={{
+                    background: 'var(--bg)',
+                    padding: '8px 10px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 9,
+                      fontWeight: 700,
+                      color: 'var(--muted)',
+                      marginBottom: 3,
+                    }}
+                  >
+                    CLOUD PROVIDER & REGIÓN
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: 'var(--ink)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
+                    <span>☁️</span>
+                    <span>{cloudProvider}</span>
+                  </div>
+                </div>
+
+                {/* Staging */}
+                <div
+                  style={{
+                    background: 'var(--bg)',
+                    padding: '8px 10px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: 3,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: 9,
+                        fontWeight: 700,
+                        color: 'var(--muted)',
+                      }}
+                    >
+                      STAGING ENDPOINT
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: 9,
+                        fontWeight: 700,
+                        background: 'rgba(46, 117, 89, 0.15)',
+                        color: '#2E7559',
+                        padding: '1px 5px',
+                        borderRadius: 3,
+                        border: '1px solid #2E7559',
+                      }}
+                    >
+                      ACTIVO
+                    </span>
+                  </div>
+                  <a
+                    href={stagingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 11,
+                      color: 'var(--terracotta)',
+                      textDecoration: 'none',
+                      display: 'block',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                    title={stagingUrl}
+                  >
+                    🌐 {stagingUrl}
+                  </a>
+                </div>
+              </div>
+
+              {/* Stack Tags */}
+              <div
+                style={{
+                  background: 'var(--bg)',
+                  padding: '8px 10px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: 'var(--muted)',
+                    marginBottom: 6,
+                  }}
+                >
+                  STACK TECNOLÓGICO & HERRAMIENTAS
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {stackTags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: 10,
+                        fontWeight: 600,
+                        background: 'var(--cream2)',
+                        color: 'var(--ink)',
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        border: '1px solid var(--border)',
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Runbook / Comandos Rápidos */}
+              <div
+                style={{
+                  background: 'var(--cream2)',
+                  padding: '10px 12px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: 6,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: 'var(--ink)',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    ⚡ Runbook & Comandos de Inicio
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyRunbook}
+                    style={{
+                      background: copiedRunbook ? 'rgba(46, 117, 89, 0.15)' : '#fff',
+                      color: copiedRunbook ? '#2E7559' : 'var(--ink)',
+                      border: copiedRunbook ? '1px solid #2E7559' : '1px solid var(--border)',
+                      borderRadius: 4,
+                      padding: '2px 8px',
+                      fontSize: 10,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontFamily: "'IBM Plex Sans', sans-serif",
+                    }}
+                  >
+                    {copiedRunbook ? '✓ ¡Copiado!' : '📋 Copiar Runbook'}
+                  </button>
+                </div>
+                <pre
+                  style={{
+                    margin: 0,
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 11,
+                    background: 'var(--bg)',
+                    padding: '8px 10px',
+                    borderRadius: 4,
+                    border: '1px solid var(--border)',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    color: 'var(--ink)',
+                    lineHeight: 1.45,
+                  }}
+                >
+                  {runbookInstructions}
+                </pre>
+              </div>
+            </div>
           </div>
 
           <div style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--border)', textAlign: 'right' }}>
@@ -277,7 +650,7 @@ export default function ProjectDocumentHub({
                 onOpenPreview?.({
                   title: `Guía Sandbox & APIs — ${project.title}`,
                   fileType: 'CONFIG',
-                  content: `# Guía de Entorno de Desarrollo & Sandbox\n\n**Lead Técnico:** ${project.tech_lead_name || 'Inmerge Staff'} (${project.tech_lead_contact || 'inmerge3@gmail.com'})\n\n## 1. Convenciones de Ramas Git\n- \`main\` -> Producción auditada.\n- \`feature/XYZ\` -> Desarrollos asignados a consultores.\n\n## 2. Reglas de Testing & Formato\n- Ejecutar \`npm test\` antes de solicitar homologación de hito.\n- Prohibidos logs o credenciales expuestas.`,
+                  content: `# Guía de Entorno de Desarrollo & Sandbox\n\n**Proyecto:** ${project.title}\n**Pilar:** ${project.pillar || 'N/A'}\n**Lead Técnico:** ${project.tech_lead_name || 'Inmerge Staff'} (${project.tech_lead_contact || 'inmerge3@gmail.com'})\n**Cloud Provider:** ${cloudProvider}\n**Repositorio:** ${repoUrl}\n**Staging:** ${stagingUrl}\n**Stack:** ${stackTags.join(', ')}\n\n## 1. Convenciones de Ramas Git\n- \`main\` -> Producción auditada.\n- \`feature/XYZ\` -> Desarrollos asignados a consultores.\n\n## 2. Runbook de Inicio Rápido\n\`\`\`bash\n${runbookInstructions}\n\`\`\`\n\n## 3. Reglas de Testing & Formato\n- Ejecutar \`npm test\` antes de solicitar homologación de hito.\n- Prohibidos logs o credenciales expuestas en repositorios públicos.`,
                   notes: 'Lineamientos de desarrollo para el equipo asignado.',
                   version: 'v1.0-dev',
                   author: 'Inmerge Engineering',

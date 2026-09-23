@@ -1,4 +1,3 @@
-import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ProjectDocumentHub from './ProjectDocumentHub.jsx';
@@ -133,5 +132,120 @@ describe('ProjectDocumentHub', () => {
     render(<ProjectDocumentHub project={mockProject} deliverables={deliverables} isAdmin={false} onUpdateDeliverableStatus={vi.fn()} />);
 
     expect(screen.queryByRole('button', { name: /✓ Aprobar y Publicar al Cliente/i })).not.toBeInTheDocument();
+  });
+
+  it('renderiza la ficha técnica con repositorio, stack tags y runbook de entorno', () => {
+    const mockProjectWithSpecs = {
+      id: 'proj-cloud-1',
+      title: 'Modernización Cloud GCP & BigQuery',
+      pillar: 'datos',
+      description: 'Auditoría y optimización de pipelines.',
+      repo_url: 'https://github.com/inmerge-org/data-lake-pipeline',
+      staging_url: 'https://staging.pipeline.inmerge.dev',
+      cloud_provider: 'Google Cloud Platform (us-central1)',
+      stack_tags: ['BigQuery', 'Dataform', 'Python', 'FastAPI'],
+      runbook_instructions: 'Usar gcloud auth application-default login antes de correr el test local.',
+    };
+
+    render(<ProjectDocumentHub project={mockProjectWithSpecs} deliverables={[]} />);
+
+    expect(screen.getByText(/Google Cloud Platform/i)).toBeInTheDocument();
+    expect(screen.getByText('BigQuery')).toBeInTheDocument();
+    expect(screen.getByText(/data-lake-pipeline/i)).toBeInTheDocument();
+    expect(screen.getByText(/gcloud auth application-default/i)).toBeInTheDocument();
+  });
+
+  it('permite copiar la URL del repositorio con feedback visual temporal', async () => {
+    const writeTextMock = vi.fn().mockResolvedValue();
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: writeTextMock,
+      },
+    });
+
+    const mockProjectWithSpecs = {
+      id: 'proj-copy-test',
+      title: 'Desarrollo API Microservicios',
+      pillar: 'desarrollo',
+      repo_url: 'https://github.com/inmerge-org/backend-api',
+      cloud_provider: 'AWS (us-east-1)',
+      stack_tags: ['Node.js', 'Express', 'PostgreSQL'],
+      runbook_instructions: 'npm run test:ci',
+    };
+
+    render(<ProjectDocumentHub project={mockProjectWithSpecs} deliverables={[]} />);
+
+    const copyRepoBtn = screen.getByRole('button', { name: /Copiar URL Repositorio/i });
+    expect(copyRepoBtn).toBeInTheDocument();
+
+    fireEvent.click(copyRepoBtn);
+
+    expect(writeTextMock).toHaveBeenCalledWith('https://github.com/inmerge-org/backend-api');
+    expect(await screen.findByText(/¡Copiado!/i)).toBeInTheDocument();
+  });
+
+  it('utiliza fallbacks técnicos según el pilar cuando no se especifican en el proyecto', () => {
+    const mockPillarProject = {
+      id: 'proj-pillar-auditoria',
+      title: 'Auditoría Forense Web',
+      pillar: 'auditoria',
+    };
+
+    render(<ProjectDocumentHub project={mockPillarProject} deliverables={[]} />);
+
+    expect(screen.getByText(/Lighthouse/i)).toBeInTheDocument();
+  });
+
+  it('permite copiar el runbook de entorno con feedback visual temporal', async () => {
+    const writeTextMock = vi.fn().mockResolvedValue();
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: writeTextMock,
+      },
+    });
+
+    const mockProjectWithSpecs = {
+      id: 'proj-runbook-test',
+      title: 'Auditoría PostgreSQL',
+      pillar: 'auditoria',
+      runbook_instructions: 'docker compose -f docker-compose.audit.yml up -d',
+    };
+
+    render(<ProjectDocumentHub project={mockProjectWithSpecs} deliverables={[]} />);
+
+    const copyRunbookBtn = screen.getByRole('button', { name: /Copiar Runbook/i });
+    expect(copyRunbookBtn).toBeInTheDocument();
+
+    fireEvent.click(copyRunbookBtn);
+
+    expect(writeTextMock).toHaveBeenCalledWith('docker compose -f docker-compose.audit.yml up -d');
+    expect(await screen.findByText(/¡Copiado!/i)).toBeInTheDocument();
+  });
+
+  it('envía los datos de la ficha técnica al previsualizar la guía sandbox en el drawer', () => {
+    const onOpenPreview = vi.fn();
+    const mockProjectWithSpecs = {
+      id: 'proj-preview-test',
+      title: 'Plataforma Web Mochica',
+      pillar: 'auditoria',
+      repo_url: 'https://github.com/inmerge-org/mochica-web',
+      cloud_provider: 'Cloudflare Pages / AWS',
+      staging_url: 'https://staging.mochica.pe',
+      stack_tags: ['Vite', 'React'],
+      runbook_instructions: 'npm run dev',
+    };
+
+    render(<ProjectDocumentHub project={mockProjectWithSpecs} deliverables={[]} onOpenPreview={onOpenPreview} />);
+
+    const previewBtn = screen.getByRole('button', { name: /Previsualizar Guía Sandbox/i });
+    fireEvent.click(previewBtn);
+
+    expect(onOpenPreview).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Guía Sandbox & APIs — Plataforma Web Mochica',
+        fileType: 'CONFIG',
+        content: expect.stringContaining('https://github.com/inmerge-org/mochica-web'),
+      }),
+    );
   });
 });
