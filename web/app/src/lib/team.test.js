@@ -663,9 +663,7 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
         generated_at: '2026-09-24T10:01:00Z',
       };
 
-      supabase.rpc
-        .mockResolvedValueOnce({ data: mockSnapshot1, error: null })
-        .mockResolvedValueOnce({ data: mockSnapshot2, error: null });
+      supabase.rpc.mockResolvedValueOnce({ data: mockSnapshot1, error: null }).mockResolvedValueOnce({ data: mockSnapshot2, error: null });
 
       // 1. Primera llamada consulta Supabase RPC
       const firstCall = await fetchWorkspaceTelemetrySnapshot({
@@ -698,9 +696,7 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       const mockSnapshot1 = { kpis: { active_projects_count: 1 }, generated_at: '2026-09-24T10:00:00Z' };
       const mockSnapshot2 = { kpis: { active_projects_count: 2 }, generated_at: '2026-09-24T10:00:15Z' };
 
-      supabase.rpc
-        .mockResolvedValueOnce({ data: mockSnapshot1, error: null })
-        .mockResolvedValueOnce({ data: mockSnapshot2, error: null });
+      supabase.rpc.mockResolvedValueOnce({ data: mockSnapshot1, error: null }).mockResolvedValueOnce({ data: mockSnapshot2, error: null });
 
       const firstCall = await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
       expect(firstCall).toBe(mockSnapshot1);
@@ -717,9 +713,7 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       const mockSnapshot1 = { kpis: { active_projects_count: 1 }, generated_at: '2026-09-24T10:00:00Z' };
       const mockSnapshot2 = { kpis: { active_projects_count: 2 }, generated_at: '2026-09-24T10:00:20Z' };
 
-      supabase.rpc
-        .mockResolvedValueOnce({ data: mockSnapshot1, error: null })
-        .mockResolvedValueOnce({ data: mockSnapshot2, error: null });
+      supabase.rpc.mockResolvedValueOnce({ data: mockSnapshot1, error: null }).mockResolvedValueOnce({ data: mockSnapshot2, error: null });
 
       const nowSpy = vi.spyOn(Date, 'now');
       nowSpy.mockReturnValue(1000000);
@@ -784,6 +778,96 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
 
       await fetchTeamProjects();
       expect(supabase.from).toHaveBeenCalledTimes(2);
+    });
+
+    it('clearTeamDataCache({ entity: "telemetry" }) invalida solo el caché de telemetría manteniendo intacto el de proyectos', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      const mockSnapshot1 = { kpis: { active_projects_count: 1 }, generated_at: '2026-09-24T10:00:00Z' };
+      const mockSnapshot2 = { kpis: { active_projects_count: 2 }, generated_at: '2026-09-24T10:00:15Z' };
+      supabase.rpc.mockResolvedValueOnce({ data: mockSnapshot1, error: null }).mockResolvedValueOnce({ data: mockSnapshot2, error: null });
+
+      // Llenar ambos cachés
+      await fetchTeamProjects();
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(supabase.from).toHaveBeenCalledTimes(1);
+      expect(supabase.rpc).toHaveBeenCalledTimes(1);
+
+      // Invalidar solo telemetría
+      clearTeamDataCache({ entity: 'telemetry' });
+
+      // Proyectos debe venir de caché (no invoca supabase.from)
+      await fetchTeamProjects();
+      expect(supabase.from).toHaveBeenCalledTimes(1);
+
+      // Telemetría debe consultar RPC nuevamente
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(supabase.rpc).toHaveBeenCalledTimes(2);
+    });
+
+    it('clearTeamDataCache({ entity: "projects" }) invalida solo el caché de proyectos manteniendo intacto el de telemetría', async () => {
+      const mockProjects1 = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const mockProjects2 = [{ id: 'proj-1', title: 'Proyecto Alpha Actualizado' }];
+      const orderMock = vi
+        .fn()
+        .mockResolvedValueOnce({ data: mockProjects1, error: null })
+        .mockResolvedValueOnce({ data: mockProjects2, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      const mockSnapshot = { kpis: { active_projects_count: 1 }, generated_at: '2026-09-24T10:00:00Z' };
+      supabase.rpc.mockResolvedValue({ data: mockSnapshot, error: null });
+
+      // Llenar ambos cachés
+      await fetchTeamProjects();
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(supabase.from).toHaveBeenCalledTimes(1);
+      expect(supabase.rpc).toHaveBeenCalledTimes(1);
+
+      // Invalidar solo proyectos
+      clearTeamDataCache({ entity: 'projects' });
+
+      // Telemetría debe venir de caché (no invoca supabase.rpc de nuevo)
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(supabase.rpc).toHaveBeenCalledTimes(1);
+
+      // Proyectos debe consultar la base de datos nuevamente
+      await fetchTeamProjects();
+      expect(supabase.from).toHaveBeenCalledTimes(2);
+    });
+
+    it('clearTeamDataCache({ entity: "all" }) y clearTeamDataCache() invalidan ambos cachés', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      const mockSnapshot = { kpis: { active_projects_count: 1 }, generated_at: '2026-09-24T10:00:00Z' };
+      supabase.rpc.mockResolvedValue({ data: mockSnapshot, error: null });
+
+      // 1. Probar con { entity: 'all' }
+      await fetchTeamProjects();
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(supabase.from).toHaveBeenCalledTimes(1);
+      expect(supabase.rpc).toHaveBeenCalledTimes(1);
+
+      clearTeamDataCache({ entity: 'all' });
+
+      await fetchTeamProjects();
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(supabase.from).toHaveBeenCalledTimes(2);
+      expect(supabase.rpc).toHaveBeenCalledTimes(2);
+
+      // 2. Probar llamada por defecto clearTeamDataCache()
+      clearTeamDataCache();
+
+      await fetchTeamProjects();
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(supabase.from).toHaveBeenCalledTimes(3);
+      expect(supabase.rpc).toHaveBeenCalledTimes(3);
     });
 
     it('createProjectTask invalida el caché de proyectos llamando clearTeamDataCache', async () => {

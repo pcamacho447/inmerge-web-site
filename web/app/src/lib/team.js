@@ -9,11 +9,17 @@ export const TELEMETRY_CACHE_TTL_MS = 15000; // 15s TTL
 let telemetrySnapshotCache = null;
 
 /**
- * Invalida el caché en memoria de proyectos y telemetría del equipo técnico.
+ * Invalida el caché en memoria de proyectos y/o telemetría del equipo técnico de forma granular.
+ * @param {Object} [options={}]
+ * @param {'all' | 'projects' | 'telemetry'} [options.entity='all']
  */
-export function clearTeamDataCache() {
-  teamProjectsCache = null;
-  telemetrySnapshotCache = null;
+export function clearTeamDataCache({ entity = 'all' } = {}) {
+  if (entity === 'all' || entity === 'projects') {
+    teamProjectsCache = null;
+  }
+  if (entity === 'all' || entity === 'telemetry') {
+    telemetrySnapshotCache = null;
+  }
 }
 
 /**
