@@ -25,6 +25,11 @@ import {
   fetchWorkspaceTelemetrySnapshot,
 } from './team.js';
 import { supabase } from './supabaseClient.js';
+import { createInAppNotification } from './notifications.js';
+
+vi.mock('./notifications.js', () => ({
+  createInAppNotification: vi.fn().mockResolvedValue({ id: 'mock-notif-1' }),
+}));
 
 vi.mock('./supabaseClient.js', () => ({
   supabase: {
@@ -409,6 +414,33 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       expect(updateMock).toHaveBeenCalledWith(expect.objectContaining({ status: 'PUBLICADO_CLIENTE' }));
       expect(eqMock).toHaveBeenCalledWith('id', 'del-1');
       expect(res).toEqual(mockUpdated);
+      expect(createInAppNotification).not.toHaveBeenCalled();
+    });
+
+    it('updateDeliverableStatus dispara createInAppNotification cuando el estado cambia a EN_REVISION', async () => {
+      const mockUpdated = { id: 'del-2', status: 'EN_REVISION', title: 'Auditoría PostgreSQL', project_id: 'p-1' };
+      const singleMock = vi.fn().mockResolvedValue({ data: mockUpdated, error: null });
+      const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+      const eqMock = vi.fn().mockReturnValue({ select: selectMock });
+      const updateMock = vi.fn().mockReturnValue({ eq: eqMock });
+      const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      supabase.from.mockImplementation((table) => {
+        if (table === 'project_deliverables') return { update: updateMock };
+        if (table === 'team_activity_logs') return { insert: logInsertMock };
+        return {};
+      });
+
+      const res = await updateDeliverableStatus('del-2', 'EN_REVISION', { projectId: 'p-1', title: 'Auditoría PostgreSQL' });
+      expect(res).toEqual(mockUpdated);
+      expect(createInAppNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          targetRole: 'admin',
+          category: 'DELIVERABLE',
+          projectId: 'p-1',
+          title: 'Entregable en Revisión',
+        }),
+      );
     });
 
     it('fetchProjectFindings consulta los hallazgos del proyecto ordenados por fecha', async () => {
@@ -427,7 +459,7 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       expect(res).toEqual(mockFindings);
     });
 
-    it('createProjectFinding sanitiza e inserta un hallazgo técnico', async () => {
+    it('createProjectFinding sanitiza e inserta un hallazgo técnico y dispara notificación si es severidad crítica/alta', async () => {
       const mockFinding = { id: 'f-1', title: 'XSS en search', severity: 'ALTA', category: 'SEGURIDAD_OWASP' };
       const singleMock = vi.fn().mockResolvedValue({ data: mockFinding, error: null });
       const selectMock = vi.fn().mockReturnValue({ single: singleMock });
@@ -457,6 +489,38 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
         }),
       );
       expect(res).toEqual(mockFinding);
+      expect(createInAppNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          targetRole: 'admin',
+          category: 'FINDING',
+          severity: 'HIGH',
+          projectId: 'p-1',
+        }),
+      );
+    });
+
+    it('createProjectFinding no dispara createInAppNotification si la severidad es baja', async () => {
+      const mockFinding = { id: 'f-low', title: 'Typo menor en logs', severity: 'BAJA', category: 'CALIDAD_CODIGO' };
+      const singleMock = vi.fn().mockResolvedValue({ data: mockFinding, error: null });
+      const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+      const insertMock = vi.fn().mockReturnValue({ select: selectMock });
+      const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      supabase.from.mockImplementation((table) => {
+        if (table === 'project_findings') return { insert: insertMock };
+        if (table === 'team_activity_logs') return { insert: logInsertMock };
+        return {};
+      });
+
+      createInAppNotification.mockClear();
+      await createProjectFinding({
+        projectId: 'p-1',
+        title: 'Typo menor en logs',
+        severity: 'BAJA',
+        category: 'CALIDAD_CODIGO',
+      });
+
+      expect(createInAppNotification).not.toHaveBeenCalled();
     });
 
     it('updateProjectFinding actualiza los campos de un hallazgo técnico', async () => {

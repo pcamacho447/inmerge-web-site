@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient.js';
 import { sanitizeDeliverablePayload, sanitizeFindingPayload } from './pm.js';
+import { createInAppNotification } from './notifications.js';
 
 const TEAM_PROJECTS_CACHE_TTL_MS = 30000; // 30s TTL
 let teamProjectsCache = null;
@@ -647,6 +648,18 @@ export async function updateDeliverableStatus(deliverableId, newStatus, { projec
     details: { new_status: newStatus, title: title || data?.title, project_id: projectId || data?.project_id },
   });
 
+  if (newStatus === 'EN_REVISION') {
+    createInAppNotification({
+      targetRole: 'admin',
+      title: 'Entregable en Revisión',
+      message: `El entregable "${title || data?.title || 'Entregable'}" ha cambiado a estado EN_REVISION y requiere aprobación.`,
+      category: 'DELIVERABLE',
+      severity: 'INFO',
+      projectId: projectId || data?.project_id,
+      linkUrl: `/equipo?tab=projects&projectId=${projectId || data?.project_id}&subtab=deliverables`,
+    }).catch((notifErr) => console.warn('Deliverable notification warning:', notifErr));
+  }
+
   clearTeamDataCache();
 
   return data;
@@ -938,6 +951,20 @@ export async function createProjectFinding(payload) {
     entityId: data.id,
     details: { code: sanitized.finding_code, title: sanitized.title, severity: sanitized.severity, project_id: sanitized.project_id },
   });
+
+  const isCriticalOrHigh = ['CRITICA', 'CRITICAL', 'ALTA', 'HIGH'].includes(sanitized.severity);
+  if (isCriticalOrHigh) {
+    const notifSeverity = sanitized.severity === 'CRITICA' || sanitized.severity === 'CRITICAL' ? 'CRITICAL' : 'HIGH';
+    createInAppNotification({
+      targetRole: 'admin',
+      title: `Hallazgo ${notifSeverity === 'CRITICAL' ? 'Crítico' : 'de Alta Severidad'}: ${sanitized.finding_code || 'Auditoría'}`,
+      message: `Se ha detectado un hallazgo de severidad ${notifSeverity}: "${sanitized.title}".`,
+      category: 'FINDING',
+      severity: notifSeverity,
+      projectId: sanitized.project_id,
+      linkUrl: `/equipo?tab=projects&projectId=${sanitized.project_id}&subtab=findings`,
+    }).catch((notifErr) => console.warn('Finding notification warning:', notifErr));
+  }
 
   clearTeamDataCache();
 
