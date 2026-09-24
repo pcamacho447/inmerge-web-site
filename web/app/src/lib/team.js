@@ -146,14 +146,7 @@ export async function fetchTeamProjects() {
         assigned_to_id
       ),
       deliverables:project_deliverables (
-        id,
-        title,
-        file_type,
-        file_path,
-        external_url,
-        version,
-        notes,
-        created_at
+        *
       ),
       tasks:project_tasks (
         *

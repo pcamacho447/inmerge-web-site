@@ -34,17 +34,7 @@ export async function fetchClientProjects(userId) {
         assigned_to_id
       ),
       project_deliverables (
-        id,
-        milestone_id,
-        title,
-        file_type,
-        file_path,
-        external_url,
-        version,
-        sha256_checksum,
-        file_size_bytes,
-        status,
-        created_at
+        *
       ),
       project_tasks (
         id,
