@@ -189,6 +189,12 @@ describe('pm.js - Project Management Engine', () => {
         ],
         milestones: [{ status: 'COMPLETED' }, { status: 'PENDING' }],
         risks: [{ status: 'ABIERTO' }],
+        findings: [
+          { severity: 'CRITICA', status: 'DETECTADO' },
+          { severity: 'ALTA', status: 'EN_CORRECCION' },
+          { severity: 'MEDIA', status: 'DETECTADO' },
+          { severity: 'CRITICA', status: 'VERIFICADO' },
+        ],
       };
 
       const metrics = await fetchProjectAnalytics('proj-123', localData);
@@ -202,6 +208,14 @@ describe('pm.js - Project Management Engine', () => {
       expect(metrics.total_milestones).toBe(2);
       expect(metrics.completed_milestones).toBe(1);
       expect(metrics.open_risks_count).toBe(1);
+      expect(metrics.open_critical_findings_count).toBe(2);
+    });
+
+    it('returns null if projectId is null or undefined', async () => {
+      const { fetchProjectAnalytics } = await import('./pm.js');
+      expect(await fetchProjectAnalytics(null)).toBeNull();
+      expect(await fetchProjectAnalytics(undefined)).toBeNull();
     });
   });
 });
+

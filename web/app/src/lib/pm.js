@@ -114,6 +114,7 @@ export const FINDING_STATUS_CONFIG = {
 
 /**
  * Calcula el progreso de un hito individual basado en sus tareas o en su estado directo.
+ * Optimizado mediante recorrido único (single-pass O(N)).
  * @param {Object} milestone
  * @param {Array} tasks
  * @returns {number} Porcentaje de 0 a 100
@@ -121,24 +122,35 @@ export const FINDING_STATUS_CONFIG = {
 export function calculateMilestoneProgress(milestone, tasks = []) {
   if (!milestone) return 0;
 
-  const milestoneTasks = (tasks || []).filter((t) => String(t.milestone_id) === String(milestone.id));
+  const mId = String(milestone.id);
+  const taskList = tasks || [];
+  let totalWeight = 0;
+  let completedWeight = 0;
+  let matchingCount = 0;
 
-  if (milestoneTasks.length === 0) {
+  for (let i = 0; i < taskList.length; i++) {
+    const t = taskList[i];
+    if (String(t.milestone_id) === mId) {
+      matchingCount++;
+      const weight = Number(t.weight) || 1;
+      totalWeight += weight;
+      if (t.status === 'DONE') {
+        completedWeight += weight;
+      } else if (t.status === 'REVIEW') {
+        completedWeight += weight * 0.8;
+      } else if (t.status === 'IN_PROGRESS') {
+        completedWeight += weight * 0.4;
+      }
+    }
+  }
+
+  if (matchingCount === 0) {
     if (milestone.status === 'COMPLETADO') return 100;
     if (milestone.status === 'EN_PROGRESO' || milestone.status === 'EN_PROCESO') return 50;
     return 0;
   }
 
-  const totalWeight = milestoneTasks.reduce((sum, t) => sum + (Number(t.weight) || 1), 0);
   if (totalWeight === 0) return 0;
-
-  const completedWeight = milestoneTasks.reduce((sum, t) => {
-    const weight = Number(t.weight) || 1;
-    if (t.status === 'DONE') return sum + weight;
-    if (t.status === 'REVIEW') return sum + weight * 0.8;
-    if (t.status === 'IN_PROGRESS') return sum + weight * 0.4;
-    return sum;
-  }, 0);
 
   return Math.min(100, Math.max(0, Math.round((completedWeight / totalWeight) * 100)));
 }
@@ -152,17 +164,25 @@ export function calculateMilestoneProgress(milestone, tasks = []) {
 export function calculateProjectProgress(milestones = [], tasks = []) {
   if (!milestones || milestones.length === 0) {
     if (!tasks || tasks.length === 0) return 0;
-    // Si no hay hitos pero sí tareas
-    const totalWeight = tasks.reduce((sum, t) => sum + (Number(t.weight) || 1), 0);
+    // Si no hay hitos pero sí tareas: pase único
+    let totalWeight = 0;
+    let doneWeight = 0;
+    for (let i = 0; i < tasks.length; i++) {
+      const weight = Number(tasks[i].weight) || 1;
+      totalWeight += weight;
+      if (tasks[i].status === 'DONE') {
+        doneWeight += weight;
+      }
+    }
     if (totalWeight === 0) return 0;
-    const doneWeight = tasks.filter((t) => t.status === 'DONE').reduce((sum, t) => sum + (Number(t.weight) || 1), 0);
     return Math.round((doneWeight / totalWeight) * 100);
   }
 
   let totalMilestoneWeight = 0;
   let accumulatedProgress = 0;
 
-  for (const m of milestones) {
+  for (let i = 0; i < milestones.length; i++) {
+    const m = milestones[i];
     const mWeight = Number(m.weight) || 1;
     const mProg = calculateMilestoneProgress(m, tasks);
     totalMilestoneWeight += mWeight;
@@ -174,7 +194,7 @@ export function calculateProjectProgress(milestones = [], tasks = []) {
 }
 
 /**
- * Calcula total de horas estimadas vs horas reales incurridas
+ * Calcula total de horas estimadas vs horas reales incurridas en un único pase
  * @param {Array} tasks
  * @returns {{ estimatedHours: number, actualHours: number, varianceHours: number }}
  */
@@ -183,8 +203,13 @@ export function calculateProjectHours(tasks = []) {
     return { estimatedHours: 0, actualHours: 0, varianceHours: 0 };
   }
 
-  const estimated = tasks.reduce((sum, t) => sum + (Number(t.estimated_hours) || 0), 0);
-  const actual = tasks.reduce((sum, t) => sum + (Number(t.actual_hours) || 0), 0);
+  let estimated = 0;
+  let actual = 0;
+  for (let i = 0; i < tasks.length; i++) {
+    const t = tasks[i];
+    estimated += Number(t.estimated_hours) || 0;
+    actual += Number(t.actual_hours) || 0;
+  }
 
   return {
     estimatedHours: Number(estimated.toFixed(1)),
@@ -365,22 +390,60 @@ export async function fetchProjectAnalytics(projectId, localProjectData = null) 
     console.warn('[pm] RPC get_project_analytics no disponible, calculando en cliente:', rpcErr);
   }
 
-  // Fallback analítico local si se pasan los datos del proyecto
+  // Fallback analítico local si se pasan los datos del proyecto (recorrido en pase único)
   if (localProjectData) {
     const tasks = localProjectData.tasks || [];
     const milestones = localProjectData.milestones || [];
     const risks = localProjectData.risks || [];
+    const findings = localProjectData.findings || [];
 
     const totalTasks = tasks.length;
-    const completedTasks = tasks.filter((t) => t.status === 'DONE').length;
-    const inProgressTasks = tasks.filter((t) => t.status === 'IN_PROGRESS').length;
-    const blockedTasks = tasks.filter((t) => t.status === 'BLOCKED').length;
-    const overdueTasks = tasks.filter((t) => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'DONE').length;
+    let completedTasks = 0;
+    let inProgressTasks = 0;
+    let blockedTasks = 0;
+    let overdueTasks = 0;
+    let estHours = 0;
+    let actHours = 0;
+    const now = new Date();
 
-    const estHours = tasks.reduce((sum, t) => sum + (Number(t.estimated_hours) || 0), 0);
-    const actHours = tasks.reduce((sum, t) => sum + (Number(t.actual_hours) || 0), 0);
+    for (let i = 0; i < totalTasks; i++) {
+      const t = tasks[i];
+      if (t.status === 'DONE') {
+        completedTasks++;
+      } else {
+        if (t.status === 'IN_PROGRESS') {
+          inProgressTasks++;
+        } else if (t.status === 'BLOCKED') {
+          blockedTasks++;
+        }
+        if (t.due_date && new Date(t.due_date) < now) {
+          overdueTasks++;
+        }
+      }
+      estHours += Number(t.estimated_hours) || 0;
+      actHours += Number(t.actual_hours) || 0;
+    }
+
     const variance = estHours > 0 ? Number((((actHours - estHours) / estHours) * 100).toFixed(2)) : 0;
     const completionPct = totalTasks > 0 ? Number(((completedTasks / totalTasks) * 100).toFixed(1)) : 0;
+
+    let completedMilestones = 0;
+    for (let i = 0; i < milestones.length; i++) {
+      if (milestones[i].status === 'COMPLETED') completedMilestones++;
+    }
+
+    let openRisksCount = 0;
+    for (let i = 0; i < risks.length; i++) {
+      if (risks[i].status !== 'RESUELTO') openRisksCount++;
+    }
+
+    let openCriticalFindingsCount = 0;
+    for (let i = 0; i < findings.length; i++) {
+      const f = findings[i];
+      if (f.status !== 'VERIFICADO' && (f.severity === 'CRITICA' || f.severity === 'ALTA')) {
+        openCriticalFindingsCount++;
+      }
+    }
 
     return {
       project_id: projectId,
@@ -394,8 +457,9 @@ export async function fetchProjectAnalytics(projectId, localProjectData = null) 
       effort_variance_pct: variance,
       completion_pct: completionPct,
       total_milestones: milestones.length,
-      completed_milestones: milestones.filter((m) => m.status === 'COMPLETED').length,
-      open_risks_count: risks.filter((r) => r.status !== 'RESUELTO').length,
+      completed_milestones: completedMilestones,
+      open_risks_count: openRisksCount,
+      open_critical_findings_count: openCriticalFindingsCount,
     };
   }
 

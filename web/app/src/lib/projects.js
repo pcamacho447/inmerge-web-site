@@ -1,7 +1,28 @@
 import { supabase } from './supabaseClient.js';
 
-export async function fetchClientProjects(userId) {
+const CLIENT_PROJECTS_CACHE_TTL_MS = 30000; // 30s TTL
+const clientCache = new Map();
+
+/**
+ * Invalida el caché en memoria de proyectos del portal de clientes.
+ * Si se especifica userId, solo invalida las entradas de dicho cliente; si es null, vacía todo el caché.
+ */
+export function clearClientProjectsCache(userId = null) {
+  if (userId) {
+    clientCache.delete(userId);
+  } else {
+    clientCache.clear();
+  }
+}
+
+export async function fetchClientProjects(userId, { forceRefresh = false } = {}) {
   if (!userId) return [];
+
+  const now = Date.now();
+  const cached = clientCache.get(userId);
+  if (!forceRefresh && cached && now - cached.timestamp < CLIENT_PROJECTS_CACHE_TTL_MS) {
+    return cached.data;
+  }
 
   const { data: projects, error } = await supabase
     .from('client_projects')
@@ -73,13 +94,20 @@ export async function fetchClientProjects(userId) {
   }
 
   // Sort milestones by order_index and tasks by due_date
-  return (projects || []).map((p) => ({
+  const formattedProjects = (projects || []).map((p) => ({
     ...p,
     milestones: (p.project_milestones || []).sort((a, b) => (a.order_index || 0) - (b.order_index || 0)),
     deliverables: (p.project_deliverables || []).filter((d) => !d.status || d.status === 'PUBLICADO_CLIENTE'),
     tasks: (p.project_tasks || []).sort((a, b) => new Date(a.due_date || a.created_at || 0) - new Date(b.due_date || b.created_at || 0)),
     risks: p.project_risks || [],
   }));
+
+  clientCache.set(userId, {
+    timestamp: now,
+    data: formattedProjects,
+  });
+
+  return formattedProjects;
 }
 
 /**
@@ -116,10 +144,18 @@ export async function verifyDeliverableIntegrity(fileBlob, expectedSha256) {
 export function generateExecutiveReportMarkdown(project) {
   if (!project) return '';
 
-  const totalTasks = project.tasks?.length || 0;
-  const doneTasks = project.tasks?.filter((t) => t.status === 'DONE').length || 0;
-  const estHours = project.tasks?.reduce((sum, t) => sum + (Number(t.estimated_hours) || 0), 0) || 0;
-  const actHours = project.tasks?.reduce((sum, t) => sum + (Number(t.actual_hours) || 0), 0) || 0;
+  const tasks = project.tasks || [];
+  const totalTasks = tasks.length;
+  let doneTasks = 0;
+  let estHours = 0;
+  let actHours = 0;
+
+  for (let i = 0; i < totalTasks; i++) {
+    const t = tasks[i];
+    if (t.status === 'DONE') doneTasks++;
+    estHours += Number(t.estimated_hours) || 0;
+    actHours += Number(t.actual_hours) || 0;
+  }
   const variance = estHours > 0 ? (((actHours - estHours) / estHours) * 100).toFixed(1) : 0;
 
   return `# INMERGE — Resumen Ejecutivo de Proyecto

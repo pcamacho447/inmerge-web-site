@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   fetchClientProjects,
+  clearClientProjectsCache,
   getSignedDeliverableUrl,
   calculateFileSha256,
   verifyDeliverableIntegrity,
@@ -26,6 +27,7 @@ vi.mock('./supabaseClient.js', () => ({
 describe('projects.js', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearClientProjectsCache();
   });
 
   it('returns empty array if userId is not provided', async () => {
@@ -185,4 +187,78 @@ describe('projects.js', () => {
     expect(report).toContain('Reporte Forense.pdf');
     expect(report).toContain('a1b2c3d4e5f6');
   });
+
+  it('caches client projects per userId for 30s TTL and avoids redundant queries', async () => {
+    const mockOrder = vi.fn().mockResolvedValue({
+      data: [{ id: 'proj-1', title: 'Audit P1', client_id: 'user-a' }],
+      error: null,
+    });
+    const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
+    const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+    supabase.from.mockReturnValue({ select: mockSelect });
+
+    // Call 1 for user-a
+    const firstCall = await fetchClientProjects('user-a');
+    expect(firstCall).toHaveLength(1);
+    expect(supabase.from).toHaveBeenCalledTimes(1);
+
+    // Call 2 for user-a should hit cache
+    const secondCall = await fetchClientProjects('user-a');
+    expect(secondCall).toHaveLength(1);
+    expect(supabase.from).toHaveBeenCalledTimes(1);
+
+    // Call for user-b should query database
+    await fetchClientProjects('user-b');
+    expect(supabase.from).toHaveBeenCalledTimes(2);
+  });
+
+  it('bypasses cache when forceRefresh is true', async () => {
+    const mockOrder = vi.fn().mockResolvedValue({
+      data: [{ id: 'proj-1', title: 'Audit P1', client_id: 'user-a' }],
+      error: null,
+    });
+    const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
+    const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+    supabase.from.mockReturnValue({ select: mockSelect });
+
+    await fetchClientProjects('user-a');
+    expect(supabase.from).toHaveBeenCalledTimes(1);
+
+    await fetchClientProjects('user-a', { forceRefresh: true });
+    expect(supabase.from).toHaveBeenCalledTimes(2);
+  });
+
+  it('clearClientProjectsCache clears cache for specific user or all users', async () => {
+    const mockOrder = vi.fn().mockResolvedValue({
+      data: [{ id: 'proj-1', title: 'Audit P1', client_id: 'user-a' }],
+      error: null,
+    });
+    const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
+    const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+    supabase.from.mockReturnValue({ select: mockSelect });
+
+    // Fill cache for user-a and user-b
+    await fetchClientProjects('user-a');
+    await fetchClientProjects('user-b');
+    expect(supabase.from).toHaveBeenCalledTimes(2);
+
+    // Clear user-a only
+    clearClientProjectsCache('user-a');
+
+    // user-a should query DB again
+    await fetchClientProjects('user-a');
+    expect(supabase.from).toHaveBeenCalledTimes(3);
+
+    // user-b should still hit cache
+    await fetchClientProjects('user-b');
+    expect(supabase.from).toHaveBeenCalledTimes(3);
+
+    // Clear all
+    clearClientProjectsCache();
+
+    // user-b should now query DB again
+    await fetchClientProjects('user-b');
+    expect(supabase.from).toHaveBeenCalledTimes(4);
+  });
 });
+
