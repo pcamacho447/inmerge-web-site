@@ -465,3 +465,115 @@ export async function fetchProjectAnalytics(projectId, localProjectData = null) 
 
   return null;
 }
+
+/**
+ * Agrega y calcula métricas analíticas consolidadas de un conjunto de proyectos en un único pase O(N).
+ * Optimizado para el portal de clientes y tableros ejecutivos.
+ *
+ * @param {Array} projects - Lista de proyectos con sus tareas y entregables asociados
+ * @returns {{
+ *   totalProjects: number,
+ *   totalTasks: number,
+ *   completedTasks: number,
+ *   completionPct: number,
+ *   estimatedHours: number,
+ *   actualHours: number,
+ *   varianceHours: number,
+ *   publishedDeliverablesCount: number,
+ *   healthCounts: { ON_TRACK: number, AT_RISK: number, DELAYED: number, BLOCKED: number }
+ * }}
+ */
+export function calculateAggregatedProjectMetrics(projects = []) {
+  const emptyMetrics = {
+    totalProjects: 0,
+    totalTasks: 0,
+    completedTasks: 0,
+    completionPct: 0,
+    estimatedHours: 0,
+    actualHours: 0,
+    varianceHours: 0,
+    publishedDeliverablesCount: 0,
+    healthCounts: {
+      ON_TRACK: 0,
+      AT_RISK: 0,
+      DELAYED: 0,
+      BLOCKED: 0,
+    },
+  };
+
+  if (!projects || !Array.isArray(projects) || projects.length === 0) {
+    return emptyMetrics;
+  }
+
+  let totalProjects = 0;
+  let totalTasks = 0;
+  let completedTasks = 0;
+  let estHours = 0;
+  let actHours = 0;
+  let publishedDeliverablesCount = 0;
+
+  const healthCounts = {
+    ON_TRACK: 0,
+    AT_RISK: 0,
+    DELAYED: 0,
+    BLOCKED: 0,
+  };
+
+  for (let i = 0; i < projects.length; i++) {
+    const proj = projects[i];
+    if (!proj || typeof proj !== 'object') continue;
+
+    totalProjects++;
+
+    const health = proj.health_status || 'ON_TRACK';
+    if (healthCounts[health] !== undefined) {
+      healthCounts[health]++;
+    } else {
+      healthCounts[health] = (healthCounts[health] || 0) + 1;
+    }
+
+    const tasks = proj.tasks || proj.project_tasks || [];
+    if (Array.isArray(tasks)) {
+      for (let j = 0; j < tasks.length; j++) {
+        const t = tasks[j];
+        if (!t || typeof t !== 'object') continue;
+
+        totalTasks++;
+        if (t.status === 'DONE') {
+          completedTasks++;
+        }
+        estHours += Number(t.estimated_hours) || 0;
+        actHours += Number(t.actual_hours) || 0;
+      }
+    }
+
+    const deliverables = proj.deliverables || proj.project_deliverables || [];
+    if (Array.isArray(deliverables)) {
+      for (let k = 0; k < deliverables.length; k++) {
+        const d = deliverables[k];
+        if (!d || typeof d !== 'object') continue;
+
+        if (!d.status || d.status === 'PUBLICADO_CLIENTE') {
+          publishedDeliverablesCount++;
+        }
+      }
+    }
+  }
+
+  const completionPct = totalTasks > 0 ? Number(((completedTasks / totalTasks) * 100).toFixed(1)) : 0;
+  const estimatedHours = Number(estHours.toFixed(1));
+  const actualHours = Number(actHours.toFixed(1));
+  const varianceHours = Number((actualHours - estimatedHours).toFixed(1));
+
+  return {
+    totalProjects,
+    totalTasks,
+    completedTasks,
+    completionPct,
+    estimatedHours,
+    actualHours,
+    varianceHours,
+    publishedDeliverablesCount,
+    healthCounts,
+  };
+}

@@ -3,6 +3,7 @@ import {
   calculateMilestoneProgress,
   calculateProjectProgress,
   calculateProjectHours,
+  calculateAggregatedProjectMetrics,
   deriveProjectHealth,
   sanitizeTaskPayload,
   sanitizeRiskPayload,
@@ -215,6 +216,144 @@ describe('pm.js - Project Management Engine', () => {
       const { fetchProjectAnalytics } = await import('./pm.js');
       expect(await fetchProjectAnalytics(null)).toBeNull();
       expect(await fetchProjectAnalytics(undefined)).toBeNull();
+    });
+  });
+
+  describe('calculateAggregatedProjectMetrics', () => {
+    it('handles null, undefined, and empty array gracefully', () => {
+      const expectedEmpty = {
+        totalProjects: 0,
+        totalTasks: 0,
+        completedTasks: 0,
+        completionPct: 0,
+        estimatedHours: 0,
+        actualHours: 0,
+        varianceHours: 0,
+        publishedDeliverablesCount: 0,
+        healthCounts: {
+          ON_TRACK: 0,
+          AT_RISK: 0,
+          DELAYED: 0,
+          BLOCKED: 0,
+        },
+      };
+
+      expect(calculateAggregatedProjectMetrics()).toEqual(expectedEmpty);
+      expect(calculateAggregatedProjectMetrics(null)).toEqual(expectedEmpty);
+      expect(calculateAggregatedProjectMetrics(undefined)).toEqual(expectedEmpty);
+      expect(calculateAggregatedProjectMetrics([])).toEqual(expectedEmpty);
+    });
+
+    it('aggregates metrics across multiple projects accurately in a single pass O(N)', () => {
+      const sampleProjects = [
+        {
+          id: 'proj-1',
+          health_status: 'ON_TRACK',
+          tasks: [
+            { id: 't-1', status: 'DONE', estimated_hours: 10, actual_hours: 8 },
+            { id: 't-2', status: 'IN_PROGRESS', estimated_hours: 15, actual_hours: 12 },
+          ],
+          deliverables: [
+            { id: 'd-1', status: 'PUBLICADO_CLIENTE' },
+            { id: 'd-2', status: 'BORRADOR_INTERNO' },
+          ],
+        },
+        {
+          id: 'proj-2',
+          health_status: 'AT_RISK',
+          tasks: [
+            { id: 't-3', status: 'DONE', estimated_hours: 5, actual_hours: 6.5 },
+            { id: 't-4', status: 'TODO', estimated_hours: 10.5, actual_hours: 0 },
+          ],
+          deliverables: [
+            { id: 'd-3', status: 'PUBLICADO_CLIENTE' },
+            { id: 'd-4', title: 'Informe de Arquitectura' }, // No explicit status -> counts as published
+          ],
+        },
+        {
+          id: 'proj-3',
+          health_status: 'DELAYED',
+          tasks: [],
+          deliverables: [],
+        },
+        {
+          id: 'proj-4',
+          health_status: 'BLOCKED',
+          tasks: [{ id: 't-5', status: 'BLOCKED', estimated_hours: 4.5, actual_hours: 1.5 }],
+          deliverables: [{ id: 'd-5', status: 'EN_REVISION' }],
+        },
+      ];
+
+      const metrics = calculateAggregatedProjectMetrics(sampleProjects);
+
+      expect(metrics.totalProjects).toBe(4);
+      expect(metrics.totalTasks).toBe(5);
+      expect(metrics.completedTasks).toBe(2);
+      expect(metrics.completionPct).toBe(40);
+      expect(metrics.estimatedHours).toBe(45);
+      expect(metrics.actualHours).toBe(28);
+      expect(metrics.varianceHours).toBe(-17);
+      expect(metrics.publishedDeliverablesCount).toBe(3);
+      expect(metrics.healthCounts).toEqual({
+        ON_TRACK: 1,
+        AT_RISK: 1,
+        DELAYED: 1,
+        BLOCKED: 1,
+      });
+    });
+
+    it('supports projects with project_tasks and project_deliverables database fields', () => {
+      const dbProjects = [
+        {
+          id: 'proj-raw',
+          // health_status omitted -> defaults to ON_TRACK
+          project_tasks: [{ id: 't-raw-1', status: 'DONE', estimated_hours: 20, actual_hours: 22 }],
+          project_deliverables: [
+            { id: 'd-raw-1', status: 'PUBLICADO_CLIENTE' },
+            { id: 'd-raw-2', status: 'BORRADOR_INTERNO' },
+          ],
+        },
+      ];
+
+      const metrics = calculateAggregatedProjectMetrics(dbProjects);
+
+      expect(metrics.totalProjects).toBe(1);
+      expect(metrics.totalTasks).toBe(1);
+      expect(metrics.completedTasks).toBe(1);
+      expect(metrics.completionPct).toBe(100);
+      expect(metrics.estimatedHours).toBe(20);
+      expect(metrics.actualHours).toBe(22);
+      expect(metrics.varianceHours).toBe(2);
+      expect(metrics.publishedDeliverablesCount).toBe(1);
+      expect(metrics.healthCounts.ON_TRACK).toBe(1);
+    });
+
+    it('handles non-numeric values, string numbers, and null items defensively', () => {
+      const noisyProjects = [
+        null,
+        {
+          health_status: 'UNKNOWN_STATUS',
+          tasks: [
+            null,
+            { status: 'DONE', estimated_hours: '12.5', actual_hours: '14.2' },
+            { status: 'TODO', estimated_hours: null, actual_hours: undefined },
+          ],
+          deliverables: [null, { status: null }],
+        },
+      ];
+
+      const metrics = calculateAggregatedProjectMetrics(noisyProjects);
+
+      expect(metrics.totalProjects).toBe(1);
+      expect(metrics.totalTasks).toBe(2);
+      expect(metrics.completedTasks).toBe(1);
+      expect(metrics.completionPct).toBe(50);
+      expect(metrics.estimatedHours).toBe(12.5);
+      expect(metrics.actualHours).toBe(14.2);
+      expect(metrics.varianceHours).toBe(1.7);
+      expect(metrics.publishedDeliverablesCount).toBe(1);
+      expect(metrics.healthCounts.UNKNOWN_STATUS).toBe(1);
+      expect(metrics.healthCounts.ON_TRACK).toBe(0);
     });
   });
 });
