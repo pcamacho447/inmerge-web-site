@@ -1,21 +1,42 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient.js';
+import { clearTeamDataCache } from '../lib/team.js';
 
 /**
  * Hook reactivo para el Panel de Consultores & Equipo Técnico (/equipo).
  * Escucha cambios en tiempo real en leads_tdr, client_projects, project_deliverables y team_activity_logs.
  */
-export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) {
+export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled = true } = {}) {
   const [toast, setToast] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('CONNECTING');
   const onDataRefreshRef = useRef(onDataRefresh);
+  const onDeltaPatchRef = useRef(onDeltaPatch);
+  const debounceTimerRef = useRef(null);
 
   useEffect(() => {
     onDataRefreshRef.current = onDataRefresh;
   }, [onDataRefresh]);
 
   useEffect(() => {
+    onDeltaPatchRef.current = onDeltaPatch;
+  }, [onDeltaPatch]);
+
+  useEffect(() => {
     if (!enabled || !supabase?.channel) return;
+
+    const dispatchChange = (payload) => {
+      clearTeamDataCache();
+      if (typeof onDeltaPatchRef.current === 'function') {
+        onDeltaPatchRef.current(payload);
+      } else {
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+          onDataRefreshRef.current?.({ forceRefresh: true });
+        }, 300);
+      }
+    };
 
     const channel = supabase.channel('realtime-team-consultancy');
 
@@ -45,7 +66,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
               message: `El lead de ${name} cambió a estado "${lead.status || 'Actualizado'}".`,
             });
           }
-          onDataRefreshRef.current?.();
+          dispatchChange(payload);
         },
       )
       .on(
@@ -64,7 +85,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
               message: `Se registró el proyecto "${proj.title || 'Proyecto Inmerge'}".`,
             });
           }
-          onDataRefreshRef.current?.();
+          dispatchChange(payload);
         },
       )
       .on(
@@ -84,7 +105,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
               message: `Nuevo entregable publicado: "${title}".`,
             });
           }
-          onDataRefreshRef.current?.();
+          dispatchChange(payload);
         },
       )
       .on(
@@ -103,7 +124,7 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
               message: `Un cliente descargó un entregable confidencial (Trazabilidad registrada).`,
             });
           }
-          onDataRefreshRef.current?.();
+          dispatchChange(payload);
         },
       )
       .subscribe((status, err) => {
@@ -116,6 +137,9 @@ export default function useRealtimeTeam({ onDataRefresh, enabled = true } = {}) 
       });
 
     return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
       if (supabase && typeof supabase.removeChannel === 'function') {
         supabase.removeChannel(channel);
       }
