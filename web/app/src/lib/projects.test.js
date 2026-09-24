@@ -261,4 +261,3 @@ describe('projects.js', () => {
     expect(supabase.from).toHaveBeenCalledTimes(4);
   });
 });
-

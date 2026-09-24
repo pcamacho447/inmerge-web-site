@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import Equipo from './Equipo.jsx';
@@ -37,6 +37,7 @@ vi.mock('../lib/team.js', () => ({
   updateProjectFinding: vi.fn(),
   deleteProjectFinding: vi.fn(),
   fetchProjectFindings: vi.fn(),
+  fetchWorkspaceTelemetrySnapshot: vi.fn(),
 }));
 
 vi.mock('../hooks/useRealtimeTeam.js', () => ({
@@ -125,6 +126,17 @@ describe('Equipo Console Component', () => {
         created_at: '2026-09-10T14:00:00Z',
       },
     ]);
+
+    teamLib.fetchWorkspaceTelemetrySnapshot.mockResolvedValue({
+      kpis: {
+        active_projects_count: 1,
+        active_leads_count: 1,
+        pending_deliverables_count: 1,
+        open_critical_findings_count: 0,
+        user_assigned_tasks_count: 0,
+      },
+      generated_at: '2026-09-23T20:00:00Z',
+    });
   });
 
   it('renders the Full-Canvas layout with top KPI metric strip and realtime status', async () => {
@@ -311,5 +323,105 @@ describe('Equipo Console Component', () => {
 
     expect(await screen.findByText(/ESTACIÓN DE TRABAJO TÉCNICA/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Principal Architect' })).toBeInTheDocument();
+  });
+
+  it('aprovecha fetchWorkspaceTelemetrySnapshot para inicializar telemetría de KPIs', async () => {
+    render(
+      <MemoryRouter>
+        <Equipo />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(teamLib.fetchWorkspaceTelemetrySnapshot).toHaveBeenCalledWith({
+        userEmail: 'lead.architect@inmerge.pe',
+        isAdmin: true,
+      });
+    });
+  });
+
+  it('aplica parches delta reactivos para tareas, entregables y hallazgos sin consultar la red', async () => {
+    let capturedOptions;
+    realtimeHook.default.mockImplementation((opts) => {
+      capturedOptions = opts;
+      return {
+        toast: null,
+        dismissToast: vi.fn(),
+        connectionStatus: 'CONNECTED',
+        isOnline: true,
+      };
+    });
+
+    render(
+      <MemoryRouter>
+        <Equipo />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(screen.queryByText(/Cargando consola/i)).not.toBeInTheDocument());
+
+    expect(capturedOptions?.onDeltaPatch).toBeDefined();
+
+    // Limpiar contador de llamadas a la red
+    teamLib.fetchTeamProjects.mockClear();
+
+    // 1. Delta INSERT en project_tasks sin invocar red
+    act(() => {
+      capturedOptions.onDeltaPatch({
+        table: 'project_tasks',
+        eventType: 'INSERT',
+        new: {
+          id: 'task-new-1',
+          project_id: 'proj-1',
+          title: 'Optimización de Índices PostgreSQL',
+          status: 'IN_PROGRESS',
+        },
+      });
+    });
+
+    expect(teamLib.fetchTeamProjects).not.toHaveBeenCalled();
+
+    // 2. Delta UPDATE en project_deliverables reflejado en la UI
+    act(() => {
+      capturedOptions.onDeltaPatch({
+        table: 'project_deliverables',
+        eventType: 'UPDATE',
+        new: {
+          id: 'deliv-1',
+          project_id: 'proj-1',
+          title: 'Informe Forense Aprobado',
+          status: 'PUBLICADO_CLIENTE',
+        },
+      });
+    });
+
+    expect(teamLib.fetchTeamProjects).not.toHaveBeenCalled();
+
+    // El entregable actualizado debe reflejarse en la UI
+    expect(await screen.findByText(/Informe Forense Aprobado/i)).toBeInTheDocument();
+
+    // 3. Delta INSERT en project_findings reflejado directamente en la matriz
+    act(() => {
+      capturedOptions.onDeltaPatch({
+        table: 'project_findings',
+        eventType: 'INSERT',
+        new: {
+          id: 'find-99',
+          project_id: 'proj-1',
+          finding_code: 'FIND-SEC-99',
+          title: 'Hallazgo Crítico Resuelto',
+          severity: 'ALTA',
+          status: 'IDENTIFICADO',
+        },
+      });
+    });
+
+    expect(teamLib.fetchTeamProjects).not.toHaveBeenCalled();
+
+    const toolSelect = screen.getByLabelText(/Seleccionar herramienta avanzada de proyecto/i);
+    fireEvent.change(toolSelect, { target: { value: 'PM_FINDINGS' } });
+
+    expect(await screen.findByText('FIND-SEC-99')).toBeInTheDocument();
+    expect(screen.getByText('Hallazgo Crítico Resuelto')).toBeInTheDocument();
   });
 });

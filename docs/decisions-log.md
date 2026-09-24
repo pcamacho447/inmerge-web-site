@@ -394,3 +394,47 @@ Implementación completa del plan de arquitectura de operaciones y entregables p
 - **Linter (ESLint):** 0 errores (`npm run lint`).
 - **Formateador (Prettier):** 100% de archivos en conformidad de estilo (`npm run format:check`).
 - **Compilación de Producción (Vite):** Bundle generado con éxito en `dist/` en 2.65s (`npm run build`).
+
+---
+
+## Sesión: 2026-09-23 (Sesión 3) — Fase 1: Optimización de Consultas SQL, Índices Compuestos, RPCs de Telemetría y Sincronización Delta Reactiva
+
+Implementación completa de la Fase 1 del plan de optimización de bases de datos y rendimiento (`docs/superpowers/plans/2026-09-23-optimizacion-consultas-sql-indices-rpc.md`).
+
+### 1. Migración SQL de Índices Compuestos B-Tree & Paridad Estricta (`0011_inmerge_sql_performance_and_telemetry_rpc.sql`)
+- **Decisión:** Crear índices btree compuestos específicos en PostgreSQL para transformar los escaneos secuenciales O(N) en búsquedas directas O(log N):
+  - `idx_tasks_assigned_email_status` en `project_tasks(assigned_to_email, status)`: optimiza el filtrado del cockpit técnico y conteos de tareas por especialista.
+  - `idx_deliverables_proj_status` en `project_deliverables(project_id, status)`: optimiza la consulta de entregables confidenciales y el filtrado hermético para el portal del cliente.
+  - `idx_findings_proj_sev_stat` en `project_findings(project_id, severity, status)`: acelera la matriz forense y agregados de vulnerabilidades críticas.
+  - `idx_milestones_assigned_email` en `project_milestones(assigned_to_email)`: optimiza el emparejamiento de hitos asignados a consultores.
+  - `idx_leads_status_created` en `leads_tdr(status, created_at DESC)`: acelera la bandeja de entrada y triaje de TDRs.
+- **Paridad Estricta:** Replicación 1:1 en `supabase/migrations/` y `web/app/supabase/migrations/`, verificada con `scripts/verify-migrations-parity.test.mjs`.
+
+### 2. RPCs Consolidadas en PostgreSQL (Single-Pass Aggregates & Telemetry Snapshot)
+- **Decisión:** Reemplazar múltiples consultas separadas y agregaciones pesadas en el cliente por dos funciones PL/pgSQL STABLE con `SECURITY DEFINER`:
+  - `get_project_analytics(p_project_id UUID)`: Ejecuta una agregación consolidada en una sola pasada sobre `project_tasks`, calculando conteos por estado, varianza de esfuerzo (`effort_variance_pct`), porcentaje de avance (`completion_pct`), y conteos correlacionados de riesgos abiertos y hallazgos críticos abiertos.
+  - `get_workspace_telemetry_snapshot(p_user_email TEXT, p_is_admin BOOLEAN)`: Proporciona un snapshot integral en un único viaje de red (1 HTTP roundtrip) con conteos exactos de proyectos activos, leads pendientes, entregables en revisión, hallazgos críticos sin mitigar y tareas asignadas al usuario.
+
+### 3. Caché en Memoria con TTL de 30 Segundos y Fallbacks Resilientes (`team.js` & `projects.js`)
+- **Decisión:** Implementar un caché en memoria de 30 segundos (`CACHE_TTL_MS = 30000`) tanto para el panel de consultores (`teamProjectsCache`) como para el portal de clientes (`clientCache` indexado por `userId`):
+  - Invocaciones repetidas o cambios de pestaña dentro de la ventana de 30s reutilizan la referencia en memoria a 0ms de latencia.
+  - El parámetro `{ forceRefresh: true }` y los invalidadores explícitos `clearTeamDataCache()` y `clearClientProjectsCache()` purgan el caché inmediatamente ante mutaciones o eventos de sincronización.
+  - Las consultas se construyen con diseño defensivo y fallbacks analíticos locales que computan métricas agregadas si la base de datos remota aún no ha aplicado las funciones RPC (cumpliendo la Regla 4 de `AGENTS.md`).
+
+### 4. Sincronización Delta Reactiva en Tiempo Real (`useRealtimeTeam.js`)
+- **Decisión:** Refactorizar el hook de suscripciones WebSocket para erradicar las tormentas de re-consultas (*refetch storms*):
+  - Se añadió el manejador opcional `onDeltaPatch(payload)` y la invalidación inmediata de caché `clearTeamDataCache()`.
+  - Cuando se provee `onDeltaPatch`, las mutaciones en `leads_tdr`, `client_projects`, `project_deliverables`, `project_tasks` y `project_findings` se despachan de forma instantánea al estado local, sin generar tráfico de red HTTP ni sobrecarga a la base de datos.
+  - Como mecanismo de respaldo ante la ausencia de `onDeltaPatch`, se implementó amortiguación (*debouncing*) de 300ms en `onDataRefresh({ forceRefresh: true })`, consolidando ráfagas de eventos Realtime en una única recarga.
+
+### 5. Integración en Consola Operativa (`Equipo.jsx`)
+- **Decisión:** Integrar `handleDeltaPatch` y `fetchWorkspaceTelemetrySnapshot` en `/equipo`:
+  - La carga inicial aprovecha el RPC de telemetría consolidada para poblar los indicadores Bento ejecutivos y tiras de KPIs instantáneamente.
+  - Los eventos WebSocket de tareas, entregables y hallazgos parchean la matriz de proyectos local en tiempo real con latencia visual de 0ms, preservando la inmutabilidad y ordenación del estado.
+  - El indicador visual de estado Realtime en la barra superior refleja fielmente la salud del canal (`REALTIME ACTIVO` vs `SIN CONEXIÓN REALTIME`) con accesibilidad WCAG (`role="status"`, `aria-live="polite"`).
+
+### 6. Evidencias de Verificación y Calidad Global
+- **Suite de Pruebas Vitest:** 42 archivos de prueba ejecutados, 259 pruebas pasando con 100% de éxito (0 fallos).
+- **Linter (ESLint):** 0 errores (`npm run lint`).
+- **Formateador (Prettier):** 100% de archivos en conformidad estricta (`npm run format:check`).
+- **Compilación de Producción (Vite):** Build limpio y optimizado generado en 2.65s (`npm run build`).

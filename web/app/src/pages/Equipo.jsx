@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
@@ -8,6 +8,7 @@ import {
   fetchTeamLeads,
   updateLeadStatus,
   fetchTeamProjects,
+  fetchWorkspaceTelemetrySnapshot,
   createTeamProject,
   updateProjectStatus,
   addProjectMilestone,
@@ -57,6 +58,7 @@ export default function Equipo() {
   const [clients, setClients] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
+  const [telemetrySnapshot, setTelemetrySnapshot] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusMsg, setStatusMsg] = useState(null);
@@ -124,16 +126,23 @@ export default function Equipo() {
     }
     setError(null);
     try {
-      const [leadsData, projsData, clientsData, logsData] = await Promise.all([
+      const [leadsData, projsData, clientsData, logsData, telemetryData] = await Promise.all([
         fetchTeamLeads().catch(() => []),
         fetchTeamProjects().catch(() => []),
         fetchRegisteredClients().catch(() => []),
         fetchTeamActivityLogs({ limit: 50 }).catch(() => []),
+        (typeof fetchWorkspaceTelemetrySnapshot === 'function'
+          ? fetchWorkspaceTelemetrySnapshot({ userEmail: user?.email, isAdmin: user?.isAdmin })
+          : Promise.resolve(null)
+        ).catch(() => null),
       ]);
       setLeads(leadsData);
       setProjects(projsData);
       setClients(clientsData);
       setActivityLogs(logsData);
+      if (telemetryData) {
+        setTelemetrySnapshot(telemetryData);
+      }
 
       const staffData = await fetchStaffMembers().catch(() => []);
       setStaffList(staffData);
@@ -158,10 +167,93 @@ export default function Equipo() {
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
-  const totalDeliverablesCount = projects.reduce((acc, p) => acc + (p.deliverables?.length || 0), 0);
-  const activeLeadsCount = leads.filter((l) => l.status === 'NUEVO' || l.status === 'EN_REVISION').length;
-  const activeProjectsCount = projects.filter((p) => p.status !== 'FINALIZADO').length;
-  const totalTasksCount = projects.reduce((acc, p) => acc + (p.tasks?.length || 0), 0);
+  const totalDeliverablesCount =
+    projects.reduce((acc, p) => acc + (p.deliverables?.length || 0), 0) || telemetrySnapshot?.kpis?.pending_deliverables_count || 0;
+  const activeLeadsCount =
+    leads.length > 0
+      ? leads.filter((l) => l.status === 'NUEVO' || l.status === 'EN_REVISION').length
+      : (telemetrySnapshot?.kpis?.active_leads_count ?? 0);
+  const activeProjectsCount =
+    projects.length > 0 ? projects.filter((p) => p.status !== 'FINALIZADO').length : (telemetrySnapshot?.kpis?.active_projects_count ?? 0);
+  const totalTasksCount =
+    projects.reduce((acc, p) => acc + (p.tasks?.length || 0), 0) || telemetrySnapshot?.kpis?.user_assigned_tasks_count || 0;
+
+  // Manejador delta reactivo para mutaciones en tiempo real sin HTTP refetch
+  const handleDeltaPatch = useCallback((payload) => {
+    if (!payload) return;
+    const { table, eventType, new: newRow, old: oldRow } = payload;
+
+    if (table === 'project_tasks' || table === 'project_deliverables' || table === 'project_findings') {
+      const targetProjectId = newRow?.project_id || oldRow?.project_id;
+      if (!targetProjectId) return;
+      const collectionKey = table === 'project_tasks' ? 'tasks' : table === 'project_deliverables' ? 'deliverables' : 'findings';
+
+      setProjects((prevProjects) =>
+        prevProjects.map((p) => {
+          if (p.id !== targetProjectId) return p;
+          const items = p[collectionKey] || [];
+          let updatedItems;
+          if (eventType === 'INSERT' && newRow) {
+            const exists = items.some((item) => item.id === newRow.id);
+            updatedItems = exists ? items.map((item) => (item.id === newRow.id ? { ...item, ...newRow } : item)) : [newRow, ...items];
+          } else if (eventType === 'UPDATE' && newRow) {
+            updatedItems = items.map((item) => (item.id === newRow.id ? { ...item, ...newRow } : item));
+          } else if (eventType === 'DELETE' && oldRow) {
+            updatedItems = items.filter((item) => item.id !== oldRow.id);
+          } else {
+            updatedItems = items;
+          }
+          return { ...p, [collectionKey]: updatedItems };
+        }),
+      );
+      return;
+    }
+
+    if (table === 'client_projects') {
+      if (eventType === 'INSERT' && newRow) {
+        setProjects((prev) => {
+          if (prev.some((p) => p.id === newRow.id)) return prev;
+          return [
+            {
+              milestones: [],
+              deliverables: [],
+              tasks: [],
+              risks: [],
+              findings: [],
+              ...newRow,
+            },
+            ...prev,
+          ];
+        });
+      } else if (eventType === 'UPDATE' && newRow) {
+        setProjects((prev) => prev.map((p) => (p.id === newRow.id ? { ...p, ...newRow } : p)));
+      } else if (eventType === 'DELETE' && oldRow) {
+        setProjects((prev) => prev.filter((p) => p.id !== oldRow.id));
+      }
+      return;
+    }
+
+    if (table === 'leads_tdr') {
+      if (eventType === 'INSERT' && newRow) {
+        setLeads((prev) => {
+          if (prev.some((l) => l.id === newRow.id)) return prev;
+          return [newRow, ...prev];
+        });
+      } else if (eventType === 'UPDATE' && newRow) {
+        setLeads((prev) => prev.map((l) => (l.id === newRow.id ? { ...l, ...newRow } : l)));
+      } else if (eventType === 'DELETE' && oldRow) {
+        setLeads((prev) => prev.filter((l) => l.id !== oldRow.id));
+      }
+      return;
+    }
+
+    if (table === 'team_activity_logs' && eventType === 'INSERT' && newRow) {
+      setActivityLogs((prev) => {
+        if (prev.some((log) => log.id === newRow.id)) return prev;
+        return [newRow, ...prev.slice(0, 49)];
+      });
+    }
+  }, []);
 
   // Escuchar suscripciones en tiempo real para el equipo
   const {
@@ -171,6 +263,7 @@ export default function Equipo() {
     isOnline: realtimeIsOnline,
   } = useRealtimeTeam({
     onDataRefresh: () => loadData(false),
+    onDeltaPatch: handleDeltaPatch,
     enabled: !!user,
   });
 
@@ -780,6 +873,7 @@ export default function Equipo() {
               <span
                 role="status"
                 aria-live="polite"
+                title={`Conexión Realtime: ${realtimeConnectionStatus}`}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -787,11 +881,11 @@ export default function Equipo() {
                   fontSize: 9,
                   fontFamily: "'IBM Plex Mono', monospace",
                   fontWeight: 600,
-                  color: '#2E7559',
-                  background: 'rgba(46, 117, 89, 0.1)',
+                  color: realtimeIsOnline ? '#2E7559' : '#8C7A6B',
+                  background: realtimeIsOnline ? 'rgba(46, 117, 89, 0.1)' : 'rgba(140, 122, 107, 0.1)',
                   padding: '1px 6px',
                   borderRadius: 10,
-                  border: '1px solid rgba(46, 117, 89, 0.25)',
+                  border: `1px solid ${realtimeIsOnline ? 'rgba(46, 117, 89, 0.25)' : 'rgba(140, 122, 107, 0.25)'}`,
                 }}
               >
                 <span
@@ -799,10 +893,10 @@ export default function Equipo() {
                     width: 5,
                     height: 5,
                     borderRadius: '50%',
-                    background: '#2E7559',
+                    background: realtimeIsOnline ? '#2E7559' : '#8C7A6B',
                   }}
                 />
-                REALTIME ACTIVO
+                {realtimeIsOnline ? 'REALTIME ACTIVO' : 'SIN CONEXIÓN REALTIME'}
               </span>
             </div>
             <h1 className="equipo-brand-title">Gestión Operativa de Auditorías & Proyectos</h1>

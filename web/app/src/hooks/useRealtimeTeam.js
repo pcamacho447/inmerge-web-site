@@ -66,7 +66,7 @@ export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled =
               message: `El lead de ${name} cambió a estado "${lead.status || 'Actualizado'}".`,
             });
           }
-          dispatchChange(payload);
+          dispatchChange({ ...payload, table: payload.table || 'leads_tdr' });
         },
       )
       .on(
@@ -85,7 +85,7 @@ export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled =
               message: `Se registró el proyecto "${proj.title || 'Proyecto Inmerge'}".`,
             });
           }
-          dispatchChange(payload);
+          dispatchChange({ ...payload, table: payload.table || 'client_projects' });
         },
       )
       .on(
@@ -105,7 +105,29 @@ export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled =
               message: `Nuevo entregable publicado: "${title}".`,
             });
           }
-          dispatchChange(payload);
+          dispatchChange({ ...payload, table: payload.table || 'project_deliverables' });
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'project_tasks',
+        },
+        (payload) => {
+          dispatchChange({ ...payload, table: payload.table || 'project_tasks' });
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'project_findings',
+        },
+        (payload) => {
+          dispatchChange({ ...payload, table: payload.table || 'project_findings' });
         },
       )
       .on(
@@ -124,7 +146,7 @@ export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled =
               message: `Un cliente descargó un entregable confidencial (Trazabilidad registrada).`,
             });
           }
-          dispatchChange(payload);
+          dispatchChange({ ...payload, table: payload.table || 'team_activity_logs' });
         },
       )
       .subscribe((status, err) => {
