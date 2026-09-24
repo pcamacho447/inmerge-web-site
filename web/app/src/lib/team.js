@@ -5,11 +5,15 @@ import { createInAppNotification } from './notifications.js';
 const TEAM_PROJECTS_CACHE_TTL_MS = 30000; // 30s TTL
 let teamProjectsCache = null;
 
+export const TELEMETRY_CACHE_TTL_MS = 15000; // 15s TTL
+let telemetrySnapshotCache = null;
+
 /**
- * Invalida el caché en memoria de proyectos del equipo técnico.
+ * Invalida el caché en memoria de proyectos y telemetría del equipo técnico.
  */
 export function clearTeamDataCache() {
   teamProjectsCache = null;
+  telemetrySnapshotCache = null;
 }
 
 /**
@@ -197,9 +201,28 @@ export async function fetchTeamProjects({ forceRefresh = false } = {}) {
 
 /**
  * Consulta la telemetría consolidada de proyectos, tareas y entregables del workspace
- * mediante el RPC optimizado get_workspace_telemetry_snapshot, con fallback analítico local resiliente.
+ * mediante el RPC optimizado get_workspace_telemetry_snapshot, con fallback analítico local resiliente
+ * y deduplicación en caché en memoria (15s TTL).
  */
-export async function fetchWorkspaceTelemetrySnapshot({ userEmail = null, isAdmin = false, localProjects = null, localLeads = null } = {}) {
+export async function fetchWorkspaceTelemetrySnapshot({
+  userEmail = null,
+  isAdmin = false,
+  forceRefresh = false,
+  localProjects = null,
+  localLeads = null,
+} = {}) {
+  const now = Date.now();
+  const cacheKey = `${userEmail || ''}_${isAdmin ? '1' : '0'}`;
+
+  if (
+    !forceRefresh &&
+    telemetrySnapshotCache &&
+    telemetrySnapshotCache.key === cacheKey &&
+    now - telemetrySnapshotCache.timestamp < TELEMETRY_CACHE_TTL_MS
+  ) {
+    return telemetrySnapshotCache.data;
+  }
+
   try {
     if (supabase && typeof supabase.rpc === 'function') {
       const { data, error } = await supabase.rpc('get_workspace_telemetry_snapshot', {
@@ -208,6 +231,11 @@ export async function fetchWorkspaceTelemetrySnapshot({ userEmail = null, isAdmi
       });
 
       if (!error && data) {
+        telemetrySnapshotCache = {
+          data,
+          timestamp: now,
+          key: cacheKey,
+        };
         return data;
       }
       if (error) {
@@ -242,7 +270,7 @@ export async function fetchWorkspaceTelemetrySnapshot({ userEmail = null, isAdmi
       }
     }
 
-    return {
+    const fallbackSnapshot = {
       kpis: {
         active_projects_count: activeProjects.length,
         active_leads_count: activeLeads.length,
@@ -252,6 +280,14 @@ export async function fetchWorkspaceTelemetrySnapshot({ userEmail = null, isAdmi
       },
       generated_at: new Date().toISOString(),
     };
+
+    telemetrySnapshotCache = {
+      data: fallbackSnapshot,
+      timestamp: now,
+      key: cacheKey,
+    };
+
+    return fallbackSnapshot;
   } catch (fallbackErr) {
     console.error('[team] Error en fallback de telemetría de workspace:', fallbackErr);
     return {

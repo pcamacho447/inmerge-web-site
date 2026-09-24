@@ -641,6 +641,103 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       expect(res.generated_at).toBeDefined();
     });
 
+    it('fetchWorkspaceTelemetrySnapshot reutiliza el snapshot en memoria dentro del TTL de 15s y permite forceRefresh', async () => {
+      const mockSnapshot1 = {
+        kpis: {
+          active_projects_count: 3,
+          active_leads_count: 2,
+          pending_deliverables_count: 4,
+          open_critical_findings_count: 1,
+          user_assigned_tasks_count: 5,
+        },
+        generated_at: '2026-09-24T10:00:00Z',
+      };
+      const mockSnapshot2 = {
+        kpis: {
+          active_projects_count: 4,
+          active_leads_count: 2,
+          pending_deliverables_count: 4,
+          open_critical_findings_count: 1,
+          user_assigned_tasks_count: 6,
+        },
+        generated_at: '2026-09-24T10:01:00Z',
+      };
+
+      supabase.rpc
+        .mockResolvedValueOnce({ data: mockSnapshot1, error: null })
+        .mockResolvedValueOnce({ data: mockSnapshot2, error: null });
+
+      // 1. Primera llamada consulta Supabase RPC
+      const firstCall = await fetchWorkspaceTelemetrySnapshot({
+        userEmail: 'dev@inmerge.pe',
+        isAdmin: true,
+      });
+
+      // 2. Segunda llamada dentro del TTL debe retornar exactamente la misma referencia sin invocar RPC de nuevo
+      const secondCall = await fetchWorkspaceTelemetrySnapshot({
+        userEmail: 'dev@inmerge.pe',
+        isAdmin: true,
+      });
+
+      expect(firstCall).toBe(mockSnapshot1);
+      expect(secondCall).toBe(firstCall);
+      expect(supabase.rpc).toHaveBeenCalledTimes(1);
+
+      // 3. Llamada con forceRefresh: true debe saltarse el caché e invocar RPC de nuevo
+      const forcedCall = await fetchWorkspaceTelemetrySnapshot({
+        userEmail: 'dev@inmerge.pe',
+        isAdmin: true,
+        forceRefresh: true,
+      });
+
+      expect(forcedCall).toBe(mockSnapshot2);
+      expect(supabase.rpc).toHaveBeenCalledTimes(2);
+    });
+
+    it('clearTeamDataCache invalida el caché de telemetría de workspace', async () => {
+      const mockSnapshot1 = { kpis: { active_projects_count: 1 }, generated_at: '2026-09-24T10:00:00Z' };
+      const mockSnapshot2 = { kpis: { active_projects_count: 2 }, generated_at: '2026-09-24T10:00:15Z' };
+
+      supabase.rpc
+        .mockResolvedValueOnce({ data: mockSnapshot1, error: null })
+        .mockResolvedValueOnce({ data: mockSnapshot2, error: null });
+
+      const firstCall = await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(firstCall).toBe(mockSnapshot1);
+      expect(supabase.rpc).toHaveBeenCalledTimes(1);
+
+      clearTeamDataCache();
+
+      const secondCall = await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(secondCall).toBe(mockSnapshot2);
+      expect(supabase.rpc).toHaveBeenCalledTimes(2);
+    });
+
+    it('fetchWorkspaceTelemetrySnapshot expira el caché tras cumplirse el TTL de 15 segundos', async () => {
+      const mockSnapshot1 = { kpis: { active_projects_count: 1 }, generated_at: '2026-09-24T10:00:00Z' };
+      const mockSnapshot2 = { kpis: { active_projects_count: 2 }, generated_at: '2026-09-24T10:00:20Z' };
+
+      supabase.rpc
+        .mockResolvedValueOnce({ data: mockSnapshot1, error: null })
+        .mockResolvedValueOnce({ data: mockSnapshot2, error: null });
+
+      const nowSpy = vi.spyOn(Date, 'now');
+      nowSpy.mockReturnValue(1000000);
+
+      const firstCall = await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(firstCall).toBe(mockSnapshot1);
+      expect(supabase.rpc).toHaveBeenCalledTimes(1);
+
+      // Simular avance de 15001ms (> 15s TTL)
+      nowSpy.mockReturnValue(1000000 + 15001);
+
+      const secondCall = await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(secondCall).toBe(mockSnapshot2);
+      expect(supabase.rpc).toHaveBeenCalledTimes(2);
+
+      nowSpy.mockRestore();
+    });
+
     it('fetchTeamProjects reutiliza el resultado en memoria dentro del TTL de 30s', async () => {
       const mockProjects = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
       const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
