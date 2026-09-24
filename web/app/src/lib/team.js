@@ -6,6 +6,7 @@ const TEAM_PROJECTS_CACHE_TTL_MS = 30000; // 30s TTL
 let teamProjectsCache = null;
 
 export const TELEMETRY_CACHE_TTL_MS = 15000; // 15s TTL
+export const TELEMETRY_RPC_RETRY_DELAY_MS = 200; // 200ms transparent retry backoff delay
 let telemetrySnapshotCache = null;
 
 let cacheHits = 0;
@@ -246,8 +247,8 @@ export async function fetchTeamProjects({ forceRefresh = false } = {}) {
 
 /**
  * Consulta la telemetría consolidada de proyectos, tareas y entregables del workspace
- * mediante el RPC optimizado get_workspace_telemetry_snapshot, con fallback analítico local resiliente
- * y deduplicación en caché en memoria (15s TTL).
+ * mediante el RPC optimizado get_workspace_telemetry_snapshot, con 1 reintento transparente
+ * (backoff de 200ms), fallback analítico local resiliente y deduplicación en caché en memoria (15s TTL).
  */
 export async function fetchWorkspaceTelemetrySnapshot({
   userEmail = null,
@@ -270,27 +271,43 @@ export async function fetchWorkspaceTelemetrySnapshot({
   }
 
   cacheMisses++;
-  try {
-    if (supabase && typeof supabase.rpc === 'function') {
-      const { data, error } = await supabase.rpc('get_workspace_telemetry_snapshot', {
-        p_user_email: userEmail,
-        p_is_admin: isAdmin,
-      });
+  if (supabase && typeof supabase.rpc === 'function') {
+    const maxAttempts = 2;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const response =
+          (await supabase.rpc('get_workspace_telemetry_snapshot', {
+            p_user_email: userEmail,
+            p_is_admin: isAdmin,
+          })) || {};
+        const { data, error } = response;
 
-      if (!error && data) {
-        telemetrySnapshotCache = {
-          data,
-          timestamp: now,
-          key: cacheKey,
-        };
-        return data;
+        if (!error && data) {
+          telemetrySnapshotCache = {
+            data,
+            timestamp: now,
+            key: cacheKey,
+          };
+          return data;
+        }
+
+        if (error) {
+          console.warn(
+            `[team] RPC get_workspace_telemetry_snapshot intento ${attempt}/${maxAttempts} arrojó error:`,
+            error.message || error,
+          );
+        }
+      } catch (rpcErr) {
+        console.warn(
+          `[team] Error en intento ${attempt}/${maxAttempts} invocando get_workspace_telemetry_snapshot:`,
+          rpcErr?.message || rpcErr,
+        );
       }
-      if (error) {
-        console.warn('[team] RPC get_workspace_telemetry_snapshot arrojó error, aplicando fallback:', error.message);
+
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, TELEMETRY_RPC_RETRY_DELAY_MS));
       }
     }
-  } catch (rpcErr) {
-    console.warn('[team] Error invocando get_workspace_telemetry_snapshot, aplicando fallback:', rpcErr);
   }
 
   // Fallback analítico local si el RPC no está disponible o falla

@@ -23,6 +23,7 @@ import {
   deleteProjectFinding,
   clearTeamDataCache,
   fetchWorkspaceTelemetrySnapshot,
+  TELEMETRY_RPC_RETRY_DELAY_MS,
   getCacheTelemetryMetrics,
   resetCacheTelemetryMetrics,
 } from './team.js';
@@ -594,7 +595,7 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
     });
 
     it('fetchWorkspaceTelemetrySnapshot recurre al cálculo local si el RPC falla', async () => {
-      supabase.rpc.mockResolvedValueOnce({ data: null, error: { message: 'function not found' } });
+      supabase.rpc.mockResolvedValue({ data: null, error: { message: 'function not found' } });
 
       const mockProjects = [
         {
@@ -642,6 +643,119 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       expect(res.kpis.open_critical_findings_count).toBe(1);
       expect(res.kpis.user_assigned_tasks_count).toBe(1);
       expect(res.generated_at).toBeDefined();
+    });
+
+    it('TELEMETRY_RPC_RETRY_DELAY_MS está configurado en 200ms para backoff de red', () => {
+      expect(TELEMETRY_RPC_RETRY_DELAY_MS).toBe(200);
+    });
+
+    it('fetchWorkspaceTelemetrySnapshot reintenta la llamada RPC tras 200ms de backoff si el primer intento falla y retorna los datos si el reintento es exitoso', async () => {
+      const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+      const mockSnapshot = {
+        kpis: {
+          active_projects_count: 5,
+          active_leads_count: 3,
+          pending_deliverables_count: 2,
+          open_critical_findings_count: 0,
+          user_assigned_tasks_count: 4,
+        },
+        generated_at: '2026-09-24T10:00:00Z',
+      };
+
+      supabase.rpc
+        .mockResolvedValueOnce({ data: null, error: { message: '503 Service Unavailable' } })
+        .mockResolvedValueOnce({ data: mockSnapshot, error: null });
+
+      const res = await fetchWorkspaceTelemetrySnapshot({
+        userEmail: 'dev@inmerge.pe',
+        isAdmin: true,
+      });
+
+      expect(supabase.rpc).toHaveBeenCalledTimes(2);
+      expect(supabase.rpc).toHaveBeenNthCalledWith(1, 'get_workspace_telemetry_snapshot', {
+        p_user_email: 'dev@inmerge.pe',
+        p_is_admin: true,
+      });
+      expect(supabase.rpc).toHaveBeenNthCalledWith(2, 'get_workspace_telemetry_snapshot', {
+        p_user_email: 'dev@inmerge.pe',
+        p_is_admin: true,
+      });
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), TELEMETRY_RPC_RETRY_DELAY_MS);
+      expect(res).toEqual(mockSnapshot);
+
+      setTimeoutSpy.mockRestore();
+    });
+
+    it('fetchWorkspaceTelemetrySnapshot ejecuta exactamente 1 reintento con backoff de 200ms antes de recurrir al cálculo local si ambos intentos RPC fallan', async () => {
+      const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+      supabase.rpc.mockResolvedValue({ data: null, error: { message: '500 Internal Server Error' } });
+
+      const mockProjects = [
+        {
+          id: 'p-1',
+          status: 'EN_DESARROLLO',
+          deliverables: [{ id: 'd-1', status: 'BORRADOR_INTERNO' }],
+          tasks: [],
+          findings: [],
+        },
+      ];
+      const mockLeads = [{ id: 'l-1', status: 'NUEVO' }];
+
+      const res = await fetchWorkspaceTelemetrySnapshot({
+        userEmail: 'dev@inmerge.pe',
+        isAdmin: true,
+        localProjects: mockProjects,
+        localLeads: mockLeads,
+      });
+
+      expect(supabase.rpc).toHaveBeenCalledTimes(2);
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), TELEMETRY_RPC_RETRY_DELAY_MS);
+      expect(res.kpis.active_projects_count).toBe(1);
+      expect(res.kpis.active_leads_count).toBe(1);
+      expect(res.kpis.pending_deliverables_count).toBe(1);
+
+      setTimeoutSpy.mockRestore();
+    });
+
+    it('fetchWorkspaceTelemetrySnapshot reintenta tras 200ms si el primer intento RPC lanza una excepción (throw)', async () => {
+      const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+      const mockSnapshot = {
+        kpis: { active_projects_count: 2 },
+        generated_at: '2026-09-24T10:00:00Z',
+      };
+
+      supabase.rpc.mockRejectedValueOnce(new Error('Connection reset by peer')).mockResolvedValueOnce({ data: mockSnapshot, error: null });
+
+      const res = await fetchWorkspaceTelemetrySnapshot({
+        userEmail: 'dev@inmerge.pe',
+        isAdmin: false,
+      });
+
+      expect(supabase.rpc).toHaveBeenCalledTimes(2);
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), TELEMETRY_RPC_RETRY_DELAY_MS);
+      expect(res).toEqual(mockSnapshot);
+
+      setTimeoutSpy.mockRestore();
+    });
+
+    it('fetchWorkspaceTelemetrySnapshot no ejecuta reintentos ni espera backoff cuando el primer intento es exitoso', async () => {
+      const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+      const mockSnapshot = {
+        kpis: { active_projects_count: 1 },
+        generated_at: '2026-09-24T10:00:00Z',
+      };
+      supabase.rpc.mockResolvedValueOnce({ data: mockSnapshot, error: null });
+
+      const res = await fetchWorkspaceTelemetrySnapshot({
+        userEmail: 'dev@inmerge.pe',
+        isAdmin: false,
+      });
+
+      expect(supabase.rpc).toHaveBeenCalledTimes(1);
+      expect(setTimeoutSpy).not.toHaveBeenCalledWith(expect.any(Function), TELEMETRY_RPC_RETRY_DELAY_MS);
+      expect(res).toEqual(mockSnapshot);
+
+      setTimeoutSpy.mockRestore();
     });
 
     it('fetchWorkspaceTelemetrySnapshot reutiliza el snapshot en memoria dentro del TTL de 15s y permite forceRefresh', async () => {
