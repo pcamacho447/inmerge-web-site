@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient.js';
 
-const CLIENT_PROJECTS_CACHE_TTL_MS = 30000; // 30s TTL
+export const CLIENT_PROJECTS_CACHE_TTL_MS = 30000; // 30s TTL
 const clientCache = new Map();
 
 /**

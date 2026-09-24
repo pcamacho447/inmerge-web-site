@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
+  CLIENT_PROJECTS_CACHE_TTL_MS,
   fetchClientProjects,
   clearClientProjectsCache,
   getSignedDeliverableUrl,
@@ -259,5 +260,102 @@ describe('projects.js', () => {
     // user-b should now query DB again
     await fetchClientProjects('user-b');
     expect(supabase.from).toHaveBeenCalledTimes(4);
+  });
+
+  it('exports CLIENT_PROJECTS_CACHE_TTL_MS equal to 30000 ms', () => {
+    expect(CLIENT_PROJECTS_CACHE_TTL_MS).toBe(30000);
+  });
+
+  it('expires cache for userId after 30 seconds TTL', async () => {
+    vi.useFakeTimers();
+    try {
+      const mockOrder = vi.fn().mockResolvedValue({
+        data: [{ id: 'proj-1', title: 'Audit P1', client_id: 'user-a' }],
+        error: null,
+      });
+      supabase.from.mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({ order: mockOrder }),
+        }),
+      });
+
+      await fetchClientProjects('user-a');
+      expect(mockOrder).toHaveBeenCalledTimes(1);
+
+      // Advance 29 seconds - within TTL window
+      vi.advanceTimersByTime(29000);
+      await fetchClientProjects('user-a');
+      expect(mockOrder).toHaveBeenCalledTimes(1);
+
+      // Advance past 30 seconds (total 31 seconds) - expired
+      vi.advanceTimersByTime(2000);
+      await fetchClientProjects('user-a');
+      expect(mockOrder).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('returns independent cached references for distinct userIds', async () => {
+    supabase.from.mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockImplementation((col, uid) => ({
+          order: vi.fn().mockResolvedValue({
+            data: [{ id: `proj-${uid}`, title: `Audit ${uid}`, client_id: uid }],
+            error: null,
+          }),
+        })),
+      }),
+    });
+
+    const userARes1 = await fetchClientProjects('user-a');
+    const userBRes1 = await fetchClientProjects('user-b');
+    const userARes2 = await fetchClientProjects('user-a');
+    const userBRes2 = await fetchClientProjects('user-b');
+
+    expect(userARes1).toBe(userARes2);
+    expect(userBRes1).toBe(userBRes2);
+    expect(userARes1).not.toBe(userBRes1);
+    expect(userARes1[0].client_id).toBe('user-a');
+    expect(userBRes1[0].client_id).toBe('user-b');
+  });
+
+  it('clearClientProjectsCache deletes only cache for userId when supplied, and clears all when null or undefined', async () => {
+    let callCount = 0;
+    supabase.from.mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockImplementation((col, uid) => ({
+          order: vi.fn().mockImplementation(() => {
+            callCount++;
+            return Promise.resolve({
+              data: [{ id: `proj-${uid}-${callCount}`, title: `Audit ${uid}`, client_id: uid }],
+              error: null,
+            });
+          }),
+        })),
+      }),
+    });
+
+    // Populate user-a and user-b
+    const a1 = await fetchClientProjects('user-a');
+    const b1 = await fetchClientProjects('user-b');
+
+    // Invalidate user-a only
+    clearClientProjectsCache('user-a');
+    const a2 = await fetchClientProjects('user-a');
+    const b2 = await fetchClientProjects('user-b');
+
+    expect(a2).not.toBe(a1); // user-a refetched
+    expect(b2).toBe(b1); // user-b stayed cached
+
+    // Invalidate with undefined clears all
+    clearClientProjectsCache(undefined);
+    const b3 = await fetchClientProjects('user-b');
+    expect(b3).not.toBe(b2); // user-b refetched
+
+    // Invalidate with null clears all
+    clearClientProjectsCache(null);
+    const b4 = await fetchClientProjects('user-b');
+    expect(b4).not.toBe(b3); // user-b refetched again
   });
 });
