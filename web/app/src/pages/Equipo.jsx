@@ -40,6 +40,8 @@ import TeamActivityFeed from '../components/team/TeamActivityFeed.jsx';
 import StaffManagementView from '../components/team/StaffManagementView.jsx';
 import CommandPaletteModal from '../components/team/CommandPaletteModal.jsx';
 import WorkerCockpitView from '../components/team/WorkerCockpitView.jsx';
+import NotificationsPopover from '../components/team/NotificationsPopover.jsx';
+import ConnectionTelemetryBanner from '../components/team/ConnectionTelemetryBanner.jsx';
 
 export default function Equipo() {
   useDocumentHead({ title: 'Panel de Equipo & Consultores — Inmerge', path: '/equipo', noIndex: true });
@@ -51,6 +53,7 @@ export default function Equipo() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [activityFilter, setActivityFilter] = useState('ALL'); // 'ALL' | 'LEADS' | 'PROJECTS' | 'DELIVERABLES' | 'STAFF'
   const [leads, setLeads] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -831,6 +834,7 @@ export default function Equipo() {
 
   return (
     <div className="equipo-layout-root">
+      <ConnectionTelemetryBanner isOnline={realtimeIsOnline} connectionStatus={realtimeConnectionStatus} />
       {/* Sticky Editorial Top Bar */}
       <header className="equipo-topbar">
         <div className="equipo-topbar-left">
@@ -931,6 +935,29 @@ export default function Equipo() {
             <span style={{ fontSize: 13 }}>🔍</span>
             <span className="equipo-search-text">Buscar o ejecutar...</span>
             <kbd className="equipo-search-kbd">⌘K</kbd>
+          </button>
+
+          <button
+            type="button"
+            className="equipo-notifications-trigger"
+            onClick={() => setIsNotificationsOpen((prev) => !prev)}
+            title="Centro de Notificaciones"
+            aria-label="Abrir centro de notificaciones"
+            style={{
+              background: 'none',
+              border: '1px solid var(--border)',
+              borderRadius: '50%',
+              width: 36,
+              height: 36,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              color: 'var(--ink)',
+            }}
+          >
+            🔔
           </button>
 
           {user?.isAdmin && (
@@ -1423,6 +1450,8 @@ export default function Equipo() {
           setIsDrawerOpen(true);
         }}
       />
+
+      <NotificationsPopover isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} userEmail={user?.email} />
 
       <ToastNotification toast={activeToast} onDismiss={dismissToast} />
       <Footer />

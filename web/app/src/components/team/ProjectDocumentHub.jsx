@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DELIVERABLE_STATUS_CONFIG } from '../../lib/pm.js';
+import { getSignedDeliverableUrl } from '../../lib/vaultStorage.js';
 
 const PILLAR_TECH_FALLBACKS = {
   auditoria: {
@@ -126,18 +127,52 @@ export default function ProjectDocumentHub({
     });
   };
 
-  const handlePreviewDeliverable = (deliv) => {
+  const handlePreviewDeliverable = async (deliv) => {
+    let previewUrl = deliv.external_url || null;
+    let expiresAt = null;
+
+    if (deliv.file_path) {
+      try {
+        const result = await getSignedDeliverableUrl(deliv.file_path);
+        if (result?.signedUrl) {
+          previewUrl = result.signedUrl;
+          expiresAt = result.expiresAt;
+        }
+      } catch (err) {
+        console.warn('[ProjectDocumentHub] Error al obtener URL firmada de entregable:', err);
+      }
+    }
+
     onOpenPreview?.({
       title: deliv.title,
       fileType: deliv.file_type || 'DOC',
       content: deliv.notes || 'Sin notas adicionales.',
-      url: deliv.external_url || deliv.file_path || null,
+      url: previewUrl || deliv.file_path || null,
       notes: deliv.notes || '',
       version: deliv.version || 'v1.0',
       author: 'Equipo Técnico Inmerge',
       deliverableId: deliv.id,
       filePath: deliv.file_path,
+      expiresAt,
     });
+  };
+
+  const handleDownloadDeliverable = async (e, deliv) => {
+    e?.stopPropagation?.();
+    if (deliv.file_path) {
+      try {
+        const { signedUrl } = await getSignedDeliverableUrl(deliv.file_path);
+        if (signedUrl) {
+          window.open(signedUrl, '_blank', 'noopener,noreferrer');
+          return;
+        }
+      } catch (err) {
+        console.warn('[ProjectDocumentHub] Error al descargar entregable:', err);
+      }
+    }
+    if (deliv.external_url) {
+      window.open(deliv.external_url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -817,6 +852,7 @@ export default function ProjectDocumentHub({
                         <button
                           type="button"
                           onClick={() => handlePreviewDeliverable(deliv)}
+                          aria-label={`Ver entregable ${deliv.title}`}
                           style={{
                             background: 'none',
                             border: 'none',
@@ -828,6 +864,25 @@ export default function ProjectDocumentHub({
                         >
                           👁️ Ver
                         </button>
+
+                        {(deliv.file_path || deliv.external_url) && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleDownloadDeliverable(e, deliv)}
+                            aria-label={`Descargar entregable ${deliv.title}`}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--ink)',
+                              cursor: 'pointer',
+                              fontSize: 11,
+                              fontWeight: 600,
+                              padding: '2px 4px',
+                            }}
+                          >
+                            ⬇️ Descargar
+                          </button>
+                        )}
                       </div>
                     </div>
                   );

@@ -438,3 +438,46 @@ Implementación completa de la Fase 1 del plan de optimización de bases de dato
 - **Linter (ESLint):** 0 errores (`npm run lint`).
 - **Formateador (Prettier):** 100% de archivos en conformidad estricta (`npm run format:check`).
 - **Compilación de Producción (Vite):** Build limpio y optimizado generado en 2.65s (`npm run build`).
+
+---
+
+## Sesión: 2026-09-24 — Fase 2: Escalabilidad de Infraestructura, Almacenamiento Vault, Notificaciones In-App y Telemetría
+
+Implementación completa de la Fase 2 del plan de escalabilidad (`docs/superpowers/plans/2026-09-23-fase-2-escalabilidad-notificaciones-alertas.md`).
+
+### 1. Migración SQL de Notificaciones y Bucket Seguro Vault (`0012_inmerge_user_notifications_and_vault_storage.sql`)
+- **Decisión:** Implementar la infraestructura de base de datos y almacenamiento confidencial para notificaciones in-app y custodia de entregables:
+  - **Tabla `user_notifications`:** Esquema relacional con columnas tipadas (`user_email`, `target_role`, `title`, `message`, `category`, `severity`, `project_id`, `link_url`, `is_read`, `created_at`), validación por check constraints para severidades (`CRITICAL`, `HIGH`, `MEDIUM`, `INFO`) y categorías (`DELIVERABLE`, `FINDING`, `TASK`, `SYSTEM`, `SECURITY`), con índices optimizados B-tree (`idx_user_notif_email_read`, `idx_user_notif_role_created`).
+  - **Políticas RLS en `user_notifications`:** Acceso granular con `auth.jwt() ->> 'email'`, permisos de lectura restringidos al destinatario o rol, e inserción abierta para triggers y administradores.
+  - **Bucket de Almacenamiento Seguro `project-deliverables-vault`:** Configurado como bucket privado con límite de 50 MB por archivo, restricción de tipos MIME autorizados (PDF, JSON, PNG, JPG, ZIP, Markdown) y políticas RLS estrictas en `storage.objects` (solo staff autenticado para lectura/escritura y clientes para proyectos asociados).
+- **Paridad Estricta:** Replicación correlativa en `supabase/migrations/` y `web/app/supabase/migrations/`, validada con `scripts/verify-migrations-parity.test.mjs`.
+
+### 2. Gestor de Notificaciones In-App con Caché TTL y Fallback Resiliente (`notifications.js`)
+- **Decisión:** Crear un gestor de notificaciones in-app de alta resiliencia y bajo impacto de red:
+  - **Caché en Memoria con TTL de 15s (`NOTIFICATIONS_CACHE_TTL_MS = 15000`):** Minimiza llamadas recurrentes a la base de datos durante navegación rápida entre pestañas.
+  - **Consultas Defensivas y Fallback Local:** Diseñado según la Regla 4 de `AGENTS.md`. Si la tabla remota no ha sido migrada o hay contingencia de red, las notificaciones se almacenan y consultan en un búfer local en memoria, garantizando continuidad operativa con 0 caídas.
+  - **Mutaciones Seguras:** Funciones `createInAppNotification`, `fetchUserNotifications`, `markNotificationAsRead` y `markAllUserNotificationsAsRead` con saneamiento estricto de parámetros.
+
+### 3. Cliente de Almacenamiento Seguro Vault & URLs Firmadas Temporales (`vaultStorage.js`)
+- **Decisión:** Centralizar la custodia de archivos técnicos en un cliente dedicado `vaultStorage.js`:
+  - **Validación Previa:** Verificación de tamaño máximo (<50MB) y extensiones permitidas antes de iniciar cualquier transferencia hacia Supabase Storage.
+  - **URLs Firmadas de Corta Duración (`getSignedDeliverableUrl`):** Enlaces temporales con expiración auditada (por defecto 900s / 15 minutos), con fallback resiliente seguro en modo local y registro forense.
+  - **Subida Controlada (`uploadDeliverableToVault`):** Normalización y saneamiento de rutas (`<projectId>/<timestamp>_<cleanFileName>`) para prevenir colisiones o inyección en rutas de almacenamiento.
+
+### 4. Componentes UI Accesibles: Centro de Notificaciones & Banner de Telemetría
+- **Decisión:** Crear dos componentes reutilizables con accesibilidad WCAG 2.1 AA en `web/app/src/components/team/`:
+  - **`<NotificationsPopover />`:** Diálogo flotante (`role="dialog"`, `aria-modal="true"`) con cierre por tecla `Escape`, filtrado por leídas/no leídas, badges de severidad estilizados acordes a la paleta editorial Inmerge, contador de no leídas y soporte para modo controlado o autónomo vía `userEmail`.
+  - **`<ConnectionTelemetryBanner />`:** Banner de contingencia accesible (`role="alert"`, `aria-live="assertive"`) que detecta automáticamente caídas de red local (`navigator.onLine`) o reconexión del WebSocket Realtime (`DISCONNECTED`, `CONNECTING`, `CHANNEL_ERROR`), ofreciendo feedback visual inmediato y botón de reintento.
+
+### 5. Integración Global en Consolas Operativas (`/equipo` y `/cuenta`) y Hub de Entregables
+- **Decisión:** Incorporar las capacidades de telemetría, notificaciones y URLs firmadas en las vistas principales:
+  - **Panel de Consultores (`Equipo.jsx`):** Banner superior de telemetría de red, botón de acceso al Centro de Notificaciones en la barra de herramientas superior, y modal `<NotificationsPopover />` para supervisión in-situ.
+  - **Portal de Clientes (`Cuenta.jsx`):** Banner de conectividad en cabecera, trigger de notificaciones con accesibilidad bilingüe (`ES | EN`), y consumo de notificaciones dirigidas al cliente.
+  - **Hub Documental (`ProjectDocumentHub.jsx`):** Integración de `getSignedDeliverableUrl` para la previsualización e inicio de descargas seguras directas de archivos confidenciales.
+
+### 6. Evidencias de Verificación y Calidad Global
+- **Suite Completa de Pruebas (Vitest):** 46 archivos de prueba ejecutados, 318 pruebas pasando con 100% de éxito (0 fallos, 0 regresiones).
+- **Linter (ESLint):** 0 errores (`npm run lint`).
+- **Formateador (Prettier):** 100% de archivos en conformidad estricta (`npm run format:check`).
+- **Compilación de Producción (Vite):** Build de producción limpio y optimizado generado en 2.44s (`npm run build`).
+

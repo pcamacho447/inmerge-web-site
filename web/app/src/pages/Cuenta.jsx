@@ -12,6 +12,8 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 import ClientProjectsView from '../components/client/ClientProjectsView.jsx';
 import ClientBillingView from '../components/client/ClientBillingView.jsx';
 import ClientSupportCard from '../components/client/ClientSupportCard.jsx';
+import NotificationsPopover from '../components/team/NotificationsPopover.jsx';
+import ConnectionTelemetryBanner from '../components/team/ConnectionTelemetryBanner.jsx';
 
 export default function Cuenta() {
   const { isEn, content } = useLanguage();
@@ -29,6 +31,7 @@ export default function Cuenta() {
   const [activeTab, setActiveTab] = useState('projects'); // 'projects' | 'billing' | 'support'
   const [downloadingId, setDownloadingId] = useState(null);
   const [downloadErrorToast, setDownloadErrorToast] = useState(null);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const {
     projects,
@@ -99,6 +102,7 @@ export default function Cuenta() {
 
   return (
     <>
+      <ConnectionTelemetryBanner isOnline={isOnline} connectionStatus={connectionStatus} />
       <div style={{ maxWidth: 960, margin: '0 auto', padding: '120px clamp(20px,5vw,40px) 80px' }}>
         {/* Header Bar */}
         <div
@@ -176,6 +180,28 @@ export default function Cuenta() {
           </div>
 
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <button
+              type="button"
+              className="cuenta-notifications-trigger"
+              onClick={() => setIsNotificationsOpen((prev) => !prev)}
+              aria-label={isEn ? 'Open notifications center' : 'Abrir centro de notificaciones'}
+              title={isEn ? 'Notifications' : 'Notificaciones'}
+              style={{
+                background: 'none',
+                border: '1px solid var(--border)',
+                borderRadius: '50%',
+                width: 36,
+                height: 36,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                color: 'var(--ink)',
+              }}
+            >
+              🔔
+            </button>
             {['admin', 'auditor', 'engineer'].includes(user?.role) && (
               <Link
                 to="/equipo"
@@ -340,6 +366,8 @@ export default function Cuenta() {
 
         {activeTab === 'support' && <ClientSupportCard user={user} projectsCount={projects.length} isEn={isEn} content={content} />}
       </div>
+
+      <NotificationsPopover isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} userEmail={user?.email} />
 
       <ToastNotification toast={activeToast} onDismiss={dismissActiveToast} />
       <Footer />

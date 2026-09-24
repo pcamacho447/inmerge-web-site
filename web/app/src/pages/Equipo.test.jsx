@@ -46,6 +46,15 @@ vi.mock('../hooks/useRealtimeTeam.js', () => ({
 
 vi.mock('../lib/supabaseClient.js', () => ({
   supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      or: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: [], error: null }),
+    })),
     channel: vi.fn(() => ({
       on: vi.fn().mockReturnThis(),
       subscribe: vi.fn((cb) => cb && cb('SUBSCRIBED')),
@@ -423,5 +432,47 @@ describe('Equipo Console Component', () => {
 
     expect(await screen.findByText('FIND-SEC-99')).toBeInTheDocument();
     expect(screen.getByText('Hallazgo Crítico Resuelto')).toBeInTheDocument();
+  });
+
+  it('opens and closes NotificationsPopover when clicking the notifications trigger button', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <Equipo />
+      </MemoryRouter>,
+    );
+
+    await screen.findByText('Gestión Operativa de Auditorías & Proyectos');
+
+    const notifBtn = screen.getByRole('button', { name: /Abrir centro de notificaciones/i });
+    expect(notifBtn).toBeInTheDocument();
+
+    await user.click(notifBtn);
+
+    expect(await screen.findByRole('dialog', { name: /Centro de Notificaciones/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Notificaciones' })).toBeInTheDocument();
+
+    fireEvent.keyDown(window, { key: 'Escape', code: 'Escape' });
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /Centro de Notificaciones/i })).not.toBeInTheDocument();
+    });
+  });
+
+  it('displays ConnectionTelemetryBanner when network is offline', async () => {
+    realtimeHook.default.mockReturnValue({
+      toast: null,
+      dismissToast: vi.fn(),
+      connectionStatus: 'DISCONNECTED',
+      isOnline: false,
+    });
+
+    render(
+      <MemoryRouter>
+        <Equipo />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText(/SIN CONEXIÓN DE RED/i)).toBeInTheDocument();
   });
 });

@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProjectDocumentHub from './ProjectDocumentHub.jsx';
+import * as vaultStorage from '../../lib/vaultStorage.js';
+
+vi.mock('../../lib/vaultStorage.js', () => ({
+  getSignedDeliverableUrl: vi.fn().mockResolvedValue({
+    signedUrl: 'https://vault.inmerge.dev/signed/proj-1/report.pdf',
+    expiresAt: '2026-09-24T12:00:00Z',
+  }),
+}));
 
 describe('ProjectDocumentHub', () => {
   const mockProject = {
@@ -247,5 +255,59 @@ describe('ProjectDocumentHub', () => {
         content: expect.stringContaining('https://github.com/inmerge-org/mochica-web'),
       }),
     );
+  });
+
+  it('resolves signed URL via getSignedDeliverableUrl when previewing deliverable with file_path', async () => {
+    const onOpenPreview = vi.fn();
+    const deliverablesWithFile = [
+      {
+        id: 'deliv-signed-1',
+        title: 'Informe Forense de Seguridad',
+        file_path: 'proj-101/informe-forense.pdf',
+        file_type: 'PDF',
+        status: 'PUBLICADO_CLIENTE',
+      },
+    ];
+
+    render(<ProjectDocumentHub project={mockProject} deliverables={deliverablesWithFile} onOpenPreview={onOpenPreview} />);
+
+    const previewBtn = screen.getByRole('button', { name: /Ver entregable Informe Forense de Seguridad/i });
+    fireEvent.click(previewBtn);
+
+    await waitFor(() => {
+      expect(vaultStorage.getSignedDeliverableUrl).toHaveBeenCalledWith('proj-101/informe-forense.pdf');
+      expect(onOpenPreview).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Informe Forense de Seguridad',
+          url: 'https://vault.inmerge.dev/signed/proj-1/report.pdf',
+          filePath: 'proj-101/informe-forense.pdf',
+        }),
+      );
+    });
+  });
+
+  it('triggers direct secure download via getSignedDeliverableUrl', async () => {
+    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const deliverablesWithFile = [
+      {
+        id: 'deliv-signed-2',
+        title: 'Certificado de Auditoría OWASP',
+        file_path: 'proj-101/owasp-cert.pdf',
+        file_type: 'PDF',
+        status: 'PUBLICADO_CLIENTE',
+      },
+    ];
+
+    render(<ProjectDocumentHub project={mockProject} deliverables={deliverablesWithFile} />);
+
+    const downloadBtn = screen.getByRole('button', { name: /Descargar entregable Certificado de Auditoría OWASP/i });
+    fireEvent.click(downloadBtn);
+
+    await waitFor(() => {
+      expect(vaultStorage.getSignedDeliverableUrl).toHaveBeenCalledWith('proj-101/owasp-cert.pdf');
+      expect(windowOpenSpy).toHaveBeenCalledWith('https://vault.inmerge.dev/signed/proj-1/report.pdf', '_blank', 'noopener,noreferrer');
+    });
+
+    windowOpenSpy.mockRestore();
   });
 });

@@ -21,6 +21,15 @@ vi.mock('../hooks/useOrganizationBilling.js', () => ({
 
 vi.mock('../lib/supabaseClient.js', () => ({
   supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      or: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: [], error: null }),
+    })),
     channel: vi.fn(),
     removeChannel: vi.fn(),
   },
@@ -186,5 +195,51 @@ describe('Cuenta Component', () => {
 
     expect(screen.queryByText('RECONNECTING...')).not.toBeInTheDocument();
     expect(screen.queryByText('LIVE SYNC')).not.toBeInTheDocument();
+  });
+
+  it('opens and closes NotificationsPopover when clicking the notifications trigger button in Cuenta', () => {
+    render(
+      <MemoryRouter initialEntries={['/cuenta']}>
+        <LanguageProvider>
+          <Cuenta />
+        </LanguageProvider>
+      </MemoryRouter>,
+    );
+
+    const notifBtn = screen.getByRole('button', { name: /Abrir centro de notificaciones/i });
+    expect(notifBtn).toBeInTheDocument();
+
+    fireEvent.click(notifBtn);
+
+    expect(screen.getByRole('dialog', { name: /Centro de Notificaciones/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Notificaciones' })).toBeInTheDocument();
+
+    fireEvent.keyDown(window, { key: 'Escape', code: 'Escape' });
+    expect(screen.queryByRole('dialog', { name: /Centro de Notificaciones/i })).not.toBeInTheDocument();
+  });
+
+  it('displays ConnectionTelemetryBanner when network is offline in Cuenta', () => {
+    billingHook.default.mockReturnValueOnce({
+      organization: null,
+      orders: [],
+      loading: false,
+      saving: false,
+      toast: null,
+      dismissToast: vi.fn(),
+      saveOrganization: vi.fn(),
+      connectionStatus: 'DISCONNECTED',
+      isOnline: false,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/cuenta']}>
+        <LanguageProvider>
+          <Cuenta />
+        </LanguageProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText(/SIN CONEXIÓN DE RED/i)).toBeInTheDocument();
   });
 });
