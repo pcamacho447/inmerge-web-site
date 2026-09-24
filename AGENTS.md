@@ -80,3 +80,8 @@ Consulte las especificaciones técnicas del entorno en:
 1. **Testing:** Ejecutar `npm test` en `web/app` antes de cada commit. Toda la suite de pruebas unitarias y de integración debe pasar al 100% de éxito (0 tests fallidos).
 2. **Build de Producción:** Verificar que `npm run build` compile limpiamente sin errores de bundling.
 3. **Formato y Linter:** Mantener conformidad con `npm run lint` y `npm run format`.
+4. **Validación de Paridad y Resiliencia en Cambios de Esquema Supabase (PostgreSQL / PostgREST):**
+   - **Verificación Previa:** Antes de modificar consultas JS que seleccionan columnas en Supabase, verificar el esquema actual en las migraciones SQL (`supabase/migrations/` y `web/app/supabase/migrations/`).
+   - **Consultas Resilientes (Defensive Queries):** Toda consulta a tablas en evolución debe utilizar selecciones dinámicas o flexibles (e.g., `project_deliverables (*)`) y evaluación defensiva de atributos opcionales (`!row.col || row.col === 'val'`). Esto evita que la aplicación se caiga con errores HTTP 400 de PostgREST (`column table_1.col does not exist`) si la base de datos remota no ha sido migrada aún.
+   - **Trazabilidad de Migraciones SQL:** Cada alteración de esquema (nuevas columnas, tablas, RLS o triggers) DEBE incluir la creación del correspondiente archivo de migración SQL correlativo tanto en `supabase/migrations/` como en `web/app/supabase/migrations/`.
+
