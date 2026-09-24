@@ -57,6 +57,20 @@ export function clearClientProjectsCache(userId = null) {
   }
 }
 
+/**
+ * Filtra rigurosamente los entregables visibles para el cliente.
+ * Divulga exclusivamente entregables con estado 'PUBLICADO_CLIENTE' o registros heredados sin columna de estado.
+ * Excluye de forma hermética borradores internos ('BORRADOR_INTERNO') e ítems en revisión técnica ('EN_REVISION').
+ * Resiliente ante colecciones nulas, indefinidas o ítems malformados.
+ *
+ * @param {Array} deliverables
+ * @returns {Array}
+ */
+export function filterDeliverablesForClient(deliverables = []) {
+  if (!deliverables || !Array.isArray(deliverables)) return [];
+  return deliverables.filter((d) => Boolean(d) && typeof d === 'object' && (!d.status || d.status === 'PUBLICADO_CLIENTE'));
+}
+
 export async function fetchClientProjects(userId, { forceRefresh = false } = {}) {
   if (!userId) return [];
 
@@ -142,7 +156,7 @@ export async function fetchClientProjects(userId, { forceRefresh = false } = {})
   const formattedProjects = (projects || []).map((p) => ({
     ...p,
     milestones: (p.project_milestones || []).sort((a, b) => (a.order_index || 0) - (b.order_index || 0)),
-    deliverables: (p.project_deliverables || []).filter((d) => !d.status || d.status === 'PUBLICADO_CLIENTE'),
+    deliverables: filterDeliverablesForClient(p.project_deliverables),
     tasks: (p.project_tasks || []).sort((a, b) => new Date(a.due_date || a.created_at || 0) - new Date(b.due_date || b.created_at || 0)),
     risks: p.project_risks || [],
   }));

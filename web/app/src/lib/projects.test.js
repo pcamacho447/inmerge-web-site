@@ -3,6 +3,7 @@ import {
   CLIENT_PROJECTS_CACHE_TTL_MS,
   fetchClientProjects,
   clearClientProjectsCache,
+  filterDeliverablesForClient,
   getSignedDeliverableUrl,
   calculateFileSha256,
   verifyDeliverableIntegrity,
@@ -495,6 +496,119 @@ describe('projects.js', () => {
       expect(getClientCacheMetrics().activeUsersInCache).toBe(0);
 
       nowSpy.mockRestore();
+    });
+  });
+
+  describe('Strict Deliverable Client Isolation & Resilience', () => {
+    it('filterDeliverablesForClient strictly includes PUBLICADO_CLIENTE and legacy deliverables without status', () => {
+      const input = [
+        { id: 'deliv-pub-1', title: 'Informe Final', status: 'PUBLICADO_CLIENTE' },
+        { id: 'deliv-legacy-1', title: 'Entregable Histórico Sin Estado' },
+        { id: 'deliv-legacy-null', title: 'Entregable con Status Null', status: null },
+        { id: 'deliv-legacy-undef', title: 'Entregable con Status Undefined', status: undefined },
+      ];
+
+      const result = filterDeliverablesForClient(input);
+      expect(result).toHaveLength(4);
+      expect(result.map((d) => d.id)).toEqual(['deliv-pub-1', 'deliv-legacy-1', 'deliv-legacy-null', 'deliv-legacy-undef']);
+    });
+
+    it('filterDeliverablesForClient strictly excludes BORRADOR_INTERNO, EN_REVISION and any non-public status', () => {
+      const input = [
+        { id: 'deliv-pub', title: 'Dictamen Oficial', status: 'PUBLICADO_CLIENTE' },
+        { id: 'deliv-draft', title: 'Notas de Trabajo', status: 'BORRADOR_INTERNO' },
+        { id: 'deliv-rev', title: 'Revisión por Pares', status: 'EN_REVISION' },
+        { id: 'deliv-arch', title: 'Entregable Archivado', status: 'ARCHIVADO' },
+        { id: 'deliv-other', title: 'Otro Estado Interno', status: 'CONFIDENCIAL' },
+      ];
+
+      const result = filterDeliverablesForClient(input);
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('deliv-pub');
+      expect(result[0].status).toBe('PUBLICADO_CLIENTE');
+    });
+
+    it('filterDeliverablesForClient handles null, undefined, non-arrays, and malformed items gracefully without crashing', () => {
+      expect(filterDeliverablesForClient(null)).toEqual([]);
+      expect(filterDeliverablesForClient(undefined)).toEqual([]);
+      expect(filterDeliverablesForClient('not-an-array')).toEqual([]);
+      expect(filterDeliverablesForClient(42)).toEqual([]);
+      expect(filterDeliverablesForClient({})).toEqual([]);
+
+      const malformedInput = [
+        null,
+        undefined,
+        'string-entry',
+        12345,
+        { id: 'valid-pub', title: 'Auditoría Certificada', status: 'PUBLICADO_CLIENTE' },
+        null,
+      ];
+      const result = filterDeliverablesForClient(malformedInput);
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('valid-pub');
+    });
+
+    it('fetchClientProjects guarantees deliverable isolation across multiple client projects and handles malformed data', async () => {
+      const mockProjects = [
+        {
+          id: 'proj-cloud',
+          title: 'Auditoría Cloud AWS',
+          client_id: 'client-isolated-1',
+          project_deliverables: [
+            { id: 'd-pub-1', title: 'Certificación Cloud', status: 'PUBLICADO_CLIENTE' },
+            { id: 'd-draft-1', title: 'Borrador Confidencial', status: 'BORRADOR_INTERNO' },
+            { id: 'd-rev-1', title: 'Revisión Arquitectura', status: 'EN_REVISION' },
+            null,
+          ],
+        },
+        {
+          id: 'proj-data',
+          title: 'Ciencia de Datos BI',
+          client_id: 'client-isolated-1',
+          project_deliverables: [
+            { id: 'd-draft-2', title: 'Borrador Notebook', status: 'BORRADOR_INTERNO' },
+            { id: 'd-rev-2', title: 'Revisión Pipeline', status: 'EN_REVISION' },
+          ],
+        },
+        {
+          id: 'proj-empty',
+          title: 'Consultoría Estratégica',
+          client_id: 'client-isolated-1',
+          project_deliverables: null,
+        },
+      ];
+
+      supabase.from.mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            order: vi.fn().mockResolvedValue({
+              data: mockProjects,
+              error: null,
+            }),
+          }),
+        }),
+      });
+
+      const projects = await fetchClientProjects('client-isolated-1');
+      expect(projects).toHaveLength(3);
+
+      // Proj 1: Only published deliverable survived, drafts/review and null stripped
+      expect(projects[0].deliverables).toHaveLength(1);
+      expect(projects[0].deliverables[0].id).toBe('d-pub-1');
+
+      // Proj 2: All were draft/review -> empty array
+      expect(projects[1].deliverables).toEqual([]);
+
+      // Proj 3: project_deliverables was null -> empty array
+      expect(projects[2].deliverables).toEqual([]);
+
+      // Assert no BORRADOR_INTERNO or EN_REVISION ever leaked into any project
+      for (const p of projects) {
+        for (const d of p.deliverables) {
+          expect(d.status).not.toBe('BORRADOR_INTERNO');
+          expect(d.status).not.toBe('EN_REVISION');
+        }
+      }
     });
   });
 });
