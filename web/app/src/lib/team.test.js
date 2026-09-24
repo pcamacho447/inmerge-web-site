@@ -21,6 +21,8 @@ import {
   createProjectFinding,
   updateProjectFinding,
   deleteProjectFinding,
+  clearTeamDataCache,
+  fetchWorkspaceTelemetrySnapshot,
 } from './team.js';
 import { supabase } from './supabaseClient.js';
 
@@ -43,6 +45,7 @@ vi.mock('./supabaseClient.js', () => ({
 describe('team.js — Servicios para el Equipo de Consultores', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearTeamDataCache();
   });
 
   it('fetchRegisteredClients consulta la lista de clientes registrados', async () => {
@@ -494,6 +497,162 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       expect(deleteMock).toHaveBeenCalled();
       expect(eqMock).toHaveBeenCalledWith('id', 'f-1');
       expect(res).toBe(true);
+    });
+  });
+
+  describe('Workspace Telemetry RPC & In-Memory TTL Caching', () => {
+    it('fetchWorkspaceTelemetrySnapshot invoca el RPC get_workspace_telemetry_snapshot', async () => {
+      const mockSnapshot = {
+        kpis: {
+          active_projects_count: 3,
+          active_leads_count: 2,
+          pending_deliverables_count: 4,
+          open_critical_findings_count: 1,
+          user_assigned_tasks_count: 5,
+        },
+        generated_at: '2026-09-23T22:00:00Z',
+      };
+      supabase.rpc.mockResolvedValueOnce({ data: mockSnapshot, error: null });
+
+      const res = await fetchWorkspaceTelemetrySnapshot({
+        userEmail: 'dev@inmerge.pe',
+        isAdmin: true,
+      });
+
+      expect(supabase.rpc).toHaveBeenCalledWith('get_workspace_telemetry_snapshot', {
+        p_user_email: 'dev@inmerge.pe',
+        p_is_admin: true,
+      });
+      expect(res).toEqual(mockSnapshot);
+    });
+
+    it('fetchWorkspaceTelemetrySnapshot recurre al cálculo local si el RPC falla', async () => {
+      supabase.rpc.mockResolvedValueOnce({ data: null, error: { message: 'function not found' } });
+
+      const mockProjects = [
+        {
+          id: 'p-1',
+          status: 'EN_DESARROLLO',
+          deliverables: [
+            { id: 'd-1', status: 'BORRADOR_INTERNO' },
+            { id: 'd-2', status: 'PUBLICADO_CLIENTE' },
+          ],
+          tasks: [
+            { id: 't-1', assigned_to_email: 'dev@inmerge.pe', status: 'IN_PROGRESS' },
+            { id: 't-2', assigned_to_email: 'dev@inmerge.pe', status: 'DONE' },
+            { id: 't-3', assigned_to_email: 'other@inmerge.pe', status: 'TODO' },
+          ],
+          findings: [
+            { id: 'f-1', severity: 'CRITICA', status: 'DETECTADO' },
+            { id: 'f-2', severity: 'BAJA', status: 'DETECTADO' },
+          ],
+        },
+        {
+          id: 'p-2',
+          status: 'FINALIZADO',
+          deliverables: [],
+          tasks: [],
+          findings: [],
+        },
+      ];
+
+      const mockLeads = [
+        { id: 'l-1', status: 'NUEVO' },
+        { id: 'l-2', status: 'EN_REVISION' },
+        { id: 'l-3', status: 'CONVERTIDO' },
+      ];
+
+      const res = await fetchWorkspaceTelemetrySnapshot({
+        userEmail: 'dev@inmerge.pe',
+        isAdmin: false,
+        localProjects: mockProjects,
+        localLeads: mockLeads,
+      });
+
+      expect(res.kpis.active_projects_count).toBe(1);
+      expect(res.kpis.active_leads_count).toBe(2);
+      expect(res.kpis.pending_deliverables_count).toBe(1);
+      expect(res.kpis.open_critical_findings_count).toBe(1);
+      expect(res.kpis.user_assigned_tasks_count).toBe(1);
+      expect(res.generated_at).toBeDefined();
+    });
+
+    it('fetchTeamProjects reutiliza el resultado en memoria dentro del TTL de 30s', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      const firstCall = await fetchTeamProjects();
+      const secondCall = await fetchTeamProjects();
+
+      expect(firstCall[0].title).toBe('Proyecto Alpha');
+      expect(secondCall).toBe(firstCall);
+      expect(supabase.from).toHaveBeenCalledTimes(1);
+    });
+
+    it('fetchTeamProjects con forceRefresh: true fuerza una nueva consulta a la base de datos', async () => {
+      const mockProjects1 = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const mockProjects2 = [{ id: 'proj-1', title: 'Proyecto Alpha Actualizado' }];
+
+      const orderMock = vi
+        .fn()
+        .mockResolvedValueOnce({ data: mockProjects1, error: null })
+        .mockResolvedValueOnce({ data: mockProjects2, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      const firstCall = await fetchTeamProjects();
+      const forcedCall = await fetchTeamProjects({ forceRefresh: true });
+
+      expect(firstCall[0].title).toBe('Proyecto Alpha');
+      expect(forcedCall[0].title).toBe('Proyecto Alpha Actualizado');
+      expect(supabase.from).toHaveBeenCalledTimes(2);
+    });
+
+    it('clearTeamDataCache invalida el caché y fuerza una nueva llamada a Supabase', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      await fetchTeamProjects();
+      expect(supabase.from).toHaveBeenCalledTimes(1);
+
+      clearTeamDataCache();
+
+      await fetchTeamProjects();
+      expect(supabase.from).toHaveBeenCalledTimes(2);
+    });
+
+    it('createProjectTask invalida el caché de proyectos llamando clearTeamDataCache', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+
+      const mockTask = { id: 't-1', title: 'Nueva Tarea', project_id: 'proj-1', status: 'TODO' };
+      const taskSingleMock = vi.fn().mockResolvedValue({ data: mockTask, error: null });
+      const taskSelectMock = vi.fn().mockReturnValue({ single: taskSingleMock });
+      const taskInsertMock = vi.fn().mockReturnValue({ select: taskSelectMock });
+      const logInsertMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      supabase.from.mockImplementation((table) => {
+        if (table === 'client_projects') return { select: selectMock };
+        if (table === 'project_tasks') return { insert: taskInsertMock };
+        if (table === 'team_activity_logs') return { insert: logInsertMock };
+        return {};
+      });
+
+      // 1. Primer fetch llena el caché
+      await fetchTeamProjects();
+      expect(supabase.from).toHaveBeenCalledWith('client_projects');
+
+      // 2. Crear tarea técnica
+      await createProjectTask(mockTask);
+
+      // 3. Segundo fetch debe disparar consulta de nuevo por invalidación
+      await fetchTeamProjects();
+      expect(selectMock).toHaveBeenCalledTimes(2);
     });
   });
 });

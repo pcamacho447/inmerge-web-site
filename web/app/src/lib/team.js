@@ -1,6 +1,16 @@
 import { supabase } from './supabaseClient.js';
 import { sanitizeDeliverablePayload, sanitizeFindingPayload } from './pm.js';
 
+const TEAM_PROJECTS_CACHE_TTL_MS = 30000; // 30s TTL
+let teamProjectsCache = null;
+
+/**
+ * Invalida el caché en memoria de proyectos del equipo técnico.
+ */
+export function clearTeamDataCache() {
+  teamProjectsCache = null;
+}
+
 /**
  * Consulta la lista de clientes registrados en la plataforma.
  */
@@ -117,9 +127,14 @@ export async function updateLeadStatus(leadId, { status, notes, assignedTo }) {
 }
 
 /**
- * Consulta todos los proyectos y clientes para el equipo técnico.
+ * Consulta todos los proyectos y clientes para el equipo técnico con caché en memoria (30s TTL).
  */
-export async function fetchTeamProjects() {
+export async function fetchTeamProjects({ forceRefresh = false } = {}) {
+  const now = Date.now();
+  if (!forceRefresh && teamProjectsCache && now - teamProjectsCache.timestamp < TEAM_PROJECTS_CACHE_TTL_MS) {
+    return teamProjectsCache.data;
+  }
+
   const { data, error } = await supabase
     .from('client_projects')
     .select(
@@ -163,13 +178,92 @@ export async function fetchTeamProjects() {
     throw new Error(error.message || 'No se pudieron cargar los proyectos');
   }
 
-  return (data || []).map((p) => ({
+  const processed = (data || []).map((p) => ({
     ...p,
     milestones: (p.milestones || []).sort((a, b) => (a.order_index || 0) - (b.order_index || 0)),
     deliverables: p.deliverables || [],
     tasks: p.tasks || [],
     risks: p.risks || [],
   }));
+
+  teamProjectsCache = {
+    data: processed,
+    timestamp: now,
+  };
+
+  return processed;
+}
+
+/**
+ * Consulta la telemetría consolidada de proyectos, tareas y entregables del workspace
+ * mediante el RPC optimizado get_workspace_telemetry_snapshot, con fallback analítico local resiliente.
+ */
+export async function fetchWorkspaceTelemetrySnapshot({ userEmail = null, isAdmin = false, localProjects = null, localLeads = null } = {}) {
+  try {
+    if (supabase && typeof supabase.rpc === 'function') {
+      const { data, error } = await supabase.rpc('get_workspace_telemetry_snapshot', {
+        p_user_email: userEmail,
+        p_is_admin: isAdmin,
+      });
+
+      if (!error && data) {
+        return data;
+      }
+      if (error) {
+        console.warn('[team] RPC get_workspace_telemetry_snapshot arrojó error, aplicando fallback:', error.message);
+      }
+    }
+  } catch (rpcErr) {
+    console.warn('[team] Error invocando get_workspace_telemetry_snapshot, aplicando fallback:', rpcErr);
+  }
+
+  // Fallback analítico local si el RPC no está disponible o falla
+  try {
+    const projects = localProjects || (await fetchTeamProjects());
+    const leads = localLeads || (await fetchTeamLeads());
+
+    const activeProjects = (projects || []).filter((p) => p.status !== 'FINALIZADO');
+    const activeLeads = (leads || []).filter((l) => ['NUEVO', 'EN_REVISION'].includes(l.status));
+
+    let pendingDeliverables = 0;
+    let openCriticalFindings = 0;
+    let userAssignedTasks = 0;
+
+    for (const p of projects || []) {
+      if (Array.isArray(p.deliverables)) {
+        pendingDeliverables += p.deliverables.filter((d) => ['BORRADOR_INTERNO', 'EN_REVISION'].includes(d.status)).length;
+      }
+      if (Array.isArray(p.findings)) {
+        openCriticalFindings += p.findings.filter((f) => ['CRITICA', 'ALTA'].includes(f.severity) && f.status !== 'VERIFICADO').length;
+      }
+      if (Array.isArray(p.tasks) && userEmail) {
+        userAssignedTasks += p.tasks.filter((t) => t.assigned_to_email === userEmail && t.status !== 'DONE').length;
+      }
+    }
+
+    return {
+      kpis: {
+        active_projects_count: activeProjects.length,
+        active_leads_count: activeLeads.length,
+        pending_deliverables_count: pendingDeliverables,
+        open_critical_findings_count: openCriticalFindings,
+        user_assigned_tasks_count: userAssignedTasks,
+      },
+      generated_at: new Date().toISOString(),
+    };
+  } catch (fallbackErr) {
+    console.error('[team] Error en fallback de telemetría de workspace:', fallbackErr);
+    return {
+      kpis: {
+        active_projects_count: 0,
+        active_leads_count: 0,
+        pending_deliverables_count: 0,
+        open_critical_findings_count: 0,
+        user_assigned_tasks_count: 0,
+      },
+      generated_at: new Date().toISOString(),
+    };
+  }
 }
 
 /**
@@ -216,6 +310,8 @@ export async function createTeamProject({
     details: { title, pillar, client_id: clientId, tech_lead_name: techLeadName },
   });
 
+  clearTeamDataCache();
+
   return data;
 }
 
@@ -245,6 +341,8 @@ export async function updateProjectStaff(projectId, { techLeadName, techLeadCont
     entityId: projectId,
     details: { updateFields, title: data?.title },
   });
+
+  clearTeamDataCache();
 
   return data;
 }
@@ -325,6 +423,8 @@ export async function updateProjectStatus(projectId, newStatus, { notes = '', cl
     details: { new_status: newStatus, title: data.title, notes },
   });
 
+  clearTeamDataCache();
+
   return data;
 }
 
@@ -379,6 +479,8 @@ export async function addProjectMilestone({
     },
   });
 
+  clearTeamDataCache();
+
   return data;
 }
 
@@ -414,6 +516,8 @@ export async function updateMilestoneStatus(milestoneId, statusOrUpdates) {
     entityId: milestoneId,
     details: { updates, title: data.title, project_id: data.project_id },
   });
+
+  clearTeamDataCache();
 
   return data;
 }
@@ -511,6 +615,8 @@ export async function createDeliverableRecord({
       .catch((fnErr) => console.warn('Deliverable notification warning:', fnErr));
   }
 
+  clearTeamDataCache();
+
   return data;
 }
 
@@ -540,6 +646,8 @@ export async function updateDeliverableStatus(deliverableId, newStatus, { projec
     entityId: deliverableId,
     details: { new_status: newStatus, title: title || data?.title, project_id: projectId || data?.project_id },
   });
+
+  clearTeamDataCache();
 
   return data;
 }
@@ -642,6 +750,8 @@ export async function createProjectTask(taskPayload) {
     details: { project_id: data.project_id, title: data.title, status: data.status },
   });
 
+  clearTeamDataCache();
+
   return data;
 }
 
@@ -668,6 +778,8 @@ export async function updateProjectTask(taskId, updates) {
     details: { project_id: data.project_id, title: data.title, status: data.status },
   });
 
+  clearTeamDataCache();
+
   return data;
 }
 
@@ -688,6 +800,8 @@ export async function deleteProjectTask(taskId, projectId) {
     entityId: taskId,
     details: { project_id: projectId },
   });
+
+  clearTeamDataCache();
 
   return true;
 }
@@ -755,6 +869,8 @@ export async function updateProjectRisk(riskId, updates) {
     details: { project_id: data.project_id, status: data.status },
   });
 
+  clearTeamDataCache();
+
   return data;
 }
 
@@ -780,6 +896,8 @@ export async function updateProjectHealth(projectId, { healthStatus, startDate, 
     entityId: projectId,
     details: updates,
   });
+
+  clearTeamDataCache();
 
   return data;
 }
@@ -821,6 +939,8 @@ export async function createProjectFinding(payload) {
     details: { code: sanitized.finding_code, title: sanitized.title, severity: sanitized.severity, project_id: sanitized.project_id },
   });
 
+  clearTeamDataCache();
+
   return data;
 }
 
@@ -848,6 +968,8 @@ export async function updateProjectFinding(findingId, updates) {
     details: { updates, title: data?.title, project_id: data?.project_id },
   });
 
+  clearTeamDataCache();
+
   return data;
 }
 
@@ -861,5 +983,8 @@ export async function deleteProjectFinding(findingId) {
     console.error('Error al eliminar hallazgo:', error);
     throw new Error(error.message || 'No se pudo eliminar el hallazgo.');
   }
+
+  clearTeamDataCache();
+
   return true;
 }
