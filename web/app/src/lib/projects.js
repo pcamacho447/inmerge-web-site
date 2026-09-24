@@ -3,6 +3,48 @@ import { supabase } from './supabaseClient.js';
 export const CLIENT_PROJECTS_CACHE_TTL_MS = 30000; // 30s TTL
 const clientCache = new Map();
 
+let cacheHits = 0;
+let cacheMisses = 0;
+
+/**
+ * Retorna las métricas operativas y de diagnóstico del caché en memoria de clientes.
+ * @returns {{
+ *   hits: number,
+ *   misses: number,
+ *   totalRequests: number,
+ *   hitRatioPct: number,
+ *   activeUsersInCache: number
+ * }}
+ */
+export function getClientCacheMetrics() {
+  const now = Date.now();
+  const totalRequests = cacheHits + cacheMisses;
+  const hitRatioPct = totalRequests === 0 ? 0 : Number(((cacheHits / totalRequests) * 100).toFixed(2));
+
+  let activeUsersInCache = 0;
+  for (const entry of clientCache.values()) {
+    if (now - entry.timestamp < CLIENT_PROJECTS_CACHE_TTL_MS) {
+      activeUsersInCache++;
+    }
+  }
+
+  return {
+    hits: cacheHits,
+    misses: cacheMisses,
+    totalRequests,
+    hitRatioPct,
+    activeUsersInCache,
+  };
+}
+
+/**
+ * Restablece los contadores de diagnóstico de caché a cero (para diagnóstico o aislamiento en tests).
+ */
+export function resetClientCacheMetrics() {
+  cacheHits = 0;
+  cacheMisses = 0;
+}
+
 /**
  * Invalida el caché en memoria de proyectos del portal de clientes.
  * Si se especifica userId, solo invalida las entradas de dicho cliente; si es null, vacía todo el caché.
@@ -21,8 +63,11 @@ export async function fetchClientProjects(userId, { forceRefresh = false } = {})
   const now = Date.now();
   const cached = clientCache.get(userId);
   if (!forceRefresh && cached && now - cached.timestamp < CLIENT_PROJECTS_CACHE_TTL_MS) {
+    cacheHits++;
     return cached.data;
   }
+
+  cacheMisses++;
 
   const { data: projects, error } = await supabase
     .from('client_projects')

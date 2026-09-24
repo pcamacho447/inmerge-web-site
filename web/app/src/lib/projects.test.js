@@ -7,6 +7,8 @@ import {
   calculateFileSha256,
   verifyDeliverableIntegrity,
   generateExecutiveReportMarkdown,
+  getClientCacheMetrics,
+  resetClientCacheMetrics,
 } from './projects.js';
 import { supabase } from './supabaseClient.js';
 
@@ -29,6 +31,7 @@ describe('projects.js', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     clearClientProjectsCache();
+    resetClientCacheMetrics();
   });
 
   it('returns empty array if userId is not provided', async () => {
@@ -357,5 +360,141 @@ describe('projects.js', () => {
     clearClientProjectsCache(null);
     const b4 = await fetchClientProjects('user-b');
     expect(b4).not.toBe(b3); // user-b refetched again
+  });
+
+  describe('Client Cache Diagnostics & Metrics', () => {
+    it('getClientCacheMetrics retorna estado inicial vacío tras reset y limpieza de caché', () => {
+      clearClientProjectsCache();
+      resetClientCacheMetrics();
+
+      const metrics = getClientCacheMetrics();
+      expect(metrics).toEqual({
+        hits: 0,
+        misses: 0,
+        totalRequests: 0,
+        hitRatioPct: 0,
+        activeUsersInCache: 0,
+      });
+    });
+
+    it('fetchClientProjects incrementa misses en primera consulta y hits en consultas subsecuentes', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Auditoría Cliente', client_id: 'user-client-1' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const eqMock = vi.fn().mockReturnValue({ order: orderMock });
+      const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      // 1. Primera consulta: Miss (va a base de datos)
+      await fetchClientProjects('user-client-1');
+      let metrics = getClientCacheMetrics();
+      expect(metrics.misses).toBe(1);
+      expect(metrics.hits).toBe(0);
+      expect(metrics.totalRequests).toBe(1);
+      expect(metrics.hitRatioPct).toBe(0);
+      expect(metrics.activeUsersInCache).toBe(1);
+
+      // 2. Segunda consulta dentro de TTL: Hit
+      await fetchClientProjects('user-client-1');
+      metrics = getClientCacheMetrics();
+      expect(metrics.misses).toBe(1);
+      expect(metrics.hits).toBe(1);
+      expect(metrics.totalRequests).toBe(2);
+      expect(metrics.hitRatioPct).toBe(50);
+      expect(metrics.activeUsersInCache).toBe(1);
+
+      // 3. Tercera consulta dentro de TTL: Hit
+      await fetchClientProjects('user-client-1');
+      metrics = getClientCacheMetrics();
+      expect(metrics.misses).toBe(1);
+      expect(metrics.hits).toBe(2);
+      expect(metrics.totalRequests).toBe(3);
+      expect(metrics.hitRatioPct).toBe(66.67);
+
+      // 4. Consulta con forceRefresh: Miss
+      await fetchClientProjects('user-client-1', { forceRefresh: true });
+      metrics = getClientCacheMetrics();
+      expect(metrics.misses).toBe(2);
+      expect(metrics.hits).toBe(2);
+      expect(metrics.totalRequests).toBe(4);
+      expect(metrics.hitRatioPct).toBe(50);
+      expect(metrics.activeUsersInCache).toBe(1);
+    });
+
+    it('activeUsersInCache refleja usuarios activos independientes y respeta invalidación granular', async () => {
+      const mockProjectsA = [{ id: 'proj-a', title: 'Proyecto A', client_id: 'user-a' }];
+      const mockProjectsB = [{ id: 'proj-b', title: 'Proyecto B', client_id: 'user-b' }];
+
+      supabase.from.mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockImplementation((col, uid) => ({
+            order: vi.fn().mockResolvedValue({
+              data: uid === 'user-a' ? mockProjectsA : mockProjectsB,
+              error: null,
+            }),
+          })),
+        }),
+      });
+
+      await fetchClientProjects('user-a');
+      expect(getClientCacheMetrics().activeUsersInCache).toBe(1);
+
+      await fetchClientProjects('user-b');
+      expect(getClientCacheMetrics().activeUsersInCache).toBe(2);
+
+      // Invalidar solo user-a
+      clearClientProjectsCache('user-a');
+      let metrics = getClientCacheMetrics();
+      expect(metrics.activeUsersInCache).toBe(1);
+
+      // Invalidar todos
+      clearClientProjectsCache();
+      metrics = getClientCacheMetrics();
+      expect(metrics.activeUsersInCache).toBe(0);
+      expect(metrics.totalRequests).toBe(2); // Los contadores se preservan
+    });
+
+    it('resetClientCacheMetrics restablece hits y misses a cero preservando activeUsersInCache', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Auditoría Cliente', client_id: 'user-client-1' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const eqMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: vi.fn().mockReturnValue({ eq: eqMock }) });
+
+      await fetchClientProjects('user-client-1');
+      await fetchClientProjects('user-client-1');
+
+      let metrics = getClientCacheMetrics();
+      expect(metrics.hits).toBe(1);
+      expect(metrics.misses).toBe(1);
+      expect(metrics.totalRequests).toBe(2);
+      expect(metrics.activeUsersInCache).toBe(1);
+
+      resetClientCacheMetrics();
+
+      metrics = getClientCacheMetrics();
+      expect(metrics.hits).toBe(0);
+      expect(metrics.misses).toBe(0);
+      expect(metrics.totalRequests).toBe(0);
+      expect(metrics.hitRatioPct).toBe(0);
+      expect(metrics.activeUsersInCache).toBe(1);
+    });
+
+    it('activeUsersInCache retorna 0 cuando las entradas en caché han expirado su TTL', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Auditoría Cliente', client_id: 'user-client-1' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const eqMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: vi.fn().mockReturnValue({ eq: eqMock }) });
+
+      const nowSpy = vi.spyOn(Date, 'now');
+      nowSpy.mockReturnValue(1000000);
+
+      await fetchClientProjects('user-client-1');
+      expect(getClientCacheMetrics().activeUsersInCache).toBe(1);
+
+      // Avanzar más allá de los 30s de TTL (30001ms)
+      nowSpy.mockReturnValue(1000000 + 30001);
+      expect(getClientCacheMetrics().activeUsersInCache).toBe(0);
+
+      nowSpy.mockRestore();
+    });
   });
 });
