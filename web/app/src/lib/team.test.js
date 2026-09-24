@@ -23,6 +23,8 @@ import {
   deleteProjectFinding,
   clearTeamDataCache,
   fetchWorkspaceTelemetrySnapshot,
+  getCacheTelemetryMetrics,
+  resetCacheTelemetryMetrics,
 } from './team.js';
 import { supabase } from './supabaseClient.js';
 import { createInAppNotification } from './notifications.js';
@@ -51,6 +53,7 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     clearTeamDataCache();
+    resetCacheTelemetryMetrics();
   });
 
   it('fetchRegisteredClients consulta la lista de clientes registrados', async () => {
@@ -898,6 +901,165 @@ describe('team.js — Servicios para el Equipo de Consultores', () => {
       // 3. Segundo fetch debe disparar consulta de nuevo por invalidación
       await fetchTeamProjects();
       expect(selectMock).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('Cache Telemetry Diagnostics & Health Metrics', () => {
+    it('getCacheTelemetryMetrics retorna estado inicial vacío tras reset y limpieza de caché', () => {
+      clearTeamDataCache();
+      resetCacheTelemetryMetrics();
+
+      const metrics = getCacheTelemetryMetrics();
+      expect(metrics).toEqual({
+        hits: 0,
+        misses: 0,
+        totalRequests: 0,
+        hitRatioPct: 0,
+        hasProjectsCache: false,
+        hasTelemetryCache: false,
+      });
+    });
+
+    it('fetchTeamProjects incrementa misses en primera consulta y hits en consultas subsecuentes', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      // 1. Primera consulta: Miss (va a base de datos)
+      await fetchTeamProjects();
+      let metrics = getCacheTelemetryMetrics();
+      expect(metrics.misses).toBe(1);
+      expect(metrics.hits).toBe(0);
+      expect(metrics.totalRequests).toBe(1);
+      expect(metrics.hitRatioPct).toBe(0);
+      expect(metrics.hasProjectsCache).toBe(true);
+      expect(metrics.hasTelemetryCache).toBe(false);
+
+      // 2. Segunda consulta dentro de TTL: Hit
+      await fetchTeamProjects();
+      metrics = getCacheTelemetryMetrics();
+      expect(metrics.misses).toBe(1);
+      expect(metrics.hits).toBe(1);
+      expect(metrics.totalRequests).toBe(2);
+      expect(metrics.hitRatioPct).toBe(50);
+      expect(metrics.hasProjectsCache).toBe(true);
+
+      // 3. Tercera consulta dentro de TTL: Hit
+      await fetchTeamProjects();
+      metrics = getCacheTelemetryMetrics();
+      expect(metrics.misses).toBe(1);
+      expect(metrics.hits).toBe(2);
+      expect(metrics.totalRequests).toBe(3);
+      expect(metrics.hitRatioPct).toBe(66.67);
+
+      // 4. Consulta con forceRefresh: Miss
+      await fetchTeamProjects({ forceRefresh: true });
+      metrics = getCacheTelemetryMetrics();
+      expect(metrics.misses).toBe(2);
+      expect(metrics.hits).toBe(2);
+      expect(metrics.totalRequests).toBe(4);
+      expect(metrics.hitRatioPct).toBe(50);
+    });
+
+    it('fetchWorkspaceTelemetrySnapshot incrementa misses y hits calculando hitRatioPct', async () => {
+      const mockSnapshot = {
+        kpis: { active_projects_count: 5 },
+        generated_at: '2026-09-24T10:00:00Z',
+      };
+      supabase.rpc.mockResolvedValue({ data: mockSnapshot, error: null });
+
+      // 1. Primer snapshot: Miss (consulta RPC)
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      let metrics = getCacheTelemetryMetrics();
+      expect(metrics.misses).toBe(1);
+      expect(metrics.hits).toBe(0);
+      expect(metrics.totalRequests).toBe(1);
+      expect(metrics.hitRatioPct).toBe(0);
+      expect(metrics.hasTelemetryCache).toBe(true);
+
+      // 2. Segundo snapshot con misma clave dentro del TTL: Hit
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      metrics = getCacheTelemetryMetrics();
+      expect(metrics.misses).toBe(1);
+      expect(metrics.hits).toBe(1);
+      expect(metrics.totalRequests).toBe(2);
+      expect(metrics.hitRatioPct).toBe(50);
+      expect(metrics.hasTelemetryCache).toBe(true);
+    });
+
+    it('getCacheTelemetryMetrics refleja el estado independiente de hasProjectsCache y hasTelemetryCache tras invalidación granular', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      const mockSnapshot = { kpis: { active_projects_count: 1 }, generated_at: '2026-09-24T10:00:00Z' };
+      supabase.rpc.mockResolvedValue({ data: mockSnapshot, error: null });
+
+      await fetchTeamProjects();
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+
+      let metrics = getCacheTelemetryMetrics();
+      expect(metrics.hasProjectsCache).toBe(true);
+      expect(metrics.hasTelemetryCache).toBe(true);
+      const previousTotal = metrics.totalRequests;
+
+      // Invalidar solo proyectos
+      clearTeamDataCache({ entity: 'projects' });
+      metrics = getCacheTelemetryMetrics();
+      expect(metrics.hasProjectsCache).toBe(false);
+      expect(metrics.hasTelemetryCache).toBe(true);
+      expect(metrics.totalRequests).toBe(previousTotal);
+
+      // Invalidar solo telemetría
+      clearTeamDataCache({ entity: 'telemetry' });
+      metrics = getCacheTelemetryMetrics();
+      expect(metrics.hasProjectsCache).toBe(false);
+      expect(metrics.hasTelemetryCache).toBe(false);
+    });
+
+    it('resetCacheTelemetryMetrics restablece contadores a cero manteniendo el estado de caché activo', async () => {
+      const mockProjects = [{ id: 'proj-1', title: 'Proyecto Alpha' }];
+      const orderMock = vi.fn().mockResolvedValue({ data: mockProjects, error: null });
+      const selectMock = vi.fn().mockReturnValue({ order: orderMock });
+      supabase.from.mockReturnValue({ select: selectMock });
+
+      await fetchTeamProjects();
+      await fetchTeamProjects();
+
+      let metrics = getCacheTelemetryMetrics();
+      expect(metrics.hits).toBe(1);
+      expect(metrics.misses).toBe(1);
+      expect(metrics.totalRequests).toBe(2);
+      expect(metrics.hasProjectsCache).toBe(true);
+
+      // Restablecer métricas
+      resetCacheTelemetryMetrics();
+
+      metrics = getCacheTelemetryMetrics();
+      expect(metrics.hits).toBe(0);
+      expect(metrics.misses).toBe(0);
+      expect(metrics.totalRequests).toBe(0);
+      expect(metrics.hitRatioPct).toBe(0);
+      expect(metrics.hasProjectsCache).toBe(true);
+    });
+
+    it('hasTelemetryCache y hasProjectsCache retornan false cuando el caché ha expirado su TTL', async () => {
+      const mockSnapshot = { kpis: { active_projects_count: 2 }, generated_at: '2026-09-24T10:00:00Z' };
+      supabase.rpc.mockResolvedValue({ data: mockSnapshot, error: null });
+
+      const nowSpy = vi.spyOn(Date, 'now');
+      nowSpy.mockReturnValue(5000000);
+
+      await fetchWorkspaceTelemetrySnapshot({ userEmail: 'dev@inmerge.pe', isAdmin: true });
+      expect(getCacheTelemetryMetrics().hasTelemetryCache).toBe(true);
+
+      // Avanzar más allá de los 15s de TTL (15001ms)
+      nowSpy.mockReturnValue(5000000 + 15001);
+      expect(getCacheTelemetryMetrics().hasTelemetryCache).toBe(false);
+
+      nowSpy.mockRestore();
     });
   });
 });

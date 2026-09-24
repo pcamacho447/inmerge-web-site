@@ -8,6 +8,43 @@ let teamProjectsCache = null;
 export const TELEMETRY_CACHE_TTL_MS = 15000; // 15s TTL
 let telemetrySnapshotCache = null;
 
+let cacheHits = 0;
+let cacheMisses = 0;
+
+/**
+ * Retorna las métricas operativas y de salud del caché en memoria del equipo.
+ * @returns {{
+ *   hits: number,
+ *   misses: number,
+ *   totalRequests: number,
+ *   hitRatioPct: number,
+ *   hasProjectsCache: boolean,
+ *   hasTelemetryCache: boolean
+ * }}
+ */
+export function getCacheTelemetryMetrics() {
+  const now = Date.now();
+  const totalRequests = cacheHits + cacheMisses;
+  const hitRatioPct = totalRequests === 0 ? 0 : Number(((cacheHits / totalRequests) * 100).toFixed(2));
+
+  return {
+    hits: cacheHits,
+    misses: cacheMisses,
+    totalRequests,
+    hitRatioPct,
+    hasProjectsCache: Boolean(teamProjectsCache && now - teamProjectsCache.timestamp < TEAM_PROJECTS_CACHE_TTL_MS),
+    hasTelemetryCache: Boolean(telemetrySnapshotCache && now - telemetrySnapshotCache.timestamp < TELEMETRY_CACHE_TTL_MS),
+  };
+}
+
+/**
+ * Restablece los contadores de telemetría de caché a cero (para diagnóstico o aislamiento en tests).
+ */
+export function resetCacheTelemetryMetrics() {
+  cacheHits = 0;
+  cacheMisses = 0;
+}
+
 /**
  * Invalida el caché en memoria de proyectos y/o telemetría del equipo técnico de forma granular.
  * @param {Object} [options={}]
@@ -143,9 +180,11 @@ export async function updateLeadStatus(leadId, { status, notes, assignedTo }) {
 export async function fetchTeamProjects({ forceRefresh = false } = {}) {
   const now = Date.now();
   if (!forceRefresh && teamProjectsCache && now - teamProjectsCache.timestamp < TEAM_PROJECTS_CACHE_TTL_MS) {
+    cacheHits++;
     return teamProjectsCache.data;
   }
 
+  cacheMisses++;
   const { data, error } = await supabase
     .from('client_projects')
     .select(
@@ -226,9 +265,11 @@ export async function fetchWorkspaceTelemetrySnapshot({
     telemetrySnapshotCache.key === cacheKey &&
     now - telemetrySnapshotCache.timestamp < TELEMETRY_CACHE_TTL_MS
   ) {
+    cacheHits++;
     return telemetrySnapshotCache.data;
   }
 
+  cacheMisses++;
   try {
     if (supabase && typeof supabase.rpc === 'function') {
       const { data, error } = await supabase.rpc('get_workspace_telemetry_snapshot', {
