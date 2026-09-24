@@ -481,3 +481,39 @@ Implementación completa de la Fase 2 del plan de escalabilidad (`docs/superpowe
 - **Formateador (Prettier):** 100% de archivos en conformidad estricta (`npm run format:check`).
 - **Compilación de Producción (Vite):** Build de producción limpio y optimizado generado en 2.44s (`npm run build`).
 
+---
+
+## Sesión: 2026-09-24 (Sesión 2) — Optimización de Telemetría RPC, Deduplicación de Caché (15s TTL), Invalidación Granular y Reintentos Resilientes
+
+Implementación de la optimización del canal de telemetría y consolidación de caché en el panel de consultores (`web/app/src/lib/team.js`).
+
+### 1. Deduplicación y Caché en Memoria con TTL de 15s (`TELEMETRY_CACHE_TTL_MS = 15000`)
+- **Decisión:** Implementar almacenamiento en caché en memoria con expiración de 15 segundos para `fetchWorkspaceTelemetrySnapshot`:
+  - **Clave Compuesta:** Clave determinística `${userEmail || ''}_${isAdmin ? '1' : '0'}` para garantizar aislamiento de métricas por especialista y rol de auditor/administrador.
+  - **Deduplicación de Consultas:** Invocaciones concurrentes o transiciones de navegación entre subpestañas dentro de la ventana de 15s resuelven a 0ms de latencia sin emitir viajes de red redundantes.
+  - **Soporte `forceRefresh`:** Bypasea el caché cuando se solicita sincronización manual explícita.
+
+### 2. Invalidación Granular por Entidad (`clearTeamDataCache({ entity })`)
+- **Decisión:** Evolucionar el invalidador de caché monolítico a una API selectiva por entidad:
+  - `clearTeamDataCache({ entity = 'all' })` admite las opciones `'all'`, `'projects'` y `'telemetry'`.
+  - Mutaciones en proyectos, hitos o entregables pueden purgar selectivamente el segmento afectado sin invalidar innecesariamente el snapshot de telemetría general, o purgar ambos ante mutaciones transversales.
+
+### 3. Métricas de Salud del Caché y Diagnóstico Operativo (`getCacheTelemetryMetrics`)
+- **Decisión:** Exportar herramientas de telemetría interna para diagnóstico de rendimiento:
+  - `getCacheTelemetryMetrics()` retorna `{ hits, misses, totalRequests, hitRatioPct, hasProjectsCache, hasTelemetryCache }`.
+  - Permite auditar el ratio de aciertos de caché (*cache hit ratio*) en tiempo real y verificar el estado de frescura de las estructuras en memoria sin alterar su ciclo de vida.
+  - Se acompaña del método de aislamiento `resetCacheTelemetryMetrics()` para entornos de prueba y benchmarks.
+
+### 4. Resiliencia de Red con Reintento Transparente y Backoff de 200ms (`TELEMETRY_RPC_RETRY_DELAY_MS = 200`)
+- **Decisión:** Incorporar tolerancia a fallos transitorios en la invocación de `get_workspace_telemetry_snapshot`:
+  - Algoritmo de 1 reintento transparente (`maxAttempts = 2`) con retardo de 200ms ante fallos de conexión, respuestas HTTP 5xx o excepciones transitorias.
+  - Si ambos intentos RPC resultan infructuosos, la función activa automáticamente el fallback analítico local resiliente (conforme a la Regla 4 de `AGENTS.md`), computando los KPIs a partir de los datos en memoria con cero interrupciones de cara al usuario.
+
+### 5. Evidencias de Verificación y Calidad Global
+- **Suite Completa de Pruebas (Vitest):** 46 archivos de prueba ejecutados, 335 pruebas pasando con 100% de éxito (0 fallos, 0 regresiones).
+  - Incluye 46 tests en `team.test.js` que validan el ciclo de vida de caché TTL, expiración, invalidación granular, contadores de hits/misses, y reintentos con backoff simulado.
+- **Linter (ESLint):** 0 errores (`npm run lint`).
+- **Formateador (Prettier):** 100% de archivos en conformidad estricta (`npm run format:check`).
+- **Compilación de Producción (Vite):** Build de producción limpio y optimizado generado en 2.19s (`npm run build`).
+
+
