@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import useRealtimeTeam from './useRealtimeTeam.js';
+import useRealtimeTeam, { coalesceDeltaPayloads } from './useRealtimeTeam.js';
 import { supabase } from '../lib/supabaseClient.js';
 import { clearTeamDataCache } from '../lib/team.js';
 
@@ -234,5 +234,206 @@ describe('useRealtimeTeam', () => {
 
     expect(onDataRefresh).not.toHaveBeenCalled();
     expect(supabase.removeChannel).toHaveBeenCalledWith(mockChannel);
+  });
+
+  describe('coalesceDeltaPayloads', () => {
+    it('returns empty array when queue is null, undefined, or empty', () => {
+      expect(coalesceDeltaPayloads()).toEqual([]);
+      expect(coalesceDeltaPayloads(null)).toEqual([]);
+      expect(coalesceDeltaPayloads([])).toEqual([]);
+    });
+
+    it('deduplicates rapid consecutive UPDATE events for the same entity ID within a 100ms window retaining the latest payload', () => {
+      const eventQueue = [
+        {
+          table: 'client_projects',
+          eventType: 'UPDATE',
+          old: { id: 'p1', title: 'Init', progress: 10 },
+          new: { id: 'p1', title: 'Init', progress: 10 },
+          timestamp: 1000,
+        },
+        {
+          table: 'client_projects',
+          eventType: 'UPDATE',
+          old: { id: 'p1', title: 'Init', progress: 10 },
+          new: { id: 'p1', title: 'Draft v1', progress: 20 },
+          timestamp: 1040,
+        },
+        {
+          table: 'client_projects',
+          eventType: 'UPDATE',
+          old: { id: 'p1', title: 'Draft v1', progress: 20 },
+          new: { id: 'p1', title: 'Final Production', progress: 50 },
+          timestamp: 1080,
+        },
+      ];
+
+      const coalesced = coalesceDeltaPayloads(eventQueue, 100);
+
+      expect(coalesced).toHaveLength(1);
+      expect(coalesced[0]).toEqual({
+        table: 'client_projects',
+        eventType: 'UPDATE',
+        old: { id: 'p1', title: 'Init', progress: 10 },
+        new: { id: 'p1', title: 'Final Production', progress: 50 },
+        timestamp: 1080,
+      });
+    });
+
+    it('retains UPDATE events when time delta exceeds the windowMs threshold', () => {
+      const eventQueue = [
+        {
+          table: 'client_projects',
+          eventType: 'UPDATE',
+          new: { id: 'p1', title: 'Batch 1 Update' },
+          timestamp: 1000,
+        },
+        {
+          table: 'client_projects',
+          eventType: 'UPDATE',
+          new: { id: 'p1', title: 'Batch 2 Update' },
+          timestamp: 1150, // 150ms later (> 100ms window)
+        },
+      ];
+
+      const coalesced = coalesceDeltaPayloads(eventQueue, 100);
+      expect(coalesced).toHaveLength(2);
+      expect(coalesced[0].new.title).toBe('Batch 1 Update');
+      expect(coalesced[1].new.title).toBe('Batch 2 Update');
+    });
+
+    it('coalesces consecutive UPDATE events when timestamps are omitted', () => {
+      const eventQueue = [
+        {
+          table: 'client_projects',
+          eventType: 'UPDATE',
+          new: { id: 'p2', status: 'PLANNING' },
+        },
+        {
+          table: 'client_projects',
+          eventType: 'UPDATE',
+          new: { id: 'p2', status: 'IN_PROGRESS' },
+        },
+      ];
+
+      const coalesced = coalesceDeltaPayloads(eventQueue);
+      expect(coalesced).toHaveLength(1);
+      expect(coalesced[0].new).toEqual({ id: 'p2', status: 'IN_PROGRESS' });
+    });
+
+    it('properly handles mixed event queues (INSERT, UPDATE, DELETE) across different tables', () => {
+      const mixedQueue = [
+        {
+          table: 'leads_tdr',
+          eventType: 'INSERT',
+          new: { id: 'lead-1', company: 'FinTech Corp', pillar: 'software' },
+          timestamp: 1000,
+        },
+        {
+          table: 'client_projects',
+          eventType: 'UPDATE',
+          old: { id: 'proj-1', title: 'Legacy Project' },
+          new: { id: 'proj-1', title: 'Cloud Modernization v1' },
+          timestamp: 1010,
+        },
+        {
+          table: 'client_projects',
+          eventType: 'UPDATE',
+          old: { id: 'proj-1', title: 'Cloud Modernization v1' },
+          new: { id: 'proj-1', title: 'Cloud Modernization v2' },
+          timestamp: 1045,
+        },
+        {
+          table: 'project_deliverables',
+          eventType: 'DELETE',
+          old: { id: 'deliv-99' },
+          timestamp: 1060,
+        },
+        {
+          table: 'leads_tdr',
+          eventType: 'UPDATE',
+          new: { id: 'lead-1', status: 'CALIFICADO' },
+          timestamp: 1070,
+        },
+      ];
+
+      const coalesced = coalesceDeltaPayloads(mixedQueue, 100);
+
+      expect(coalesced).toHaveLength(4);
+      // 1: lead-1 INSERT
+      expect(coalesced[0]).toEqual({
+        table: 'leads_tdr',
+        eventType: 'INSERT',
+        new: { id: 'lead-1', company: 'FinTech Corp', pillar: 'software' },
+        timestamp: 1000,
+      });
+      // 2: proj-1 UPDATE (coalesced to latest v2)
+      expect(coalesced[1]).toEqual({
+        table: 'client_projects',
+        eventType: 'UPDATE',
+        old: { id: 'proj-1', title: 'Legacy Project' },
+        new: { id: 'proj-1', title: 'Cloud Modernization v2' },
+        timestamp: 1045,
+      });
+      // 3: deliv-99 DELETE
+      expect(coalesced[2]).toEqual({
+        table: 'project_deliverables',
+        eventType: 'DELETE',
+        old: { id: 'deliv-99' },
+        timestamp: 1060,
+      });
+      // 4: lead-1 UPDATE
+      expect(coalesced[3]).toEqual({
+        table: 'leads_tdr',
+        eventType: 'UPDATE',
+        new: { id: 'lead-1', status: 'CALIFICADO' },
+        timestamp: 1070,
+      });
+    });
+  });
+
+  it('batches and coalesces rapid incoming deltas when coalesce option is enabled on useRealtimeTeam', () => {
+    const onDeltaPatch = vi.fn();
+    renderHook(() =>
+      useRealtimeTeam({
+        onDeltaPatch,
+        enabled: true,
+        coalesce: true,
+        coalesceWindowMs: 100,
+      }),
+    );
+
+    act(() => {
+      eventCallbacks['client_projects']({
+        eventType: 'UPDATE',
+        new: { id: 'p1', title: 'Draft v1' },
+      });
+      eventCallbacks['client_projects']({
+        eventType: 'UPDATE',
+        new: { id: 'p1', title: 'Draft v2' },
+      });
+      eventCallbacks['client_projects']({
+        eventType: 'UPDATE',
+        new: { id: 'p1', title: 'Final Title' },
+      });
+    });
+
+    // Before timer advances, onDeltaPatch should not have been called
+    expect(onDeltaPatch).not.toHaveBeenCalled();
+
+    // Advance by 100ms window
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    // Should only have been called once with the coalesced latest payload
+    expect(onDeltaPatch).toHaveBeenCalledTimes(1);
+    expect(onDeltaPatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        table: 'client_projects',
+        eventType: 'UPDATE',
+        new: expect.objectContaining({ id: 'p1', title: 'Final Title' }),
+      }),
+    );
   });
 });
