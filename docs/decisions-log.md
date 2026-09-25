@@ -306,6 +306,7 @@ Bitácora histórica de decisiones arquitectónicas, de producto, de diseño y a
 ## Sesión: 2026-09-23 — Refactorización UX & Hub Documental para el Panel del Trabajador (`/equipo`)
 
 ### Tarea 1: Corrección de Cumplimiento Normativo en Tareas Técnicas (`ProjectTaskManager.jsx`)
+
 - **Agente Ejecutor:** Sally 🎨 & Amelia 💻
 - **Archivos Modificados:** `web/app/src/components/ProjectTaskManager.jsx`, `web/app/src/components/ProjectTaskManager.test.jsx`
 - **Resumen del Cambio:** Se eliminó la instrucción nativa bloqueante `window.confirm()` en la eliminación de tareas técnicas para cumplir con la directriz del proyecto (AGENTS.md). Se implementó un estado de confirmación en dos pasos (`confirmDeleteTaskId`) con reseteo automático a los 4 segundos y feedback visual accesible.
@@ -313,6 +314,7 @@ Bitácora histórica de decisiones arquitectónicas, de producto, de diseño y a
 - **Estado:** APROBADO.
 
 ### Tarea 2: Hub de Especificaciones & Documentación Compartida (`ProjectDocumentHub.jsx`)
+
 - **Agente Ejecutor:** Sally 🎨 & Winston 🏛️
 - **Archivos Creados:** `web/app/src/components/team/ProjectDocumentHub.jsx`, `web/app/src/components/team/ProjectDocumentHub.test.jsx`
 - **Resumen del Cambio:** Se creó el espacio de documentación compartida para el desarrollador, organizando los requerimientos en 4 categorías: Briefing TDR, Arquitectura, Sandbox/APIs y Entregables Auditados. Incorpora disparadores de previsualización sin requerir descarga inmediata de archivos.
@@ -320,13 +322,15 @@ Bitácora histórica de decisiones arquitectónicas, de producto, de diseño y a
 - **Estado:** APROBADO.
 
 ### Tarea 3: Visor de Previsualización In-App (`DocumentPreviewDrawer.jsx`)
+
 - **Agente Ejecutor:** Sally 🎨 & Amelia 💻
 - **Archivos Creados:** `web/app/src/components/team/DocumentPreviewDrawer.jsx`, `web/app/src/components/team/DocumentPreviewDrawer.test.jsx`
-- **Resumen del Cambio:** Se implementó un panel deslizante lateral (*Slide-Over Drawer*) con accesibilidad completa (tecla `Escape`, overlay y atributos ARIA). Soporta renderizado de texto/markdown estructurado, incrustación de PDFs/enlaces iframe y acciones de descarga firmada.
+- **Resumen del Cambio:** Se implementó un panel deslizante lateral (_Slide-Over Drawer_) con accesibilidad completa (tecla `Escape`, overlay y atributos ARIA). Soporta renderizado de texto/markdown estructurado, incrustación de PDFs/enlaces iframe y acciones de descarga firmada.
 - **Verificación:** Pruebas unitarias en `DocumentPreviewDrawer.test.jsx` pasando al 100% (2/2 tests).
 - **Estado:** APROBADO.
 
 ### Tarea 4: Descongestión de Botones & Divulgación Progresiva en `ProjectsManagementView.jsx`
+
 - **Agente Ejecutor:** Sally 🎨 & Amelia 💻
 - **Archivos Modificados:** `web/app/src/components/team/ProjectsManagementView.jsx`
 - **Resumen del Cambio:** Se refactorizaron las subpestañas por tarjeta de proyecto, reemplazando la franja saturada de 5 botones por un esquema limpio de 3 grupos de divulgación progresiva (`[ 📖 Especificaciones & Docs ]`, `[ 📋 Tareas Técnicas ]`, y un selector desplegable para herramientas avanzadas PM). Se conectó `ProjectDocumentHub` y `DocumentPreviewDrawer`.
@@ -334,6 +338,7 @@ Bitácora histórica de decisiones arquitectónicas, de producto, de diseño y a
 - **Estado:** APROBADO.
 
 ### Tarea 5: Filtro de Enfoque "Mis Asignaciones" en la Consola (`Equipo.jsx`)
+
 - **Agente Ejecutor:** Sally 🎨 & John 📋
 - **Archivos Modificados:** `web/app/src/pages/Equipo.jsx`
 - **Resumen del Cambio:** Se introdujo el selector de alcance reactivo `viewScope` (`Todos los Proyectos` vs `★ Mis Asignaciones`). Permite a cualquier consultor, desarrollador o auditor aislar instantáneamente únicamente los proyectos donde figura como Lead Técnico o donde tiene hitos o tareas técnicas asignadas a su email.
@@ -341,6 +346,7 @@ Bitácora histórica de decisiones arquitectónicas, de producto, de diseño y a
 - **Estado:** APROBADO.
 
 ### Tarea 6: Trazabilidad Automática Lead TDR -> Cédula Técnica de Proyecto (`Equipo.jsx`)
+
 - **Agente Ejecutor:** Mary 📊 & Amelia 💻
 - **Archivos Modificados:** `web/app/src/pages/Equipo.jsx`
 - **Resumen del Cambio:** Se actualizó la conversión de Leads a Proyectos (`handleConvertLeadToProject`) para generar automáticamente la descripción en formato de Cédula Técnica Markdown (`# CÉDULA DE ALCANCE INICIAL`, `## 1. Requerimiento`, `## 2. Contacto`, `## 3. Plazo y Pilar`). Esto permite su lectura estructurada inmediata en `ProjectDocumentHub`.
@@ -348,6 +354,7 @@ Bitácora histórica de decisiones arquitectónicas, de producto, de diseño y a
 - **Estado:** APROBADO.
 
 ### Tarea 7: Verificación Global de Calidad, Build y Cierre de Sesión (`/equipo`)
+
 - **Agente Ejecutor:** Sally 🎨 & Amelia 💻
 - **Archivos Creados:** `docs/brainstorming/brainstorm-ux-panel-trabajador-2026-09-23/cambios-implementados.md`
 - **Resumen del Cambio:** Se completó la refactorización integral del panel de operaciones del trabajador. Se verificó el 100% de la suite de pruebas unitarias e integración (40 suites, 210 pruebas pasando en verde). Se realizó la compilación de producción con Vite (`npm run build`) en 2.58s sin advertencias ni errores. Se redactó la documentación final de cambios y la guía de uso.
@@ -361,6 +368,7 @@ Bitácora histórica de decisiones arquitectónicas, de producto, de diseño y a
 Implementación completa del plan de arquitectura de operaciones y entregables para ingenieros y auditores según especificación consensuada (`docs/superpowers/plans/2026-09-23-panel-trabajadores-cockpit-auditoria-entregables.md`).
 
 ### 1. Flujo Asimétrico de Entregables & Aislamiento Hermético de Clientes
+
 - **Decisión:** Establecer una máquina de estados formal para entregables técnicos (`project_deliverables`): `BORRADOR_INTERNO` → `EN_REVISION` → `PUBLICADO_CLIENTE`.
   - **Permisos por Roles:** Los ingenieros y auditores redactan y elevan entregables a revisión (`EN_REVISION`). Únicamente usuarios administradores (`admin`) pueden aprobar y publicar formalmente a `PUBLICADO_CLIENTE`, o rechazar devolviendo a `BORRADOR_INTERNO` con registro de feedback.
   - **Aislamiento de Clientes:** En el portal de clientes (`/cuenta`), la función `fetchClientProjectDeliverables` filtra estrictamente a nivel de consulta y cliente entregables cuyo estado sea única y exclusivamente `PUBLICADO_CLIENTE`. Los borradores y revisiones intermedias quedan completamente invisibles e inaccesibles para el cliente.
@@ -368,6 +376,7 @@ Implementación completa del plan de arquitectura de operaciones y entregables p
 - **Archivos Clave:** `web/app/src/lib/pm.js`, `web/app/src/lib/team.js`, `web/app/src/lib/projects.js`, `web/app/src/components/team/ProjectsManagementView.jsx`.
 
 ### 2. Matriz de Hallazgos Forenses de Auditoría (`ProjectAuditFindings.jsx` & `PM_FINDINGS`)
+
 - **Decisión:** Incorporar un módulo de registro y seguimiento de vulnerabilidades y hallazgos técnicos forenses por proyecto, accesible dentro del selector de herramientas avanzadas PM (`PM_FINDINGS`).
   - **Taxonomía Estandarizada:**
     - Severidades: `CRITICA`, `ALTA`, `MEDIA`, `BAJA`, `INFORMATIVA` con codificación visual y semántica Mochica.
@@ -377,12 +386,14 @@ Implementación completa del plan de arquitectura de operaciones y entregables p
 - **Archivos Clave:** `web/app/src/components/team/ProjectAuditFindings.jsx`, `web/app/src/components/team/ProjectAuditFindings.test.jsx`, `web/app/src/lib/pm.js`, `web/app/src/lib/team.js`.
 
 ### 3. Ficha Técnica, Entornos & Runbook Interactivo (`ProjectDocumentHub.jsx`)
+
 - **Decisión:** Evolucionar la sección de Arquitectura del Hub Documental de Proyecto hacia una consola interactiva de especificaciones y despliegue técnico:
   - **Runbook Interactivo de Pasos de Despliegue:** Lista estructurada de procedimientos técnicos numerados, indicador de duración estimada, estado (`PENDIENTE` vs `COMPLETADO`) conmutador de progreso y comando de terminal directo con botón de copiado al portapapeles y anuncio accesible (`aria-live="polite"`).
   - **Ficha de Entornos de Infraestructura:** Especificaciones organizadas de endpoints, branches y configuraciones para entornos de `Desarrollo / Local`, `Staging / QA` y `Producción`.
 - **Archivos Clave:** `web/app/src/components/team/ProjectDocumentHub.jsx`, `web/app/src/components/team/ProjectDocumentHub.test.jsx`.
 
 ### 4. Cockpit Personal de Especialistas & Auto-scoping por Roles (`WorkerCockpitView.jsx`)
+
 - **Decisión:** Diseñar una estación de trabajo centrada en el colaborador técnico para eliminar la sobrecarga cognitiva en `/equipo`:
   - **Auto-scoping:** Al autenticarse un usuario no-administrador (`engineer`, `auditor`), la consola inicializa automáticamente la pestaña en `cockpit` ("Mi Estación") y fija el alcance en `viewScope = 'ASSIGNED'` ("Mis Asignaciones").
   - **Vista Cockpit (`WorkerCockpitView.jsx`):** Agrupa en un panel unificado las métricas personales de tareas (Pendientes, En Proceso, Completadas), entregables propios y la lista reactiva de tareas técnicas asignadas con capacidad de alternar estado in-situ y botón de navegación directa al contexto del proyecto (`Ver en Proyecto`).
@@ -390,6 +401,7 @@ Implementación completa del plan de arquitectura de operaciones y entregables p
 - **Archivos Clave:** `web/app/src/components/team/WorkerCockpitView.jsx`, `web/app/src/components/team/WorkerCockpitView.test.jsx`, `web/app/src/pages/Equipo.jsx`, `web/app/src/components/team/CommandPaletteModal.jsx`.
 
 ### 5. Evidencias de Verificación y Calidad de Código
+
 - **Suite de Pruebas Automatizadas (Vitest):** 42 suites de pruebas ejecutadas, 245 pruebas aprobadas al 100% (0 errores, 0 regresiones).
 - **Linter (ESLint):** 0 errores (`npm run lint`).
 - **Formateador (Prettier):** 100% de archivos en conformidad de estilo (`npm run format:check`).
@@ -402,6 +414,7 @@ Implementación completa del plan de arquitectura de operaciones y entregables p
 Implementación completa de la Fase 1 del plan de optimización de bases de datos y rendimiento (`docs/superpowers/plans/2026-09-23-optimizacion-consultas-sql-indices-rpc.md`).
 
 ### 1. Migración SQL de Índices Compuestos B-Tree & Paridad Estricta (`0011_inmerge_sql_performance_and_telemetry_rpc.sql`)
+
 - **Decisión:** Crear índices btree compuestos específicos en PostgreSQL para transformar los escaneos secuenciales O(N) en búsquedas directas O(log N):
   - `idx_tasks_assigned_email_status` en `project_tasks(assigned_to_email, status)`: optimiza el filtrado del cockpit técnico y conteos de tareas por especialista.
   - `idx_deliverables_proj_status` en `project_deliverables(project_id, status)`: optimiza la consulta de entregables confidenciales y el filtrado hermético para el portal del cliente.
@@ -411,29 +424,34 @@ Implementación completa de la Fase 1 del plan de optimización de bases de dato
 - **Paridad Estricta:** Replicación 1:1 en `supabase/migrations/` y `web/app/supabase/migrations/`, verificada con `scripts/verify-migrations-parity.test.mjs`.
 
 ### 2. RPCs Consolidadas en PostgreSQL (Single-Pass Aggregates & Telemetry Snapshot)
+
 - **Decisión:** Reemplazar múltiples consultas separadas y agregaciones pesadas en el cliente por dos funciones PL/pgSQL STABLE con `SECURITY DEFINER`:
   - `get_project_analytics(p_project_id UUID)`: Ejecuta una agregación consolidada en una sola pasada sobre `project_tasks`, calculando conteos por estado, varianza de esfuerzo (`effort_variance_pct`), porcentaje de avance (`completion_pct`), y conteos correlacionados de riesgos abiertos y hallazgos críticos abiertos.
   - `get_workspace_telemetry_snapshot(p_user_email TEXT, p_is_admin BOOLEAN)`: Proporciona un snapshot integral en un único viaje de red (1 HTTP roundtrip) con conteos exactos de proyectos activos, leads pendientes, entregables en revisión, hallazgos críticos sin mitigar y tareas asignadas al usuario.
 
 ### 3. Caché en Memoria con TTL de 30 Segundos y Fallbacks Resilientes (`team.js` & `projects.js`)
+
 - **Decisión:** Implementar un caché en memoria de 30 segundos (`CACHE_TTL_MS = 30000`) tanto para el panel de consultores (`teamProjectsCache`) como para el portal de clientes (`clientCache` indexado por `userId`):
   - Invocaciones repetidas o cambios de pestaña dentro de la ventana de 30s reutilizan la referencia en memoria a 0ms de latencia.
   - El parámetro `{ forceRefresh: true }` y los invalidadores explícitos `clearTeamDataCache()` y `clearClientProjectsCache()` purgan el caché inmediatamente ante mutaciones o eventos de sincronización.
   - Las consultas se construyen con diseño defensivo y fallbacks analíticos locales que computan métricas agregadas si la base de datos remota aún no ha aplicado las funciones RPC (cumpliendo la Regla 4 de `AGENTS.md`).
 
 ### 4. Sincronización Delta Reactiva en Tiempo Real (`useRealtimeTeam.js`)
-- **Decisión:** Refactorizar el hook de suscripciones WebSocket para erradicar las tormentas de re-consultas (*refetch storms*):
+
+- **Decisión:** Refactorizar el hook de suscripciones WebSocket para erradicar las tormentas de re-consultas (_refetch storms_):
   - Se añadió el manejador opcional `onDeltaPatch(payload)` y la invalidación inmediata de caché `clearTeamDataCache()`.
   - Cuando se provee `onDeltaPatch`, las mutaciones en `leads_tdr`, `client_projects`, `project_deliverables`, `project_tasks` y `project_findings` se despachan de forma instantánea al estado local, sin generar tráfico de red HTTP ni sobrecarga a la base de datos.
-  - Como mecanismo de respaldo ante la ausencia de `onDeltaPatch`, se implementó amortiguación (*debouncing*) de 300ms en `onDataRefresh({ forceRefresh: true })`, consolidando ráfagas de eventos Realtime en una única recarga.
+  - Como mecanismo de respaldo ante la ausencia de `onDeltaPatch`, se implementó amortiguación (_debouncing_) de 300ms en `onDataRefresh({ forceRefresh: true })`, consolidando ráfagas de eventos Realtime en una única recarga.
 
 ### 5. Integración en Consola Operativa (`Equipo.jsx`)
+
 - **Decisión:** Integrar `handleDeltaPatch` y `fetchWorkspaceTelemetrySnapshot` en `/equipo`:
   - La carga inicial aprovecha el RPC de telemetría consolidada para poblar los indicadores Bento ejecutivos y tiras de KPIs instantáneamente.
   - Los eventos WebSocket de tareas, entregables y hallazgos parchean la matriz de proyectos local en tiempo real con latencia visual de 0ms, preservando la inmutabilidad y ordenación del estado.
   - El indicador visual de estado Realtime en la barra superior refleja fielmente la salud del canal (`REALTIME ACTIVO` vs `SIN CONEXIÓN REALTIME`) con accesibilidad WCAG (`role="status"`, `aria-live="polite"`).
 
 ### 6. Evidencias de Verificación y Calidad Global
+
 - **Suite de Pruebas Vitest:** 42 archivos de prueba ejecutados, 259 pruebas pasando con 100% de éxito (0 fallos).
 - **Linter (ESLint):** 0 errores (`npm run lint`).
 - **Formateador (Prettier):** 100% de archivos en conformidad estricta (`npm run format:check`).
@@ -446,6 +464,7 @@ Implementación completa de la Fase 1 del plan de optimización de bases de dato
 Implementación completa de la Fase 2 del plan de escalabilidad (`docs/superpowers/plans/2026-09-23-fase-2-escalabilidad-notificaciones-alertas.md`).
 
 ### 1. Migración SQL de Notificaciones y Bucket Seguro Vault (`0012_inmerge_user_notifications_and_vault_storage.sql`)
+
 - **Decisión:** Implementar la infraestructura de base de datos y almacenamiento confidencial para notificaciones in-app y custodia de entregables:
   - **Tabla `user_notifications`:** Esquema relacional con columnas tipadas (`user_email`, `target_role`, `title`, `message`, `category`, `severity`, `project_id`, `link_url`, `is_read`, `created_at`), validación por check constraints para severidades (`CRITICAL`, `HIGH`, `MEDIUM`, `INFO`) y categorías (`DELIVERABLE`, `FINDING`, `TASK`, `SYSTEM`, `SECURITY`), con índices optimizados B-tree (`idx_user_notif_email_read`, `idx_user_notif_role_created`).
   - **Políticas RLS en `user_notifications`:** Acceso granular con `auth.jwt() ->> 'email'`, permisos de lectura restringidos al destinatario o rol, e inserción abierta para triggers y administradores.
@@ -453,29 +472,34 @@ Implementación completa de la Fase 2 del plan de escalabilidad (`docs/superpowe
 - **Paridad Estricta:** Replicación correlativa en `supabase/migrations/` y `web/app/supabase/migrations/`, validada con `scripts/verify-migrations-parity.test.mjs`.
 
 ### 2. Gestor de Notificaciones In-App con Caché TTL y Fallback Resiliente (`notifications.js`)
+
 - **Decisión:** Crear un gestor de notificaciones in-app de alta resiliencia y bajo impacto de red:
   - **Caché en Memoria con TTL de 15s (`NOTIFICATIONS_CACHE_TTL_MS = 15000`):** Minimiza llamadas recurrentes a la base de datos durante navegación rápida entre pestañas.
   - **Consultas Defensivas y Fallback Local:** Diseñado según la Regla 4 de `AGENTS.md`. Si la tabla remota no ha sido migrada o hay contingencia de red, las notificaciones se almacenan y consultan en un búfer local en memoria, garantizando continuidad operativa con 0 caídas.
   - **Mutaciones Seguras:** Funciones `createInAppNotification`, `fetchUserNotifications`, `markNotificationAsRead` y `markAllUserNotificationsAsRead` con saneamiento estricto de parámetros.
 
 ### 3. Cliente de Almacenamiento Seguro Vault & URLs Firmadas Temporales (`vaultStorage.js`)
+
 - **Decisión:** Centralizar la custodia de archivos técnicos en un cliente dedicado `vaultStorage.js`:
   - **Validación Previa:** Verificación de tamaño máximo (<50MB) y extensiones permitidas antes de iniciar cualquier transferencia hacia Supabase Storage.
   - **URLs Firmadas de Corta Duración (`getSignedDeliverableUrl`):** Enlaces temporales con expiración auditada (por defecto 900s / 15 minutos), con fallback resiliente seguro en modo local y registro forense.
   - **Subida Controlada (`uploadDeliverableToVault`):** Normalización y saneamiento de rutas (`<projectId>/<timestamp>_<cleanFileName>`) para prevenir colisiones o inyección en rutas de almacenamiento.
 
 ### 4. Componentes UI Accesibles: Centro de Notificaciones & Banner de Telemetría
+
 - **Decisión:** Crear dos componentes reutilizables con accesibilidad WCAG 2.1 AA en `web/app/src/components/team/`:
   - **`<NotificationsPopover />`:** Diálogo flotante (`role="dialog"`, `aria-modal="true"`) con cierre por tecla `Escape`, filtrado por leídas/no leídas, badges de severidad estilizados acordes a la paleta editorial Inmerge, contador de no leídas y soporte para modo controlado o autónomo vía `userEmail`.
   - **`<ConnectionTelemetryBanner />`:** Banner de contingencia accesible (`role="alert"`, `aria-live="assertive"`) que detecta automáticamente caídas de red local (`navigator.onLine`) o reconexión del WebSocket Realtime (`DISCONNECTED`, `CONNECTING`, `CHANNEL_ERROR`), ofreciendo feedback visual inmediato y botón de reintento.
 
 ### 5. Integración Global en Consolas Operativas (`/equipo` y `/cuenta`) y Hub de Entregables
+
 - **Decisión:** Incorporar las capacidades de telemetría, notificaciones y URLs firmadas en las vistas principales:
   - **Panel de Consultores (`Equipo.jsx`):** Banner superior de telemetría de red, botón de acceso al Centro de Notificaciones en la barra de herramientas superior, y modal `<NotificationsPopover />` para supervisión in-situ.
   - **Portal de Clientes (`Cuenta.jsx`):** Banner de conectividad en cabecera, trigger de notificaciones con accesibilidad bilingüe (`ES | EN`), y consumo de notificaciones dirigidas al cliente.
   - **Hub Documental (`ProjectDocumentHub.jsx`):** Integración de `getSignedDeliverableUrl` para la previsualización e inicio de descargas seguras directas de archivos confidenciales.
 
 ### 6. Evidencias de Verificación y Calidad Global
+
 - **Suite Completa de Pruebas (Vitest):** 46 archivos de prueba ejecutados, 318 pruebas pasando con 100% de éxito (0 fallos, 0 regresiones).
 - **Linter (ESLint):** 0 errores (`npm run lint`).
 - **Formateador (Prettier):** 100% de archivos en conformidad estricta (`npm run format:check`).
@@ -488,28 +512,33 @@ Implementación completa de la Fase 2 del plan de escalabilidad (`docs/superpowe
 Implementación de la optimización del canal de telemetría y consolidación de caché en el panel de consultores (`web/app/src/lib/team.js`).
 
 ### 1. Deduplicación y Caché en Memoria con TTL de 15s (`TELEMETRY_CACHE_TTL_MS = 15000`)
+
 - **Decisión:** Implementar almacenamiento en caché en memoria con expiración de 15 segundos para `fetchWorkspaceTelemetrySnapshot`:
   - **Clave Compuesta:** Clave determinística `${userEmail || ''}_${isAdmin ? '1' : '0'}` para garantizar aislamiento de métricas por especialista y rol de auditor/administrador.
   - **Deduplicación de Consultas:** Invocaciones concurrentes o transiciones de navegación entre subpestañas dentro de la ventana de 15s resuelven a 0ms de latencia sin emitir viajes de red redundantes.
   - **Soporte `forceRefresh`:** Bypasea el caché cuando se solicita sincronización manual explícita.
 
 ### 2. Invalidación Granular por Entidad (`clearTeamDataCache({ entity })`)
+
 - **Decisión:** Evolucionar el invalidador de caché monolítico a una API selectiva por entidad:
   - `clearTeamDataCache({ entity = 'all' })` admite las opciones `'all'`, `'projects'` y `'telemetry'`.
   - Mutaciones en proyectos, hitos o entregables pueden purgar selectivamente el segmento afectado sin invalidar innecesariamente el snapshot de telemetría general, o purgar ambos ante mutaciones transversales.
 
 ### 3. Métricas de Salud del Caché y Diagnóstico Operativo (`getCacheTelemetryMetrics`)
+
 - **Decisión:** Exportar herramientas de telemetría interna para diagnóstico de rendimiento:
   - `getCacheTelemetryMetrics()` retorna `{ hits, misses, totalRequests, hitRatioPct, hasProjectsCache, hasTelemetryCache }`.
-  - Permite auditar el ratio de aciertos de caché (*cache hit ratio*) en tiempo real y verificar el estado de frescura de las estructuras en memoria sin alterar su ciclo de vida.
+  - Permite auditar el ratio de aciertos de caché (_cache hit ratio_) en tiempo real y verificar el estado de frescura de las estructuras en memoria sin alterar su ciclo de vida.
   - Se acompaña del método de aislamiento `resetCacheTelemetryMetrics()` para entornos de prueba y benchmarks.
 
 ### 4. Resiliencia de Red con Reintento Transparente y Backoff de 200ms (`TELEMETRY_RPC_RETRY_DELAY_MS = 200`)
+
 - **Decisión:** Incorporar tolerancia a fallos transitorios en la invocación de `get_workspace_telemetry_snapshot`:
   - Algoritmo de 1 reintento transparente (`maxAttempts = 2`) con retardo de 200ms ante fallos de conexión, respuestas HTTP 5xx o excepciones transitorias.
   - Si ambos intentos RPC resultan infructuosos, la función activa automáticamente el fallback analítico local resiliente (conforme a la Regla 4 de `AGENTS.md`), computando los KPIs a partir de los datos en memoria con cero interrupciones de cara al usuario.
 
 ### 5. Evidencias de Verificación y Calidad Global
+
 - **Suite Completa de Pruebas (Vitest):** 46 archivos de prueba ejecutados, 335 pruebas pasando con 100% de éxito (0 fallos, 0 regresiones).
   - Incluye 46 tests en `team.test.js` que validan el ciclo de vida de caché TTL, expiración, invalidación granular, contadores de hits/misses, y reintentos con backoff simulado.
 - **Linter (ESLint):** 0 errores (`npm run lint`).
@@ -523,17 +552,20 @@ Implementación de la optimización del canal de telemetría y consolidación de
 Implementación de las optimizaciones arquitectónicas de rendimiento, diagnóstico y seguridad para el portal de clientes (`/cuenta` / `/en/account`) en `web/app/src/lib/projects.js` y `web/app/src/lib/pm.js`.
 
 ### 1. Caché Multi-Usuario en Memoria con TTL de 30s (`CLIENT_PROJECTS_CACHE_TTL_MS = 30000`)
+
 - **Decisión:** Implementar un almacenamiento estructurado mediante `Map` en memoria (`clientCache`) indexado estrictamente por `userId`:
   - **Aislamiento Multi-Usuario:** Previene colisiones y fugas de datos entre sesiones o cuentas en el mismo entorno de ejecución cliente.
   - **Estrategia TTL & Freshness:** Cada entrada almacena `{ data, timestamp }`. Si el tiempo transcurrido desde la última consulta es menor a 30 segundos, las llamadas posteriores a `fetchClientProjects(userId)` retornan instantáneamente la referencia en memoria con 0ms de latencia y sin tráfico de red redundante.
   - **Soporte de `forceRefresh` e Invalidación:** Soporta `{ forceRefresh: true }` y la función de purga `clearClientProjectsCache(userId?)`, permitiendo invalidar un usuario específico o la totalidad del mapa ante eventos de mutación o sincronización.
 
 ### 2. Telemetría y Diagnóstico de Caché (`getClientCacheMetrics` & `resetClientCacheMetrics`)
+
 - **Decisión:** Exponer métricas de rendimiento y observabilidad interna del caché del portal:
   - `getClientCacheMetrics()` retorna `{ hits, misses, totalRequests, hitRatioPct, userCacheCount }`, posibilitando auditar el ratio de aciertos de caché en tiempo real.
   - Se añade `resetClientCacheMetrics()` para restablecer contadores en pruebas automatizadas y diagnósticos de benchmark.
 
 ### 3. Analítica Agregada en Pasada Única O(N) (`calculateAggregatedProjectMetrics`)
+
 - **Decisión:** Centralizar el cálculo de métricas agregadas del portafolio en una sola pasada iterativa lineal O(N) en `web/app/src/lib/pm.js`:
   - En un solo bucle sobre la colección de proyectos, computa simultáneamente:
     - Estado de salud global (`activeCount`, `completedCount`, `delayedCount`, `onTrackCount`).
@@ -543,16 +575,58 @@ Implementación de las optimizaciones arquitectónicas de rendimiento, diagnóst
   - **Tolerancia a Fallos:** Maneja valores nulos, colecciones vacías y estructuras heterogéneas sin lanzar excepciones.
 
 ### 4. Aislamiento Hermético de Entregables para Clientes (`filterDeliverablesForClient`)
+
 - **Decisión:** Reforzar la frontera de seguridad y confidencialidad de entregables técnicos (`project_deliverables`):
   - La función pura `filterDeliverablesForClient(deliverables)` garantiza que única y exclusivamente los registros con estado `PUBLICADO_CLIENTE` sean expuestos al portal del cliente.
   - Cualquier borrador interno (`BORRADOR_INTERNO`), revisión preliminar (`EN_REVISION`) o estado desconocido es purgado automáticamente en la capa de datos antes de transferirse a la vista de usuario.
 
 ### 5. Evidencias de Verificación y Calidad Global
+
 - **Suite Completa de Pruebas (Vitest):** 46 archivos de prueba ejecutados, 352 pruebas pasando con 100% de éxito (0 fallos, 0 regresiones).
   - Incluye 23 pruebas en `projects.test.js` y 19 pruebas en `pm.test.js` verificando el ciclo de vida de caché multi-usuario, TTL, invalidación selectiva, métricas de diagnóstico, agregación O(N) y aislamiento estricto de entregables.
 - **Linter (ESLint):** 0 errores (`npm run lint`).
 - **Formateador (Prettier):** 100% de conformidad estricta (`npm run format:check`).
 - **Compilación de Producción (Vite):** Bundle de producción compilado limpiamente en 2.67s sin advertencias ni errores (`npm run build`).
 
+---
 
+## Sesión: 2026-09-24 (Sesión 4) — Optimización de Sincronización Realtime: Event Coalescing, Delta Patching, Escuchadores Postgres y Resincronización Automática
 
+Implementación de optimizaciones reactivas de alto rendimiento para el hook del panel de operaciones (`web/app/src/hooks/useRealtimeTeam.js`) y su canal de WebSocket Supabase Realtime.
+
+### 1. Consolidación y Coalescing de Eventos Realtime (`coalesceDeltaPayloads`)
+
+- **Decisión:** Implementar la función pura `coalesceDeltaPayloads(eventQueue, windowMs = 100)` para consolidar ráfagas de mutaciones concurrentes:
+  - **Deduplicación Temporal de `UPDATE`:** Agrupa eventos de actualización consecutivos para una misma entidad (`entityId` extraído defensivamente vía `getEntityId` desde `new.id`, `record.id`, `old.id` o `id`) dentro de una ventana de tiempo configurable (100ms por defecto).
+  - **Fusión Profunda de Estados:** Combina las mutaciones sucesivas (`coalescedEvent.new = { ...prevEvent.new, ...event.new }`) preservando el estado inicial `old`, lo que evita ciclos de re-renderizado innecesarios en la interfaz.
+  - **Preservación Estricta:** Mantiene inalterados y en estricto orden los eventos `INSERT`, `DELETE` y mutaciones entre diferentes tablas o entidades.
+  - **Soporte Opcional en el Hook:** Se activa mediante los parámetros `coalesce: true` y `coalesceWindowMs` en `useRealtimeTeam`.
+
+### 2. Escuchadores Postgres Granulares para Hitos y Riesgos (`project_milestones` & `project_risks`)
+
+- **Decisión:** Incorporar escuchadores dedicados de `postgres_changes` en el canal `realtime-team-consultancy`:
+  - **`project_milestones`:** Escucha cambios (`*`) en hitos del cronograma y propaga el payload enriquecido con `table: 'project_milestones'`, sincronizando el diagrama de Gantt y los indicadores de avance al instante.
+  - **`project_risks`:** Escucha mutaciones (`*`) en la matriz de riesgos del proyecto y propaga `table: 'project_risks'`, actualizando las alertas y planes de mitigación sin recargar la vista.
+  - **Propagación Uniforme:** Asegura que la propiedad `table` siempre viaje normalizada en cada delta despachado.
+
+### 3. Resincronización Automática ante Reconexión de Canal Realtime WebSocket
+
+- **Decisión:** Implementar auto-recuperación transparente ante fallos transitorios de conectividad WebSocket:
+  - **Detección de Transición:** Mediante `prevStatusRef`, monitorea transiciones desde estados caídos (`CHANNEL_ERROR`, `TIMED_OUT`, `CLOSED`) hacia `SUBSCRIBED`.
+  - **Saneamiento y Purga:** Al reconectarse, limpia temporizadores debounce en vuelo, invalida el caché local de datos (`clearTeamDataCache()`) y ejecuta `onDataRefresh({ forceRefresh: true })`.
+  - **Consistencia Garantizada:** Elimina estados inconsistentes por eventos perdidos durante desconexiones temporales de red sin requerir interacción manual del usuario.
+
+### 4. Filtrado Contextual de Deltas por Ámbito de Usuario (`shouldDispatchDelta` & `userScope`)
+
+- **Decisión:** Implementar la función pura `shouldDispatchDelta(payload, { userEmail, viewScope })` para optimizar el consumo de recursos en vistas asignadas:
+  - **Ámbito 'ASSIGNED':** Si la consola está filtrada por asignación personal (`viewScope === 'ASSIGNED'`), solo procesa deltas de tareas (`project_tasks`) o entregables (`project_deliverables`) asignados o creados por el especialista activo (`userEmail`, insensible a mayúsculas/minúsculas).
+  - **Tolerancia a Sin Asignar:** Permite el paso de elementos sin asignar para que los consultores puedan reclamar nuevas tareas o entregables en tiempo real.
+  - **Visibilidad Global de Portafolio:** Tablas críticas como `leads_tdr`, `client_projects`, `project_milestones`, `project_risks`, `project_findings` y `team_activity_logs` se despachan invariablemente a todos los consultores.
+
+### 5. Evidencias de Verificación y Calidad Global
+
+- **Suite Completa de Pruebas (Vitest):** 46 archivos de prueba ejecutados, 379 pruebas pasando con 100% de éxito (0 fallos, 0 regresiones).
+  - Incluye 34 pruebas en `useRealtimeTeam.test.js` validando exhaustivamente coalescing, fusiones parciales, orden de cola, listeners de hitos y riesgos, reconexión automática y filtrado por scope de usuario.
+- **Linter (ESLint):** 0 errores (`npm run lint`).
+- **Formateador (Prettier):** 100% de conformidad estricta (`npm run format:check`).
+- **Compilación de Producción (Vite):** Bundle de producción compilado limpiamente en 2.61s sin errores (`npm run build`).
