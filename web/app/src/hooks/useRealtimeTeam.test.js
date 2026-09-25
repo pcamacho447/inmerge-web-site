@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import useRealtimeTeam, { coalesceDeltaPayloads } from './useRealtimeTeam.js';
+import useRealtimeTeam, { coalesceDeltaPayloads, shouldDispatchDelta } from './useRealtimeTeam.js';
 import { supabase } from '../lib/supabaseClient.js';
 import { clearTeamDataCache } from '../lib/team.js';
 
@@ -732,6 +732,289 @@ describe('useRealtimeTeam', () => {
         statusCallback('SUBSCRIBED');
       });
       expect(onDataRefresh).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('shouldDispatchDelta', () => {
+    it('returns false when payload is null, undefined, or not an object', () => {
+      expect(shouldDispatchDelta(null)).toBe(false);
+      expect(shouldDispatchDelta(undefined)).toBe(false);
+      expect(shouldDispatchDelta('string')).toBe(false);
+      expect(shouldDispatchDelta(123)).toBe(false);
+    });
+
+    it('returns true when viewScope === "ALL" or viewScope is not specified, regardless of assigned email', () => {
+      const payloadOtherTask = {
+        table: 'project_tasks',
+        eventType: 'UPDATE',
+        new: { id: 't-1', title: 'Tarea Ajena', assigned_to_email: 'otro@inmerge.pe' },
+      };
+
+      // viewScope === 'ALL'
+      expect(shouldDispatchDelta(payloadOtherTask, { userEmail: 'dev@inmerge.pe', viewScope: 'ALL' })).toBe(true);
+
+      // No options provided
+      expect(shouldDispatchDelta(payloadOtherTask)).toBe(true);
+      expect(shouldDispatchDelta(payloadOtherTask, {})).toBe(true);
+
+      // userEmail missing or empty
+      expect(shouldDispatchDelta(payloadOtherTask, { viewScope: 'ASSIGNED' })).toBe(true);
+      expect(shouldDispatchDelta(payloadOtherTask, { userEmail: '', viewScope: 'ASSIGNED' })).toBe(true);
+
+      // viewScope not ASSIGNED
+      expect(shouldDispatchDelta(payloadOtherTask, { userEmail: 'dev@inmerge.pe', viewScope: 'CUSTOM' })).toBe(true);
+    });
+
+    it('returns true for non-task/deliverable tables even when viewScope === "ASSIGNED"', () => {
+      const projectPayload = {
+        table: 'client_projects',
+        eventType: 'UPDATE',
+        new: { id: 'p-1', title: 'Infraestructura Cloud' },
+      };
+      const leadPayload = {
+        table: 'leads_tdr',
+        eventType: 'INSERT',
+        new: { id: 'l-1', company: 'FinTech', email: 'prospecto@fintech.pe' },
+      };
+      const milestonePayload = {
+        table: 'project_milestones',
+        eventType: 'UPDATE',
+        new: { id: 'm-1', title: 'Hito 1', assigned_to_email: 'otro@inmerge.pe' },
+      };
+      const riskPayload = {
+        table: 'project_risks',
+        eventType: 'INSERT',
+        new: { id: 'r-1', description: 'Riesgo Técnico' },
+      };
+
+      expect(shouldDispatchDelta(projectPayload, { userEmail: 'dev@inmerge.pe', viewScope: 'ASSIGNED' })).toBe(true);
+      expect(shouldDispatchDelta(leadPayload, { userEmail: 'dev@inmerge.pe', viewScope: 'ASSIGNED' })).toBe(true);
+      expect(shouldDispatchDelta(milestonePayload, { userEmail: 'dev@inmerge.pe', viewScope: 'ASSIGNED' })).toBe(true);
+      expect(shouldDispatchDelta(riskPayload, { userEmail: 'dev@inmerge.pe', viewScope: 'ASSIGNED' })).toBe(true);
+    });
+
+    describe('when viewScope === "ASSIGNED"', () => {
+      const userEmail = 'dev@inmerge.pe';
+
+      it('ignores (returns false) deltas for project_tasks assigned to a different email', () => {
+        const payload = {
+          table: 'project_tasks',
+          eventType: 'UPDATE',
+          new: { id: 't-1', title: 'Optimizar Dockerfile', assigned_to_email: 'otro@inmerge.pe' },
+        };
+        expect(shouldDispatchDelta(payload, { userEmail, viewScope: 'ASSIGNED' })).toBe(false);
+      });
+
+      it('dispatches (returns true) deltas for project_tasks assigned to the user email (case-insensitive)', () => {
+        const payloadExact = {
+          table: 'project_tasks',
+          eventType: 'UPDATE',
+          new: { id: 't-2', title: 'Auditoría PostgreSQL', assigned_to_email: 'dev@inmerge.pe' },
+        };
+        const payloadUpperCase = {
+          table: 'project_tasks',
+          eventType: 'UPDATE',
+          new: { id: 't-3', title: 'Auditoría AWS', assigned_to_email: 'DEV@INMERGE.PE' },
+        };
+        expect(shouldDispatchDelta(payloadExact, { userEmail, viewScope: 'ASSIGNED' })).toBe(true);
+        expect(shouldDispatchDelta(payloadUpperCase, { userEmail: 'dev@inmerge.pe', viewScope: 'ASSIGNED' })).toBe(true);
+        expect(shouldDispatchDelta(payloadExact, { userEmail: 'DEV@INMERGE.PE', viewScope: 'ASSIGNED' })).toBe(true);
+      });
+
+      it('ignores (returns false) deltas for project_deliverables assigned to or authored by a different email', () => {
+        const payloadOtherAuthor = {
+          table: 'project_deliverables',
+          eventType: 'INSERT',
+          new: { id: 'd-1', title: 'Reporte Técnico', author_email: 'auditor@inmerge.pe' },
+        };
+        const payloadOtherAssigned = {
+          table: 'project_deliverables',
+          eventType: 'UPDATE',
+          new: { id: 'd-2', title: 'Reporte Arquitectura', assigned_to_email: 'lead@inmerge.pe' },
+        };
+        expect(shouldDispatchDelta(payloadOtherAuthor, { userEmail, viewScope: 'ASSIGNED' })).toBe(false);
+        expect(shouldDispatchDelta(payloadOtherAssigned, { userEmail, viewScope: 'ASSIGNED' })).toBe(false);
+      });
+
+      it('dispatches (returns true) deltas for project_deliverables when user is author or assignee', () => {
+        const payloadAuthor = {
+          table: 'project_deliverables',
+          eventType: 'INSERT',
+          new: { id: 'd-3', title: 'Certificación Cloud', author_email: 'dev@inmerge.pe' },
+        };
+        const payloadAssignee = {
+          table: 'project_deliverables',
+          eventType: 'UPDATE',
+          new: { id: 'd-4', title: 'Plan de Pruebas', assigned_to_email: 'dev@inmerge.pe' },
+        };
+        expect(shouldDispatchDelta(payloadAuthor, { userEmail, viewScope: 'ASSIGNED' })).toBe(true);
+        expect(shouldDispatchDelta(payloadAssignee, { userEmail, viewScope: 'ASSIGNED' })).toBe(true);
+      });
+
+      it('handles camelCase field variants (assignedToEmail, authorEmail)', () => {
+        const payloadCamelTask = {
+          table: 'project_tasks',
+          eventType: 'UPDATE',
+          new: { id: 't-5', title: 'Configurar CI/CD', assignedToEmail: 'otro@inmerge.pe' },
+        };
+        const payloadCamelDeliv = {
+          table: 'project_deliverables',
+          eventType: 'UPDATE',
+          new: { id: 'd-5', title: 'Entregable v1', authorEmail: 'otro@inmerge.pe' },
+        };
+
+        expect(shouldDispatchDelta(payloadCamelTask, { userEmail, viewScope: 'ASSIGNED' })).toBe(false);
+        expect(shouldDispatchDelta(payloadCamelDeliv, { userEmail, viewScope: 'ASSIGNED' })).toBe(false);
+
+        const payloadMyTaskCamel = {
+          table: 'project_tasks',
+          eventType: 'UPDATE',
+          new: { id: 't-6', title: 'Configurar CI/CD', assignedToEmail: 'dev@inmerge.pe' },
+        };
+        expect(shouldDispatchDelta(payloadMyTaskCamel, { userEmail, viewScope: 'ASSIGNED' })).toBe(true);
+      });
+
+      it('dispatches tasks or deliverables without any assigned or author email (unassigned)', () => {
+        const unassignedTask = {
+          table: 'project_tasks',
+          eventType: 'INSERT',
+          new: { id: 't-7', title: 'Tarea no asignada', assigned_to_email: null },
+        };
+        const unassignedDeliv = {
+          table: 'project_deliverables',
+          eventType: 'INSERT',
+          new: { id: 'd-6', title: 'Entregable general' },
+        };
+        expect(shouldDispatchDelta(unassignedTask, { userEmail, viewScope: 'ASSIGNED' })).toBe(true);
+        expect(shouldDispatchDelta(unassignedDeliv, { userEmail, viewScope: 'ASSIGNED' })).toBe(true);
+      });
+
+      it('handles DELETE events inspecting the old row payload', () => {
+        const deleteOtherTask = {
+          table: 'project_tasks',
+          eventType: 'DELETE',
+          old: { id: 't-8', assigned_to_email: 'otro@inmerge.pe' },
+        };
+        const deleteMyTask = {
+          table: 'project_tasks',
+          eventType: 'DELETE',
+          old: { id: 't-9', assigned_to_email: 'dev@inmerge.pe' },
+        };
+
+        expect(shouldDispatchDelta(deleteOtherTask, { userEmail, viewScope: 'ASSIGNED' })).toBe(false);
+        expect(shouldDispatchDelta(deleteMyTask, { userEmail, viewScope: 'ASSIGNED' })).toBe(true);
+      });
+    });
+  });
+
+  describe('hook integration with user scope filtering', () => {
+    it('filters out project_tasks delta and does not call onDeltaPatch or clear cache when viewScope === "ASSIGNED" and task belongs to another user', () => {
+      const onDeltaPatch = vi.fn();
+      renderHook(() =>
+        useRealtimeTeam({
+          onDeltaPatch,
+          enabled: true,
+          userEmail: 'dev@inmerge.pe',
+          viewScope: 'ASSIGNED',
+        }),
+      );
+
+      act(() => {
+        eventCallbacks['project_tasks']({
+          eventType: 'UPDATE',
+          new: { id: 't-other', title: 'Tarea de Tercero', assigned_to_email: 'otro@inmerge.pe' },
+        });
+      });
+
+      expect(clearTeamDataCache).not.toHaveBeenCalled();
+      expect(onDeltaPatch).not.toHaveBeenCalled();
+
+      // But dispatches when task is assigned to user
+      act(() => {
+        eventCallbacks['project_tasks']({
+          eventType: 'UPDATE',
+          new: { id: 't-mine', title: 'Mi Tarea Asignada', assigned_to_email: 'dev@inmerge.pe' },
+        });
+      });
+
+      expect(clearTeamDataCache).toHaveBeenCalledTimes(1);
+      expect(onDeltaPatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          table: 'project_tasks',
+          new: expect.objectContaining({ id: 't-mine' }),
+        }),
+      );
+    });
+
+    it('filters out project_deliverables toast and delta when viewScope === "ASSIGNED" and deliverable is not assigned to or authored by user', () => {
+      const onDeltaPatch = vi.fn();
+      const { result } = renderHook(() =>
+        useRealtimeTeam({
+          onDeltaPatch,
+          enabled: true,
+          userEmail: 'dev@inmerge.pe',
+          viewScope: 'ASSIGNED',
+        }),
+      );
+
+      act(() => {
+        eventCallbacks['project_deliverables']({
+          eventType: 'INSERT',
+          new: { id: 'd-other', title: 'Entregable Ajeno', author_email: 'otro@inmerge.pe' },
+        });
+      });
+
+      expect(clearTeamDataCache).not.toHaveBeenCalled();
+      expect(onDeltaPatch).not.toHaveBeenCalled();
+      expect(result.current.toast).toBeNull();
+
+      // Dispatches and shows toast when deliverable is authored by the user
+      act(() => {
+        eventCallbacks['project_deliverables']({
+          eventType: 'INSERT',
+          new: { id: 'd-mine', title: 'Mi Informe de Auditoría', author_email: 'dev@inmerge.pe' },
+        });
+      });
+
+      expect(clearTeamDataCache).toHaveBeenCalledTimes(1);
+      expect(onDeltaPatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          table: 'project_deliverables',
+          new: expect.objectContaining({ id: 'd-mine' }),
+        }),
+      );
+      expect(result.current.toast).toEqual({
+        type: 'deliverable',
+        title: 'Entregable Publicado',
+        message: 'Nuevo entregable publicado: "Mi Informe de Auditoría".',
+      });
+    });
+
+    it('dispatches all deltas when viewScope is "ALL"', () => {
+      const onDeltaPatch = vi.fn();
+      renderHook(() =>
+        useRealtimeTeam({
+          onDeltaPatch,
+          enabled: true,
+          userEmail: 'dev@inmerge.pe',
+          viewScope: 'ALL',
+        }),
+      );
+
+      act(() => {
+        eventCallbacks['project_tasks']({
+          eventType: 'UPDATE',
+          new: { id: 't-any', title: 'Cualquier Tarea', assigned_to_email: 'otro@inmerge.pe' },
+        });
+      });
+
+      expect(clearTeamDataCache).toHaveBeenCalledTimes(1);
+      expect(onDeltaPatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          table: 'project_tasks',
+          new: expect.objectContaining({ id: 't-any' }),
+        }),
+      );
     });
   });
 });
