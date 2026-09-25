@@ -93,6 +93,7 @@ export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled =
   const debounceTimerRef = useRef(null);
   const eventQueueRef = useRef([]);
   const coalesceTimerRef = useRef(null);
+  const prevStatusRef = useRef(null);
 
   useEffect(() => {
     onDataRefreshRef.current = onDataRefresh;
@@ -104,6 +105,7 @@ export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled =
 
   useEffect(() => {
     if (!enabled || !supabase?.channel) return;
+    prevStatusRef.current = null;
 
     const flushEventQueue = () => {
       if (eventQueueRef.current.length === 0) return;
@@ -276,6 +278,23 @@ export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled =
       )
       .subscribe((status, err) => {
         if (status) {
+          const wasDisconnected =
+            prevStatusRef.current === 'CHANNEL_ERROR' ||
+            prevStatusRef.current === 'TIMED_OUT' ||
+            prevStatusRef.current === 'CLOSED';
+
+          if (wasDisconnected && status === 'SUBSCRIBED') {
+            if (debounceTimerRef.current) {
+              clearTimeout(debounceTimerRef.current);
+              debounceTimerRef.current = null;
+            }
+            clearTeamDataCache();
+            if (typeof onDataRefreshRef.current === 'function') {
+              onDataRefreshRef.current({ forceRefresh: true });
+            }
+          }
+
+          prevStatusRef.current = status;
           setConnectionStatus(status);
         }
         if (status === 'CHANNEL_ERROR') {
@@ -284,6 +303,7 @@ export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled =
       });
 
     return () => {
+      prevStatusRef.current = null;
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }

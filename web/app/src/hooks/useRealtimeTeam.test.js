@@ -587,4 +587,151 @@ describe('useRealtimeTeam', () => {
       }),
     );
   });
+
+  describe('channel status transition tracking & reconnection re-synchronization', () => {
+    it('automatically triggers onDataRefresh({ forceRefresh: true }) when transitioning from CHANNEL_ERROR back to SUBSCRIBED', () => {
+      let statusCallback;
+      mockChannel.subscribe = vi.fn().mockImplementation((cb) => {
+        statusCallback = cb;
+        if (cb) cb('SUBSCRIBED');
+        return mockChannel;
+      });
+
+      const onDataRefresh = vi.fn();
+      const { result } = renderHook(() => useRealtimeTeam({ onDataRefresh, enabled: true }));
+
+      expect(result.current.connectionStatus).toBe('SUBSCRIBED');
+      expect(result.current.isOnline).toBe(true);
+      // Initial mount subscription must NOT trigger onDataRefresh
+      expect(onDataRefresh).not.toHaveBeenCalled();
+
+      // Simulate channel connection failure
+      act(() => {
+        statusCallback('CHANNEL_ERROR', new Error('WebSocket connection interrupted'));
+      });
+
+      expect(result.current.connectionStatus).toBe('CHANNEL_ERROR');
+      expect(result.current.isOnline).toBe(false);
+      expect(onDataRefresh).not.toHaveBeenCalled();
+
+      // Clear any prior cache calls
+      clearTeamDataCache.mockClear();
+
+      // Simulate successful reconnection back to SUBSCRIBED
+      act(() => {
+        statusCallback('SUBSCRIBED');
+      });
+
+      expect(result.current.connectionStatus).toBe('SUBSCRIBED');
+      expect(result.current.isOnline).toBe(true);
+      expect(clearTeamDataCache).toHaveBeenCalledTimes(1);
+      expect(onDataRefresh).toHaveBeenCalledTimes(1);
+      expect(onDataRefresh).toHaveBeenCalledWith({ forceRefresh: true });
+    });
+
+    it('automatically triggers onDataRefresh({ forceRefresh: true }) when transitioning from CLOSED back to SUBSCRIBED', () => {
+      let statusCallback;
+      mockChannel.subscribe = vi.fn().mockImplementation((cb) => {
+        statusCallback = cb;
+        if (cb) cb('SUBSCRIBED');
+        return mockChannel;
+      });
+
+      const onDataRefresh = vi.fn();
+      const { result } = renderHook(() => useRealtimeTeam({ onDataRefresh, enabled: true }));
+
+      expect(onDataRefresh).not.toHaveBeenCalled();
+
+      // Simulate channel close
+      act(() => {
+        statusCallback('CLOSED');
+      });
+
+      expect(result.current.connectionStatus).toBe('CLOSED');
+      expect(result.current.isOnline).toBe(false);
+      expect(onDataRefresh).not.toHaveBeenCalled();
+
+      clearTeamDataCache.mockClear();
+
+      // Reconnection back to SUBSCRIBED
+      act(() => {
+        statusCallback('SUBSCRIBED');
+      });
+
+      expect(result.current.connectionStatus).toBe('SUBSCRIBED');
+      expect(result.current.isOnline).toBe(true);
+      expect(clearTeamDataCache).toHaveBeenCalledTimes(1);
+      expect(onDataRefresh).toHaveBeenCalledTimes(1);
+      expect(onDataRefresh).toHaveBeenCalledWith({ forceRefresh: true });
+    });
+
+    it('triggers onDataRefresh({ forceRefresh: true }) upon reconnection even when onDeltaPatch is active', () => {
+      let statusCallback;
+      mockChannel.subscribe = vi.fn().mockImplementation((cb) => {
+        statusCallback = cb;
+        if (cb) cb('SUBSCRIBED');
+        return mockChannel;
+      });
+
+      const onDataRefresh = vi.fn();
+      const onDeltaPatch = vi.fn();
+      const { result } = renderHook(() =>
+        useRealtimeTeam({
+          onDataRefresh,
+          onDeltaPatch,
+          enabled: true,
+        }),
+      );
+
+      expect(onDataRefresh).not.toHaveBeenCalled();
+      expect(onDeltaPatch).not.toHaveBeenCalled();
+
+      // Disconnect
+      act(() => {
+        statusCallback('CHANNEL_ERROR', new Error('Socket reset'));
+      });
+
+      expect(result.current.connectionStatus).toBe('CHANNEL_ERROR');
+
+      clearTeamDataCache.mockClear();
+
+      // Reconnect
+      act(() => {
+        statusCallback('SUBSCRIBED');
+      });
+
+      expect(result.current.connectionStatus).toBe('SUBSCRIBED');
+      expect(clearTeamDataCache).toHaveBeenCalledTimes(1);
+      expect(onDataRefresh).toHaveBeenCalledTimes(1);
+      expect(onDataRefresh).toHaveBeenCalledWith({ forceRefresh: true });
+    });
+
+    it('does not trigger onDataRefresh on initial subscription or consecutive SUBSCRIBED statuses', () => {
+      let statusCallback;
+      mockChannel.subscribe = vi.fn().mockImplementation((cb) => {
+        statusCallback = cb;
+        return mockChannel;
+      });
+
+      const onDataRefresh = vi.fn();
+      const { result } = renderHook(() => useRealtimeTeam({ onDataRefresh, enabled: true }));
+
+      // Initial CONNECTING state
+      expect(result.current.connectionStatus).toBe('CONNECTING');
+      expect(onDataRefresh).not.toHaveBeenCalled();
+
+      // Initial subscription
+      act(() => {
+        statusCallback('SUBSCRIBED');
+      });
+      expect(result.current.connectionStatus).toBe('SUBSCRIBED');
+      expect(onDataRefresh).not.toHaveBeenCalled();
+
+      // Redundant SUBSCRIBED event without error in between
+      act(() => {
+        statusCallback('SUBSCRIBED');
+      });
+      expect(onDataRefresh).not.toHaveBeenCalled();
+    });
+  });
 });
