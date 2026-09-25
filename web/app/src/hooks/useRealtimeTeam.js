@@ -83,7 +83,7 @@ export function coalesceDeltaPayloads(eventQueue = [], windowMs = 100) {
 
 /**
  * Hook reactivo para el Panel de Consultores & Equipo Técnico (/equipo).
- * Escucha cambios en tiempo real en leads_tdr, client_projects, project_deliverables y team_activity_logs.
+ * Escucha cambios en tiempo real en leads_tdr, client_projects, project_deliverables, project_milestones, project_tasks, project_risks, project_findings y team_activity_logs.
  */
 export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled = true, coalesce = false, coalesceWindowMs = 100 } = {}) {
   const [toast, setToast] = useState(null);
@@ -216,10 +216,32 @@ export default function useRealtimeTeam({ onDataRefresh, onDeltaPatch, enabled =
         {
           event: '*',
           schema: 'public',
+          table: 'project_milestones',
+        },
+        (payload) => {
+          dispatchChange({ ...payload, table: payload.table || 'project_milestones' });
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
           table: 'project_tasks',
         },
         (payload) => {
           dispatchChange({ ...payload, table: payload.table || 'project_tasks' });
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'project_risks',
+        },
+        (payload) => {
+          dispatchChange({ ...payload, table: payload.table || 'project_risks' });
         },
       )
       .on(

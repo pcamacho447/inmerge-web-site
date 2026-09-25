@@ -236,6 +236,157 @@ describe('useRealtimeTeam', () => {
     expect(supabase.removeChannel).toHaveBeenCalledWith(mockChannel);
   });
 
+  it('subscribes to postgres changes on project_milestones and project_risks tables', () => {
+    renderHook(() => useRealtimeTeam({ enabled: true }));
+
+    expect(mockChannel.on).toHaveBeenCalledWith(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'project_milestones',
+      },
+      expect.any(Function),
+    );
+
+    expect(mockChannel.on).toHaveBeenCalledWith(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'project_risks',
+      },
+      expect.any(Function),
+    );
+
+    expect(eventCallbacks['project_milestones']).toBeDefined();
+    expect(eventCallbacks['project_risks']).toBeDefined();
+  });
+
+  it('handles postgres change events on project_milestones table, invalidating cache and calling onDeltaPatch', () => {
+    const onDeltaPatch = vi.fn();
+    renderHook(() => useRealtimeTeam({ onDeltaPatch, enabled: true }));
+
+    const insertPayload = {
+      eventType: 'INSERT',
+      new: { id: 'm1', project_id: 'proj-1', title: 'Hito 1: Auditoría Inicial', status: 'PENDIENTE' },
+    };
+    const updatePayload = {
+      eventType: 'UPDATE',
+      new: { id: 'm1', project_id: 'proj-1', title: 'Hito 1: Auditoría Inicial', status: 'COMPLETADO' },
+      old: { id: 'm1', project_id: 'proj-1', status: 'PENDIENTE' },
+    };
+    const deletePayload = {
+      eventType: 'DELETE',
+      old: { id: 'm1', project_id: 'proj-1' },
+    };
+
+    act(() => {
+      eventCallbacks['project_milestones'](insertPayload);
+    });
+
+    expect(clearTeamDataCache).toHaveBeenCalledTimes(1);
+    expect(onDeltaPatch).toHaveBeenCalledWith({
+      ...insertPayload,
+      table: 'project_milestones',
+    });
+
+    act(() => {
+      eventCallbacks['project_milestones'](updatePayload);
+    });
+
+    expect(clearTeamDataCache).toHaveBeenCalledTimes(2);
+    expect(onDeltaPatch).toHaveBeenCalledWith({
+      ...updatePayload,
+      table: 'project_milestones',
+    });
+
+    act(() => {
+      eventCallbacks['project_milestones'](deletePayload);
+    });
+
+    expect(clearTeamDataCache).toHaveBeenCalledTimes(3);
+    expect(onDeltaPatch).toHaveBeenCalledWith({
+      ...deletePayload,
+      table: 'project_milestones',
+    });
+  });
+
+  it('handles postgres change events on project_risks table, invalidating cache and calling onDeltaPatch', () => {
+    const onDeltaPatch = vi.fn();
+    renderHook(() => useRealtimeTeam({ onDeltaPatch, enabled: true }));
+
+    const insertPayload = {
+      eventType: 'INSERT',
+      new: { id: 'r1', project_id: 'proj-1', description: 'Riesgo de cuota API excedida', severity: 'ALTA' },
+    };
+    const updatePayload = {
+      eventType: 'UPDATE',
+      new: { id: 'r1', project_id: 'proj-1', description: 'Riesgo de cuota API excedida', status: 'RESUELTO' },
+      old: { id: 'r1', project_id: 'proj-1', status: 'IDENTIFICADO' },
+    };
+    const deletePayload = {
+      eventType: 'DELETE',
+      old: { id: 'r1', project_id: 'proj-1' },
+    };
+
+    act(() => {
+      eventCallbacks['project_risks'](insertPayload);
+    });
+
+    expect(clearTeamDataCache).toHaveBeenCalledTimes(1);
+    expect(onDeltaPatch).toHaveBeenCalledWith({
+      ...insertPayload,
+      table: 'project_risks',
+    });
+
+    act(() => {
+      eventCallbacks['project_risks'](updatePayload);
+    });
+
+    expect(clearTeamDataCache).toHaveBeenCalledTimes(2);
+    expect(onDeltaPatch).toHaveBeenCalledWith({
+      ...updatePayload,
+      table: 'project_risks',
+    });
+
+    act(() => {
+      eventCallbacks['project_risks'](deletePayload);
+    });
+
+    expect(clearTeamDataCache).toHaveBeenCalledTimes(3);
+    expect(onDeltaPatch).toHaveBeenCalledWith({
+      ...deletePayload,
+      table: 'project_risks',
+    });
+  });
+
+  it('debounces onDataRefresh when milestone or risk change events occur without onDeltaPatch', () => {
+    const onDataRefresh = vi.fn();
+    renderHook(() => useRealtimeTeam({ onDataRefresh, enabled: true }));
+
+    act(() => {
+      eventCallbacks['project_milestones']({
+        eventType: 'UPDATE',
+        new: { id: 'm1', status: 'COMPLETED' },
+      });
+      eventCallbacks['project_risks']({
+        eventType: 'INSERT',
+        new: { id: 'r2', description: 'Nuevo bloqueo técnico' },
+      });
+    });
+
+    expect(clearTeamDataCache).toHaveBeenCalledTimes(2);
+    expect(onDataRefresh).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(onDataRefresh).toHaveBeenCalledTimes(1);
+    expect(onDataRefresh).toHaveBeenCalledWith({ forceRefresh: true });
+  });
+
   describe('coalesceDeltaPayloads', () => {
     it('returns empty array when queue is null, undefined, or empty', () => {
       expect(coalesceDeltaPayloads()).toEqual([]);
