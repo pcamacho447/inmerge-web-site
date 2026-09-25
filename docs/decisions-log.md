@@ -516,4 +516,43 @@ Implementación de la optimización del canal de telemetría y consolidación de
 - **Formateador (Prettier):** 100% de archivos en conformidad estricta (`npm run format:check`).
 - **Compilación de Producción (Vite):** Build de producción limpio y optimizado generado en 2.19s (`npm run build`).
 
+---
+
+## Sesión: 2026-09-24 (Sesión 3) — Optimización del Portal de Clientes: Caché Multi-Usuario (TTL 30s), Analítica Single-Pass O(N) y Aislamiento Estricto de Entregables
+
+Implementación de las optimizaciones arquitectónicas de rendimiento, diagnóstico y seguridad para el portal de clientes (`/cuenta` / `/en/account`) en `web/app/src/lib/projects.js` y `web/app/src/lib/pm.js`.
+
+### 1. Caché Multi-Usuario en Memoria con TTL de 30s (`CLIENT_PROJECTS_CACHE_TTL_MS = 30000`)
+- **Decisión:** Implementar un almacenamiento estructurado mediante `Map` en memoria (`clientCache`) indexado estrictamente por `userId`:
+  - **Aislamiento Multi-Usuario:** Previene colisiones y fugas de datos entre sesiones o cuentas en el mismo entorno de ejecución cliente.
+  - **Estrategia TTL & Freshness:** Cada entrada almacena `{ data, timestamp }`. Si el tiempo transcurrido desde la última consulta es menor a 30 segundos, las llamadas posteriores a `fetchClientProjects(userId)` retornan instantáneamente la referencia en memoria con 0ms de latencia y sin tráfico de red redundante.
+  - **Soporte de `forceRefresh` e Invalidación:** Soporta `{ forceRefresh: true }` y la función de purga `clearClientProjectsCache(userId?)`, permitiendo invalidar un usuario específico o la totalidad del mapa ante eventos de mutación o sincronización.
+
+### 2. Telemetría y Diagnóstico de Caché (`getClientCacheMetrics` & `resetClientCacheMetrics`)
+- **Decisión:** Exponer métricas de rendimiento y observabilidad interna del caché del portal:
+  - `getClientCacheMetrics()` retorna `{ hits, misses, totalRequests, hitRatioPct, userCacheCount }`, posibilitando auditar el ratio de aciertos de caché en tiempo real.
+  - Se añade `resetClientCacheMetrics()` para restablecer contadores en pruebas automatizadas y diagnósticos de benchmark.
+
+### 3. Analítica Agregada en Pasada Única O(N) (`calculateAggregatedProjectMetrics`)
+- **Decisión:** Centralizar el cálculo de métricas agregadas del portafolio en una sola pasada iterativa lineal O(N) en `web/app/src/lib/pm.js`:
+  - En un solo bucle sobre la colección de proyectos, computa simultáneamente:
+    - Estado de salud global (`activeCount`, `completedCount`, `delayedCount`, `onTrackCount`).
+    - Consolidación financiera y presupuestaria (`totalBudgetPEN`, `totalBudgetUSD`).
+    - Avance promedio ponderado (`averageProgress`).
+    - Tareas totales, completadas y porcentaje de ejecución global de tareas.
+  - **Tolerancia a Fallos:** Maneja valores nulos, colecciones vacías y estructuras heterogéneas sin lanzar excepciones.
+
+### 4. Aislamiento Hermético de Entregables para Clientes (`filterDeliverablesForClient`)
+- **Decisión:** Reforzar la frontera de seguridad y confidencialidad de entregables técnicos (`project_deliverables`):
+  - La función pura `filterDeliverablesForClient(deliverables)` garantiza que única y exclusivamente los registros con estado `PUBLICADO_CLIENTE` sean expuestos al portal del cliente.
+  - Cualquier borrador interno (`BORRADOR_INTERNO`), revisión preliminar (`EN_REVISION`) o estado desconocido es purgado automáticamente en la capa de datos antes de transferirse a la vista de usuario.
+
+### 5. Evidencias de Verificación y Calidad Global
+- **Suite Completa de Pruebas (Vitest):** 46 archivos de prueba ejecutados, 352 pruebas pasando con 100% de éxito (0 fallos, 0 regresiones).
+  - Incluye 23 pruebas en `projects.test.js` y 19 pruebas en `pm.test.js` verificando el ciclo de vida de caché multi-usuario, TTL, invalidación selectiva, métricas de diagnóstico, agregación O(N) y aislamiento estricto de entregables.
+- **Linter (ESLint):** 0 errores (`npm run lint`).
+- **Formateador (Prettier):** 100% de conformidad estricta (`npm run format:check`).
+- **Compilación de Producción (Vite):** Bundle de producción compilado limpiamente en 2.67s sin advertencias ni errores (`npm run build`).
+
+
 
