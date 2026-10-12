@@ -109,23 +109,38 @@ describe('QuickEstimator Component (Cédula Curatorial)', () => {
     );
   });
 
-  it('renders monumental prototype window with specimen image and updates on selection', () => {
+  it('renders monumental prototype window with video showcase and updates media tabs', () => {
     renderWithLang(<QuickEstimator onOpenLLMAssistant={vi.fn()} />);
 
-    // Check figure and specimen badge
+    // Check figure and specimen container
     const figure = screen.getByRole('figure');
     expect(figure).toBeInTheDocument();
 
-    // Default image for web_pages -> landing_alto_impacto is b2b-portal.jpg
+    // Default active video for Presencia Web is /presencia_web_showcase.mp4
+    const presenceVideo = screen.getByLabelText(/video tour de presencia web/i);
+    expect(presenceVideo).toBeInTheDocument();
+    expect(presenceVideo).toHaveAttribute('src', '/presencia_web_showcase.mp4');
+
+    // Switch media tab to Video: Presencia Web Hero
+    const heroTab = screen.getByRole('tab', { name: /video: presencia web hero/i });
+    fireEvent.click(heroTab);
+
+    const heroVideo = screen.getByLabelText(/video hero tour de presencia web/i);
+    expect(heroVideo).toBeInTheDocument();
+    expect(heroVideo).toHaveAttribute('src', '/presencia_web_hero.mp4');
+
+    // Switch media tab to Captura 1:1 (Image mode)
+    const imgTab = screen.getByRole('tab', { name: /captura 1:1/i });
+    fireEvent.click(imgTab);
+
     const img = screen.getByRole('img');
     expect(img).toHaveAttribute('src', '/projects/b2b-portal.jpg');
     expect(img).toHaveAttribute('alt', 'Prototipo visual de Landing Page de Alto Impacto');
 
-    // Switch to Software Engineering (tab 02)
+    // Switch to Software Engineering (tab 02) while in image mode
     const softwareTab = screen.getByRole('tab', { name: /Ingeniería de Software/i });
     fireEvent.click(softwareTab);
 
-    // Image updates to aws-cloud.jpg
     expect(screen.getByRole('img')).toHaveAttribute('src', '/projects/aws-cloud.jpg');
     expect(screen.getByRole('img')).toHaveAttribute('alt', 'Prototipo visual de Arquitectura Cloud y Microservicios');
   });

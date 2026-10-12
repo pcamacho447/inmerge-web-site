@@ -1,5 +1,7 @@
 dist
 node_modules
+playwright-report
+test-results
 public/*.svg
 # JSON compacto a propósito: son los datos de los Sankey que sirve la CDN.
 # Prettier los indenta y casi los duplica de tamaño, justo lo contrario de

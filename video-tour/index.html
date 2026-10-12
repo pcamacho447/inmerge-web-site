@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>INMERGE — Product Launch Film</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --arena: #F3EADA;
+      --ink: #140E0A;
+      --ink-surface: #1E1612;
+      --terracotta: #A8472B;
+      --gold: #D8A84E;
+      --ochre: #C68A3D;
+      --cream: #EBDFC9;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background: #0D0907; /* Dark branded environment */
+      overflow: hidden;
+      font-family: var(--font-display);
+      color: var(--arena);
+    }
+    
+    #stage {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      background: #0D0907;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      transform-style: preserve-3d;
+    }
+
+    /* Branded subtle ambient depth glow */
+    .ambient-glow {
+      position: absolute;
+      width: 1400px;
+      height: 900px;
+      background: radial-gradient(circle, rgba(168, 71, 43, 0.16) 0%, rgba(13, 9, 7, 0) 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    /* 3D Browser Container (Hardware Accelerated) */
+    .browser-wrapper {
+      position: absolute;
+      width: 1600px;
+      height: 900px;
+      border-radius: 14px;
+      box-shadow: 0 50px 140px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(243, 234, 218, 0.12);
+      transform-style: preserve-3d;
+      z-index: 5;
+      background: #140E0A;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      will-change: transform, opacity;
+    }
+
+    .browser-header {
+      height: 44px;
+      background: var(--ink-surface);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 8px;
+      border-bottom: 1px solid rgba(243, 234, 218, 0.08);
+      z-index: 20;
+    }
+    
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--terracotta);
+    }
+    .dot:nth-child(2) { background: var(--gold); }
+    .dot:nth-child(3) { background: var(--ochre); }
+
+    .browser-url-bar {
+      margin-left: 16px;
+      background: rgba(13, 9, 7, 0.85);
+      border-radius: 6px;
+      padding: 4px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      color: var(--arena);
+      opacity: 0.9;
+      border: 1px solid rgba(243, 234, 218, 0.1);
+    }
+
+    .viewport {
+      flex: 1;
+      position: relative;
+      background: #140E0A;
+      overflow: hidden;
+    }
+
+    .site-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: var(--arena);
+      will-change: transform, opacity;
+    }
+    
+    #frame-home {
+      z-index: 3;
+    }
+
+    #frame-servicios {
+      z-index: 2;
+      transform: translateY(100%);
+    }
+
+    #frame-nosotros {
+      z-index: 1;
+      opacity: 0;
+    }
+
+    /* Flash de impacto oscuro (Hard Cut de 3 frames) */
+    #impact-flash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000000;
+      z-index: 30;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Brand Impact (13.5s – 15.0s) */
+    .brand-impact {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      width: 100%;
+    }
+
+    .brand-logo-text {
+      font-size: 190px;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      color: var(--arena);
+      line-height: 0.95;
+      text-transform: uppercase;
+      will-change: transform, opacity;
+      text-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    }
+
+    .brand-badge {
+      display: inline-block;
+      margin-top: 24px;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      border-top: 1px solid rgba(168, 71, 43, 0.4);
+      padding-top: 14px;
+    }
+
+    .brand-coords {
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: var(--arena);
+      opacity: 0.45;
+    }
+  </style>
+</head>
+<body>
+  <!-- Master: 1920x1080 a 30 FPS, Duración: 15s -->
+  <div id="stage" data-composition-id="inmerge-product-launch" data-width="1920" data-height="1080" data-fps="30">
+    <div class="ambient-glow clip" data-start="0" data-duration="15"></div>
+    <div id="impact-flash" class="clip" data-start="0" data-duration="15"></div>
+
+    <!-- Marca Final (Brand Impact) -->
+    <div class="brand-impact clip" data-start="13" data-duration="2">
+      <div class="brand-logo-text">INMERGE</div>
+      <div class="brand-badge">Boutique Software Engineering & Data Science</div>
+      <div class="brand-coords">8°08'S 79°02'W — LIMA, PERÚ</div>
+    </div>
+
+    <!-- Navegador / Interfaz Viva en 3D -->
+    <div class="browser-wrapper clip" data-start="0" data-duration="14">
+      <div class="browser-header">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="browser-url-bar">inmerge.pe</div>
+      </div>
+      <div class="viewport">
+        <!-- Vistas de la aplicación -->
+        <iframe id="frame-home" class="site-frame" src="http://localhost:5173/"></iframe>
+        <iframe id="frame-servicios" class="site-frame" src="http://localhost:5173/servicios"></iframe>
+        <iframe id="frame-nosotros" class="site-frame" src="http://localhost:5173/nosotros"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    /* ========================================================
+       00.0–04.2 — ARRIVAL
+       Dark branded environment.
+       Deep 3D space arrival:
+       scale: 0.72 -> 1.00
+       translateZ: -900 -> 0
+       rotateY: 12° -> 0°
+       rotateX: 5° -> 0°
+       opacity: 0 -> 1
+       FAST APPROACH -> DECELERATION -> LOCK
+       "Inmerge has entered the stage."
+       ======================================================== */
+    tl.fromTo(".browser-wrapper",
+      {
+        opacity: 0,
+        scale: 0.72,
+        z: -900,
+        rotateY: 12,
+        rotateX: 5
+      },
+      {
+        opacity: 1,
+        scale: 1.00,
+        z: 0,
+        rotateY: 0,
+        rotateX: 0,
+        duration: 3.2,
+        ease: "power4.out" // Fast approach with rapid acceleration and smooth lock
+      },
+      0
+    );
+
+    // Lock de estabilización perfecta en Home durante el segundo restante
+    tl.to(".browser-wrapper",
+      {
+        scale: 1.01,
+        duration: 1.0,
+        ease: "none"
+      },
+      3.2
+    );
+
+    /* ========================================================
+       04.2–08.5 — MOMENTUM
+       Cambiar hacia Servicios.
+       Entra desde abajo mientras la cámara cambia perspectiva:
+       translateY: 100vh -> 0
+       scale: 0.94 -> 1.04
+       rotateX: 5° -> 0°
+       Rápida, contundente, directional perspective, luego lock.
+       ======================================================== */
+    // Transición de frames internos (Servicios entra desde abajo con fuerza)
+    tl.fromTo("#frame-servicios",
+      { y: "100%" },
+      {
+        y: "0%",
+        duration: 1.1,
+        ease: "expo.out"
+      },
+      4.2
+    );
+
+    tl.to("#frame-home",
+      {
+        y: "-100%",
+        duration: 1.1,
+        ease: "expo.out"
+      },
+      4.2
+    );
+
+    // Cámara: Cambia perspectiva simultáneamente (0.94 -> 1.04, rotateX 5° -> 0°)
+    tl.fromTo(".browser-wrapper",
+      {
+        scale: 0.94,
+        rotateX: 5
+      },
+      {
+        scale: 1.04,
+        rotateX: 0,
+        duration: 1.4,
+        ease: "expo.out"
+      },
+      4.2
+    );
+
+    // Estabilización en Servicios
+    tl.to(".browser-wrapper",
+      {
+        scale: 1.05,
+        duration: 2.9,
+        ease: "sine.out"
+      },
+      5.6
+    );
+
+    /* ========================================================
+       08.5–11.5 — IMPACT CUT
+       Hard cut.
+       Flash oscuro de ~3 frames (0.1s).
+       Aparece inmediatamente Nosotros.
+       Pequeño push-in. Sin transición ornamental.
+       IMPACT -> NEW SCENE -> FOCUS
+       ======================================================== */
+    // Flash de 3 frames (0.10s)
+    tl.to("#impact-flash", { opacity: 0.95, duration: 0.04 }, 8.5);
+    
+    // En medio del flash, swapeamos instantáneamente el frame a Nosotros
+    tl.set("#frame-nosotros", { zIndex: 10, opacity: 1 }, 8.54);
+    tl.set("#frame-servicios", { opacity: 0 }, 8.54);
+
+    tl.to("#impact-flash", { opacity: 0, duration: 0.08 }, 8.56);
+
+    // Push-in de enfoque directo y nítido
+    tl.to(".browser-wrapper",
+      {
+        scale: 1.08,
+        duration: 2.8,
+        ease: "power2.out"
+      },
+      8.6
+    );
+
+    /* ========================================================
+       11.5–13.5 — RELEASE
+       La cámara comienza a alejarse.
+       El navegador se separa del espectador:
+       scale: 1.04 -> 0.72 (desde 1.08)
+       translateZ: 0 -> -700
+       La marca comienza a dominar la composición.
+       ======================================================== */
+    tl.to(".browser-wrapper",
+      {
+        scale: 0.72,
+        z: -700,
+        opacity: 0.75,
+        duration: 2.0,
+        ease: "power3.inOut"
+      },
+      11.5
+    );
+
+    /* ========================================================
+       13.5–15.0 — BRAND IMPACT
+       El navegador desaparece hacia el fondo.
+       Aparece INMERGE verticalmente con gran escala:
+       translateY: 120% -> 0
+       scale: 1.15 -> 1.00
+       Desaceleración final, últimos frames limpios.
+       ======================================================== */
+    // El navegador se desvanece y retira
+    tl.to(".browser-wrapper",
+      {
+        opacity: 0,
+        z: -1100,
+        duration: 0.5,
+        ease: "power2.in"
+      },
+      13.4
+    );
+
+    // Entrada monumental del logo
+    tl.set(".brand-impact", { opacity: 1 }, 13.5);
+
+    tl.fromTo(".brand-logo-text",
+      {
+        y: "120%",
+        scale: 1.15,
+        opacity: 0
+      },
+      {
+        y: "0%",
+        scale: 1.00,
+        opacity: 1,
+        duration: 0.9,
+        ease: "expo.out"
+      },
+      13.5
+    );
+
+    tl.fromTo(".brand-badge",
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+      13.8
+    );
+
+    tl.fromTo(".brand-coords",
+      { opacity: 0 },
+      { opacity: 0.45, duration: 0.5 },
+      14.0
+    );
+
+    // Registro en HyperFrames
+    window.__timelines = window.__timelines || {};
+    window.__timelines["inmerge-product-launch"] = tl;
+  </script>
+</body>
+</html>

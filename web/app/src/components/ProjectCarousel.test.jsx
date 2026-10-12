@@ -60,7 +60,7 @@ describe('ProjectCarousel / ProjectShowcase Component', () => {
     expect(screen.getByText('El Desafío Técnico')).toBeInTheDocument();
     expect(screen.getByText('Solución & Arquitectura Inmerge')).toBeInTheDocument();
     expect(screen.getByText('ENTREGABLES AUDITABLES GENERADOS:')).toBeInTheDocument();
-    expect(screen.getByText('Scripts SQL de saneamiento reproducibles')).toBeInTheDocument();
+    expect(screen.getByText('Scripts SQL idempotentes de migración y desduplicación')).toBeInTheDocument();
   });
 
   it('switches active case study when an index tab is clicked', () => {
@@ -76,8 +76,8 @@ describe('ProjectCarousel / ProjectShowcase Component', () => {
     expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
 
     // Verify updated detail canvas content
-    expect(screen.getByText('AWS Well-Architected Security')).toBeInTheDocument();
-    expect(screen.getByText('Matriz de permisos IAM auditada')).toBeInTheDocument();
+    expect(screen.getByText('AWS Security & Cost Topology')).toBeInTheDocument();
+    expect(screen.getByText('Matriz de recomendaciones de seguridad IAM y parches aplicados')).toBeInTheDocument();
   });
 
   it('navigates through tabs via keyboard arrow keys (WCAG 2.1 AA)', () => {

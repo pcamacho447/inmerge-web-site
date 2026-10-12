@@ -541,6 +541,7 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
   const [selectedSolutionIndex, setSelectedSolutionIndex] = useState(0);
   const [currency, setCurrency] = useState('PEN'); // 'PEN' | 'USD'
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [activeMedia, setActiveMedia] = useState('presencia_web'); // 'presencia_web' | 'inmerge' | 'image'
 
   const activePillar = SOLUTIONS_CATALOG[selectedPillarKey] || SOLUTIONS_CATALOG.web_pages;
   const activeSolution = activePillar.solutions[selectedSolutionIndex] || activePillar.solutions[0];
@@ -598,8 +599,54 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
       className="curatorial-placard-section"
       aria-label={isEn ? 'Editorial Estimator & Service Placard' : 'Cotizador Editorial y Cédula de Servicios'}
     >
-      {/* 1. Full-Bleed Hero Prototype Viewport (Image First — Ancho y Alto de Sección Completa) */}
+      {/* 1. Full-Bleed Hero Prototype Viewport (Dual Cinematic Video & 1:1 Prototype View) */}
       <div className="curatorial-monumental-viewport" role="figure" aria-label={prototypeCaption}>
+        {/* Selector de Medios (Video Presencia Web / Video Inmerge / Captura 1:1) */}
+        <div
+          className="monumental-media-selector-bar"
+          role="tablist"
+          aria-label={isEn ? 'Showcase Media Selection' : 'Selección de Video y Medios'}
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeMedia === 'presencia_web'}
+            className={`media-selector-btn ${activeMedia === 'presencia_web' ? 'active' : ''}`}
+            onClick={() => setActiveMedia('presencia_web')}
+          >
+            <span className="media-btn-icon" aria-hidden="true">
+              🎬
+            </span>
+            <span>{isEn ? 'Presencia Web Video' : 'Video: Presencia Web'}</span>
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeMedia === 'inmerge'}
+            className={`media-selector-btn ${activeMedia === 'inmerge' ? 'active' : ''}`}
+            onClick={() => setActiveMedia('inmerge')}
+          >
+            <span className="media-btn-icon" aria-hidden="true">
+              🎬
+            </span>
+            <span>{isEn ? 'Presencia Web Hero Video' : 'Video: Presencia Web Hero'}</span>
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeMedia === 'image'}
+            className={`media-selector-btn ${activeMedia === 'image' ? 'active' : ''}`}
+            onClick={() => setActiveMedia('image')}
+          >
+            <span className="media-btn-icon" aria-hidden="true">
+              🖼️
+            </span>
+            <span>{isEn ? '1:1 Prototype Image' : 'Captura 1:1'}</span>
+          </button>
+        </div>
+
         <div
           className="monumental-image-container"
           role="button"
@@ -614,13 +661,42 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
             }
           }}
         >
-          <img
-            key={activeSolution.id}
-            src={activeSolution.prototype.src}
-            alt={prototypeAlt}
-            className="monumental-prototype-img"
-            loading="lazy"
-          />
+          {activeMedia === 'presencia_web' && (
+            <video
+              key="video_presencia_web"
+              src="/presencia_web_showcase.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="monumental-prototype-video"
+              aria-label={isEn ? 'Presencia Web video showcase tour' : 'Video tour de Presencia Web'}
+            />
+          )}
+
+          {activeMedia === 'inmerge' && (
+            <video
+              key="video_presencia_web_hero"
+              src="/presencia_web_hero.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="monumental-prototype-video"
+              aria-label={isEn ? 'Presencia Web hero video tour' : 'Video hero tour de Presencia Web'}
+            />
+          )}
+
+          {activeMedia === 'image' && (
+            <img
+              key={activeSolution.id}
+              src={activeSolution.prototype.src}
+              alt={prototypeAlt}
+              className="monumental-prototype-img"
+              loading="lazy"
+            />
+          )}
+
           <div className="monumental-zoom-hint" aria-hidden="true">
             <span className="hint-cross">⤢</span>
             <span>{isEn ? 'INSPECT 1:1' : 'INSPECCIONAR 1:1'}</span>
@@ -631,7 +707,17 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
           <span className="caption-diamond" aria-hidden="true">
             ◆
           </span>
-          <span className="caption-text">{prototypeCaption}</span>
+          <span className="caption-text">
+            {activeMedia === 'presencia_web'
+              ? isEn
+                ? 'Video Showcase Tour: Presencia Web & Architecture'
+                : 'Video Showcase: Plataformas Web de Alto Rendimiento'
+              : activeMedia === 'inmerge'
+                ? isEn
+                  ? 'Cinematic Engineering Showcase: Inmerge Atrium'
+                  : 'Video Cinemático: Inmerge Atrio de Ingeniería & Servicios'
+                : prototypeCaption}
+          </span>
           <span className="caption-coords-inline" aria-hidden="true">
             [ INMERGE · SALA 0{pillarIndex + 1} · {activeSolution.catNumber} ]
           </span>
@@ -835,7 +921,13 @@ export default function QuickEstimator({ initialPillar = 'web_pages', onOpenLLMA
             </button>
 
             <div className="curatorial-lightbox-viewport">
-              <img src={activeSolution.prototype.src} alt={prototypeAlt} className="curatorial-lightbox-img" />
+              {activeMedia === 'presencia_web' ? (
+                <video src="/presencia_web_showcase.mp4" autoPlay loop muted playsInline controls className="curatorial-lightbox-video" />
+              ) : activeMedia === 'inmerge' ? (
+                <video src="/presencia_web_hero.mp4" autoPlay loop muted playsInline controls className="curatorial-lightbox-video" />
+              ) : (
+                <img src={activeSolution.prototype.src} alt={prototypeAlt} className="curatorial-lightbox-img" />
+              )}
             </div>
 
             <div className="curatorial-lightbox-caption-bar">

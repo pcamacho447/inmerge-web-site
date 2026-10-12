@@ -2,7 +2,7 @@ import { useState } from 'react';
 import useReveal from '../hooks/useReveal.js';
 import useDocumentHead from '../hooks/useDocumentHead.js';
 import Footer from '../components/Footer.jsx';
-import QuickEstimator from '../components/QuickEstimator.jsx';
+import ProjectFeed from '../components/ProjectFeed.jsx';
 import LLMAssistantModal from '../components/LLMAssistantModal.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
@@ -27,9 +27,9 @@ export default function Servicios() {
 
   return (
     <>
-      {/* Full-Canvas Curatorial Pavilion — Monumental Horizontal Exhibition */}
+      {/* Full-Canvas Curatorial Pavilion — Continuous Project Gallery */}
       <div className="services-curatorial-canvas">
-        <QuickEstimator initialPillar="web_pages" onOpenLLMAssistant={(ctx) => handleOpenAssistant(ctx)} />
+        <ProjectFeed onOpenAssistant={handleOpenAssistant} />
       </div>
 
       {/* Floating AI Assistant Trigger Button — Alaec */}
