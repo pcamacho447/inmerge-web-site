@@ -2,15 +2,21 @@ import { useRef, useState } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { MochicaStepIcon } from './MochicaPatterns.jsx';
 
+// Mapeo del primer cuadro exacto de cada video para garantizar cero saltos visuales entre reposo y reproducción
+const VIDEO_POSTER_MAP = {
+  '/presencia_web_showcase.mp4': '/projects/video_showcase_frame0.jpg',
+  '/hero_inmerge.mp4': '/projects/video_inmerge_frame0.jpg',
+  '/presencia_web_hero.mp4': '/projects/video_hero_frame0.jpg',
+};
+
 export default function ProjectRow({ project, onOpenSpec }) {
   const { lang, isEn } = useLanguage();
   const videoRef = useRef(null);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
 
   if (!project) return null;
 
-  const videoSrc =
+  const rawVideoSrc =
     project?.videoUrl || (project?.media && project.media.find((m) => m.type === 'video')?.url) || '/presencia_web_showcase.mp4';
 
   const clientName = project.client?.[lang] || project.client?.es || '';
@@ -21,11 +27,15 @@ export default function ProjectRow({ project, onOpenSpec }) {
   const stack = project.stack || [];
   const metrics = project.metrics || [];
 
-  const posterSrc = project.posterUrl || project.image || '/projects/data-sanitization.jpg';
+  // Poster exacto correspondiente al fotograma 0 del video para sincronización 1:1
+  const posterSrc = VIDEO_POSTER_MAP[rawVideoSrc] || project.posterUrl || project.image || '/projects/video_showcase_frame0.jpg';
 
-  // Control de reproducción interactivo:
-  // El video arranca detenido/en reposo (sin autoplay continuo ni al scroll).
-  // Se reproduce cuando el cursor pasa por encima (hover) o al hacer click.
+  // Video posicionado en reposo en el fotograma 0 (#t=0.001) para que el visor muestre el cuadro congelado
+  const videoSrc = rawVideoSrc ? `${rawVideoSrc}#t=0.001` : null;
+
+  // Interacción continua:
+  // El video está siempre ahí, en reposo/pausado.
+  // Al pasar el mouse por encima reproduce; al retirar el mouse se pausa.
   const handleMouseEnter = () => {
     if (hasVideoError) return;
     const videoEl = videoRef.current;
@@ -33,13 +43,9 @@ export default function ProjectRow({ project, onOpenSpec }) {
 
     const playPromise = videoEl.play();
     if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setIsVideoPlaying(true);
-        })
-        .catch(() => {
-          // Ignorar interrupciones silenciosas del navegador
-        });
+      playPromise.catch(() => {
+        // Ignorar interrupciones silenciosas del navegador
+      });
     }
   };
 
@@ -48,7 +54,6 @@ export default function ProjectRow({ project, onOpenSpec }) {
     if (!videoEl) return;
 
     videoEl.pause();
-    setIsVideoPlaying(false);
   };
 
   const handleClickMedia = () => {
@@ -59,15 +64,10 @@ export default function ProjectRow({ project, onOpenSpec }) {
     if (videoEl.paused) {
       const playPromise = videoEl.play();
       if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsVideoPlaying(true);
-          })
-          .catch(() => {});
+        playPromise.catch(() => {});
       }
     } else {
       videoEl.pause();
-      setIsVideoPlaying(false);
     }
   };
 
@@ -101,7 +101,7 @@ export default function ProjectRow({ project, onOpenSpec }) {
           </div>
         </div>
 
-        {/* Columna 2: Visor 1:1 Multimedia (Detenido por defecto; reproduce al pasar el mouse por encima o click) */}
+        {/* Columna 2: Visor 1:1 Multimedia (El video reside pausado; reproduce al pasar el mouse y se pausa al salir) */}
         <div
           className="project-index-col-media"
           onMouseEnter={handleMouseEnter}
@@ -112,36 +112,22 @@ export default function ProjectRow({ project, onOpenSpec }) {
           onKeyDown={handleKeyDownMedia}
           tabIndex={0}
           role="button"
-          aria-label={`${isEn ? 'Play preview of' : 'Reproducir video demostrativo de'} ${projectTitle}`}
+          aria-label={`${isEn ? 'Play video of' : 'Reproducir video de'} ${projectTitle}`}
         >
           <div className="project-media-viewport">
             {videoSrc && !hasVideoError ? (
-              <>
-                <video
-                  ref={videoRef}
-                  src={videoSrc}
-                  poster={posterSrc}
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                  className="project-media-video"
-                  aria-hidden="true"
-                  onPlay={() => setIsVideoPlaying(true)}
-                  onPause={() => setIsVideoPlaying(false)}
-                  onError={() => setHasVideoError(true)}
-                />
-                <img
-                  src={posterSrc}
-                  alt={projectTitle}
-                  loading="eager"
-                  decoding="async"
-                  className={`project-media-poster ${isVideoPlaying ? 'is-faded' : ''}`}
-                  onError={(e) => {
-                    e.currentTarget.src = '/projects/data-sanitization.jpg';
-                  }}
-                />
-              </>
+              <video
+                ref={videoRef}
+                src={videoSrc}
+                poster={posterSrc}
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                className="project-media-video"
+                aria-label={projectTitle}
+                onError={() => setHasVideoError(true)}
+              />
             ) : (
               <img
                 src={posterSrc}
@@ -150,7 +136,7 @@ export default function ProjectRow({ project, onOpenSpec }) {
                 decoding="async"
                 className="project-media-poster-static"
                 onError={(e) => {
-                  e.currentTarget.src = '/projects/data-sanitization.jpg';
+                  e.currentTarget.src = '/projects/video_showcase_frame0.jpg';
                 }}
               />
             )}

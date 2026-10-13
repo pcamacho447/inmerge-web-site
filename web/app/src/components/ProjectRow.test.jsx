@@ -68,7 +68,8 @@ describe('ProjectRow Component', () => {
 
     const video = container.querySelector('video');
     expect(video).toBeInTheDocument();
-    expect(video).toHaveAttribute('poster', '/projects/data-sanitization.jpg');
+    expect(video).toHaveAttribute('src', '/presencia_web_showcase.mp4#t=0.001');
+    expect(video).toHaveAttribute('poster', '/projects/video_showcase_frame0.jpg');
     expect(video).toHaveAttribute('preload', 'metadata');
     expect(video).not.toHaveAttribute('autoplay');
     expect(video.muted).toBe(true);
@@ -137,6 +138,6 @@ describe('ProjectRow Component', () => {
     // Video should be replaced by fallback static image
     const fallbackImg = container.querySelector('.project-media-poster-static');
     expect(fallbackImg).toBeInTheDocument();
-    expect(fallbackImg).toHaveAttribute('src', '/projects/data-sanitization.jpg');
+    expect(fallbackImg).toHaveAttribute('src', '/projects/video_showcase_frame0.jpg');
   });
 });
