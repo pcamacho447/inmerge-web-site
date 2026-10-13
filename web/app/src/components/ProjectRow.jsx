@@ -120,6 +120,8 @@ export default function ProjectRow({ project, onOpenSpec }) {
                 ref={videoRef}
                 src={videoSrc}
                 poster={posterSrc}
+                width="100%"
+                height="100%"
                 muted
                 loop
                 playsInline
