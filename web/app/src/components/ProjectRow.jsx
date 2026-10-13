@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { MochicaStepIcon } from './MochicaPatterns.jsx';
 
@@ -14,10 +14,21 @@ export default function ProjectRow({ project, onOpenSpec }) {
   const videoRef = useRef(null);
   const [hasVideoError, setHasVideoError] = useState(false);
 
-  if (!project) return null;
-
   const rawVideoSrc =
     project?.videoUrl || (project?.media && project.media.find((m) => m.type === 'video')?.url) || '/presencia_web_showcase.mp4';
+
+  // Video sin hash fragment para evitar bloqueos de buffer y permitir reproducción instantánea
+  const videoSrc = rawVideoSrc || null;
+
+  // Garantizar compatibilidad estricta con la política de autoplay de navegadores (Chrome/Safari/Firefox)
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.defaultMuted = true;
+    }
+  }, [videoSrc]);
+
+  if (!project) return null;
 
   const clientName = project.client?.[lang] || project.client?.es || '';
   const industryName = project.industry?.[lang] || project.industry?.es || '';
@@ -30,17 +41,15 @@ export default function ProjectRow({ project, onOpenSpec }) {
   // Poster exacto correspondiente al fotograma 0 del video para sincronización 1:1
   const posterSrc = VIDEO_POSTER_MAP[rawVideoSrc] || project.posterUrl || project.image || '/projects/video_showcase_frame0.jpg';
 
-  // Video posicionado en reposo en el fotograma 0 (#t=0.001) para que el visor muestre el cuadro congelado
-  const videoSrc = rawVideoSrc ? `${rawVideoSrc}#t=0.001` : null;
-
   // Interacción continua:
-  // El video está siempre ahí, en reposo/pausado.
+  // El video está siempre precargado y pausado en el fotograma 0.
   // Al pasar el mouse por encima reproduce; al retirar el mouse se pausa.
   const handleMouseEnter = () => {
     if (hasVideoError) return;
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
+    videoEl.muted = true;
     const playPromise = videoEl.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
@@ -61,6 +70,7 @@ export default function ProjectRow({ project, onOpenSpec }) {
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
+    videoEl.muted = true;
     if (videoEl.paused) {
       const playPromise = videoEl.play();
       if (playPromise !== undefined) {
@@ -114,7 +124,11 @@ export default function ProjectRow({ project, onOpenSpec }) {
           role="button"
           aria-label={`${isEn ? 'Play video of' : 'Reproducir video de'} ${projectTitle}`}
         >
-          <div className="project-media-viewport">
+          <div
+            className="project-media-viewport"
+            onPointerEnter={handleMouseEnter}
+            onPointerLeave={handleMouseLeave}
+          >
             {videoSrc && !hasVideoError ? (
               <video
                 ref={videoRef}
@@ -125,7 +139,7 @@ export default function ProjectRow({ project, onOpenSpec }) {
                 muted
                 loop
                 playsInline
-                preload="metadata"
+                preload="auto"
                 className="project-media-video"
                 aria-label={projectTitle}
                 onError={() => setHasVideoError(true)}

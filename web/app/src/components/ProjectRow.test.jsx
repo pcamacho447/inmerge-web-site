@@ -68,9 +68,9 @@ describe('ProjectRow Component', () => {
 
     const video = container.querySelector('video');
     expect(video).toBeInTheDocument();
-    expect(video).toHaveAttribute('src', '/presencia_web_showcase.mp4#t=0.001');
+    expect(video).toHaveAttribute('src', '/presencia_web_showcase.mp4');
     expect(video).toHaveAttribute('poster', '/projects/video_showcase_frame0.jpg');
-    expect(video).toHaveAttribute('preload', 'metadata');
+    expect(video).toHaveAttribute('preload', 'auto');
     expect(video).not.toHaveAttribute('autoplay');
     expect(video.muted).toBe(true);
     expect(video).toHaveAttribute('loop');
