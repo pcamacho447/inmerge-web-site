@@ -1,55 +1,28 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { MochicaStepIcon } from './MochicaPatterns.jsx';
 
 export default function ProjectRow({ project, onOpenSpec }) {
   const { lang, isEn } = useLanguage();
   const videoRef = useRef(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   const videoSrc =
     project?.videoUrl || (project?.media && project.media.find((m) => m.type === 'video')?.url) || '/presencia_web_showcase.mp4';
 
-  // Autoplay continuo cuando el video entra en el viewport y pausa al salir
+  // Precargar activamente el video en memoria para eliminar tiempos de espera o buffering
   useEffect(() => {
     if (!project) return;
-
-    const prefersReducedMotion =
-      typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-        ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        : false;
-
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
-    if (prefersReducedMotion) {
-      videoEl.pause();
-      return;
-    }
-
-    if (typeof IntersectionObserver !== 'undefined') {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              videoEl.play().catch(() => {
-                // Silently handle autoplay restriction
-              });
-            } else {
-              videoEl.pause();
-            }
-          });
-        },
-        { threshold: 0.15 },
-      );
-
-      observer.observe(videoEl);
-
-      return () => {
-        observer.unobserve(videoEl);
-        observer.disconnect();
-      };
-    } else {
-      videoEl.play().catch(() => {});
+    videoEl.preload = 'auto';
+    if (typeof videoEl.load === 'function') {
+      try {
+        videoEl.load();
+      } catch {
+        // Fallback seguro para entornos de prueba
+      }
     }
   }, [project, videoSrc]);
 
@@ -64,6 +37,57 @@ export default function ProjectRow({ project, onOpenSpec }) {
   const metrics = project.metrics || [];
 
   const posterSrc = project.posterUrl || project.image || '/projects/data-sanitization.jpg';
+
+  // Control de reproducción: se reproduce cuando pasan el cursor (hover) o le hacen click por encima
+  const handleMouseEnter = () => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    const playPromise = videoEl.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setIsVideoPlaying(true);
+        })
+        .catch(() => {
+          // Ignorar interrupciones silenciosas del navegador
+        });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    videoEl.pause();
+    setIsVideoPlaying(false);
+  };
+
+  const handleClickMedia = () => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    if (videoEl.paused) {
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsVideoPlaying(true);
+          })
+          .catch(() => {});
+      }
+    } else {
+      videoEl.pause();
+      setIsVideoPlaying(false);
+    }
+  };
+
+  const handleKeyDownMedia = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClickMedia();
+    }
+  };
 
   return (
     <article className="project-feed-row project-index-row" id={`project-row-${project.id}`}>
@@ -88,24 +112,42 @@ export default function ProjectRow({ project, onOpenSpec }) {
           </div>
         </div>
 
-        {/* Columna 2: Visor 1:1 Multimedia (Video en reproducción continua) */}
-        <div className="project-index-col-media">
+        {/* Columna 2: Visor 1:1 Multimedia (Pre-cargado en memoria, reproducción por hover o click) */}
+        <div
+          className="project-index-col-media"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleClickMedia}
+          onFocus={handleMouseEnter}
+          onBlur={handleMouseLeave}
+          onKeyDown={handleKeyDownMedia}
+          tabIndex={0}
+          role="button"
+          aria-label={`${isEn ? 'Play preview of' : 'Reproducir video demostrativo de'} ${projectTitle}`}
+        >
           <div className="project-media-viewport">
             {videoSrc ? (
-              <video
-                ref={videoRef}
-                src={videoSrc}
-                poster={posterSrc}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                className="project-media-video"
-                aria-label={projectTitle}
-              />
+              <>
+                <video
+                  ref={videoRef}
+                  src={videoSrc}
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  className="project-media-video"
+                  aria-hidden="true"
+                />
+                <img
+                  src={posterSrc}
+                  alt={projectTitle}
+                  loading="eager"
+                  decoding="async"
+                  className={`project-media-poster ${isVideoPlaying ? 'is-faded' : ''}`}
+                />
+              </>
             ) : (
-              <img src={posterSrc} alt={projectTitle} loading="lazy" decoding="async" className="project-media-poster-static" />
+              <img src={posterSrc} alt={projectTitle} loading="eager" decoding="async" className="project-media-poster-static" />
             )}
           </div>
         </div>
