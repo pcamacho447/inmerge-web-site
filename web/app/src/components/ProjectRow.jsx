@@ -1,11 +1,57 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { MochicaStepIcon } from './MochicaPatterns.jsx';
 
 export default function ProjectRow({ project, onOpenSpec }) {
   const { lang, isEn } = useLanguage();
   const videoRef = useRef(null);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+  const videoSrc =
+    project?.videoUrl || (project?.media && project.media.find((m) => m.type === 'video')?.url) || '/presencia_web_showcase.mp4';
+
+  // Autoplay continuo cuando el video entra en el viewport y pausa al salir
+  useEffect(() => {
+    if (!project) return;
+
+    const prefersReducedMotion =
+      typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        : false;
+
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    if (prefersReducedMotion) {
+      videoEl.pause();
+      return;
+    }
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              videoEl.play().catch(() => {
+                // Silently handle autoplay restriction
+              });
+            } else {
+              videoEl.pause();
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+
+      observer.observe(videoEl);
+
+      return () => {
+        observer.unobserve(videoEl);
+        observer.disconnect();
+      };
+    } else {
+      videoEl.play().catch(() => {});
+    }
+  }, [project, videoSrc]);
 
   if (!project) return null;
 
@@ -18,29 +64,6 @@ export default function ProjectRow({ project, onOpenSpec }) {
   const metrics = project.metrics || [];
 
   const posterSrc = project.posterUrl || project.image || '/projects/data-sanitization.jpg';
-  const videoSrc =
-    project.videoUrl || (project.media && project.media.find((m) => m.type === 'video')?.url) || '/presencia_web_showcase.mp4';
-
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      videoRef.current
-        .play()
-        .then(() => {
-          setIsVideoPlaying(true);
-        })
-        .catch(() => {
-          // Silently ignore rapid mouseleave abort
-        });
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-      setIsVideoPlaying(false);
-    }
-  };
 
   return (
     <article className="project-feed-row project-index-row" id={`project-row-${project.id}`}>
@@ -49,7 +72,6 @@ export default function ProjectRow({ project, onOpenSpec }) {
         <div className="project-index-col-meta">
           <div className="project-number-badge" aria-label={`${isEn ? 'Project' : 'Proyecto'} ${project.number}`}>
             <span className="project-num-text">{project.number}</span>
-            <span className="project-num-divider">/</span>
             <span className="project-industry-text">{industryName}</span>
           </div>
 
@@ -66,29 +88,25 @@ export default function ProjectRow({ project, onOpenSpec }) {
           </div>
         </div>
 
-        {/* Columna 2: Visor 1:1 Multimedia con Hover Fade a Video (50%) */}
-        <div className="project-index-col-media" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        {/* Columna 2: Visor 1:1 Multimedia (Video en reproducción continua) */}
+        <div className="project-index-col-media">
           <div className="project-media-viewport">
-            {videoSrc && (
+            {videoSrc ? (
               <video
                 ref={videoRef}
                 src={videoSrc}
-                preload="none"
+                poster={posterSrc}
+                autoPlay
                 muted
                 loop
                 playsInline
+                preload="metadata"
                 className="project-media-video"
-                aria-hidden="true"
+                aria-label={projectTitle}
               />
+            ) : (
+              <img src={posterSrc} alt={projectTitle} loading="lazy" decoding="async" className="project-media-poster-static" />
             )}
-            <img
-              src={posterSrc}
-              alt={projectTitle}
-              loading="lazy"
-              decoding="async"
-              className={`project-media-poster ${isVideoPlaying ? 'is-faded' : ''}`}
-            />
-            <div className="project-media-corner-accent" aria-hidden="true" />
           </div>
         </div>
 
