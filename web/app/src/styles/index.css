@@ -4891,7 +4891,9 @@ html:active-view-transition-type(backward)::view-transition-new(director-showcas
 }
 
 .project-index-col-media:focus-visible .project-media-viewport {
-  box-shadow: 0 0 0 2px var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  box-shadow: none;
 }
 
 .project-media-viewport {
@@ -4899,9 +4901,10 @@ html:active-view-transition-type(backward)::view-transition-new(director-showcas
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: var(--ink);
+  background: var(--bg);
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .project-media-video {
@@ -4914,6 +4917,8 @@ html:active-view-transition-type(backward)::view-transition-new(director-showcas
   object-position: center;
   display: block;
   z-index: 1;
+  background: var(--bg);
+  border-radius: 0;
 }
 
 .project-media-poster,
@@ -4926,6 +4931,8 @@ html:active-view-transition-type(backward)::view-transition-new(director-showcas
   object-fit: cover;
   object-position: center;
   z-index: 2;
+  background: var(--bg);
+  border-radius: 0;
   pointer-events: none;
 }
 
@@ -4966,10 +4973,10 @@ html:active-view-transition-type(backward)::view-transition-new(director-showcas
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 14px 16px;
-  background: rgba(235, 223, 201, 0.4);
+  padding: 8px 0;
+  background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .index-metric-item {
