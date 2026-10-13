@@ -4921,13 +4921,12 @@ html:active-view-transition-type(backward)::view-transition-new(director-showcas
   height: 100%;
   object-fit: cover;
   z-index: 2;
+  pointer-events: none;
   transition:
     opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.project-index-col-media:hover .project-media-poster,
-.project-index-col-media:focus-visible .project-media-poster,
 .project-media-poster.is-faded {
   opacity: 0;
   transform: scale(1.02);

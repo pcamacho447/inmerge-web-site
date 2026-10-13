@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { MochicaStepIcon } from './MochicaPatterns.jsx';
 
@@ -6,27 +6,12 @@ export default function ProjectRow({ project, onOpenSpec }) {
   const { lang, isEn } = useLanguage();
   const videoRef = useRef(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
+
+  if (!project) return null;
 
   const videoSrc =
     project?.videoUrl || (project?.media && project.media.find((m) => m.type === 'video')?.url) || '/presencia_web_showcase.mp4';
-
-  // Precargar activamente el video en memoria para eliminar tiempos de espera o buffering
-  useEffect(() => {
-    if (!project) return;
-    const videoEl = videoRef.current;
-    if (!videoEl) return;
-
-    videoEl.preload = 'auto';
-    if (typeof videoEl.load === 'function') {
-      try {
-        videoEl.load();
-      } catch {
-        // Fallback seguro para entornos de prueba
-      }
-    }
-  }, [project, videoSrc]);
-
-  if (!project) return null;
 
   const clientName = project.client?.[lang] || project.client?.es || '';
   const industryName = project.industry?.[lang] || project.industry?.es || '';
@@ -38,8 +23,11 @@ export default function ProjectRow({ project, onOpenSpec }) {
 
   const posterSrc = project.posterUrl || project.image || '/projects/data-sanitization.jpg';
 
-  // Control de reproducción: se reproduce cuando pasan el cursor (hover) o le hacen click por encima
+  // Control de reproducción interactivo:
+  // El video arranca detenido/en reposo (sin autoplay continuo ni al scroll).
+  // Se reproduce cuando el cursor pasa por encima (hover) o al hacer click.
   const handleMouseEnter = () => {
+    if (hasVideoError) return;
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
@@ -64,6 +52,7 @@ export default function ProjectRow({ project, onOpenSpec }) {
   };
 
   const handleClickMedia = () => {
+    if (hasVideoError) return;
     const videoEl = videoRef.current;
     if (!videoEl) return;
 
@@ -112,7 +101,7 @@ export default function ProjectRow({ project, onOpenSpec }) {
           </div>
         </div>
 
-        {/* Columna 2: Visor 1:1 Multimedia (Pre-cargado en memoria, reproducción por hover o click) */}
+        {/* Columna 2: Visor 1:1 Multimedia (Detenido por defecto; reproduce al pasar el mouse por encima o click) */}
         <div
           className="project-index-col-media"
           onMouseEnter={handleMouseEnter}
@@ -126,17 +115,21 @@ export default function ProjectRow({ project, onOpenSpec }) {
           aria-label={`${isEn ? 'Play preview of' : 'Reproducir video demostrativo de'} ${projectTitle}`}
         >
           <div className="project-media-viewport">
-            {videoSrc ? (
+            {videoSrc && !hasVideoError ? (
               <>
                 <video
                   ref={videoRef}
                   src={videoSrc}
+                  poster={posterSrc}
                   muted
                   loop
                   playsInline
-                  preload="auto"
+                  preload="metadata"
                   className="project-media-video"
                   aria-hidden="true"
+                  onPlay={() => setIsVideoPlaying(true)}
+                  onPause={() => setIsVideoPlaying(false)}
+                  onError={() => setHasVideoError(true)}
                 />
                 <img
                   src={posterSrc}
@@ -144,10 +137,22 @@ export default function ProjectRow({ project, onOpenSpec }) {
                   loading="eager"
                   decoding="async"
                   className={`project-media-poster ${isVideoPlaying ? 'is-faded' : ''}`}
+                  onError={(e) => {
+                    e.currentTarget.src = '/projects/data-sanitization.jpg';
+                  }}
                 />
               </>
             ) : (
-              <img src={posterSrc} alt={projectTitle} loading="eager" decoding="async" className="project-media-poster-static" />
+              <img
+                src={posterSrc}
+                alt={projectTitle}
+                loading="eager"
+                decoding="async"
+                className="project-media-poster-static"
+                onError={(e) => {
+                  e.currentTarget.src = '/projects/data-sanitization.jpg';
+                }}
+              />
             )}
           </div>
         </div>

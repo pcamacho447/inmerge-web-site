@@ -340,7 +340,7 @@ export const PROJECTS_DATA = [
       en: 'Eng. D. Alva · Microservices Lead',
     },
     videoUrl: '/presencia_web_showcase.mp4',
-    posterUrl: '/projects/b2b-portal.jpg',
+    posterUrl: '/projects/logistics-microservices.jpg',
     specs: {
       es: [
         'Microservicios desacoplados en Node.js y Go',
@@ -803,7 +803,7 @@ export const PROJECTS_DATA = [
       en: 'Eng. R. Morales · Data Scientist',
     },
     videoUrl: '/presencia_web_showcase.mp4',
-    posterUrl: '/projects/forecasting.jpg',
+    posterUrl: '/projects/demand-forecasting.jpg',
     specs: {
       es: [
         'Modelo ML de series temporales con regredores LightGBM',
