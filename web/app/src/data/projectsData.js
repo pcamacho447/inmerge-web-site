@@ -339,8 +339,8 @@ export const PROJECTS_DATA = [
       es: 'Ing. D. Alva · Líder de Microservicios',
       en: 'Eng. D. Alva · Microservices Lead',
     },
-    videoUrl: '/presencia_web_showcase.mp4',
-    posterUrl: '/projects/logistics-microservices.jpg',
+    videoUrl: '/mam-inmerge-hero.mp4',
+    posterUrl: '/projects/video_mam_frame0.jpg',
     specs: {
       es: [
         'Microservicios desacoplados en Node.js y Go',
@@ -470,12 +470,12 @@ export const PROJECTS_DATA = [
       {
         id: 'media-6',
         type: 'video',
-        url: '/presencia_web_showcase.mp4',
-        poster: '/projects/b2b-portal.jpg',
+        url: '/mam-inmerge-hero.mp4',
+        poster: '/projects/video_mam_frame0.jpg',
         span: 4,
         title: {
-          es: 'Video Tour: Demostración de Telemetría k6',
-          en: 'Video Tour: k6 Telemetry Demo',
+          es: 'Video Tour: Demostración de Plataforma & Arquitectura',
+          en: 'Video Tour: Platform & Architecture Demo',
         },
       },
     ],

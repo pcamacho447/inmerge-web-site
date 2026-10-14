@@ -5,6 +5,7 @@ import { MochicaStepIcon } from './MochicaPatterns.jsx';
 // Mapeo del primer cuadro exacto de cada video para garantizar cero saltos visuales entre reposo y reproducción
 const VIDEO_POSTER_MAP = {
   '/presencia_web_showcase.mp4': '/projects/video_showcase_frame0.jpg',
+  '/mam-inmerge-hero.mp4': '/projects/video_mam_frame0.jpg',
   '/hero_inmerge.mp4': '/projects/video_inmerge_frame0.jpg',
   '/presencia_web_hero.mp4': '/projects/video_hero_frame0.jpg',
 };
